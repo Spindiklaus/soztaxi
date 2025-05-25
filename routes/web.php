@@ -29,4 +29,11 @@ Route::middleware(['web', 'auth', IsAdmin::class])->group(function () {
     })->name('admin.users');
 });
 
+Route::get('/clear', function() {   // для очиски кэша сайта
+        Artisan::call('cache:clear');    
+        Artisan::call('config:cache');    
+        Artisan::call('view:clear');  
+        Artisan::call('route:clear');  
+    return "Кэш очищен.";});
+
 require __DIR__.'/auth.php';
