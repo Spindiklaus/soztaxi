@@ -13,48 +13,15 @@
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Главная1') }}
+                        {{ __('Соцтакси') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                        {{ __('ГАЗель') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                        {{ __('Легковой автомобиль') }}
                     </x-nav-link>
                 </div>
-
-                <nav class="bg-gray-800 p-4 flex justify-between items-center">
-                    <ul class="flex space-x-4">
-                        <li class="relative" id="home-menu">
-                            <a href="#" class="text-white hover:bg-gray-700 px-3 py-2 rounded-md block relative">Главная</a>
-                            <div class="hidden absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10" id="home-dropdown">
-                                <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Новости</a>
-                                <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Акции</a>
-                                <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Каталог товаров</a>
-                            </div>
-                        </li>
-                        <li class="relative" id="about-us-menu">
-                            <a href="#" class="text-white hover:bg-gray-700 px-3 py-2 rounded-md block relative">О нас</a>
-                            <div class="hidden absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10" id="about-us-dropdown">
-                                <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Наша миссия</a>
-                                <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Команда</a>
-                                <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Награды и достижения</a>
-                            </div>
-                        </li>
-                        <li class="relative" id="products-menu">
-                            <a href="#" class="text-white hover:bg-gray-700 px-3 py-2 rounded-md block relative">Продукты</a>
-                            <div class="hidden absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10" id="products-dropdown">
-                                <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Электронные товары</a>
-                                <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Программное обеспечение</a>
-                                <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Сервисы</a>
-                            </div>
-                        </li>
-                        <li class="relative" id="contacts-menu">
-                            <a href="#" class="text-white hover:bg-gray-700 px-3 py-2 rounded-md block relative">Контакты</a>
-                            <div class="hidden absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10" id="contacts-dropdown">
-                                <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Адрес офиса</a>
-                                <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Телефон и почта</a>
-                                <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Банковские реквизиты</a>
-                            </div>
-                        </li>
-                    </ul>
-                </nav>
-
-
             </div>
 
             <!-- Settings Dropdown -->
@@ -107,7 +74,7 @@
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Главная') }}
+                {{ __('Программа учета поездок') }}
             </x-responsive-nav-link>
         </div>
 
@@ -140,58 +107,3 @@
 
 
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    const leftMenus = document.querySelectorAll("#left-menus li.relative");
-    const settingsMenu = document.querySelector("#settings-dropdown");
-
-    // Проверка доступности правого меню
-    if(settingsMenu) {
-        settingsMenu.parentNode.addEventListener("click", function(e) {
-            e.stopPropagation();                     // Заблокировать влияние на основную обработку
-        });
-    }
-
-    // Обрабатываем левое меню
-    leftMenus.forEach((menu) => {
-        const trigger = menu.querySelector("a");
-        const dropdown = menu.querySelector("div");
-
-        if (trigger && dropdown) {
-            trigger.addEventListener("click", function(e) {
-                e.preventDefault();                  // Отмена стандартного перехода
-                e.stopPropagation();                 // Заблокировать распространение события
-
-                // Закрываем все прочие меню
-                leftMenus.forEach((otherMenu) => {
-                    const otherDropdown = otherMenu.querySelector("div");
-                    if (otherDropdown && otherDropdown != dropdown) {
-                        otherDropdown.style.display = "none";
-                    }
-                });
-
-                // Переключаем текущее меню
-                if (dropdown.style.display === "block") {
-                    dropdown.style.display = "none";
-                } else {
-                    dropdown.style.display = "block";
-                }
-            });
-        }
-    });
-
-    // Универсальная обработка окна для кликов вне меню
-    window.onclick = function(event) {
-        // Если клик не попал в левое меню или его спускающее меню
-        if (!event.target.closest("#left-menus")) {
-            // Закрываем только левое меню
-            leftMenus.forEach((menu) => {
-                const dropdown = menu.querySelector("div");
-                if (dropdown) {
-                    dropdown.style.display = "none";
-                }
-            });
-        }
-    };
-});
-</script>
