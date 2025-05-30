@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('kl_id')->comment('Серия^Паспорт')->nullable();
             $table->string('fio')->comment('ФИО');
             $table->date('data_r')->comment('Дата рождения')->nullable;
-            $table->char('sex',1)->comment('Пол')->nullable->index('sex')->nullable();
+            $table->char('sex',1)->comment('Пол')->index('sex');
             $table->string('adres')->comment('Адрес')->nullable();
             $table->dateTime('rip_at')->comment('Дата смерти')->index('rip_at');
             $table->string('nom_zap')->comment('Номер записи в ЗАГС')->nullable();
