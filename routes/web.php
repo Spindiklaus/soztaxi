@@ -4,6 +4,8 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\IsAdmin;
 
+use App\Http\Controllers\Operator\CategoryController;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -27,6 +29,7 @@ Route::middleware(['web', 'auth', IsAdmin::class])->group(function () {
     Route::get('/admin/users', function () {
         return view('admin.users');
     })->name('admin.users');
+    Route::resource('categories', CategoryController::class);
 });
 
 Route::get('/clear', function() {   // для очиски кэша сайта

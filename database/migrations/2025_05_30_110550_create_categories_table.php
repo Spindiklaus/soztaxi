@@ -21,7 +21,7 @@ return new class extends Migration
             $table->unsignedTinyInteger('is_soz')->comment('Работает в соцтакси')->default(1); 
             $table->unsignedTinyInteger('is_auto')->comment('Работает в легковом авто')->default(1); 
             $table->unsignedTinyInteger('is_gaz')->comment('Работает в ГАЗели')->default(1); 
-            $table->text('komment')->comment('Комментарии к категории');
+            $table->text('komment')->comment('Комментарии к категории')->nullable();
             $table->timestamps();
         });
     }

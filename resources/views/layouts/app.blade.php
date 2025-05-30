@@ -35,4 +35,5 @@
             </main>
         </div>
     </body>
+    <script src="{{ asset('js/feather.js') }}"></script>
 </html>

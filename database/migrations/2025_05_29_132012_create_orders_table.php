@@ -43,7 +43,7 @@ return new class extends Migration
             $table->unsignedTinyInteger('otmena_taxi')->comment('Подтверждение отмены заказа у оператора такси в случае необходимости, (1 - сообщили)')->default(0); 
             $table->dateTime('closed_at')->comment('Дата закрытия заказа')->index('closed_at')->nullable();                        
 
-            $table->text('komment')->comment('КОмментарии к заказу');
+            $table->text('komment')->comment('КОмментарии к заказу')->nullable();
             $table->unsignedbigInteger('user_id')->comment('Оператор заказа')->index('user_id');
             $table->timestamps();
         });
