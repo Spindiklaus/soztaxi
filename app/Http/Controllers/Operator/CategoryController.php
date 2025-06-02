@@ -22,7 +22,7 @@ class CategoryController extends BaseController {
             $direction = 'asc';
         }
 
-        $categories = Category::orderBy($sort, $direction)->paginate(15);
+        $categories = Category::orderBy($sort, $direction)->paginate(5);
 
         return view('categories.index', compact('categories', 'sort', 'direction'));
     }
@@ -55,15 +55,18 @@ class CategoryController extends BaseController {
                 ])->with('success', 'Категория создана');
     }
 
-    public function show(Category $category) {
-        return view('categories.show', compact('category'));
+    public function show(Request $request, Category $category) {
+        // Получаем текущие параметры сортировки
+        $sort = $request->input('sort', 'id');
+        $direction = $request->input('direction', 'asc');
+        return view('categories.show', compact('category', 'sort', 'direction'));
     }
 
     public function edit(Request $request, Category $category) {
         // Получаем текущие параметры сортировки
         $sort = $request->input('sort', 'id');
         $direction = $request->input('direction', 'asc');
-        return view('categories.edit', compact('category'));
+        return view('categories.edit', compact('category', 'sort', 'direction'));
     }
 
     public function update(Request $request, Category $category) {
@@ -77,7 +80,6 @@ class CategoryController extends BaseController {
 //            'user_id' => 'required|exists:users,id',
         ]);
 
-        // Обновляем, но оставляем старого оператора
         $category->update($request->all());
 
         return redirect()->route('categories.index', [

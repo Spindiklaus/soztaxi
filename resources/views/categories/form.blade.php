@@ -1,8 +1,14 @@
 <div class="min-h-screen bg-gray-100 py-6">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <div class="bg-white shadow rounded-lg p-6 space-y-6">
+            
+<!--    <div class="bg-gray-100 py-6">
+        <div class="max-w-lg mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-white shadow rounded-lg p-6 space-y-6">            -->
+            
         <h1 class="text-2xl font-bold text-gray-800 mb-6">Создать / Редактировать категорию</h1>
 
-<p class="text-sm text-gray-500">Текущая сортировка: {{request('sort') }} / {{ request('direction') }}</p>        
+        <p class="text-sm text-gray-500">Текущая сортировка: {{request('sort') }} / {{ request('direction') }}</p>        
 
         <form method="POST" action="{{ $category->exists ? route('categories.update', $category) : route('categories.store') }}" class="bg-white shadow rounded-lg p-6 space-y-6">
             @csrf
@@ -13,7 +19,7 @@
             <!-- Скрытые поля для передачи текущей сортировки -->
             <input type="hidden" name="sort" value="{{ request('sort', 'id') }}">
             <input type="hidden" name="direction" value="{{ request('direction', 'asc') }}">
-            
+
             <!-- NMV -->
             <div>
                 <label for="nmv" class="block text-sm font-medium text-gray-700">NMV</label>
@@ -35,16 +41,19 @@
             <!-- Скидка (%) -->
             <div>
                 <label for="skidka" class="block text-sm font-medium text-gray-700">Скидка (%)</label>
-                <input type="number" name="skidka" id="skidka"
-                       value="{{ old('skidka', $category->skidka ?? '') }}"
-                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <select name="skidka" id="skidka"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    <option value="0" {{ old('skidka', $category->skidka ?? '') == '0' ? 'selected' : '' }}>0%</option>
+                    <option value="50" {{ old('skidka', $category->skidka ?? '') == '50' ? 'selected' : '' }}>50%</option>
+                    <option value="100" {{ old('skidka', $category->skidka ?? '') == '100' ? 'selected' : '' }}>100%</option>
+                </select>
             </div>
 
             <!-- Лимит поездок -->
             <div>
                 <label for="kol_p" class="block text-sm font-medium text-gray-700">Лимит поездок</label>
                 <input type="number" name="kol_p" id="kol_p"
-                       value="{{ old('kol_p', $category->kol_p ?? '') }}"
+                       value="{{ old('kol_p', $category->kol_p ?? '10') }}"
                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
             </div>
 
@@ -114,5 +123,6 @@
                 </button>
             </div>
         </form>
+        </div>
     </div>
 </div>

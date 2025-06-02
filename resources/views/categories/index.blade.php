@@ -102,7 +102,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $category->kol_p }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $category->user?->name ?? '-' }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm space-x-2 flex">
-                                    <a href="{{ route('categories.show', $category) }}" 
+                                    <a href="{{ route('categories.show', ['category' => $category, 'sort' => request('sort'), 'direction' => request('direction')]) }}" 
                                        class="inline-flex items-center px-2 py-1 rounded-md text-sm font-medium bg-blue-100 text-blue-800 hover:bg-blue-200"
                                        title="Просмотр">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
