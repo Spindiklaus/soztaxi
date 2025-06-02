@@ -12,8 +12,7 @@
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
         <!-- Scripts -->
-        <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-       <script src="{{ asset('js/app.js') }}"></script>
+        <link href="{{ asset('css/app.css') }}" rel="stylesheet">       
 <!--        <script src="https://cdn.tailwindcss.com"></script>-->
     </head>
     <body class="font-sans antialiased">
@@ -34,6 +33,13 @@
                 {{ $slot }}
             </main>
         </div>
+    <!-- Подключение Feather Icons -->
+    <script src="https://unpkg.com/feather-icons"></script> 
+    <script>
+        feather.replace(); // заменяет <i data-feather="..."> на SVG-иконки
+    </script>
+    <!-- Подключение Alpine.js с defer -->
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"  defer></script>
+    <script src="{{ asset('js/app.js') }}"></script>
     </body>
-    <script src="{{ asset('js/feather.js') }}"></script>
 </html>

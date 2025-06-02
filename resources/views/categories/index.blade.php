@@ -11,7 +11,7 @@
             <!-- Кнопка создания -->
             <div class="mb-6">
                 <a href="{{ route('categories.create') }}"
-                   class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-gray-800 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition ease-in-out duration-150"
+                   class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition ease-in-out duration-150"
                    title="Создать категорию">
                     <!-- Иконка "+" -->
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -22,18 +22,19 @@
             </div>
 
             <!-- Таблица -->
-            <div class="bg-white shadow overflow-hidden rounded-lg">
-                <div class="overflow-x-auto">
+            <div class="bg-white rounded-lg overflow-auto max-h-[70vh] border border-gray-300">
+
+                <div class="overflow-x-auto max-h-[70vh] rounded-lg border border-gray-300">
                     <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
+                        <thead class="bg-gray-200 text-gray-900 sticky top-0 z-10  shadow-lg">
                             <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NMV</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Название</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Скидка</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Поездок в месяц</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Оператор</th>
-                                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Действия</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">ID</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">NMV</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">Название</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">Скидка</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">Поездок в месяц</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">Оператор</th>
+                                <th scope="col" class="px-6 py-3 text-right text-xs font-bold uppercase tracking-wider">Действия</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
