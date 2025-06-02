@@ -21,11 +21,11 @@
 
             <!-- Page Heading -->
             @isset($header)
-                <header class="bg-white shadow">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        {{ $header }}
-                    </div>
-                </header>
+            <header class="bg-white shadow">
+                <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                    {{ $header }}
+                </div>
+            </header>
             @endisset
 
             <!-- Page Content -->
@@ -33,13 +33,14 @@
                 {{ $slot }}
             </main>
         </div>
-    <!-- Подключение Feather Icons -->
-    <script src="https://unpkg.com/feather-icons"></script> 
-    <script>
-        feather.replace(); // заменяет <i data-feather="..."> на SVG-иконки
-    </script>
-    <!-- Подключение Alpine.js с defer -->
-    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"  defer></script>
-    <script src="{{ asset('js/app.js') }}"></script>
+        <!-- Подключение Alpine.js с defer -->
+        <script src="//unpkg.com/alpinejs" defer></script>    
+        <!-- Подключение Feather Icons -->
+        <script src="https://unpkg.com/feather-icons"></script> 
+        <script>
+            feather.replace();
+        </script>
+
+        <script src="{{ asset('js/app.js') }}"></script>
     </body>
 </html>
