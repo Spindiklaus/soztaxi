@@ -56,6 +56,13 @@
                        value="{{ old('kol_p', $category->kol_p ?? '10') }}"
                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
             </div>
+            <!-- Лимит поездок -->
+            <div>
+                <label for="kat_dop" class="block text-sm font-medium text-gray-700">Категория для расчета допскидок</label>
+                <input type="number" name="kat_dop" id="kat_dop"
+                       value="{{ old('kat_dop', $category->kat_dop ?? '2') }}"
+                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+            </div>
 
             <!-- Оператор -->
             <div class="mb-3">

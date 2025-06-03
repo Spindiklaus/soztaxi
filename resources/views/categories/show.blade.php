@@ -34,6 +34,10 @@
                             <dd class="text-sm text-gray-900">{{ $category->kol_p }}</dd>
                         </div>
                         <div class="flex justify-between border-b pb-2">
+                            <dt class="text-sm font-medium text-gray-500">Категория для расчета допскидок</dt>
+                            <dd class="text-sm text-gray-900">{{ $category->kat_dop }}</dd>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
                             <dt class="text-sm font-medium text-gray-500">Оператор</dt>
                             <dd class="text-sm text-gray-900">{{ $category->user?->name ?? '-' }}</dd>
                         </div>

@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Category extends Model
 {
         protected $table = 'categories';
-        protected $fillable = ['nmv', 'name', 'skidka', 'kol_p','is_soz','is_auto','is_gaz','user_id', 'komment'];
+        protected $fillable = ['nmv', 'name', 'skidka', 'kol_p','is_soz','is_auto',
+            'is_gaz','user_id', 'komment','kat_dop'];
         
         protected $casts = [
         'created_at' => 'datetime:d.m.Y H:i:s',

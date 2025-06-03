@@ -9,7 +9,23 @@ use Illuminate\Validation\Rule;
 class CategoryController extends BaseController {
 
     public function index(Request $request) {
-        // Получаем параметры из URL
+        
+        // Получаем параметры фильтрации
+        $query = Category::query();
+
+        if ($request->filled('name')) {
+            $query->where('name', 'like', "%{$request->input('name')}%");
+        }
+
+        if ($request->filled('nmv')) {
+            $query->where('nmv', $request->input('nmv'));
+        }
+
+        if ($request->filled('skidka')) {
+            $query->where('skidka', $request->input('skidka'));
+        }
+        
+        // Получаем параметры сортировки из URL
         $sort = $request->input('sort', 'id'); // по умолчанию 'id'
         $direction = $request->input('direction', 'asc'); // по умолчанию 'asc'
 
@@ -22,7 +38,7 @@ class CategoryController extends BaseController {
             $direction = 'asc';
         }
 
-        $categories = Category::orderBy($sort, $direction)->paginate(5);
+        $categories = $query->orderBy($sort, $direction)->paginate(10);
 
         return view('categories.index', compact('categories', 'sort', 'direction'));
     }

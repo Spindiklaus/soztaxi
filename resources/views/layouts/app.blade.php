@@ -33,6 +33,8 @@
                 {{ $slot }}
             </main>
         </div>
+        <!-- Footer -->
+        @include('layouts.footer')
         <!-- Подключение Alpine.js с defer -->
         <script src="//unpkg.com/alpinejs" defer></script>    
         <!-- Подключение Feather Icons -->

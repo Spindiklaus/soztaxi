@@ -37,6 +37,7 @@ Route::get('/clear', function() {   // для очиски кэша сайта
         Artisan::call('config:cache');    
         Artisan::call('view:clear');  
         Artisan::call('route:clear');  
-    return "Кэш очищен.";});
+    return "Кэш очищен.";
+})->name('clear');
 
 require __DIR__.'/auth.php';

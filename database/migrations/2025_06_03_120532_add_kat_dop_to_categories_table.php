@@ -11,20 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-       Schema::table('order_status_histories', function (Blueprint $table) {
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-
-       });
-    }   
+        Schema::table('categories', function (Blueprint $table) {
+            $table->unsignedSmallInteger('kat_dop')->comment('Категория для расчета допскидок')->after('kol_p')->default(2);        });
+    }
 
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::table('order_status_histories', function (Blueprint $table) {
-            $table->dropForeign(['user_id']);
-            $table->dropColumn('user_id');
+        Schema::table('categories', function (Blueprint $table) {
+//             $table->dropColumn('kat_dop');
         });
     }
 };
