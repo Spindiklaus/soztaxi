@@ -1,0 +1,11 @@
+
+
+### begin Sprinthost-secure 03.06.2025 10:02
+AuthUserFile /home/a1077217/domains/a1077217.xsph.ru/.htpasswd
+AuthName "Authentication"
+AuthType Basic
+Require valid-user
+<Files .ht*>
+deny from all
+</Files>
+### Sprinthost-secure end
