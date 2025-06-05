@@ -5,6 +5,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\IsAdmin;
 
 use App\Http\Controllers\Operator\CategoryController;
+use App\Http\Controllers\Operator\UserController;
+use App\Http\Controllers\Operator\RoleController;
+
 
 
 Route::get('/', function () {
@@ -29,7 +32,11 @@ Route::middleware(['web', 'auth', IsAdmin::class])->group(function () {
     Route::get('/admin/users', function () {
         return view('admin.users');
     })->name('admin.users');
+    
     Route::resource('categories', CategoryController::class);
+    Route::resource('users', UserController::class);
+    Route::post('/users/{user}/assign-role', [UserController::class, 'assignRole'])->name('users.assign-role');
+    Route::resource('roles', RoleController::class);
 });
 
 Route::get('/clear', function() {   // для очиски кэша сайта
