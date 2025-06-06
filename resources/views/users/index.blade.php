@@ -14,6 +14,8 @@
                     <th class="py-2 px-4 border-b">ID</th>
                     <th class="py-2 px-4 border-b">Имя</th>
                     <th class="py-2 px-4 border-b">Email</th>
+                    <th class="py-2 px-4 border-b">Литера</th>
+                    <th class="py-2 px-4 border-b">Действующий</th>
                     <th class="py-2 px-4 border-b">Роли</th>
                     <th class="py-2 px-4 border-b">Назначить роль</th>
                 </tr>
@@ -24,6 +26,8 @@
                         <td class="py-2 px-4 border-b text-center" x-text="user.id"></td>
                         <td class="py-2 px-4 border-b" x-text="user.name"></td>
                         <td class="py-2 px-4 border-b" x-text="user.email"></td>
+                        <td class="py-2 px-4 border-b" x-text="user.litera"></td>
+                        <td class="py-2 px-4 border-b" x-text="user.life"></td>
                         <td class="py-2 px-4 border-b">
                             <template x-if="user.roles.length > 0">
                                 <span x-text="user.roles.map(r => r.name).join(', ')"></span>

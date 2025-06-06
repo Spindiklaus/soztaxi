@@ -39,7 +39,9 @@ class CategoryController extends BaseController {
         }
 
         $categories = $query->orderBy($sort, $direction)->paginate(10);
-
+        
+//        dd($categories);
+        
         return view('categories.index', compact('categories', 'sort', 'direction'));
     }
 

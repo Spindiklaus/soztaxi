@@ -7,6 +7,7 @@ use App\Http\Middleware\IsAdmin;
 use App\Http\Controllers\Operator\CategoryController;
 use App\Http\Controllers\Operator\UserController;
 use App\Http\Controllers\Operator\RoleController;
+use App\Http\Controllers\Operator\TaxiController;
 
 
 
@@ -37,6 +38,8 @@ Route::middleware(['web', 'auth', IsAdmin::class])->group(function () {
     Route::resource('users', UserController::class);
     Route::post('/users/{user}/assign-role', [UserController::class, 'assignRole'])->name('users.assign-role');
     Route::resource('roles', RoleController::class);
+    Route::resource('taxis', TaxiController::class);
+
 });
 
 Route::get('/clear', function() {   // для очиски кэша сайта

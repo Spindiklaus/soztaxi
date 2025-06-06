@@ -3,6 +3,7 @@
         <!-- Ссылки -->
         <nav class="flex justify-between flex-wrap gap-y-2 text-sm text-gray-600 w-full">
             <a href="{{ route('categories.index') }}" class="hover:text-blue-500 transition">Категории</a>
+            <a href="{{ route('taxis.index') }}" class="hover:text-blue-500 transition">Такси</a>
             <a href="{{ route('users.index') }}" class="hover:text-blue-500 transition">Операторы</a>
             <a href="{{ route('roles.index') }}" class="hover:text-blue-500 transition">Роли</a>
             <a href="{{ route('clear') }}" class="hover:text-blue-500 transition">Очистить кэш</a>

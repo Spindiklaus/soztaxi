@@ -24,7 +24,7 @@ return new class extends Migration
             $table->decimal('zena2_auto', 18,11)->comment('Цена легкового авто в обе стороны');              
             $table->decimal('zena1_gaz', 18,11)->comment('Цена ГАЗели в одну сторону');            
             $table->decimal('zena2_gaz', 18,11)->comment('Цена ГАЗели в обе стороны');
-            $table->text('komment')->comment('Комментарии');
+            $table->text('komment')->comment('Комментарии')->nullable;
             $table->timestamps();
         });
     }

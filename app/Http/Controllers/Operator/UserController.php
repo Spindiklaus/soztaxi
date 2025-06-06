@@ -15,14 +15,16 @@ class UserController extends BaseController {
         // Загружаем роли пользователя
         $users = User::with('roles')->get()->map(function ($user) {
             return [
-        'id' => $user->id,
-        'name' => $user->name,
-        'email' => $user->email,
-        'roles' => $user->roles->map(function ($role) {
-            return [
-        'name' => $role->name,
-            ];
-        })->toArray(),
+                'id' => $user->id,
+                'name' => $user->name,
+                'litera' => $user->litera,
+                'life' => $user->life,
+                'email' => $user->email,
+                'roles' => $user->roles->map(function ($role) {
+                    return [
+                        'name' => $role->name,
+                            ];
+                 })->toArray(),
             ];
         });
         return view('users.index', compact('users'));
