@@ -13,12 +13,22 @@
                     <!-- Левая часть -->
                     <div class="space-y-4">
                         <!-- Название -->
+                        <div class="grid grid-cols-2 gap-6">
                         <div>
                             <label for="name" class="block text-sm font-medium text-gray-700">Оператор такси (наименование)</label>
                             <input type="text" name="name" id="name" value="{{ old('name', $taxi->name) }}" required
                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                         </div>
-
+                        <!-- Статус life -->
+                        <div>
+                            <label for="life" class="block text-sm font-medium text-gray-700">Статус</label>
+                            <select name="life" id="life" required
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                <option value="1" {{ old('life', $taxi->life) == 1 ? 'selected' : '' }}>Активен</option>
+                                <option value="0" {{ old('life', $taxi->life) == 0 ? 'selected' : '' }}>Не активен</option>
+                            </select>
+                        </div>
+                        </div>
                         <!-- Коэффициенты -->
                         <div class="grid grid-cols-2 gap-6">
                             <div>

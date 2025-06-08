@@ -63,65 +63,65 @@
             </div>
 
             <!-- Таблица таксистов -->
-           <div x-data='{
-    sortField: "{{ $sort ?? "id" }}",
-    sortDirection: "{{ $direction ?? "asc" }}",
-    search: "{{ request("name") ?? "" }}",
-    lifeFilter: "{{ request("life") ?? "" }}",
-    taxis: @json($taxisJs),
-    get filteredTaxis() {
-        return this.taxis.filter(t => {
-            const matchesSearch = !this.search || t.name.toLowerCase().includes(this.search.toLowerCase());
-            const matchesLife = !this.lifeFilter || t.life == this.lifeFilter;
-            return matchesSearch && matchesLife;
-        });
-    },
-    sortBy(field) {
-        if (this.sortField === field) {
-            this.sortDirection = this.sortDirection === "asc" ? "desc" : "asc";
-        } else {
-            this.sortField = field;
-            this.sortDirection = "asc";
-        }
-        let url = "?sort=" + field + "&direction=" + this.sortDirection +
-                  (this.search ? "&name=" + encodeURIComponent(this.search) : "") +
-                  (this.lifeFilter !== "" ? "&life=" + encodeURIComponent(this.lifeFilter) : "");
-        window.location.href = url;
-    },
-    deleteTaxi(id) {
-        if (!confirm("Вы уверены?")) return;
-        fetch(`/taxis/${id}`, {
-            method: "DELETE",
-            headers: {
-                "X-CSRF-TOKEN": document.querySelector("meta[name=csrf-token]").content,
-                "Content-Type": "application/json"
-            }
-        }).then(res => {
-            if (res.ok) {
-                this.taxis = this.taxis.filter(t => t.id !== id);
-            } else {
-                alert("Ошибка при удалении");
-            }
-        });
-    }
-}' x-cloak class="bg-white rounded-lg overflow-auto max-h-[70vh] border border-gray-300">
+            <div x-data='{
+                 sortField: "{{ $sort ?? "id" }}",
+                 sortDirection: "{{ $direction ?? "asc" }}",
+                 search: "{{ request("name") ?? "" }}",
+                 lifeFilter: "{{ request("life") ?? "" }}",
+                 taxis: @json($taxisJs),
+                 get filteredTaxis() {
+                 return this.taxis.filter(t => {
+                 const matchesSearch = !this.search || t.name.toLowerCase().includes(this.search.toLowerCase());
+                 const matchesLife = !this.lifeFilter || t.life == this.lifeFilter;
+                 return matchesSearch && matchesLife;
+                 });
+                 },
+                 sortBy(field) {
+                 if (this.sortField === field) {
+                 this.sortDirection = this.sortDirection === "asc" ? "desc" : "asc";
+                 } else {
+                 this.sortField = field;
+                 this.sortDirection = "asc";
+                 }
+                 let url = "?sort=" + field + "&direction=" + this.sortDirection +
+                 (this.search ? "&name=" + encodeURIComponent(this.search) : "") +
+                 (this.lifeFilter !== "" ? "&life=" + encodeURIComponent(this.lifeFilter) : "");
+                 window.location.href = url;
+                 },
+                 deleteTaxi(id) {
+                 if (!confirm("Вы уверены?")) return;
+                 fetch(`/taxis/${id}`, {
+                 method: "DELETE",
+                 headers: {
+                 "X-CSRF-TOKEN": document.querySelector("meta[name=csrf-token]").content,
+                 "Content-Type": "application/json"
+                 }
+                 }).then(res => {
+                 if (res.ok) {
+                 this.taxis = this.taxis.filter(t => t.id !== id);
+                 } else {
+                 alert("Ошибка при удалении");
+                 }
+                 });
+                 }
+                 }' x-cloak class="bg-white rounded-lg overflow-auto max-h-[70vh] border border-gray-300">
                 <table class="min-w-full divide-y divide-gray-200 bg-white">
                     <thead class="bg-blue-800 text-gray-200 sticky top-0 z-10 shadow-lg">
                         <tr>
                             <th @click="sortBy('name')" scope="col"
-                                class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-blue-700">
+                                 class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-blue-700">
                                 Оператор такси (наименование)
                                 <span class="ml-1" x-show="sortField === 'name' && sortDirection === 'asc'">↑</span>
                                 <span class="ml-1" x-show="sortField === 'name' && sortDirection === 'desc'">↓</span>
                             </th>
                             <th @click="sortBy('koef')" scope="col"
-                                class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-blue-700">
+                                 class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-blue-700">
                                 Стоимость 1 км пути
                                 <span class="ml-1" x-show="sortField === 'koef' && sortDirection === 'asc'">↑</span>
                                 <span class="ml-1" x-show="sortField === 'koef' && sortDirection === 'desc'">↓</span>
                             </th>
                             <th @click="sortBy('posadka')" scope="col"
-                                class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-blue-700">
+                                 class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-blue-700">
                                 Стоимость посадки
                                 <span class="ml-1" x-show="sortField === 'posadka' && sortDirection === 'asc'">↑</span>
                                 <span class="ml-1" x-show="sortField === 'posadka' && sortDirection === 'desc'">↓</span>
@@ -131,12 +131,16 @@
                                 Комментарии
                             </th>
                             <th @click="sortBy('id')" scope="col"
-                                class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-blue-700">
+                                 class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-blue-700">
                                 id
                                 <span class="ml-1" x-show="sortField === 'name' && sortDirection === 'asc'">↑</span>
                                 <span class="ml-1" x-show="sortField === 'name' && sortDirection === 'desc'">↓</span>
                             </th>
-                            
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">
+                                Статус
+                            </th>
+
                             <th scope="col"
                                 class="px-6 py-3 text-right text-xs font-bold uppercase tracking-wider">
                                 Действия
@@ -150,7 +154,12 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" x-text="taxi.koef"></td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" x-text="taxi.posadka"></td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" x-text="taxi.komment"></td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" x-text="taxi.id"></td>                                
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" x-text="taxi.id"></td>   
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    <span x-text="taxi.life == 1 ? 'Активен' : 'Не активен'"
+                                          :class="taxi.life == 1 ? 'inline-flex items-center px-2 py-1 rounded-full bg-green-100 text-green-800 text-xs font-bold' : 'inline-flex items-center px-2 py-1 rounded-full bg-red-100 text-red-800 text-xs font-bold'">
+                                    </span>
+                                </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm space-x-2 flex justify-end">
                                     <a :href="`/taxis/${taxi.id}`"
                                        class="inline-flex items-center px-2 py-1 rounded-md text-sm font-medium bg-blue-100 text-blue-800 hover:bg-blue-200"
@@ -207,14 +216,14 @@
         // Для отправки CSRF токена в fetch
         document.addEventListener('alpine:init', () => {
             Alpine.data('taxiData', () => ({
-                search: '',
-                taxis: [],
-                get filteredTaxis() {
-                    return this.taxis.filter(t =>
-                        t.name.toLowerCase().includes(this.search.toLowerCase())
-                    );
-                }
-            }));
+                    search: '',
+                    taxis: [],
+                    get filteredTaxis() {
+                        return this.taxis.filter(t =>
+                            t.name.toLowerCase().includes(this.search.toLowerCase())
+                        );
+                    }
+                }));
         });
     </script>
 </x-app-layout>
