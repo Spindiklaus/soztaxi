@@ -106,7 +106,7 @@ class CategoryController extends BaseController {
                 ])->with('success', 'Категория обновлена');
     }
 
-    public function destroy(Category $category) {
+    public function destroy(Request $request, Category $category) {
         $category->delete();
         return redirect()->route('categories.index', [
                     'sort' => $request->input('sort', 'id'),

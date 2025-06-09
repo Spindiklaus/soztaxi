@@ -6,6 +6,7 @@
             <a href="{{ route('taxis.index') }}" class="hover:text-blue-500 transition">Такси</a>
             <a href="{{ route('users.index') }}" class="hover:text-blue-500 transition">Операторы</a>
             <a href="{{ route('roles.index') }}" class="hover:text-blue-500 transition">Роли</a>
+            <a href="{{ route('fiodtrns.index') }}" class="hover:text-blue-500 transition">Клиенты</a>
             <a href="{{ route('clear') }}" class="hover:text-blue-500 transition">Очистить кэш</a>
         </nav>
 
