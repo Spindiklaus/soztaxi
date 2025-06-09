@@ -7,6 +7,7 @@ use App\Models\FioDtrn;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log; // включаем логирование
 
 class ImportFioDtrnController extends BaseController
 {
@@ -24,16 +25,38 @@ class ImportFioDtrnController extends BaseController
         $request->validate([
             'csv_file' => 'required|mimes:csv,txt',
         ]);
-
         $path = $request->file('csv_file')->getRealPath();
+        Log::info("Файл загружен", ['path' => $path]); // 📌 Запись в лог
+        
+        $rows = [];
+        $handle = fopen($path, 'r');
 
-        $rows = array_map('str_getcsv', file($path));
+        if ($handle === false) {
+            return back()->with('error', 'Не удалось открыть файл');
+        }
+        while (($row = fgetcsv($handle, 0, ';')) !== false) {
+            $rows[] = $row;
+        }
+        fclose($handle);
         $header = array_shift($rows); // Убираем заголовок
 
         $allowedHeaders = ['kl_id', 'fio', 'data_r', 'sex', 'rip_at', 'created_rip', 'komment'];
 
-        if ($header !== $allowedHeaders) {
+        if ($header !== $allowedHeaders && $header !== [implode(';', $allowedHeaders)]) {
+            Log::error("Неверный заголовок CSV", ['expected' => $allowedHeaders, 'got' => $header]);
             return back()->with('error', 'Неверный формат CSV. Заголовки должны быть: ' . implode(';', $allowedHeaders));
+        }
+        // Если заголовок пришёл как строка — разбей её
+        if (is_array($header) && count($header) === 1) {
+            $header = explode(';', $header[0]);
+        } elseif (!is_array($header)) {
+            $header = explode(';', (string)$header);
+        }
+        
+        // Теперь проверяем
+        if ($header !== $allowedHeaders) {
+            Log::error("Неверный заголовок CSV", ['expected' => $allowedHeaders, 'got' => $header]);
+            return back()->with('error', 'Неверный заголовок CSV. Должен быть: ' . implode(';', $allowedHeaders));
         }
 
         $errors = [];
@@ -41,7 +64,9 @@ class ImportFioDtrnController extends BaseController
 
         foreach ($rows as $index => $row) {
             if (count($row) < count($allowedHeaders)) {
-                $errors[] = "Строка " . ($index + 2) . ": недостаточно данных";
+                $errorMsg = "Строка " . ($index + 2) . ": недостаточно данных";
+                Log::warning($errorMsg);
+                $errors[] = $errorMsg;
                 continue;
             }
 
@@ -52,7 +77,7 @@ class ImportFioDtrnController extends BaseController
                     'kl_id' => 'required|string|max:255',
                     'fio' => 'required|string|max:255',
                     'data_r' => 'nullable|date_format:d.m.Y',
-                    'sex' => 'nullable|in:M,F',
+                    'sex' => 'nullable|in:М,Ж',
                     'rip_at' => 'nullable|date_format:d.m.Y H:i',
                     'created_rip' => 'nullable|date_format:d.m.Y H:i',
                     'komment' => 'nullable|string',
@@ -65,7 +90,9 @@ class ImportFioDtrnController extends BaseController
 
                 // Проверка дубликата
                 if (FioDtrn::where('kl_id', $data['kl_id'])->exists()) {
-                    $errors[] = "Строка " . ($index + 2) . ": клиент с ID {$data['kl_id']} уже существует.";
+                     $errorMsg = "Строка " . ($index + 2) . ": клиент с ID {$data['kl_id']} уже существует.";
+                    Log::info($errorMsg);
+                    $errors[] = $errorMsg;
                     continue;
                 }
 
@@ -75,8 +102,15 @@ class ImportFioDtrnController extends BaseController
                 ]));
 
                 $successCount++;
-            } catch (ValidationException $e) {
-                $errors[] = "Строка " . ($index + 2) . ": " . collect($e->validator->errors()->all())->join(', ');
+                Log::info("Клиент импортирован", ['kl_id' => $data['kl_id'], 'fio' => $data['fio']]);
+            } catch (ValidationException $e) { // Ловим ошибки валидации
+                $errorMsg = "Строка " . ($index + 2) . ": " . collect($e->validator->errors()->all())->join(', ');
+                Log::warning($errorMsg);
+                $errors[] = $errorMsg;
+            } catch (\Throwable $e) {
+                $errorMsg = "Неизвестная ошибка на строке " . ($index + 2) . ": " . $e->getMessage();
+                Log::error($errorMsg);
+                $errors[] = $errorMsg;
             }
         }
 
@@ -85,7 +119,7 @@ class ImportFioDtrnController extends BaseController
                 ->with('import_errors', $errors)
                 ->with('success_count', $successCount);
         }
-
+        Log::info("Импорт завершён успешно", ['success_count' => $successCount]);
         return redirect()->route('fiodtrns.index')
             ->with('success', "Успешно импортировано: {$successCount} клиент(ов)");
     }

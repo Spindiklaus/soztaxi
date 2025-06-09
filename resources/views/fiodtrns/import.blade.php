@@ -1,10 +1,16 @@
 <x-app-layout>
+    <!-- Отладка -->
+    <?php // @dd(session('import_errors')) ?>
+
+@if(session('success_count'))
+    @dd(session('success_count'))
+@endif
     <div class="bg-gray-100 py-6">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h1 class="text-3xl font-bold text-gray-800 mb-4">Импорт клиентов из CSV</h1>
 
             <!-- Форма загрузки файла -->
-            <form action="{{ route('import.process') }}" method="POST" enctype="multipart/form-data"
+            <form action="{{ route('import.fiodtrns.process') }}" method="POST" enctype="multipart/form-data"
                   class="bg-white shadow rounded-lg p-6 space-y-6">
                 @csrf
 
@@ -15,8 +21,9 @@
                     <p class="mt-1">Все даты должны быть в формате <strong>дд.мм.гггг</strong>.</p>
                     <p class="mt-1">Пример:</p>
                     <pre class="bg-gray-100 p-2 rounded mt-1 text-xs">
-<!--kl_id;fio;data_r;sex;rip_at;created_rip;komment
-AB^1234567;Иванов Иван Иванович;01.01.1990;M;01.01.2024;02.01.2024;Комментарий-->
+kl_id;fio;data_r;sex;rip_at;created_rip;komment
+AB^1234567;Иванов Иван;01.01.1990;М;;;"Комментарий"
+CD^7654321;Петрова Елена;12.05.1985;Ж;10.05.2024 14:30;11.05.2024 15:00;С RIP
                     </pre>
                 </div>
 

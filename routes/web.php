@@ -42,12 +42,13 @@ Route::middleware(['web', 'auth', IsAdmin::class])->group(function () {
     Route::resource('roles', RoleController::class);
     Route::resource('taxis', TaxiController::class);
     Route::resource('fiodtrns', FioDtrnController::class);
+    Route::group(['namespace' => '', 'prefix' => 'import'], function() {
+        Route::get('/fiodtrns', [ImportFioDtrnController::class, 'showClientsImportForm'])->name('import.fiodtrns.form');
+        Route::post('/fiodtrns', [ImportFioDtrnController::class, 'importClients'])->name('import.fiodtrns.process');
+    });
 });
 
-    Route::group(['namespace' => '', 'prefix' => 'import'], function() {
-        Route::get('/fiodtrns', [ImportFioDtrnController::class, 'showClientsImportForm'])->name('import.form');
-        Route::post('/fiodtrns', [ImportFioDtrnController::class, 'importClients'])->name('import.process');
-   });
+
 
 
 Route::get('/clear', function() {   // для очиски кэша сайта
