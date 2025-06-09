@@ -2,8 +2,23 @@
     <!-- Отладка -->
     <?php // @dd(session('import_errors')) ?>
 
+<!-- Сообщение об ошибках -->
+@if(session('import_errors'))
+    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded-md">
+        <p class="font-bold">Ошибки при импорте:</p>
+        <ul class="mt-2 list-disc pl-5">
+            @foreach(session('import_errors') as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
+<!-- Сообщение об успехе -->
 @if(session('success_count'))
-    @dd(session('success_count'))
+    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4 rounded-md">
+        {{ session('success_count') }} клиент(ов) успешно импортировано.
+    </div>
 @endif
     <div class="bg-gray-100 py-6">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
