@@ -6,6 +6,10 @@
             <form action="{{ route('fiodtrns.store') }}" method="POST" class="bg-white shadow rounded-lg p-6 space-y-6">
                 @csrf
 
+                <!-- Скрытые поля для передачи текущей сортировки -->
+                <input type="hidden" name="sort" value="{{ request('sort', 'id') }}">
+                <input type="hidden" name="direction" value="{{ request('direction', 'asc') }}">
+                
                 <!-- ID клиента -->
                 <div>
                     <label for="kl_id" class="block text-sm font-medium text-gray-700">ID клиента (серия^номер)</label>

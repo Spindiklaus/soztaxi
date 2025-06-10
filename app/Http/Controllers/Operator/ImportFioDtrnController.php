@@ -86,7 +86,7 @@ class ImportFioDtrnController extends BaseController
 
                 // Преобразование дат
                 $data['data_r'] = $data['data_r'] ? Carbon::createFromFormat('d.m.Y', $data['data_r'])->toDateString() : null;
-                $data['rip_at'] = $data['rip_at'] ? Carbon::createFromFormat('d.m.Y H:i', $data['rip_at'])->toDateTimeString() : null;
+                $data['rip_at'] = $data['rip_at'] ? Carbon::createFromFormat('d.m.Y', $data['rip_at'])->toDateString() : null;
                 $data['created_rip'] = $data['created_rip'] ? Carbon::createFromFormat('d.m.Y H:i', $data['created_rip'])->toDateTimeString() : null;
 
                 // Проверка дубликата

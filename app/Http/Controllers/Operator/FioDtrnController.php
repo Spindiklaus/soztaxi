@@ -36,9 +36,9 @@ class FioDtrnController extends BaseController {
             $sort = 'id';
         }
 
-        $fiodtrns = $query->orderBy($sort, $direction)->paginate(10);
+        $fiodtrns = $query->orderBy($sort, $direction)->paginate(50);
 
-        // Подготовь данные для Alpine.js
+        // Подготовим данные для Alpine.js
         $fiodtrnsJs = [];
         foreach ($fiodtrns as $fiodtrn) {
             $fiodtrnsJs[] = [
@@ -100,7 +100,7 @@ class FioDtrnController extends BaseController {
             'kl_id' => 'required|string|max:255|unique:fio_dtrns,kl_id,' . $fiodtrn->id,
             'fio' => 'required|string|max:255',
             'data_r' => 'nullable|date',
-            'sex' => 'nullable|in:M,F',
+            'sex' => 'nullable|in:М,Ж',
         ]);
 
         $fiodtrn->update($request->all());

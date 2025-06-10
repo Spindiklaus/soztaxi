@@ -1,62 +1,41 @@
 <x-app-layout>
     <div class="bg-gray-100 py-6">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h1 class="text-3xl font-bold text-gray-800 mb-4">Создать клиента</h1>
+            <h1 class="text-3xl font-bold text-gray-800 mb-4">Сведения по клиенту</h1>
 
-            <form action="{{ route('clients.store') }}" method="POST" class="bg-white shadow rounded-lg p-6 space-y-6">
-                @csrf
-
-                <!-- ID клиента -->
-                <div>
-                    <label for="kl_id" class="block text-sm font-medium text-gray-700">ID клиента (серия^номер)</label>
-                    <input type="text" name="kl_id" id="kl_id" required
-                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500">
+            <div class="bg-white shadow rounded-lg p-6">
+                <div class="mb-4">
+                    <strong>ID клиента:</strong> {{ $fiodtrn->kl_id }}
                 </div>
-
-                <!-- ФИО -->
-                <div>
-                    <label for="fio" class="block text-sm font-medium text-gray-700">ФИО</label>
-                    <input type="text" name="fio" id="fio" required
-                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500">
+                <div class="mb-4">
+                    <strong>ФИО:</strong> {{ $fiodtrn->fio }}
                 </div>
-
-                <!-- Дата рождения и пол -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label for="data_r" class="block text-sm font-medium text-gray-700">Дата рождения</label>
-                        <input type="date" name="data_r" id="data_r"
-                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500">
-                    </div>
-                    <div>
-                        <label for="sex" class="block text-sm font-medium text-gray-700">Пол</label>
-                        <select name="sex" id="sex"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500">
-                            <option value="">Не указан</option>
-                            <option value="M">Мужской</option>
-                            <option value="F">Женский</option>
-                        </select>
-                    </div>
+                    <div><strong>Дата рождения:</strong> {{ optional($fiodtrn->data_r)->format('d.m.Y') }}</div>
+                    <div><strong>Пол:</strong> {{ $fiodtrn->sex === 'М' ? 'Мужской' : ($fiodtrn->sex === 'Ж' ? 'Женский' : '-') }}</div>
+                </div>
+                <div class="mb-4">
+                    <strong>RIP дата:</strong> {{ optional($fiodtrn->rip_at)->format('d.m.Y H:i') ?: '-' }}
+                </div>
+                <div class="mb-4">
+                    <strong>Комментарии:</strong> {{ $fiodtrn->komment ?: '-' }}
+                </div>
+                <div class="mb-4">
+                    <strong>Оператор:</strong> {{ optional($fiodtrn->user)->name ?? '-' }}
                 </div>
 
-                <!-- Комментарий -->
-                <div>
-                    <label for="komment" class="block text-sm font-medium text-gray-700">Комментарии</label>
-                    <textarea name="komment" id="komment" rows="3"
-                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500"></textarea>
-                </div>
-
-                <!-- Кнопки -->
-                <div class="flex justify-end space-x-2 pt-2">
-                    <a href="{{ route('clients.index') }}"
+                <!-- Кнопка редактирования -->
+                <div class="flex justify-end">
+                     <a href="{{ route('fiodtrns.index', ['sort' => request('sort', 'id'), 'direction' => request('direction', 'asc') ]) }}" 
                        class="inline-flex items-center px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400">
-                        Отменить
+                        К списку
                     </a>
-                    <button type="submit"
-                            class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                        Сохранить
-                    </button>
+                    <a href="{{ route('fiodtrns.edit', ['fiodtrn' => $fiodtrn, 'sort' => request('sort'), 'direction' => request('direction')]) }}"
+                       class="inline-flex items-center px-4 py-2 bg-yellow-100 text-yellow-800 rounded-md hover:bg-yellow-200">
+                        Редактировать
+                    </a>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 </x-app-layout>

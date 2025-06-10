@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="bg-gray-100 py-6">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            
+
             @if(session('import_errors'))
             <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
                 <p class="font-bold">Ошибка при импорте</p>
@@ -50,7 +50,7 @@
                 </div>    
             </div>
 
-           
+
 
             <!-- Форма фильтрации -->
             <div class="bg-white shadow rounded-lg p-4 mb-2">
@@ -78,8 +78,8 @@
                             <select name="sex" id="filter_sex"
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                                 <option value="">Все</option>
-                                <option value="M" {{ request('sex') == 'M' ? 'selected' : '' }}>Мужской</option>
-                                <option value="F" {{ request('sex') == 'F' ? 'selected' : '' }}>Женский</option>
+                                <option value="М" {{ request('sex') == 'М' ? 'selected' : '' }}>Мужской</option>
+                                <option value="Ж" {{ request('sex') == 'Ж' ? 'selected' : '' }}>Женский</option>
                             </select>
                         </div>
                     </div>
@@ -181,15 +181,15 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" x-text="fiodtrn.kl_id"></td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" x-text="fiodtrn.data_r"></td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    <span x-text="fiodtrn.sex === 'M' ? 'Мужской' : fiodtrn.sex === 'F' ? 'Женский' : '-'"
-                                          :class="fiodtrn.sex === 'M' ? 'text-blue-700' : fiodtrn.sex === 'F' ? 'text-pink-700' : 'text-gray-500'">
+                                    <span x-text="fiodtrn.sex === 'М' ? 'Мужской' : fiodtrn.sex === 'Ж' ? 'Женский' : '-'"
+                                          :class="fiodtrn.sex === 'М' ? 'text-blue-700' : fiodtrn.sex === 'Ж' ? 'text-pink-700' : 'text-gray-500'">
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" x-text="fiodtrn.rip_at"></td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" x-text="fiodtrn.komment"></td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" x-text="fiodtrn.operator"></td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm space-x-2 flex justify-end">
-                                    <a :href="`/fiodtrns/${fiodtrn.id}`"
+                                    <a :href="`/fiodtrns/${fiodtrn.id}?sort=${sortField}&direction=${sortDirection}`"
                                        class="inline-flex items-center px-2 py-1 rounded-md text-sm font-medium bg-blue-100 text-blue-800 hover:bg-blue-200"
                                        title="Просмотр">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
@@ -199,7 +199,7 @@
                                             <circle cx="12" cy="12" r="3"></circle>
                                         </svg>
                                     </a>
-                                    <a :href="`/fiodtrns/${fiodtrn.id}/edit`"
+                                    <a :href="`/fiodtrns/${fiodtrn.id}/edit?sort=${sortField}&direction=${sortDirection}`"
                                        class="inline-flex items-center px-2 py-1 rounded-md text-sm font-medium bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
                                        title="Редактировать">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
@@ -209,20 +209,31 @@
                                             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                                         </svg>
                                     </a>
-                                    <form class="inline" x-on:submit.prevent="deleteFioDtrn(fiodtrn.id)">
+
+                                    <!-- Удаление -->
+                                    <form :action="`{{ route('fiodtrns.destroy', ['fiodtrn' => '__ID__', 'sort' => '__SORT__', 'direction' => '__DIRECTION__']) }}`.replace('__ID__', fiodtrn.id).replace('__SORT__', sortField).replace('__DIRECTION__', sortDirection)"
+                                          method="POST"
+                                          class="inline"
+                                          @submit="confirm('Вы уверены, что хотите удалить этого клиента?') || event.preventDefault()">
+                                        @csrf
+                                        @method('DELETE')
                                         <button type="submit"
                                                 class="inline-flex items-center px-2 py-1 rounded-md text-sm font-medium bg-red-100 text-red-800 hover:bg-red-200"
                                                 title="Удалить">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                                 stroke-linecap="round" stroke-linejoin="round">
-                                                <polyline points="3 6 5 6 21 6"></polyline>
-                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                                <line x1="9" y1="12" x2="9" y2="18"></line>
-                                                <line x1="15" y1="12" x2="15" y2="18"></line>
-                                            </svg>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                             class="feather feather-trash-2">
+                                            <polyline points="3 6 5 6 21 6"></polyline>
+                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                            <line x1="9" y1="12" x2="9" y2="18"></line>
+                                            <line x1="15" y1="12" x2="15" y2="18"></line>
+                                        </svg>
                                         </button>
                                     </form>
+
+
+
+
                                 </td>
                             </tr>
                         </template>
@@ -265,23 +276,6 @@
                             return matchesFio && matchesKlId && matchesSex;
                         });
                     },
-                    deleteFioDtrn(id) {
-                        if (!confirm('Вы уверены?'))
-                            return;
-                        fetch(`/fiodtrns/${id}`, {
-                            method: 'DELETE',
-                            headers: {
-                                'X-CSRF-TOKEN': document.querySelector("meta[name=csrf-token]").content,
-                                'Content-Type': 'application/json'
-                            }
-                        }).then(res => {
-                            if (res.ok) {
-                                this.fiodtrns = this.fiodtrns.filter(c => c.id !== id);
-                            } else {
-                                alert('Ошибка при удалении');
-                            }
-                        });
-                    }
                 }));
         });
     </script>
