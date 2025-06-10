@@ -27,6 +27,7 @@ class ImportFioDtrnController extends BaseController
         ]);
         $path = $request->file('csv_file')->getRealPath();
         Log::info("Файл загружен", ['path' => $path]); // 📌 Запись в лог
+//        dd( $path);        
         
         $rows = [];
         $handle = fopen($path, 'r');
@@ -44,7 +45,7 @@ class ImportFioDtrnController extends BaseController
 
         if ($header !== $allowedHeaders && $header !== [implode(';', $allowedHeaders)]) {
             Log::error("Неверный заголовок CSV", ['expected' => $allowedHeaders, 'got' => $header]);
-            return back()->with('error', 'Неверный формат CSV. Заголовки должны быть: ' . implode(';', $allowedHeaders));
+            return back()->with('import_errors', ['Неверный формат CSV. Заголовки должны быть: ' . implode(';', $allowedHeaders)]);
         }
         // Если заголовок пришёл как строка — разбей её
         if (is_array($header) && count($header) === 1) {
@@ -56,7 +57,7 @@ class ImportFioDtrnController extends BaseController
         // Теперь проверяем
         if ($header !== $allowedHeaders) {
             Log::error("Неверный заголовок CSV", ['expected' => $allowedHeaders, 'got' => $header]);
-            return back()->with('error', 'Неверный заголовок CSV. Должен быть: ' . implode(';', $allowedHeaders));
+            return back()->with('import_errors', ['Неверный заголовок CSV. Должен быть: ' . implode(';', $allowedHeaders)]);
         }
 
         $errors = [];
@@ -78,7 +79,7 @@ class ImportFioDtrnController extends BaseController
                     'fio' => 'required|string|max:255',
                     'data_r' => 'nullable|date_format:d.m.Y',
                     'sex' => 'nullable|in:М,Ж',
-                    'rip_at' => 'nullable|date_format:d.m.Y H:i',
+                    'rip_at' => 'nullable|date_format:d.m.Y',
                     'created_rip' => 'nullable|date_format:d.m.Y H:i',
                     'komment' => 'nullable|string',
                 ])->validate();
@@ -113,8 +114,8 @@ class ImportFioDtrnController extends BaseController
                 $errors[] = $errorMsg;
             }
         }
-
         if (!empty($errors)) {
+
             return back()
                 ->with('import_errors', $errors)
                 ->with('success_count', $successCount);

@@ -1,25 +1,26 @@
 <x-app-layout>
     <!-- Отладка -->
     <?php // @dd(session('import_errors')) ?>
+    {{-- Отладка сессии --}}
+    <?php // @dd(session()->all()) ?>
 
-<!-- Сообщение об ошибках -->
-@if(session('import_errors'))
-    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded-md">
-        <p class="font-bold">Ошибки при импорте:</p>
-        <ul class="mt-2 list-disc pl-5">
+    <!-- Сообщение об ошибках -->
+    @if (@session('import_errors'))
+    <x-alert type="error" title="Ошибки при импорте">
+        <ul class="list-disc pl-5 space-y-1">
             @foreach(session('import_errors') as $error)
                 <li>{{ $error }}</li>
             @endforeach
         </ul>
-    </div>
-@endif
+    </x-alert>
+    @endif
 
-<!-- Сообщение об успехе -->
-@if(session('success_count'))
-    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4 rounded-md">
+    <!-- Сообщение об успехе -->
+    @session('success_count')
+    <x-alert type="success" title="Импорт завершён">
         {{ session('success_count') }} клиент(ов) успешно импортировано.
-    </div>
-@endif
+    </x-alert>
+    @endempty
     <div class="bg-gray-100 py-6">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h1 class="text-3xl font-bold text-gray-800 mb-4">Импорт клиентов из CSV</h1>

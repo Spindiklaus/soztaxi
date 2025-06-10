@@ -19,6 +19,6 @@ class IsAdmin
         return $next($request);
     }
 
-    return redirect('/')->with('error', 'У вас недостаточно прав');
+    return redirect()->route('dashboard')->with('error', 'У вас недостаточно прав для доступа к этой странице');
 }
 }

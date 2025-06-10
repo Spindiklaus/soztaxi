@@ -30,6 +30,30 @@
 
             <!-- Page Content -->
             <main>
+                <!-- Сообщение об ошибке -->
+                @if(session('error'))
+                <x-alert type="error" title="Доступ запрещён">
+                    {{ session('error') }}
+                </x-alert>
+                @endif
+                @if(session('success'))
+                <x-alert type="success" title="Успех">
+                    {{ session('success') }}
+                </x-alert>
+                @endif
+
+                @if(session('warning'))
+                <x-alert type="warning" title="Предупреждение">
+                    {{ session('warning') }}
+                </x-alert>
+                @endif
+
+                @if(session('info'))
+                <x-alert type="info" title="Информация">
+                    {{ session('info') }}
+                </x-alert>
+                @endif
+                <!-- Содержимое страницы -->
                 {{ $slot }}
             </main>
         </div>
@@ -40,7 +64,7 @@
         <!-- Подключение Feather Icons -->
         <script src="https://unpkg.com/feather-icons"></script> 
         <script>
-            feather.replace();
+feather.replace();
         </script>
 
 <!--        <script src="{{-- mix('js/app.js') --}}"></script>-->

@@ -34,4 +34,5 @@
     <span class="text-center font-medium">Легковое авто</span>
   </div>
 </section>
+
 </x-app-layout>

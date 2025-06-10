@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 
-class Fio_dtrn extends Model
+class FioDtrn extends Model
 {
     use HasFactory;
 
