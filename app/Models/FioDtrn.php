@@ -25,8 +25,13 @@ class FioDtrn extends Model
     ];
     protected $casts = [
         'data_r' => 'date',
-        'rip_at' => 'datetime',
+        'rip_at' => 'date',
         'created_rip' => 'datetime',
     ];
+    
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
     
 }
