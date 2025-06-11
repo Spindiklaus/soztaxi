@@ -55,7 +55,7 @@
             <!-- Форма фильтрации -->
             <div class="bg-white shadow rounded-lg p-4 mb-2">
                 <form action="{{ route('fiodtrns.index') }}" method="GET" class="space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <!-- Поиск по ФИО -->
                         <div>
                             <label for="filter_fio" class="block text-sm font-medium text-gray-700">ФИО</label>
@@ -82,6 +82,13 @@
                                 <option value="Ж" {{ request('sex') == 'Ж' ? 'selected' : '' }}>Женский</option>
                             </select>
                         </div>
+                        <!-- Фильтр RIP -->
+                        <div>
+                            <label for="filter_rip" class="block text-sm font-medium text-gray-700">Только с RIP</label>
+                            <input type="checkbox" name="rip" id="filter_rip"
+                                   {{ request('rip') ? 'checked' : '' }}
+                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        </div>
                     </div>
                     <!-- Кнопки -->
                     <div class="flex justify-end space-x-2 pt-2">
@@ -104,13 +111,15 @@
                  searchFio: "{{ request("fio") ?? "" }}",
                  searchKlId: "{{ request("kl_id") ?? "" }}",
                  sexFilter: "{{ request("sex") ?? "" }}",
+                 ripFilter: "{{ request('rip') ? '1' : '' }}", // фильтр RIP
                  fiodtrns: @json($fiodtrnsJs),
                  get filteredFioDtrns() {
                  return this.fiodtrns.filter(c => {
                  const matchesFio = !this.searchFio || c.fio.toLowerCase().includes(this.searchFio.toLowerCase());
                  const matchesKlId = !this.searchKlId || c.kl_id.includes(this.searchKlId);
                  const matchesSex = !this.sexFilter || c.sex === this.sexFilter;
-                 return matchesFio && matchesKlId && matchesSex;
+                 const matchesRip = !this.ripFilter || c.rip_at;
+                 return matchesFio && matchesKlId && matchesSex && matchesRip;
                  });
                  },
                  sortBy(field) {
@@ -179,7 +188,7 @@
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" 
                                     x-text="fiodtrn.fio"
-                                   :class="fiodtrn.rip_at ? 'bg-gray-500' : ''">
+                                    :class="fiodtrn.rip_at ? 'bg-gray-500' : ''">
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" x-text="fiodtrn.kl_id"></td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" x-text="fiodtrn.data_r"></td>
@@ -224,13 +233,13 @@
                                                 class="inline-flex items-center px-2 py-1 rounded-md text-sm font-medium bg-red-100 text-red-800 hover:bg-red-200"
                                                 title="Удалить">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                             class="feather feather-trash-2">
-                                            <polyline points="3 6 5 6 21 6"></polyline>
-                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                            <line x1="9" y1="12" x2="9" y2="18"></line>
-                                            <line x1="15" y1="12" x2="15" y2="18"></line>
-                                        </svg>
+                                                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                 class="feather feather-trash-2">
+                                                <polyline points="3 6 5 6 21 6"></polyline>
+                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                                <line x1="9" y1="12" x2="9" y2="18"></line>
+                                                <line x1="15" y1="12" x2="15" y2="18"></line>
+                                            </svg>
                                         </button>
                                     </form>
 
