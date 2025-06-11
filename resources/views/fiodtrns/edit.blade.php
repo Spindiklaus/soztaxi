@@ -56,11 +56,54 @@
                     </div>
                 </div>
 
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- RIP дата -->
+                    <div>
+                        <label for="rip_at" class="block text-sm font-medium text-gray-700">RIP дата</label>
+                        <input type="date" name="rip_at" id="rip_at"
+                               value="{{ old('rip_at', optional($fiodtrn->rip_at)->format('Y-m-d')) }}"
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500">
+                        @error('rip_at')
+                        <span class="text-red-500 text-xs">{{ $message }}</span>
+                        @enderror
+                    </div>
+                    <!-- Время и дата события для RIP -->
+                    <div>
+                        <label for="created_rip" class="block text-sm font-medium text-gray-700">Дата и время добавления RIP</label>
+                        <input type="datetime-local" name="created_rip" id="created_rip"
+                               value="{{ old('created_rip', optional($fiodtrn->created_rip)->format('Y-m-d\TH:i') ) }}"
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500">
+                        @error('created_rip')
+                        <span class="text-red-500 text-xs">{{ $message }}</span>
+                        @enderror
+                    </div>
+                    <!-- Оператор, занесший информацию о RIP -->
+                    <div>
+                        <label for="user_rip" class="block text-sm font-medium text-gray-700">Оператор, занесший данные о RIP</label>
+                        <select name="user_rip" id="user_rip" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500">
+                            <option value="">Не указан</option>
+                            @foreach ($users as $user)
+                            <option value="{{ $user->id }}" {{ old('user_rip', $fiodtrn->user_rip) == $user->id ? 'selected' : '' }}>
+                                {{ $user->name }}
+                            </option>
+                            @endforeach
+                        </select>
+                        @error('user_rip')
+                        <span class="text-red-500 text-xs">{{ $message }}</span>
+                        @enderror
+                    </div>
+                </div>
+
+
+
                 <!-- Комментарий -->
                 <div>
                     <label for="komment" class="block text-sm font-medium text-gray-700">Комментарии</label>
                     <textarea name="komment" id="komment" rows="3"
                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500">{{ old('komment', $fiodtrn->komment) }}</textarea>
+                    @error('komment')
+                        <span class="text-red-500 text-xs">{{ $message }}</span>
+                    @enderror                              
                 </div>
 
                 <!-- Кнопки -->

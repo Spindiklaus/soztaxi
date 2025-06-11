@@ -177,7 +177,10 @@
                     <tbody class="divide-y divide-gray-200">
                         <template x-for="fiodtrn in filteredFioDtrns" :key="fiodtrn.id">
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" x-text="fiodtrn.fio"></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" 
+                                    x-text="fiodtrn.fio"
+                                   :class="fiodtrn.rip_at ? 'bg-gray-500' : ''">
+                                </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" x-text="fiodtrn.kl_id"></td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" x-text="fiodtrn.data_r"></td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">

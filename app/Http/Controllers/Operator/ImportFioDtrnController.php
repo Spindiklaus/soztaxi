@@ -74,6 +74,7 @@ class ImportFioDtrnController extends BaseController
             $data = array_combine($allowedHeaders, $row);
 
             try {
+//                dd($data['sex'], bin2hex($data['sex'])); смотрим кодировку
                 Validator::make($data, [
                     'kl_id' => 'required|string|max:255',
                     'fio' => 'required|string|max:255',

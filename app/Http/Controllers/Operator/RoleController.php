@@ -53,12 +53,12 @@ class RoleController extends BaseController {
 
         $role->update(['name' => $request->name]);
 
-        return redirect()->route('roles.index')->with('success', 'Роль успешно обновлена.');
+        return redirect()->route('roles.index')->with('success', 'Роль обновлена.');
     }
 
     public function destroy(Role $role) {
         $role->delete();
-        return redirect()->route('roles.index')->with('success', 'Роль успешно удалена.');
+        return redirect()->route('roles.index')->with('success', 'Роль удалена.');
     }
 
 }

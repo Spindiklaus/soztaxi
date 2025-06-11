@@ -47,7 +47,7 @@ class FioDtrnController extends BaseController {
                 'fio' => $fiodtrn->fio,
                 'data_r' => optional($fiodtrn->data_r)->format('d.m.Y'),
                 'sex' => $fiodtrn->sex,
-                'rip_at' => optional($fiodtrn->rip_at)->format('d.m.Y H:i'),
+                'rip_at' => optional($fiodtrn->rip_at)->format('d.m.Y'),
                 'operator' => optional($fiodtrn->user)->name ?? '-',
                 'komment' => $fiodtrn->komment,
             ];
@@ -90,17 +90,36 @@ class FioDtrnController extends BaseController {
     }
 
     public function edit(Request $request, FioDtrn $fiodtrn) {
+        // Получаем всех пользователей с ролью admin или operator
+        $users = \App\Models\User::whereHas('roles', function ($query) {
+                    $query->whereIn('name', ['admin', 'operator']);
+                })->get();
+
         $sort = $request->input('sort', 'id');
         $direction = $request->input('direction', 'asc');
-        return view('fiodtrns.edit', compact('fiodtrn', 'sort', 'direction'));
+        return view('fiodtrns.edit', compact('fiodtrn', 'sort', 'direction', 'users'));
     }
 
     public function update(Request $request, FioDtrn $fiodtrn) {
+
+//        $data = $request->all();
+//        dd($data['created_rip']);
+//        // Замена T на пробел, чтобы соответствовало формату Y-m-d H:i
+//        if (!empty($data['created_rip'])) {
+//            $data['created_rip'] = str_replace('T', ' ', $data['created_rip']);
+//        }
+////        dd($data['created_rip']);
+//        $request->replace($data);
+        
         $request->validate([
             'kl_id' => 'required|string|max:255|unique:fio_dtrns,kl_id,' . $fiodtrn->id,
             'fio' => 'required|string|max:255',
             'data_r' => 'nullable|date',
             'sex' => 'nullable|in:М,Ж',
+            'rip_at' => 'nullable|date',
+            'created_rip' => 'nullable|required_with:rip_at|date_format:Y-m-d\TH:i',
+            'user_rip' => 'nullable|required_with:rip_at|exists:users,id',
+            'komment' => 'nullable|required_with:rip_at|string',
         ]);
 
         $fiodtrn->update($request->all());
@@ -108,7 +127,7 @@ class FioDtrnController extends BaseController {
         return redirect()->route('fiodtrns.index', [
                     'sort' => $request->input('sort', 'id'),
                     'direction' => $request->input('direction', 'asc')
-                ])->with('success', 'Клиент обновлён');
+                ])->with('success', "Клиент {$fiodtrn->fio} обновлён");
     }
 
     public function destroy(Request $request, FioDtrn $fiodtrn) {
@@ -119,4 +138,5 @@ class FioDtrnController extends BaseController {
                     'direction' => $request->input('direction', 'asc')
                 ])->with('success', 'Клиент удалён');
     }
+
 }

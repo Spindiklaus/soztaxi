@@ -14,9 +14,14 @@
                     <div><strong>Дата рождения:</strong> {{ optional($fiodtrn->data_r)->format('d.m.Y') }}</div>
                     <div><strong>Пол:</strong> {{ $fiodtrn->sex === 'М' ? 'Мужской' : ($fiodtrn->sex === 'Ж' ? 'Женский' : '-') }}</div>
                 </div>
-                <div class="mb-4">
-                    <strong>RIP дата:</strong> {{ optional($fiodtrn->rip_at)->format('d.m.Y H:i') ?: '-' }}
-                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <strong>RIP дата:</strong> {{ optional($fiodtrn->rip_at)->format('d.m.Y') ?: '-' }}
+                    </div>
+                    <div>
+                        <strong>Дата и время добавления информации о RIP:</strong> {{ optional($fiodtrn->created_rip)->format('d.m.Y H:i') ?: '-' }}
+                    </div>
+                </div>    
                 <div class="mb-4">
                     <strong>Комментарии:</strong> {{ $fiodtrn->komment ?: '-' }}
                 </div>
@@ -24,9 +29,20 @@
                     <strong>Оператор:</strong> {{ optional($fiodtrn->user)->name ?? '-' }}
                 </div>
 
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <strong>Дата создания записи:</strong> {{ optional($fiodtrn->created_at)->format('d.m.Y H:i') }}
+                    </div>
+                    <div>
+                        <strong>Дата последнего обновления:</strong> {{ optional($fiodtrn->updated_at)->format('d.m.Y H:i') }}
+                    </div>
+                </div>    
+
+
+
                 <!-- Кнопка редактирования -->
                 <div class="flex justify-end">
-                     <a href="{{ route('fiodtrns.index', ['sort' => request('sort', 'id'), 'direction' => request('direction', 'asc') ]) }}" 
+                    <a href="{{ route('fiodtrns.index', ['sort' => request('sort', 'id'), 'direction' => request('direction', 'asc') ]) }}" 
                        class="inline-flex items-center px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400">
                         К списку
                     </a>

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('fio')->comment('ФИО');
             $table->date('data_r')->comment('Дата рождения')->nullable();
             $table->char('sex',1)->comment('Пол')->nullable();
-            $table->dateTime('rip_at')->comment('Дата смерти')->index('rip_at')->nullable();
+            $table->date('rip_at')->comment('Дата смерти')->index('rip_at')->nullable();
             $table->dateTime('created_rip')->comment('Дата внесения информации о RIP')->nullable();
             $table->unsignedbigInteger('user_rip')->comment('Оператор занесения информации о RIP')->index('user_rip')->nullable();            
             $table->unsignedbigInteger('user_id')->comment('Оператор занесения ФИО')->index('user_id');
