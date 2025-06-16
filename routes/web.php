@@ -10,7 +10,7 @@ use App\Http\Controllers\Operator\RoleController;
 use App\Http\Controllers\Operator\TaxiController;
 use App\Http\Controllers\Operator\FioDtrnController;
 use App\Http\Controllers\Operator\ImportFioDtrnController;
-
+use App\Http\Controllers\Operator\FioRipController;
 
 
 Route::get('/', function () {
@@ -46,6 +46,8 @@ Route::middleware(['web', 'auth', IsAdmin::class])->group(function () {
         Route::get('/fiodtrns', [ImportFioDtrnController::class, 'showClientsImportForm'])->name('import.fiodtrns.form');
         Route::post('/fiodtrns', [ImportFioDtrnController::class, 'importClients'])->name('import.fiodtrns.process');
     });
+    Route::resource('fio_rips', FioRipController::class)->except(['show']);
+    Route::get('fio_rips/{id}/delete', [FioRipController::class, 'destroy'])->name('fio_rips.destroy');
 });
 
 
