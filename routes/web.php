@@ -11,6 +11,8 @@ use App\Http\Controllers\Operator\TaxiController;
 use App\Http\Controllers\Operator\FioDtrnController;
 use App\Http\Controllers\Operator\ImportFioDtrnController;
 use App\Http\Controllers\Operator\FioRipController;
+use App\Http\Controllers\Operator\ImportFioRipController;
+
 
 
 Route::get('/', function () {
@@ -45,9 +47,10 @@ Route::middleware(['web', 'auth', IsAdmin::class])->group(function () {
     Route::group(['namespace' => '', 'prefix' => 'import'], function() {
         Route::get('/fiodtrns', [ImportFioDtrnController::class, 'showClientsImportForm'])->name('import.fiodtrns.form');
         Route::post('/fiodtrns', [ImportFioDtrnController::class, 'importClients'])->name('import.fiodtrns.process');
+        Route::get('/fio_rips', [ImportFioRipController::class, 'showImportForm'])->name('import.fio_rips.form');
+        Route::post('/fio_rips', [ImportFioRipController::class, 'import'])->name('import.fio_rips.process');    
     });
     Route::resource('fio_rips', FioRipController::class)->except(['show']);
-    Route::get('fio_rips/{id}/delete', [FioRipController::class, 'destroy'])->name('fio_rips.destroy');
 });
 
 
