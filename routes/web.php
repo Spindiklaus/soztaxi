@@ -12,6 +12,10 @@ use App\Http\Controllers\Operator\FioDtrnController;
 use App\Http\Controllers\Operator\ImportFioDtrnController;
 use App\Http\Controllers\Operator\FioRipController;
 use App\Http\Controllers\Operator\ImportFioRipController;
+use App\Http\Controllers\Operator\SkidkaDopController;
+use App\Http\Controllers\Operator\SocialTaxiOrderController;
+
+
 
 
 
@@ -51,6 +55,8 @@ Route::middleware(['web', 'auth', IsAdmin::class])->group(function () {
         Route::post('/fio_rips', [ImportFioRipController::class, 'import'])->name('import.fio_rips.process');    
     });
     Route::resource('fio_rips', FioRipController::class)->except(['show']);
+    Route::resource('skidka_dops', SkidkaDopController::class)->except(['show']);
+    Route::resource('social-taxi-orders', SocialTaxiOrderController::class)->names('social-taxi-orders'); 
 });
 
 

@@ -68,8 +68,8 @@ class ImportFioRipController extends BaseController {
                     'data_r' => 'nullable|date_format:d.m.Y',
                     'sex' => 'nullable|in:М,Ж',
                     'adres' => 'nullable|string|max:255',
-                    'data_rip' => 'nullable|date_format:d.m.Y',
-                    'nom_zap' => 'nullable|string|max:255',
+                    'rip_at' => 'required|date_format:d.m.Y',
+                    'nom_zap' => 'string|max:255',
                 ])->validate();
 
                 // Преобразование дат

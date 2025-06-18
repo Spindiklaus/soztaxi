@@ -17,7 +17,7 @@ return new class extends Migration
             $table->unsignedSmallInteger('skidka')->comment('Окончательная скидка инвалиду')->default(100);
             $table->unsignedSmallInteger('kol_p')->comment('Лимит поездок в месяц для инвалида')->nullable();
             $table->unsignedTinyInteger('life')->comment('Действующий')->default(1);
-            $table->text('komment')->comment('Комментарии к заказу');
+            $table->text('komment')->comment('Комментарии к скидке')->nullable();
             $table->timestamps();
         });
     }
