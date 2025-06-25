@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('litera',332)->comment('Литера')->index('litera')->after('email_verified_at');
+            $table->string('litera',3)->comment('Литера')->index('litera')->after('email_verified_at');
             $table->unsignedTinyInteger('life')->comment('Действующий')->after('litera')->default(1);
         });
     }

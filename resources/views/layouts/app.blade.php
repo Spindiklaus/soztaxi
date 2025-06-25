@@ -64,7 +64,7 @@
         <!-- Подключение Feather Icons -->
         <script src="https://unpkg.com/feather-icons"></script> 
         <script>
-feather.replace();
+            feather.replace();
         </script>
 
 <!--        <script src="{{-- mix('js/app.js') --}}"></script>-->
