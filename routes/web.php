@@ -14,6 +14,8 @@ use App\Http\Controllers\Operator\FioRipController;
 use App\Http\Controllers\Operator\ImportFioRipController;
 use App\Http\Controllers\Operator\SkidkaDopController;
 use App\Http\Controllers\Operator\SocialTaxiOrderController;
+use App\Http\Controllers\Operator\ImportCategoryController;
+
 
 
 
@@ -53,6 +55,10 @@ Route::middleware(['web', 'auth', IsAdmin::class])->group(function () {
         Route::post('/fiodtrns', [ImportFioDtrnController::class, 'importClients'])->name('import.fiodtrns.process');
         Route::get('/fio_rips', [ImportFioRipController::class, 'showImportForm'])->name('import.fio_rips.form');
         Route::post('/fio_rips', [ImportFioRipController::class, 'import'])->name('import.fio_rips.process');    
+        // Форма импорта категории
+        Route::get('/categories', [ImportCategoryController::class, 'showImportForm'])->name('import.categories.form');
+        // Обработка загрузки CSV
+        Route::post('/categories', [ImportCategoryController::class, 'import'])->name('import.categories.process');        
     });
     Route::resource('fio_rips', FioRipController::class)->except(['show']);
     Route::resource('skidka_dops', SkidkaDopController::class)->except(['show']);
