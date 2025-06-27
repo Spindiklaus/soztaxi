@@ -27,7 +27,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M12 9v3m0 0v3m0-3h3m-3 0H9m4-12h5a2 2 0 012 2v10a2 2 0 01-2 2h-5l-5 5v-5H2a2 2 0 01-2-2V7a2 2 0 012-2h5V5z" />
                     </svg>
-                    Клиенты
+                    Клиенты соцтакси
                 </h1>
                 <div class="space-x-2 flex">
                     <a href="{{ route('import.fiodtrns.form') }}"
