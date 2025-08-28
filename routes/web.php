@@ -15,9 +15,7 @@ use App\Http\Controllers\Operator\ImportFioRipController;
 use App\Http\Controllers\Operator\SkidkaDopController;
 use App\Http\Controllers\Operator\SocialTaxiOrderController;
 use App\Http\Controllers\Operator\ImportCategoryController;
-
-
-
+use App\Http\Controllers\Operator\ImportOrdersController;
 
 
 
@@ -59,14 +57,14 @@ Route::middleware(['web', 'auth', IsAdmin::class])->group(function () {
         Route::get('/categories', [ImportCategoryController::class, 'showImportForm'])->name('import.categories.form');
         // Обработка загрузки CSV
         Route::post('/categories', [ImportCategoryController::class, 'import'])->name('import.categories.process');        
+        // Импорт заказов
+        Route::get('/orders', [ImportOrdersController::class, 'showImportForm'])->name('import.orders.form');
+        Route::post('/orders', [ImportOrdersController::class, 'import'])->name('import.orders.process');        
     });
     Route::resource('fio_rips', FioRipController::class)->except(['show']);
     Route::resource('skidka_dops', SkidkaDopController::class)->except(['show']);
     Route::resource('social-taxi-orders', SocialTaxiOrderController::class)->names('social-taxi-orders'); 
 });
-
-
-
 
 Route::get('/clear', function() {   // для очиски кэша сайта
         Artisan::call('cache:clear');    

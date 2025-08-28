@@ -1,0 +1,74 @@
+<x-app-layout>
+    <div class="bg-gray-100 py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-4">Импорт заказов из CSV</h1>
+            
+            <!-- Описание -->
+            <div class="bg-white shadow rounded-lg p-4 mb-4">
+                <h2 class="text-lg font-semibold text-gray-800 mb-2">Формат CSV файла:</h2>
+                <p class="text-sm text-gray-600 mb-2">
+                    Формат: <code>id;type_order;kl_id;client_tel;client_invalid;client_sopr;category_id;category_skidka;category_limit;dopus_id;skidka_dop_all;kol_p_limit;pz_nom;pz_data;adres_otkuda;adres_kuda;adres_obratno;zena_type;visit_data;predv_way;taxi_id;taxi_data;adres_trips_id;taxi_sent_at;taxi_price;taxi_way;otmena_data;otmena_taxi;closed_at;komment;user_id;created_at;updated_at;deleted_at</code>
+                </p>
+                <p class="text-sm text-gray-600 mb-3">
+                    <strong>Важно:</strong> поле <code>kl_id</code> будет использовано для поиска <code>client_id</code> в таблице клиентов
+                </p>
+                
+                <h3 class="text-md font-medium text-gray-700 mb-1">Пример содержимого:</h3>
+                <pre class="bg-gray-100 p-3 rounded text-xs overflow-x-auto">
+id;type_order;kl_id;client_tel;client_invalid;client_sopr;category_id;category_skidka;category_limit;dopus_id;skidka_dop_all;kol_p_limit;pz_nom;pz_data;adres_otkuda;adres_kuda;adres_obratno;zena_type;visit_data;predv_way;taxi_id;taxi_data;adres_trips_id;taxi_sent_at;taxi_price;taxi_way;otmena_data;otmena_taxi;closed_at;komment;user_id;created_at;updated_at;deleted_at
+318;1;36 04^448902;123123;;;10440;50;10;0;50;10;1-А;11.09.16 21:24;Самара, ул. Мичурина, 125;куда то;;1;14.09.16 08:00;0;3;11.09.16 22:23;44;11.09.16 22:23;300;10;  -   -  : :;0;14.09.16 22:19;;1;11.09.16 21:24;11.09.16 21:25;1
+319;1;36 04^448902;123123;;;600160;50;10;0;50;10;2-А;11.09.16 21:25;г. Самара, п. Берёза (Аэропорт Курумоч), квартал 2, дом 12.;куда то;;1;14.09.16 08:00;0;3;11.09.16 22:26;12;11.09.16 22:26;400;30;  -   -  : :;0;15.09.16 21:21;;1;11.09.16 21:25;11.09.16 21:27;1
+                </pre>
+            </div>
+
+            <!-- Сообщения -->
+            @if(session('success'))
+                <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            @if(session('success_count'))
+                <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4">
+                    {{ session('success_count') }} записей успешно импортировано.
+                </div>
+            @endif
+
+            @if(session('import_errors'))
+                <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
+                    <p class="font-bold">Ошибки при импорте:</p>
+                    <ul class="list-disc pl-5 mt-2">
+                        @foreach(session('import_errors') as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <!-- Форма загрузки -->
+            <form action="{{ route('import.orders.process') }}" method="POST" enctype="multipart/form-data" class="bg-white shadow rounded-lg p-6">
+                @csrf
+                <div class="mb-6">
+                    <label for="csv_file" class="block text-sm font-medium text-gray-700 mb-2">Выберите CSV-файл</label>
+                    <input type="file" name="csv_file" id="csv_file" required accept=".csv,.txt"
+                           class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                    <p class="mt-1 text-sm text-gray-500">Поддерживаются файлы с расширением .csv и .txt</p>
+                </div>
+
+                <div class="flex justify-end space-x-3">
+                    <a href="{{ route('social-taxi-orders.index') }}" 
+                       class="inline-flex items-center px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 transition duration-150 ease-in-out">
+                        Отмена
+                    </a>
+                    <button type="submit" 
+                            class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        Импортировать
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</x-app-layout>

@@ -54,10 +54,10 @@
 
             <!-- Форма фильтрации -->
             <div class="bg-white shadow rounded-lg p-4 mb-2">
-                <form action="{{ route('fiodtrns.index') }}" method="GET" class="space-y-4">
+                <form action="{{ route('fiodtrns.index') }}" method="GET" class="flex flex-wrap items-end gap-3">
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <!-- Поиск по ФИО -->
-                        <div>
+                        <div class="flex-1 min-w-[200px]">
                             <label for="filter_fio" class="block text-sm font-medium text-gray-700">ФИО</label>
                             <input type="text" name="fio" id="filter_fio"
                                    value="{{ request('fio') }}"
@@ -65,7 +65,7 @@
                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                         </div>
                         <!-- Поиск по ID клиента -->
-                        <div>
+                        <div class="flex-1 min-w-[150px]">
                             <label for="filter_kl_id" class="block text-sm font-medium text-gray-700">ID клиента</label>
                             <input type="text" name="kl_id" id="filter_kl_id"
                                    value="{{ request('kl_id') }}"
@@ -73,7 +73,7 @@
                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                         </div>
                         <!-- Фильтр по полу -->
-                        <div>
+                        <div class="flex-1 min-w-[120px]">
                             <label for="filter_sex" class="block text-sm font-medium text-gray-700">Пол</label>
                             <select name="sex" id="filter_sex"
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
@@ -83,7 +83,7 @@
                             </select>
                         </div>
                         <!-- Фильтр RIP -->
-                        <div>
+                        <div class="flex space-x-2 pb-1">
                             <label for="filter_rip" class="block text-sm font-medium text-gray-700">Только с RIP</label>
                             <input type="checkbox" name="rip" id="filter_rip"
                                    {{ request('rip') ? 'checked' : '' }}

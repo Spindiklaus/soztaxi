@@ -1,17 +1,31 @@
 <x-app-layout>
+    <!-- ТЕСТ: Файл social-taxi-orders/index.blade.php -->
     <div class="bg-gray-100 py-6">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h1 class="text-3xl font-bold text-gray-800 mb-4">Заказы</h1>
-
-            <!-- Кнопка создания записи -->
-            <a href="{{ route('social-taxi-orders.create') }}"
-               class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition ease-in-out duration-150"
-               title="Создать запись">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 text-blue-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                </svg>
-                Добавить заказ
-            </a>
+            <!-- Заголовок и кнопки -->
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-3xl font-bold text-gray-800">Заказы</h1>
+                
+                <div class="space-x-2 flex">
+                    <a href="{{ route('import.orders.form') }}"
+                       class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-white hover:bg-green-700"
+                       title="Импортировать заказы из CSV">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        Импортировать CSV
+                    </a>
+                    
+                    <a href="{{ route('social-taxi-orders.create') }}"
+                       class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition ease-in-out duration-150"
+                       title="Создать запись">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 text-blue-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Добавить заказ
+                    </a>
+                </div>
+            </div>
 
             <!-- Фильтры -->
             <form action="{{ route('social-taxi-orders.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
@@ -43,47 +57,69 @@
             </form>
 
             <!-- Таблица -->
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-blue-800 text-gray-200">
-                    <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-blue-700">ID</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-blue-700">Тип заказа</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-blue-700">Номер заказа</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-blue-700">Дата заказа</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-blue-700">Откуда</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-blue-700">Куда</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">Действия</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200">
-                    @foreach ($orders as $order)
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap">{{ $order->id }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            @if ($order->type_order == 1)
+            <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-blue-800 text-gray-200">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-blue-700">ID</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-blue-700">Тип заказа</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-blue-700">Номер заказа</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-blue-700">Дата заказа</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-blue-700">Откуда</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-blue-700">Куда</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        @forelse ($orders as $order)
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap">{{ $order->id }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @if ($order->type_order == 1)
                                 Соцтакси
-                            @elseif ($order->type_order == 2)
+                                @elseif ($order->type_order == 2)
                                 Легковое авто
-                            @elseif ($order->type_order == 3)
+                                @elseif ($order->type_order == 3)
                                 ГАЗель
-                            @endif
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">{{ $order->pz_nom }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">{{ $order->pz_data->format('d.m.Y H:i') }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">{{ $order->adres_otkuda }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">{{ $order->adres_kuda }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right space-x-2">
-                            <a href="{{ route('social-taxi-orders.edit', $order) }}" class="inline-flex items-center px-4 py-2 bg-yellow-100 text-yellow-800 rounded-md hover:bg-yellow-200">Редактировать</a>
-                            <form action="{{ route('social-taxi-orders.destroy', $order) }}" method="POST" class="inline" onsubmit="return confirm('Вы уверены?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="inline-flex items-center px-4 py-2 bg-red-100 text-red-800 rounded-md hover:bg-red-200">Удалить</button>
-                            </form>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">{{ $order->pz_nom }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">{{ $order->pz_data->format('d.m.Y H:i') }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">{{ $order->adres_otkuda }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">{{ $order->adres_kuda }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right space-x-2">
+                                <a href="{{ route('social-taxi-orders.show', $order) }}" class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-md hover:bg-blue-200 text-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                </a>
+                                <a href="{{ route('social-taxi-orders.edit', $order) }}" class="inline-flex items-center px-3 py-1 bg-yellow-100 text-yellow-800 rounded-md hover:bg-yellow-200 text-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                </a>
+                                <form action="{{ route('social-taxi-orders.destroy', $order) }}" method="POST" class="inline" onsubmit="return confirm('Вы уверены?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="inline-flex items-center px-3 py-1 bg-red-100 text-red-800 rounded-md hover:bg-red-200 text-sm">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                                Заказы не найдены
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
 
             <!-- Пагинация -->
             <div class="mt-4">
