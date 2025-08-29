@@ -16,6 +16,8 @@ use App\Http\Controllers\Operator\SkidkaDopController;
 use App\Http\Controllers\Operator\SocialTaxiOrderController;
 use App\Http\Controllers\Operator\ImportCategoryController;
 use App\Http\Controllers\Operator\ImportOrdersController;
+use App\Http\Controllers\Operator\ImportTaxiController;
+
 
 
 
@@ -59,7 +61,10 @@ Route::middleware(['web', 'auth', IsAdmin::class])->group(function () {
         Route::post('/categories', [ImportCategoryController::class, 'import'])->name('import.categories.process');        
         // Импорт заказов
         Route::get('/orders', [ImportOrdersController::class, 'showImportForm'])->name('import.orders.form');
-        Route::post('/orders', [ImportOrdersController::class, 'import'])->name('import.orders.process');        
+        Route::post('/orders', [ImportOrdersController::class, 'import'])->name('import.orders.process');  
+        // Импорт такси
+        Route::get('/taxis/import', [ImportTaxiController::class, 'showImportForm'])->name('import.taxis.form');
+        Route::post('/taxis/import', [ImportTaxiController::class, 'import'])->name('import.taxis.process');
     });
     Route::resource('fio_rips', FioRipController::class)->except(['show']);
     Route::resource('skidka_dops', SkidkaDopController::class)->except(['show']);
