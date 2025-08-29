@@ -55,6 +55,7 @@ class ImportOrdersController extends BaseController {
         $successCount = 0;
         $batchSize = 1000; // Размер пакета
         $batch = [];
+        $statusHistoryBatch = [];
 
         DB::beginTransaction();
         try {
@@ -66,6 +67,12 @@ class ImportOrdersController extends BaseController {
 
                 // Сопоставление данных
                 $data = array_combine($allowedHeaders, $row);
+                
+                // Проверяем, существует ли уже заказ с таким ID
+                if (!empty($data['id']) && Order::where('id', $data['id'])->exists()) {
+                    $errors[] = "Строка " . ($index + 2) . ": Заказ с ID={$data['id']} уже существует";
+                    continue;
+                }
 
                 // Преобразование дат
                 $data['pz_data'] = $this->convertDate($data['pz_data']);
@@ -84,7 +91,7 @@ class ImportOrdersController extends BaseController {
                     $data['deleted_at'] = null;
                 }
 
-                // Поиск client_id по kl_id с учетом разных форматов (3602 или 36 02)
+                // Поиск client_id по kl_id с учетом разных форматов
                 $client = $this->findClientByKlId($data['kl_id']);
                 if (!$client) {
                     $errors[] = "Строка " . ($index + 2) . ": Не найден клиент с kl_id={$data['kl_id']}";
@@ -99,8 +106,9 @@ class ImportOrdersController extends BaseController {
                     }
                 }
 
-                // Добавляем данные в пакет
-                $batch[] = [
+                // Подготавливаем данные для вставки (включая ID)
+                $orderData = [
+                    'id' => !empty($data['id']) ? (int)$data['id'] : null,
                     'type_order' => (int)$data['type_order'],
                     'client_id' => (int)$data['client_id'],
                     'client_tel' => $data['client_tel'],
@@ -134,18 +142,47 @@ class ImportOrdersController extends BaseController {
                     'deleted_at' => $data['deleted_at'],
                 ];
 
+                // Убираем null ID, если он пустой
+                if (empty($orderData['id'])) {
+                    unset($orderData['id']);
+                }
+
+                // Добавляем данные в пакет
+                $batch[] = $orderData;
+
+                // Определяем начальный статус для этого заказа
+                $statusId = $this->determineInitialStatus((object)$data);
+                $userId = auth()->id() ?? (int)$data['user_id'] ?? 1;
+
+                // Сохраняем информацию о статусе для последующей вставки
+                $statusHistoryBatch[] = [
+                    'status_order_id' => $statusId,
+                    'user_id' => $userId,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+
                 // Если пакет заполнен, сохраняем его
                 if (count($batch) === $batchSize) {
-                    Order::insert($batch);
+                    // Вставляем заказы
+                    $insertedOrders = $this->insertOrdersWithIds($batch);
+                    $successCount += count($insertedOrders);
+                    
+                    // Устанавливаем статусы для вставленных заказов
+                    $this->setOrderStatuses($insertedOrders, $statusHistoryBatch);
+                    
                     $batch = [];
-                    $successCount += $batchSize;
+                    $statusHistoryBatch = [];
                 }
             }
 
             // Сохраняем оставшиеся записи
             if (!empty($batch)) {
-                Order::insert($batch);
-                $successCount += count($batch);
+                $insertedOrders = $this->insertOrdersWithIds($batch);
+                $successCount += count($insertedOrders);
+                
+                // Устанавливаем статусы для вставленных заказов
+                $this->setOrderStatuses($insertedOrders, $statusHistoryBatch);
             }
 
             DB::commit();
@@ -166,27 +203,80 @@ class ImportOrdersController extends BaseController {
         }
     }
 
-    private function convertDate($dateString) {
-        if (empty($dateString) || $dateString === '  -   -  : :' || $dateString === '-' || $dateString === '0') {
-            return null;
+    /**
+     * Вставка заказов с сохранением ID
+     */
+    private function insertOrdersWithIds($batch) {
+        if (empty($batch)) {
+            return [];
         }
-        
-        // Формат даты в CSV: дд.мм.гг чч:мм или дд.мм.гггг чч:мм
-        if (preg_match('/^(\d{2})\.(\d{2})\.(\d{2,4})\s+(\d{2}):(\d{2})$/', $dateString, $matches)) {
-            $day = $matches[1];
-            $month = $matches[2];
-            $year = strlen($matches[3]) == 2 ? '20' . $matches[3] : $matches[3];
-            $hour = $matches[4];
-            $minute = $matches[5];
-            return "$year-$month-$day $hour:$minute:00";
+
+        // Разделяем заказы с ID и без ID
+        $withId = array_filter($batch, function($order) { return isset($order['id']); });
+        $withoutId = array_filter($batch, function($order) { return !isset($order['id']); });
+
+        $insertedOrders = [];
+
+        // Вставляем заказы с указанными ID
+        if (!empty($withId)) {
+            foreach ($withId as $order) {
+                $orderId = DB::table('orders')->insertGetId($order);
+                $insertedOrders[] = ['id' => $orderId, 'data' => $order];
+            }
         }
-        
-        return null;
+
+        // Вставляем заказы без ID (автоинкремент)
+        if (!empty($withoutId)) {
+            foreach ($withoutId as $order) {
+                $orderId = DB::table('orders')->insertGetId($order);
+                $insertedOrders[] = ['id' => $orderId, 'data' => $order];
+            }
+        }
+
+        return $insertedOrders;
     }
-    
+
+    /**
+     * Установка статусов для вставленных заказов
+     */
+    private function setOrderStatuses($insertedOrders, $statusHistoryBatch) {
+        if (empty($insertedOrders) || empty($statusHistoryBatch)) {
+            return;
+        }
+
+        $statusHistoryData = [];
+        foreach ($insertedOrders as $index => $orderInfo) {
+            if (isset($statusHistoryBatch[$index])) {
+                $statusHistoryData[] = array_merge(
+                    $statusHistoryBatch[$index],
+                    ['order_id' => $orderInfo['id']]
+                );
+            }
+        }
+
+        if (!empty($statusHistoryData)) {
+            DB::table('order_status_histories')->insert($statusHistoryData);
+        }
+    }
+
+    /**
+     * Определяем начальный статус на основе данных заказа
+     */
+    private function determineInitialStatus($orderData) {
+        // Логика определения статуса:
+        if (!empty($orderData->closed_at)) {
+            return 4; // Закрыт
+        } elseif (!empty($orderData->otmena_data) || !empty($orderData->cancelled_at)) {
+            return 3; // Отменён
+        } elseif (!empty($orderData->taxi_sent_at)) {
+            return 2; // Передан в такси
+        } else {
+            return 1; // Принят (по умолчанию)
+        }
+    }
+
     /**
      * Поиск клиента по kl_id с учетом разных форматов
-     * Проверяет оба формата: "36 04^123456" и "3604^123456"
      */
     private function findClientByKlId($klId) {
         // Сначала ищем по оригинальному формату
@@ -211,4 +301,21 @@ class ImportOrdersController extends BaseController {
         return $client;
     }
 
+    private function convertDate($dateString) {
+        if (empty($dateString) || $dateString === '  -   -  : :' || $dateString === '-' || $dateString === '0') {
+            return null;
+        }
+        
+        // Формат даты в CSV: дд.мм.гг чч:мм или дд.мм.гггг чч:мм
+        if (preg_match('/^(\d{2})\.(\d{2})\.(\d{2,4})\s+(\d{2}):(\d{2})$/', $dateString, $matches)) {
+            $day = $matches[1];
+            $month = $matches[2];
+            $year = strlen($matches[3]) == 2 ? '20' . $matches[3] : $matches[3];
+            $hour = $matches[4];
+            $minute = $matches[5];
+            return "$year-$month-$day $hour:$minute:00";
+        }
+        
+        return null;
+    }
 }

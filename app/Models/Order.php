@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+class Order extends Model {
 
-class Order extends Model
-{
     use HasFactory;
     use SoftDeletes; // Включаем поддержку мягкого удаления
+
     protected $table = 'orders';
     protected $fillable = [
         'type_order',
@@ -41,6 +41,7 @@ class Order extends Model
         'closed_at',
         'komment',
         'user_id',
+        'deleted_at',
     ];
     protected $dates = ['deleted_at']; // Указываем, что deleted_at — это дата
     protected $casts = [
@@ -51,15 +52,37 @@ class Order extends Model
         'closed_at' => 'datetime',
         'otmena_taxi' => 'boolean',
     ];
-    
-    public function statusHistory()
-    {
+
+    /**
+     * История статусов заказа
+     */
+    public function statusHistory() {
         return $this->hasMany(OrderStatusHistory::class);
     }
 
-    public function currentStatus()
-    {
+     /**
+     * Текущий статус заказа (последний по времени)
+     */
+    public function currentStatus() {
         return $this->hasOne(OrderStatusHistory::class)->latestOfMany();
     }
+
+    // методs для проверки наличия статусов при массовом импорте
+    public function hasStatusHistory() {
+        return $this->statusHistory()->exists();
+    }
+
+    public function needsInitialStatus() {
+        return !$this->hasStatusHistory();
+    }
     
+    /**
+     * Клиент (заказчик)
+     */
+    public function client()
+    {
+        return $this->belongsTo(FioDtrn::class, 'client_id');
+    }
+
+
 }

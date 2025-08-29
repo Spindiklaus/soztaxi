@@ -64,6 +64,8 @@ Route::middleware(['web', 'auth', IsAdmin::class])->group(function () {
     Route::resource('fio_rips', FioRipController::class)->except(['show']);
     Route::resource('skidka_dops', SkidkaDopController::class)->except(['show']);
     Route::resource('social-taxi-orders', SocialTaxiOrderController::class)->names('social-taxi-orders'); 
+    // маршрут для восстановления
+    Route::patch('/social-taxi-orders/{social_taxi_order}/restore', [SocialTaxiOrderController::class, 'restore'])->name('social-taxi-orders.restore');
 });
 
 Route::get('/clear', function() {   // для очиски кэша сайта

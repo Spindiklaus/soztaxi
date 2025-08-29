@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Models\Order;
 use App\Models\OrderStatusHistory;
+use Illuminate\Support\Facades\Auth;
 
 
 class OrderObserver
@@ -44,7 +45,7 @@ class OrderObserver
      */
     public function deleted(Order $order): void
     {
-        //
+        // Можно добавить логику при удалении, если нужно
     }
 
     /**
@@ -68,7 +69,7 @@ class OrderObserver
         OrderStatusHistory::create([
             'order_id' => $order->id,
             'status_order_id' => $statusOrderId,
-            'user_id' => Auth::id(), // записываем ID текущего пользователя
+            'user_id' => Auth::check() ? Auth::id() : null, // Проверяем, залогинен ли пользователь
             // может быть null, если вызвано из консоли или очереди
         ]);
     }
