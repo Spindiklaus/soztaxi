@@ -83,8 +83,24 @@ class TaxiController extends BaseController {
     }
 
     public function destroy(Taxi $taxi) {
+    try {
         $taxi->delete();
         return response()->json(['success' => true]);
+    } catch (\Exception $e) {
+        // Проверяем, является ли ошибка ограничением внешнего ключа
+        if (str_contains($e->getMessage(), 'foreign key constraint')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Невозможно удалить оператора такси, так как существуют заказы, связанные с ним. Сначала удалите или измените эти заказы.'
+            ], 400);
+        }
+        
+        // Другая ошибка
+        return response()->json([
+            'success' => false,
+            'message' => 'Ошибка при удалении оператора такси: ' . $e->getMessage()
+        ], 400);
     }
+}
 
 }
