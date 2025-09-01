@@ -223,7 +223,7 @@
             </div>
             <!-- Пагинация -->
             <div class="mt-4">
-                {{ $orders->appends(request()->all())->links() }}
+                {{ $orders->appends(request()->except('page'))->links() }}
             </div>
         </div>
     </div>
