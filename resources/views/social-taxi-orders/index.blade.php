@@ -28,7 +28,7 @@
             </div>
 
             <!-- Фильтры -->
-            <form action="{{ route('social-taxi-orders.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <form action="{{ route('social-taxi-orders.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                 <div>
                     <label for="filter_pz_nom" class="block text-sm font-medium text-gray-700">Номер заказа</label>
                     <input type="text" name="pz_nom" id="filter_pz_nom" value="{{ request('pz_nom') }}" placeholder="%Поиск%" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
@@ -44,7 +44,15 @@
                     </select>
                 </div>
 
-                <div class="flex justify-end space-x-2 col-span-full">
+                <div>
+                    <label for="show_deleted" class="block text-sm font-medium text-gray-700">Статус записей</label>
+                    <select name="show_deleted" id="show_deleted" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <option value="0" {{ request('show_deleted', '0') == '0' ? 'selected' : '' }}>Только активные</option>
+                        <option value="1" {{ request('show_deleted') == '1' ? 'selected' : '' }}>Все (включая удаленные)</option>
+                    </select>
+                </div>
+
+                <div class="flex justify-end space-x-2 md:col-span-1">
                     <button type="submit"
                             class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition ease-in-out duration-150">
                         Применить фильтр

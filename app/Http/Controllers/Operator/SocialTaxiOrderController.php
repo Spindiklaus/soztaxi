@@ -7,25 +7,32 @@ use Illuminate\Http\Request;
 
 class SocialTaxiOrderController extends BaseController {
 
-    // Показать список заказов (включая удаленные)
-    public function index(Request $request) {
-        $query = Order::with(['currentStatus.statusOrder', 'client'])->withTrashed(); // Включаем удаленные
-        // Фильтрация
-        if ($request->has('pz_nom')) {
-            $query->where('pz_nom', 'like', '%' . $request->input('pz_nom') . '%');
-        }
-        if ($request->has('type_order')) {
-            $query->where('type_order', $request->input('type_order'));
-        }
-
-        // Сортировка по умолчанию - по дате приема заказа DESC
-        $query->orderBy('pz_data', 'desc');
-
-        $orders = $query->paginate(15)->appends($request->all());
-
-        return view('social-taxi-orders.index', compact('orders'));
+    // Показать список заказов (временно упрощенный вариант)
+// Показать список заказов
+public function index(Request $request) {
+    $showDeleted = $request->get('show_deleted', '0');
+    
+    if ($showDeleted == '1') {
+        $query = Order::with(['currentStatus.statusOrder', 'client'])->withTrashed();
+    } else {
+        $query = Order::with(['currentStatus.statusOrder', 'client']);
     }
 
+    // Фильтрация только по непустым значениям
+    if ($request->filled('pz_nom')) {  // filled() вместо has() + проверки на пустоту проверяет, что значение существует и не является пустой строкой.
+        $query->where('pz_nom', 'like', '%' . $request->input('pz_nom') . '%');
+    }
+    if ($request->filled('type_order')) {
+        $query->where('type_order', $request->input('type_order'));
+    }
+
+    // Сортировка
+    $query->orderBy('pz_data', 'desc');
+
+    $orders = $query->paginate(15)->appends($request->all());
+
+    return view('social-taxi-orders.index', compact('orders', 'showDeleted'));
+}
     // Показать форму создания заказа
     public function create() {
         return view('social-taxi-orders.create');
@@ -35,7 +42,7 @@ class SocialTaxiOrderController extends BaseController {
     public function store(Request $request) {
         $validated = $request->validate([
             'type_order' => 'required|integer|in:1,2,3',
-            'client_id' => 'required|exists:clients,id',
+            'client_id' => 'required|exists:fio_dtrns,id', // Исправлено на fio_dtrns
             'client_tel' => 'required|string|max:255',
             'adres_otkuda' => 'required|string|max:255',
             'adres_kuda' => 'required|string|max:255',
@@ -65,7 +72,7 @@ class SocialTaxiOrderController extends BaseController {
     public function update(Request $request, Order $order) {
         $validated = $request->validate([
             'type_order' => 'required|integer|in:1,2,3',
-            'client_id' => 'required|exists:clients,id',
+            'client_id' => 'required|exists:fio_dtrns,id', // Исправлено на fio_dtrns
             'client_tel' => 'required|string|max:255',
             'adres_otkuda' => 'required|string|max:255',
             'adres_kuda' => 'required|string|max:255',
@@ -104,5 +111,4 @@ class SocialTaxiOrderController extends BaseController {
 
         return redirect()->route('social-taxi-orders.index')->with('error', 'Заказ не был удален.');
     }
-
 }
