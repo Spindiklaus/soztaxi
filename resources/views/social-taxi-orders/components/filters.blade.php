@@ -75,10 +75,19 @@
                         class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition ease-in-out duration-150">
                     Применить фильтр
                 </button>
-                <a href="{{ route('social-taxi-orders.index', array_merge(request()->only(['sort', 'direction', 'show_deleted']), ['date_from' => '2016-08-01', 'date_to' => date('Y-m-d')])) }}"
-                   class="inline-flex items-center px-4 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-gray-800 hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition ease-in-out duration-150">
-                    Сбросить фильтры
-                </a>
+                @php
+    // Собираем параметры для сброса - оставляем только базовые
+    $baseParams = request()->only(['sort', 'direction']);
+    $resetParams = array_merge($baseParams, [
+        'date_from' => '2016-08-01',
+        'date_to' => date('Y-m-d'),
+        'show_deleted' => '0'
+    ]);
+@endphp
+<a href="{{ route('social-taxi-orders.index', $resetParams) }}"
+   class="inline-flex items-center px-4 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-gray-800 hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition ease-in-out duration-150">
+    Сбросить фильтры
+</a>
             </div>
         </div>
     </div>
@@ -100,8 +109,18 @@ function toggleFilters() {
 
 // Показываем фильтры, если есть активные фильтры
 document.addEventListener('DOMContentLoaded', function() {
-    const hasActiveFilters = {{ request()->hasAny(['pz_nom', 'type_order', 'status_order_id', 'date_from', 'date_to']) ? 'true' : 'false' }};
-    if (hasActiveFilters) {
+    // Проверяем, есть ли активные пользовательские фильтры
+    const hasUserFilters = {{ 
+        collect(request()->except(['sort', 'direction', 'page']))->filter(function($value, $key) {
+            // Исключаем параметры по умолчанию
+            if ($key === 'date_from' && $value === '2016-08-01') return false;
+            if ($key === 'date_to' && $value === date('Y-m-d')) return false;
+            if ($key === 'show_deleted' && $value === '0') return false;
+            return !empty($value);
+        })->isNotEmpty() ? 'true' : 'false' 
+    }};
+    
+    if (hasUserFilters) {
         document.getElementById('filters-content').classList.remove('hidden');
         document.getElementById('filter-arrow').classList.add('rotate-180');
     }
