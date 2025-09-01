@@ -14,9 +14,9 @@
     
     <!-- Содержимое фильтров (скрыто по умолчанию) -->
     <div id="filters-content" class="p-4 hidden">
-        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
             <!-- Скрытое поле для сохранения параметров сортировки -->
-            @foreach(request()->except(['pz_nom', 'type_order', 'show_deleted', 'page', 'date_from', 'date_to']) as $key => $value)
+            @foreach(request()->except(['pz_nom', 'type_order', 'show_deleted', 'status_order_id', 'page', 'date_from', 'date_to']) as $key => $value)
                 <input type="hidden" name="{{ $key }}" value="{{ $value }}">
             @endforeach
 
@@ -43,8 +43,19 @@
                 </select>
             </div>
 
+            <div>
+                <label for="filter_status_order_id" class="block text-sm font-medium text-gray-700">Статус заказа</label>
+                <select name="status_order_id" id="filter_status_order_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    <option value="">Все статусы</option>
+                    <option value="1" {{ request('status_order_id') == '1' ? 'selected' : '' }}>Принят</option>
+                    <option value="2" {{ request('status_order_id') == '2' ? 'selected' : '' }}>Передан в такси</option>
+                    <option value="3" {{ request('status_order_id') == '3' ? 'selected' : '' }}>Отменён</option>
+                    <option value="4" {{ request('status_order_id') == '4' ? 'selected' : '' }}>Закрыт</option>
+                </select>
+            </div>
+
             <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700">Дата приема заказа (c - по)</label>
+                <label class="block text-sm font-medium text-gray-700">Дата приема заказа</label>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
                         <input type="date" name="date_from" id="date_from" 
@@ -58,17 +69,17 @@
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="flex justify-end space-x-2">
-            <button type="submit"
-                    class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition ease-in-out duration-150">
-                Применить фильтр
-            </button>
-            <a href="{{ route('social-taxi-orders.index', array_merge(request()->only(['sort', 'direction', 'show_deleted']), ['date_from' => '2016-08-01', 'date_to' => date('Y-m-d')])) }}"
-               class="inline-flex items-center px-4 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-gray-800 hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition ease-in-out duration-150">
-                Сбросить фильтры
-            </a>
+            <div class="md:col-span-2 flex items-end space-x-2">
+                <button type="submit"
+                        class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition ease-in-out duration-150">
+                    Применить фильтр
+                </button>
+                <a href="{{ route('social-taxi-orders.index', array_merge(request()->only(['sort', 'direction', 'show_deleted']), ['date_from' => '2016-08-01', 'date_to' => date('Y-m-d')])) }}"
+                   class="inline-flex items-center px-4 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-gray-800 hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition ease-in-out duration-150">
+                    Сбросить фильтры
+                </a>
+            </div>
         </div>
     </div>
 </form>
@@ -89,7 +100,7 @@ function toggleFilters() {
 
 // Показываем фильтры, если есть активные фильтры
 document.addEventListener('DOMContentLoaded', function() {
-    const hasActiveFilters = {{ request()->hasAny(['pz_nom', 'type_order', 'date_from', 'date_to']) ? 'true' : 'false' }};
+    const hasActiveFilters = {{ request()->hasAny(['pz_nom', 'type_order', 'status_order_id', 'date_from', 'date_to']) ? 'true' : 'false' }};
     if (hasActiveFilters) {
         document.getElementById('filters-content').classList.remove('hidden');
         document.getElementById('filter-arrow').classList.add('rotate-180');

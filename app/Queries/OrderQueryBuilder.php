@@ -50,31 +50,36 @@ class OrderQueryBuilder
      * @return self Возвращает себя для цепочного вызова
      */
     public function applyFilters(Request $request): self
-    {
-        // Фильтрация по номеру заказа (частичное совпадение)
-        if ($request->filled('pz_nom')) {
-            $this->query->where('pz_nom', 'like', '%' . $request->input('pz_nom') . '%');
-        }
-        
-        // Фильтрация по типу заказа
-        if ($request->filled('type_order')) {
-            $this->query->where('type_order', $request->input('type_order'));
-        }
-        
-        // Фильтрация по диапазону дат приема заказов
-        // По умолчанию: с 01.08.2016 по текущую дату
-        $dateFrom = $request->input('date_from', '2016-08-01');
-        $dateTo = $request->input('date_to', date('Y-m-d'));
-        
-        if ($dateFrom) {
-            $this->query->whereDate('pz_data', '>=', $dateFrom);
-        }
-        if ($dateTo) {
-            $this->query->whereDate('pz_data', '<=', $dateTo);
-        }
-        
-        return $this;
+{
+    // Фильтрация
+    if ($request->filled('pz_nom')) {
+        $this->query->where('pz_nom', 'like', '%' . $request->input('pz_nom') . '%');
     }
+    
+    if ($request->filled('type_order')) {
+        $this->query->where('type_order', $request->input('type_order'));
+    }
+    
+    // Фильтрация по статусу заказа
+    if ($request->filled('status_order_id')) {
+        $this->query->whereHas('currentStatus', function ($q) use ($request) {
+            $q->where('status_order_id', $request->input('status_order_id'));
+        });
+    }
+    
+    // Фильтрация по диапазону дат
+    $dateFrom = $request->input('date_from', '2016-08-01');
+    $dateTo = $request->input('date_to', date('Y-m-d'));
+    
+    if ($dateFrom) {
+        $this->query->whereDate('pz_data', '>=', $dateFrom);
+    }
+    if ($dateTo) {
+        $this->query->whereDate('pz_data', '<=', $dateTo);
+    }
+    
+    return $this;
+}
 
     /**
      * Применяет сортировку к запросу
