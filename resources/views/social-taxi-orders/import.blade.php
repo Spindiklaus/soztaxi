@@ -7,15 +7,19 @@
             <div class="bg-white shadow rounded-lg p-4 mb-4">
                 <h2 class="text-lg font-semibold text-gray-800 mb-2">Формат CSV файла:</h2>
                 <p class="text-sm text-gray-600 mb-2">
-                    Формат: <code>id;type_order;kl_id;client_tel;client_invalid;client_sopr;category_id;category_skidka;category_limit;dopus_id;skidka_dop_all;kol_p_limit;pz_nom;pz_data;adres_otkuda;adres_kuda;adres_obratno;zena_type;visit_data;predv_way;taxi_id;taxi_data;adres_trips_id;taxi_sent_at;taxi_price;taxi_way;otmena_data;otmena_taxi;closed_at;komment;user_id;created_at;updated_at;deleted_at</code>
+                    Формат: <code class="break-all">id;type_order;kl_id;client_tel;client_invalid;client_sopr;nmv;category_skidka;category_limit;dopus_id;skidka_dop_all;kol_p_limit;pz_nom;pz_data;adres_otkuda;adres_kuda;adres_obratno;zena_type;visit_data;predv_way;taxi_id;taxi_data;adres_trips_id;taxi_sent_at;taxi_price;taxi_way;otmena_data;otmena_taxi;closed_at;komment;user_id;created_at;updated_at;deleted_at</code>
                 </p>
                 <p class="text-sm text-gray-600 mb-3">
-                    <strong>Важно:</strong> поле <code>kl_id</code> будет использовано для поиска <code>client_id</code> в таблице клиентов
+                    <strong>Важно:</strong> 
+                    <ul class="list-disc pl-5 mt-1 text-sm">
+                        <li>Поле <code>kl_id</code> будет использовано для поиска <code>client_id</code> в таблице клиентов</li>
+                        <li>Поле <code>nmv</code> будет использовано для поиска <code>category_id</code> в таблице категорий (по NMV категории)</li>
+                    </ul>
                 </p>
                 
                 <h3 class="text-md font-medium text-gray-700 mb-1">Пример содержимого:</h3>
                 <pre class="bg-gray-100 p-3 rounded text-xs overflow-x-auto">
-id;type_order;kl_id;client_tel;client_invalid;client_sopr;category_id;category_skidka;category_limit;dopus_id;skidka_dop_all;kol_p_limit;pz_nom;pz_data;adres_otkuda;adres_kuda;adres_obratno;zena_type;visit_data;predv_way;taxi_id;taxi_data;adres_trips_id;taxi_sent_at;taxi_price;taxi_way;otmena_data;otmena_taxi;closed_at;komment;user_id;created_at;updated_at;deleted_at
+id;type_order;kl_id;client_tel;client_invalid;client_sopr;nmv;category_skidka;category_limit;dopus_id;skidka_dop_all;kol_p_limit;pz_nom;pz_data;adres_otkuda;adres_kuda;adres_obratno;zena_type;visit_data;predv_way;taxi_id;taxi_data;adres_trips_id;taxi_sent_at;taxi_price;taxi_way;otmena_data;otmena_taxi;closed_at;komment;user_id;created_at;updated_at;deleted_at
 318;1;36 04^448902;123123;;;10440;50;10;0;50;10;1-А;11.09.16 21:24;Самара, ул. Мичурина, 125;куда то;;1;14.09.16 08:00;0;3;11.09.16 22:23;44;11.09.16 22:23;300;10;  -   -  : :;0;14.09.16 22:19;;1;11.09.16 21:24;11.09.16 21:25;1
 319;1;36 04^448902;123123;;;600160;50;10;0;50;10;2-А;11.09.16 21:25;г. Самара, п. Берёза (Аэропорт Курумоч), квартал 2, дом 12.;куда то;;1;14.09.16 08:00;0;3;11.09.16 22:26;12;11.09.16 22:26;400;30;  -   -  : :;0;15.09.16 21:21;;1;11.09.16 21:25;11.09.16 21:27;1
                 </pre>
@@ -57,15 +61,15 @@ id;type_order;kl_id;client_tel;client_invalid;client_sopr;category_id;category_s
 
                 <div class="flex justify-end space-x-3">
                     <a href="{{ route('social-taxi-orders.index') }}" 
-                       class="inline-flex items-center px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 transition duration-150 ease-in-out">
+                       class="inline-flex items-center px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400">
                         Отмена
                     </a>
                     <button type="submit" 
-                            class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out">
+                            class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                         </svg>
-                        Импортировать
+                        Загрузить
                     </button>
                 </div>
             </form>

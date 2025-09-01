@@ -2,37 +2,37 @@
 
 namespace App\Http\Controllers\Operator;
 
+use App\Queries\OrderQueryBuilder;
 use App\Models\Order;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreSocialTaxiOrderRequest;
+use App\Http\Requests\UpdateSocialTaxiOrderRequest;
 
 class SocialTaxiOrderController extends BaseController {
 
-    // Показать список заказов (временно упрощенный вариант)
-// Показать список заказов
+    protected $queryBuilder;
+
+    public function __construct(OrderQueryBuilder $queryBuilder) {
+        $this->queryBuilder = $queryBuilder;
+    }
+
+    // Показать список заказов
     public function index(Request $request) {
+        // По умолчанию показываем только неудаленные записи
         $showDeleted = $request->get('show_deleted', '0');
 
-        if ($showDeleted == '1') {
-            $query = Order::with(['currentStatus.statusOrder', 'client'])->withTrashed();
-        } else {
-            $query = Order::with(['currentStatus.statusOrder', 'client']);
-        }
+        $sort = $request->get('sort', 'pz_data');
+        $direction = $request->get('direction', 'desc');
 
-        // Фильтрация только по непустым значениям
-        if ($request->filled('pz_nom')) {  // filled() вместо has() + проверки на пустоту проверяет, что значение существует и не является пустой строкой.
-            $query->where('pz_nom', 'like', '%' . $request->input('pz_nom') . '%');
-        }
-        if ($request->filled('type_order')) {
-            $query->where('type_order', $request->input('type_order'));
-        }
-
-        // Сортировка
-        $query->orderBy('pz_data', 'desc');
-
+        $query = $this->queryBuilder->build($request, $showDeleted == '1');
         $orders = $query->paginate(15)->appends($request->all());
 
-        $params = $request->only(['show_deleted', 'pz_nom', 'type_order', 'page']);
-        return view('social-taxi-orders.index', compact('orders', 'showDeleted', 'params'));
+        return view('social-taxi-orders.index', compact(
+                        'orders',
+                        'showDeleted',
+                        'sort',
+                        'direction'
+        ));
     }
 
     // Показать форму создания заказа
@@ -41,21 +41,8 @@ class SocialTaxiOrderController extends BaseController {
     }
 
     // Сохранить новый заказ
-    public function store(Request $request) {
-        $validated = $request->validate([
-            'type_order' => 'required|integer|in:1,2,3',
-            'client_id' => 'required|exists:fio_dtrns,id', // Исправлено на fio_dtrns
-            'client_tel' => 'required|string|max:255',
-            'adres_otkuda' => 'required|string|max:255',
-            'adres_kuda' => 'required|string|max:255',
-            'pz_nom' => 'required|string|max:255',
-            'pz_data' => 'required|date',
-            'visit_data' => 'required|date',
-            'taxi_id' => 'required|exists:taxis,id',
-            'komment' => 'nullable|string',
-        ]);
-
-        Order::create($validated);
+    public function store(StoreSocialTaxiOrderRequest $request) {
+        Order::create($request->validated());
 
         return redirect()->route('social-taxi-orders.index')->with('success', 'Заказ успешно создан.');
     }
@@ -71,21 +58,8 @@ class SocialTaxiOrderController extends BaseController {
     }
 
     // Обновить заказ
-    public function update(Request $request, Order $order) {
-        $validated = $request->validate([
-            'type_order' => 'required|integer|in:1,2,3',
-            'client_id' => 'required|exists:fio_dtrns,id', // Исправлено на fio_dtrns
-            'client_tel' => 'required|string|max:255',
-            'adres_otkuda' => 'required|string|max:255',
-            'adres_kuda' => 'required|string|max:255',
-            'pz_nom' => 'required|string|max:255',
-            'pz_data' => 'required|date',
-            'visit_data' => 'required|date',
-            'taxi_id' => 'required|exists:taxis,id',
-            'komment' => 'nullable|string',
-        ]);
-
-        $order->update($validated);
+    public function update(UpdateSocialTaxiOrderRequest $request, Order $order) {
+        $order->update($request->validated());
 
         return redirect()->route('social-taxi-orders.index')->with('success', 'Заказ успешно обновлен.');
     }
@@ -96,18 +70,14 @@ class SocialTaxiOrderController extends BaseController {
         $order = Order::withTrashed()->find($id);
 
         if (!$order) {
-            // Сохраняем параметры запроса при редиректе
-            $params = request()->only(['show_deleted', 'pz_nom', 'type_order', 'page']);
-            return redirect()->route('social-taxi-orders.index', $params)->with('error', 'Заказ не найден.');
+            return redirect()->back()->with('error', 'Заказ не найден.');
         }
 
         // Принудительно устанавливаем deleted_at
         $order->deleted_at = now();
         $order->save();
 
-        // Сохраняем параметры запроса при редиректе
-        $params = request()->only(['show_deleted', 'pz_nom', 'type_order', 'page']);
-        return redirect()->route('social-taxi-orders.index', $params)->with('success', 'Заказ успешно удален.');
+        return redirect()->back()->with('success', 'Заказ успешно удален.');
     }
 
     public function restore($id) {
@@ -115,19 +85,15 @@ class SocialTaxiOrderController extends BaseController {
         $order = Order::withTrashed()->find($id);
 
         if (!$order) {
-            return redirect()->route('social-taxi-orders.index')->with('error', 'Заказ не найден.');
+            return redirect()->back()->with('error', 'Заказ не найден.');
         }
 
         if ($order->trashed()) {
             $order->restore();
-            // Сохраняем параметры запроса при редиректе
-            $params = request()->only(['show_deleted', 'pz_nom', 'type_order', 'page']);
-            return redirect()->route('social-taxi-orders.index', $params)->with('success', 'Заказ успешно восстановлен.');
+            return redirect()->back()->with('success', 'Заказ успешно восстановлен.');
         }
 
-        // Сохраняем параметры запроса при редиректе
-        $params = request()->only(['show_deleted', 'pz_nom', 'type_order', 'page']);
-        return redirect()->route('social-taxi-orders.index', $params)->with('error', 'Заказ не был удален.');
+        return redirect()->back()->with('error', 'Заказ не был удален.');
     }
 
 }

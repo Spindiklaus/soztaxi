@@ -83,6 +83,23 @@ class Order extends Model {
     {
         return $this->belongsTo(FioDtrn::class, 'client_id');
     }
+    
+    /**
+     * Категория инвалидности клиента
+     */
+    public function category()
+    {
+        return $this->belongsTo(Category::class, 'category_id');
+    }
+    
+     /**
+     * Дополнительные условия для скидок
+     */
+    public function dopus()
+    {
+        return $this->belongsTo(SkidkaDop::class, 'dopus_id');
+    }
+
 
 
 }

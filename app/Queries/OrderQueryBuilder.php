@@ -1,0 +1,204 @@
+<?php
+
+namespace App\Queries;
+
+use App\Models\Order;
+use Illuminate\Http\Request;
+
+/**
+ * Построитель запросов для таблицы заказов
+ * 
+ * Этот класс инкапсулирует всю логику построения запросов к таблице orders,
+ * включая фильтрацию, сортировку и работу с удаленными записями.
+ * 
+ * Используется для уменьшения "толщины" контроллера и соблюдения принципа 
+ * единственной ответственности (SRP).
+ */
+class OrderQueryBuilder
+{
+    /**
+     * @var \Illuminate\Database\Eloquent\Builder Экземпляр построителя запросов
+     */
+    protected $query;
+
+    /**
+     * Конструктор класса
+     * 
+     * Инициализирует построитель запросов с базовыми отношениями,
+     * которые нужны для отображения списка заказов.
+     */
+    public function __construct()
+    {
+        // Создаем базовый запрос с предзагрузкой необходимых отношений
+        $this->query = Order::with([
+            'currentStatus.statusOrder', // Текущий статус заказа
+            'client',                     // Клиент (заказчик)
+            'category',                   // Категория инвалидности
+            'dopus'                       // Дополнительные условия
+        ]);
+    }
+
+    /**
+     * Применяет фильтры к запросу
+     * 
+     * Обрабатывает все входящие параметры фильтрации:
+     * - поиск по номеру заказа
+     * - фильтр по типу заказа
+     * - фильтр по диапазону дат
+     * 
+     * @param Request $request HTTP-запрос с параметрами фильтрации
+     * @return self Возвращает себя для цепочного вызова
+     */
+    public function applyFilters(Request $request): self
+    {
+        // Фильтрация по номеру заказа (частичное совпадение)
+        if ($request->filled('pz_nom')) {
+            $this->query->where('pz_nom', 'like', '%' . $request->input('pz_nom') . '%');
+        }
+        
+        // Фильтрация по типу заказа
+        if ($request->filled('type_order')) {
+            $this->query->where('type_order', $request->input('type_order'));
+        }
+        
+        // Фильтрация по диапазону дат приема заказов
+        // По умолчанию: с 01.08.2016 по текущую дату
+        $dateFrom = $request->input('date_from', '2016-08-01');
+        $dateTo = $request->input('date_to', date('Y-m-d'));
+        
+        if ($dateFrom) {
+            $this->query->whereDate('pz_data', '>=', $dateFrom);
+        }
+        if ($dateTo) {
+            $this->query->whereDate('pz_data', '<=', $dateTo);
+        }
+        
+        return $this;
+    }
+
+    /**
+     * Применяет сортировку к запросу
+     * 
+     * Обрабатывает параметры сортировки и применяет соответствующий ORDER BY.
+     * Поддерживает сортировку по:
+     * - дате приема заказа (pz_data)
+     * - дате поездки (visit_data)  
+     * - ФИО клиента (client_fio)
+     * - ID заказа (id)
+     * 
+     * @param Request $request HTTP-запрос с параметрами сортировки
+     * @return self Возвращает себя для цепочного вызова
+     */
+    public function applySorting(Request $request): self
+    {
+        // Получаем параметры сортировки из запроса
+        $sort = $request->input('sort', 'pz_data');        // Поле для сортировки
+        $direction = $request->input('direction', 'desc'); // Направление (ASC/DESC)
+        
+        // Защита от некорректных значений сортировки
+        $allowedSorts = ['pz_data', 'visit_data', 'client_fio', 'id'];
+        if (!in_array($sort, $allowedSorts)) {
+            $sort = 'pz_data'; // По умолчанию сортируем по дате приема
+        }
+        
+        // Защита от некорректного направления сортировки
+        if (!in_array(strtolower($direction), ['asc', 'desc'])) {
+            $direction = 'desc'; // По умолчанию DESC
+        }
+        
+        // Применяем соответствующую сортировку в зависимости от поля
+        switch ($sort) {
+            case 'client_fio':
+                // Специальная сортировка по ФИО клиента через JOIN
+                $this->applyClientFioSorting($direction);
+                break;
+            case 'visit_data':
+                // Сортировка по дате поездки
+                $this->query->orderBy('visit_data', $direction);
+                break;
+            case 'pz_data':
+            default:
+                // Сортировка по дате приема заказа (по умолчанию)
+                $this->query->orderBy('pz_data', $direction);
+                break;
+        }
+        
+        return $this;
+    }
+
+    /**
+     * Применяет сортировку по ФИО клиента
+     * 
+     * Для сортировки по ФИО требуется JOIN с таблицей клиентов,
+     * так как ФИО хранится в отдельной таблице.
+     * 
+     * @param string $direction Направление сортировки (ASC/DESC)
+     * @return void
+     */
+    protected function applyClientFioSorting(string $direction): void
+    {
+        $this->query->join('fio_dtrns', 'orders.client_id', '=', 'fio_dtrns.id')
+                    ->select('orders.*', 'fio_dtrns.fio as client_fio_sort')
+                    ->orderBy('client_fio_sort', $direction);
+    }
+
+    /**
+     * Включает/исключает удаленные записи в результат
+     * 
+     * При включении удаленных записей использует withTrashed(),
+     * что позволяет показывать как активные, так и удаленные заказы.
+     * 
+     * @param bool $withTrashed Флаг включения удаленных записей
+     * @return self Возвращает себя для цепочного вызова
+     */
+    public function withTrashed(bool $withTrashed = true): self
+    {
+        if ($withTrashed) {
+            $this->query->withTrashed();
+        }
+        return $this;
+    }
+
+    /**
+     * Выполняет пагинацию результатов
+     * 
+     * @param int $perPage Количество записей на страницу
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     */
+    public function paginate(int $perPage = 15)
+    {
+        return $this->query->paginate($perPage);
+    }
+
+    /**
+     * Выполняет запрос и возвращает все результаты
+     * 
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function get()
+    {
+        return $this->query->get();
+    }
+
+    /**
+     * Собирает итоговый запрос
+     * 
+     * Основной метод, который объединяет все фильтры, сортировку 
+     * и настройки отображения удаленных записей.
+     * 
+     * @param Request $request HTTP-запрос
+     * @param bool $withTrashed Флаг включения удаленных записей
+     * @return self Возвращает себя для дальнейшего использования
+     */
+    public function build(Request $request, bool $withTrashed = false)
+    {
+        // Применяем настройку отображения удаленных записей
+        if ($withTrashed) {
+            $this->withTrashed();
+        }
+        
+        // Последовательно применяем фильтры и сортировку
+        return $this->applyFilters($request)
+                   ->applySorting($request);
+    }
+}
