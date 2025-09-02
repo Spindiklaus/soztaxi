@@ -48,8 +48,30 @@ class SocialTaxiOrderController extends BaseController {
     }
 
     // Показать конкретный заказ
-    public function show(Order $order) {
-        return view('social-taxi-orders.show', compact('order'));
+    public function show($id) {
+
+        \Log::info('Попытка открыть заказ', ['order_id' => $id]);
+
+        try {
+            // Сначала попробуем найти заказ
+            $order = Order::withTrashed()->find($id);
+
+            if (!$order) {
+                \Log::warning('Заказ не найден', ['order_id' => $id]);
+                return redirect()->route('social-taxi-orders.index')
+                                ->with('error', 'Заказ не найден.');
+            }
+
+            \Log::info('Найден заказ', ['order_id' => $order->id, 'deleted_at' => $order->deleted_at]);
+
+            // Загружаем все необходимые отношения
+            $order->load(['client', 'category', 'dopus', 'statusHistory.statusOrder', 'user']);
+
+            return view('social-taxi-orders.show', compact('order'));
+        } catch (\Exception $e) {
+            return redirect()->route('social-taxi-orders.index')
+                            ->with('error', 'ЗПроизошла ошибка при открытии заказа.');
+        }
     }
 
     // Показать форму редактирования заказа

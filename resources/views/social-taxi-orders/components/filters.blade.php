@@ -99,9 +99,50 @@ function toggleFilters() {
 }
 
 // Показываем фильтры, если есть активные фильтры
+// Фильтры разворачиваются при наличии активных фильтров
+// Фильтры свернуты по умолчанию
 document.addEventListener('DOMContentLoaded', function() {
-    const hasActiveFilters = {{ request()->hasAny(['pz_nom', 'type_order', 'status_order_id', 'date_from', 'date_to']) ? 'true' : 'false' }};
-    if (hasActiveFilters) {
+    // Получаем все параметры запроса
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    // Проверяем, есть ли "настоящие" фильтры (не только по умолчанию)
+    let hasRealFilters = false;
+    
+    for (const [key, value] of urlParams.entries()) {
+        // Пропускаем системные параметры
+        if (['sort', 'direction', 'page'].includes(key)) {
+            continue;
+        }
+        
+        // Проверяем конкретные фильтры
+        if (key === 'pz_nom' && value !== '') {
+            hasRealFilters = true;
+            break;
+        }
+        if (key === 'type_order' && value !== '') {
+            hasRealFilters = true;
+            break;
+        }
+        if (key === 'status_order_id' && value !== '') {
+            hasRealFilters = true;
+            break;
+        }
+        if (key === 'date_from' && value !== '2016-08-01') {
+            hasRealFilters = true;
+            break;
+        }
+        if (key === 'date_to' && value !== '{{ date('Y-m-d') }}') {
+            hasRealFilters = true;
+            break;
+        }
+        if (key === 'show_deleted' && value !== '0') {
+            hasRealFilters = true;
+            break;
+        }
+    }
+    
+    // Показываем фильтры, если есть настоящие фильтры
+    if (hasRealFilters) {
         document.getElementById('filters-content').classList.remove('hidden');
         document.getElementById('filter-arrow').classList.add('rotate-180');
     }
