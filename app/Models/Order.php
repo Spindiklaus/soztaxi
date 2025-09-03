@@ -48,9 +48,13 @@ class Order extends Model {
         'pz_data' => 'datetime',
         'visit_data' => 'datetime',
         'taxi_sent_at' => 'datetime',
+        'taxi_data' => 'datetime',
         'cancelled_at' => 'datetime',
         'closed_at' => 'datetime',
         'otmena_taxi' => 'boolean',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'deleted_at' => 'datetime',
     ];
 
     /**
@@ -99,7 +103,11 @@ class Order extends Model {
     {
         return $this->belongsTo(SkidkaDop::class, 'dopus_id');
     }
-
+    
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
 
 }
