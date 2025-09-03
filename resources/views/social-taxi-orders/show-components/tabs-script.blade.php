@@ -34,4 +34,28 @@
             });
         });
     });
+    
+    function toggleClientInfo() {
+    const content = document.getElementById('client-info-content');
+    const arrow = document.getElementById('client-info-arrow');
+    
+    if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        arrow.classList.add('rotate-180');
+    } else {
+        content.classList.add('hidden');
+        arrow.classList.remove('rotate-180');
+    }
+}
+
+// Показываем информацию о клиенте, если есть активные фильтры или по умолчанию
+document.addEventListener('DOMContentLoaded', function() {
+    // Можно добавить логику для автоматического открытия при определенных условиях
+    // Например, если есть важные данные клиента
+    const hasImportantClientData = {{ 
+        ($order->client_invalid || $order->kl_id || $order->client_tel) ? 'true' : 'false' 
+    }};
+    
+    // Пока оставим закрытым по умолчанию
+});
 </script>

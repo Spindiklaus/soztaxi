@@ -22,11 +22,11 @@
                         <label class="block text-sm font-medium text-gray-700">Оператор</label>
                         <div class="mt-1 bg-gray-100 p-2 rounded-md">
                             @if($order->user)
-                                {{ $order->user->name }} (#{{ $order->user_id }})
+                            {{ $order->user->name }} (#{{ $order->user_id }})
                             @elseif($order->user_id)
-                                #{{ $order->user_id }}
+                            #{{ $order->user_id }}
                             @else
-                                Не указан
+                            Не указан
                             @endif
                         </div>
                     </div>
@@ -41,67 +41,69 @@
             </div>
 
             <!-- Клиент -->
-            <div class="bg-gray-50 p-4 rounded-lg mb-6">
-                <h2 class="text-lg font-semibold text-gray-800 mb-4">Клиент</h2>
+            <div class="border border-gray-200 rounded-lg mb-6">
+                <div class="bg-gray-50 px-4 py-3 rounded-t-lg">
+                    <button type="button" 
+                            onclick="toggleClientInfo()"
+                            class="flex items-center justify-between w-full text-left">
+                        <h2 class="text-lg font-semibold text-gray-800">
+                            Клиент: {{ $order->client->fio ?? 'Не указан' }}
+                        </h2>
+                        <svg id="client-info-arrow" class="h-5 w-5 transform transition-transform text-gray-500" 
+                             xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">ФИО (справочно)</label>
-                        <div class="mt-1 bg-gray-100 p-2 rounded-md">{{ $order->client->fio ?? 'Не указан' }}</div>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Удостоверение инвалида</label>
-                        <div class="mt-1 bg-gray-100 p-2 rounded-md">{{ $order->client_invalid ?? 'Не указано' }}</div>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Серия и номер паспорта</label>
-                        <div class="mt-1 bg-gray-100 p-2 rounded-md">{{ $order->kl_id ?? 'Не указан' }}</div>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Телефон для связи</label>
-                        <div class="mt-1 bg-gray-100 p-2 rounded-md">{{ $order->client_tel ?? 'Не указан' }}</div>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">ФИО (сопровождающий)</label>
-                        <div class="mt-1 bg-gray-100 p-2 rounded-md">{{ $order->client_sopr ?? 'Не указан' }}</div>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Категория инвалидности</label>
-                        <div class="mt-1 bg-gray-100 p-2 rounded-md">
-                            {{ $order->category ? $order->category->nmv : 'Не указана' }}
+                <div id="client-info-content" class="p-4 hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Удостоверение инвалида</label>
+                            <div class="mt-1 bg-gray-100 p-2 rounded-md">{{ $order->client_invalid ?? 'Не указано' }}</div>
                         </div>
-                    </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">NMV (код категории)</label>
-                        <div class="mt-1 bg-gray-100 p-2 rounded-md">
-                            {{ $order->category ? $order->category->nmv : 'Не указан' }}
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Серия и номер паспорта</label>
+                            <div class="mt-1 bg-gray-100 p-2 rounded-md">{{ $order->kl_id ?? 'Не указан' }}</div>
                         </div>
-                    </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Скидка по категории, %</label>
-                        <div class="mt-1 bg-gray-100 p-2 rounded-md">
-                            {{ $order->category ? $order->category->skidka . '%' : 'Не указана' }}
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Телефон для связи</label>
+                            <div class="mt-1 bg-gray-100 p-2 rounded-md">{{ $order->client_tel ?? 'Не указан' }}</div>
                         </div>
-                    </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Лимит поездок для категории</label>
-                        <div class="mt-1 bg-gray-100 p-2 rounded-md">
-                            {{ $order->category ? $order->category->kol_p . ' поездок/мес' : 'Не указан' }}
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">ФИО (сопровождающий)</label>
+                            <div class="mt-1 bg-gray-100 p-2 rounded-md">{{ $order->client_sopr ?? 'Не указан' }}</div>
                         </div>
-                    </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Дополнительные условия</label>
-                        <div class="mt-1 bg-gray-100 p-2 rounded-md">
-                            {{ $order->dopus ? $order->dopus->name : 'Не указаны' }}
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Категория инвалидности (NMV)</label>
+                            <div class="mt-1 bg-gray-100 p-2 rounded-md">
+                                {{ $order->category ? $order->category->nmv : 'Не указана' }}
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Скидка по категории, %</label>
+                            <div class="mt-1 bg-gray-100 p-2 rounded-md">
+                                {{ $order->category ? $order->category->skidka . '%' : 'Не указана' }}
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Лимит поездок для категории</label>
+                            <div class="mt-1 bg-gray-100 p-2 rounded-md">
+                                {{ $order->category ? $order->category->kol_p . ' поездок/мес' : 'Не указан' }}
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Дополнительные условия</label>
+                            <div class="mt-1 bg-gray-100 p-2 rounded-md">
+                                {{ $order->dopus ? $order->dopus->name : 'Не указаны' }}
+                            </div>
                         </div>
                     </div>
                 </div>
