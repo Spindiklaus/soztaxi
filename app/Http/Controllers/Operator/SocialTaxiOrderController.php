@@ -50,7 +50,7 @@ class SocialTaxiOrderController extends BaseController {
     // Показать конкретный заказ
     public function show($id) {
 
-        \Log::info('Попытка открыть заказ', ['order_id' => $id]);
+//        \Log::info('Попытка открыть заказ', ['order_id' => $id]);
 
         try {
             // Сначала попробуем найти заказ
@@ -62,12 +62,15 @@ class SocialTaxiOrderController extends BaseController {
                                 ->with('error', 'Заказ не найден.');
             }
 
-            \Log::info('Найден заказ', ['order_id' => $order->id, 'deleted_at' => $order->deleted_at]);
+//            \Log::info('Найден заказ', ['order_id' => $order->id, 'deleted_at' => $order->deleted_at]);
 
             // Загружаем все необходимые отношения
             $order->load(['client', 'category', 'dopus', 'statusHistory.statusOrder', 'user']);
+            
+            // Получаем количество поездок клиента в месяце
+           $tripCount = getClientTripsCountInMonthByVisitDate($order->client_id, $order->visit_data);
 
-            return view('social-taxi-orders.show', compact('order'));
+            return view('social-taxi-orders.show', compact('order', 'tripCount'));
         } catch (\Exception $e) {
             return redirect()->route('social-taxi-orders.index')
                             ->with('error', 'ЗПроизошла ошибка при открытии заказа.');

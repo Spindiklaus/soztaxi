@@ -179,8 +179,22 @@
                         <span class="font-medium text-gray-700">лимит</span>
                         <span class="text-red-600 font-semibold">{{ $order->category ? $order->category->kol_p : '0' }} поездок/мес</span>
                     </span>
+                    @if($order->category && $order->category->kat_dop)
+                        <span class="text-lg">
+                        <span class="font-medium text-gray-700">Категория скидок:</span>
+                        <span class="text-blue-600 font-semibold">{{ $order->category->kat_dop }}</span>
+                        </span>
+                    @endif
                 </div>
             </div>
+            
+            <!-- Сведения для расчета -->
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <div class="flex flex-wrap items-center gap-2 md:gap-4">
+                    <span class="text-lg font-semibold text-gray-800">Количество поездок клиента в этом месяце: {{$tripCount}}</span>
+                </div>
+            </div>    
+            
         </div>   
     </div>
     <!-- Предварительный расчет -->
