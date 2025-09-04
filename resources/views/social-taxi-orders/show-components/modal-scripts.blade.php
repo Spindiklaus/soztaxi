@@ -123,10 +123,10 @@ function displayClientTrips(data, type = 'normal') {
     if (modalTitle) {
         switch(type) {
             case 'actual':
-                modalTitle.textContent = `Фактические поездки клиента за ${period}`;
+                modalTitle.textContent = `Фактические (закрытые) поездки клиента за ${period}`;
                 break;
             case 'taxi-sent':
-                modalTitle.textContent = `Поездки клиента, переданные в такси за ${period}`;
+                modalTitle.textContent = `Поездки клиента за ${period}, переданные в такси `;
                 break;
             default:
                 modalTitle.textContent = `Поездки клиента за ${period}`;
@@ -149,7 +149,7 @@ function displayClientTrips(data, type = 'normal') {
         content.innerHTML = `
             <div class="text-center py-8">
                 <p class="text-gray-600">${message} в ${period}</p>
-                <button onclick="closeClientTripsModal()" class="mt-4 px-4 py-2 bg-gray-300 rounded-md">Закрыть</button>
+                <button onclick="closeClientTripsModal()" class="mt-4 px-4 py-2 bg-gray-300 rounded-md hover:bg-gray-400">Закрыть</button>
             </div>
         `;
         return;
@@ -161,10 +161,10 @@ function displayClientTrips(data, type = 'normal') {
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Тип заказа</th>
                         <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Дата поездки</th>
                         <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Откуда</th>
                         <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Куда</th>
-                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Тип заказа</th>
                         <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Номер заказа</th>
     `;
     
@@ -175,9 +175,12 @@ function displayClientTrips(data, type = 'normal') {
             break;
         case 'taxi-sent':
             tripsHtml += '<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Дата передачи в такси</th>';
-            tripsHtml += '<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Оператор такси</th>';
+            // УБРАЛИ колонку "Оператор такси"
             break;
     }
+    
+    // Добавляем колонку текущего статуса
+    tripsHtml += '<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Текущий статус</th>';
     
     tripsHtml += `
                     </tr>
@@ -198,16 +201,16 @@ function displayClientTrips(data, type = 'normal') {
         tripsHtml += `
             <tr>
                 <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
+                    <span class="${getOrderTypeColor(trip.type_order)} font-medium">
+                        ${getOrderTypeName(trip.type_order)}
+                    </span>
+                </td>
+                <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
                     ${visitDate}
                     ${visitTime ? `<br><span class="text-xs text-gray-500">${visitTime}</span>` : ''}
                 </td>
                 <td class="px-4 py-2 text-sm text-gray-900 max-w-xs truncate" title="${trip.adres_otkuda || '-'}">${trip.adres_otkuda || '-'}</td>
                 <td class="px-4 py-2 text-sm text-gray-900 max-w-xs truncate" title="${trip.adres_kuda || '-'}">${trip.adres_kuda || '-'}</td>
-                <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
-                    <span class="${getOrderTypeColor(trip.type_order)} font-medium">
-                        ${getOrderTypeName(trip.type_order)}
-                    </span>
-                </td>
                 <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">${trip.pz_nom || '-'}</td>
         `;
         
@@ -241,12 +244,28 @@ function displayClientTrips(data, type = 'normal') {
                         ${sentDate}
                         ${sentTime ? `<br><span class="text-xs text-gray-500">${sentTime}</span>` : ''}
                     </td>
-                    <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
-                        ${trip.taxi_id ? 'Оператор #' + trip.taxi_id : '-'}
-                    </td>
                 `;
+                // УБРАЛИ вывод оператора такси
                 break;
         }
+        
+        // Добавляем текущий статус заказа
+        let statusHtml = '-';
+        if (trip.current_status && trip.current_status.status_order) {
+            const status = trip.current_status.status_order;
+            const colorClass = status.color || 'bg-gray-100 text-gray-800';
+            statusHtml = `
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${colorClass}">
+                    ${status.name}
+                </span>
+            `;
+        }
+        
+        tripsHtml += `
+            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
+                ${statusHtml}
+            </td>
+        `;
         
         tripsHtml += `
             </tr>
