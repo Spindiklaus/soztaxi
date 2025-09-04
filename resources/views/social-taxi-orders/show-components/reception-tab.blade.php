@@ -189,13 +189,33 @@
             </div>
 
             <!-- Количество поездок клиента -->
-            <div class="bg-gray-50 p-4 rounded-lg">
+            <div class="bg-gray-50 p-4 rounded-lg mb-6">
                 <div class="flex items-center">
                     <span class="text-lg font-semibold text-gray-800">Количество поездок клиента в этом месяце:</span>
                     <button 
                         onclick="showClientTrips({{ $order->client_id }}, '{{ $order->visit_data ? $order->visit_data->format('Y-m') : date('Y-m') }}')"
                         class="ml-2 inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors">
                         {{ getClientTripsCountInMonthByVisitDate($order->client_id, $order->visit_data) }}
+                    </button>
+                </div>
+
+                <!-- Число фактических поездок в месяц -->
+                <div class="flex items-center mt-2">
+                    <span class="text-lg font-semibold text-gray-800">Число фактических поездок в месяц:</span>
+                    <button 
+                        onclick="showClientActualTrips({{ $order->client_id }}, '{{ $order->visit_data ? $order->visit_data->format('Y-m') : date('Y-m') }}')"
+                        class="ml-2 inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-green-100 text-green-800 hover:bg-green-200 transition-colors">
+                        {{ getClientActualTripsCountInMonthByVisitDate($order->client_id, $order->visit_data) }}
+                    </button>
+                </div>
+
+                <!-- Число поездок переданных в такси -->
+                <div class="flex items-center mt-2">
+                    <span class="text-lg font-semibold text-gray-800">Число поездок переданных в такси:</span>
+                    <button 
+                        onclick="showClientTaxiSentTrips({{ $order->client_id }}, '{{ $order->visit_data ? $order->visit_data->format('Y-m') : date('Y-m') }}')"
+                        class="ml-2 inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-yellow-100 text-yellow-800 hover:bg-yellow-200 transition-colors">
+                        {{ getClientTaxiSentTripsCountInMonthByVisitDate($order->client_id, $order->visit_data) }}
                     </button>
                 </div>
             </div>

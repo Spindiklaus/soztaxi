@@ -26,7 +26,29 @@ function showClientTrips(clientId, monthYear) {
         modal.classList.add('flex');
     }
     
-    loadClientTrips(clientId, monthYear);
+    loadClientTrips(clientId, monthYear, 'normal');
+}
+
+// Показать модальное окно с фактическими поездками клиента
+function showClientActualTrips(clientId, monthYear) {
+    const modal = document.getElementById('client-trips-modal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+    
+    loadClientTrips(clientId, monthYear, 'actual');
+}
+
+// Показать модальное окно с поездками, переданными в такси
+function showClientTaxiSentTrips(clientId, monthYear) {
+    const modal = document.getElementById('client-trips-modal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+    
+    loadClientTrips(clientId, monthYear, 'taxi-sent');
 }
 
 // Закрыть модальное окно
@@ -39,7 +61,7 @@ function closeClientTripsModal() {
 }
 
 // Загрузить поездки клиента
-function loadClientTrips(clientId, monthYear) {
+function loadClientTrips(clientId, monthYear, type = 'normal') {
     const content = document.getElementById('client-trips-content');
     if (!content) return;
     
@@ -50,7 +72,20 @@ function loadClientTrips(clientId, monthYear) {
         </div>
     `;
     
-    fetch(`/api/client-trips/${clientId}/${monthYear}`)
+    // Выбираем правильный маршрут в зависимости от типа
+    let apiUrl;
+    switch(type) {
+        case 'actual':
+            apiUrl = `/api/client-actual-trips/${clientId}/${monthYear}`;
+            break;
+        case 'taxi-sent':
+            apiUrl = `/api/client-taxi-sent-trips/${clientId}/${monthYear}`;
+            break;
+        default:
+            apiUrl = `/api/client-trips/${clientId}/${monthYear}`;
+    }
+    
+    fetch(apiUrl)
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -61,7 +96,7 @@ function loadClientTrips(clientId, monthYear) {
             if (data.error) {
                 throw new Error(data.error);
             }
-            displayClientTrips(data);
+            displayClientTrips(data, type);
         })
         .catch(error => {
             console.error('Ошибка загрузки поездок:', error);
@@ -77,16 +112,43 @@ function loadClientTrips(clientId, monthYear) {
 }
 
 // Отобразить поездки клиента
-function displayClientTrips(data) {
+function displayClientTrips(data, type = 'normal') {
     const content = document.getElementById('client-trips-content');
     if (!content) return;
     
-    const { trips, clientName, count } = data;
+    const { trips, clientName, count, period } = data;
+    
+    // Обновляем заголовок модального окна в зависимости от типа
+    const modalTitle = document.querySelector('#client-trips-modal h3');
+    if (modalTitle) {
+        switch(type) {
+            case 'actual':
+                modalTitle.textContent = `Фактические поездки клиента за ${period}`;
+                break;
+            case 'taxi-sent':
+                modalTitle.textContent = `Поездки клиента, переданные в такси за ${period}`;
+                break;
+            default:
+                modalTitle.textContent = `Поездки клиента за ${period}`;
+        }
+    }
     
     if (trips.length === 0) {
+        let message = '';
+        switch(type) {
+            case 'actual':
+                message = 'У клиента нет фактических поездок';
+                break;
+            case 'taxi-sent':
+                message = 'У клиента нет поездок, переданных в такси';
+                break;
+            default:
+                message = 'У клиента нет поездок';
+        }
+        
         content.innerHTML = `
             <div class="text-center py-8">
-                <p class="text-gray-600">У клиента ${clientName} нет поездок в этом месяце</p>
+                <p class="text-gray-600">${message} в ${period}</p>
                 <button onclick="closeClientTripsModal()" class="mt-4 px-4 py-2 bg-gray-300 rounded-md">Закрыть</button>
             </div>
         `;
@@ -104,16 +166,40 @@ function displayClientTrips(data) {
                         <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Куда</th>
                         <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Тип заказа</th>
                         <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Номер заказа</th>
+    `;
+    
+    // Добавляем дополнительные колонки в зависимости от типа
+    switch(type) {
+        case 'actual':
+            tripsHtml += '<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Дата закрытия</th>';
+            break;
+        case 'taxi-sent':
+            tripsHtml += '<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Дата передачи в такси</th>';
+            tripsHtml += '<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Оператор такси</th>';
+            break;
+    }
+    
+    tripsHtml += `
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
     `;
     
     trips.forEach(trip => {
+        // Форматируем дату поездки
+        let visitDate = '-';
+        let visitTime = '';
+        if (trip.visit_data) {
+            const dateObj = new Date(trip.visit_data);
+            visitDate = dateObj.toLocaleDateString('ru-RU');
+            visitTime = dateObj.toLocaleTimeString('ru-RU', {hour: '2-digit', minute:'2-digit'});
+        }
+        
         tripsHtml += `
             <tr>
                 <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
-                    ${trip.visit_data ? new Date(trip.visit_data).toLocaleDateString('ru-RU') + ' ' + new Date(trip.visit_data).toLocaleTimeString('ru-RU', {hour: '2-digit', minute:'2-digit'}) : '-'}
+                    ${visitDate}
+                    ${visitTime ? `<br><span class="text-xs text-gray-500">${visitTime}</span>` : ''}
                 </td>
                 <td class="px-4 py-2 text-sm text-gray-900 max-w-xs truncate" title="${trip.adres_otkuda || '-'}">${trip.adres_otkuda || '-'}</td>
                 <td class="px-4 py-2 text-sm text-gray-900 max-w-xs truncate" title="${trip.adres_kuda || '-'}">${trip.adres_kuda || '-'}</td>
@@ -123,6 +209,46 @@ function displayClientTrips(data) {
                     </span>
                 </td>
                 <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">${trip.pz_nom || '-'}</td>
+        `;
+        
+        // Добавляем дополнительные данные в зависимости от типа
+        switch(type) {
+            case 'actual':
+                let closedDate = '-';
+                let closedTime = '';
+                if (trip.closed_at) {
+                    const closedObj = new Date(trip.closed_at);
+                    closedDate = closedObj.toLocaleDateString('ru-RU');
+                    closedTime = closedObj.toLocaleTimeString('ru-RU', {hour: '2-digit', minute:'2-digit'});
+                }
+                tripsHtml += `
+                    <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
+                        ${closedDate}
+                        ${closedTime ? `<br><span class="text-xs text-gray-500">${closedTime}</span>` : ''}
+                    </td>
+                `;
+                break;
+            case 'taxi-sent':
+                let sentDate = '-';
+                let sentTime = '';
+                if (trip.taxi_sent_at) {
+                    const sentObj = new Date(trip.taxi_sent_at);
+                    sentDate = sentObj.toLocaleDateString('ru-RU');
+                    sentTime = sentObj.toLocaleTimeString('ru-RU', {hour: '2-digit', minute:'2-digit'});
+                }
+                tripsHtml += `
+                    <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
+                        ${sentDate}
+                        ${sentTime ? `<br><span class="text-xs text-gray-500">${sentTime}</span>` : ''}
+                    </td>
+                    <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
+                        ${trip.taxi_id ? 'Оператор #' + trip.taxi_id : '-'}
+                    </td>
+                `;
+                break;
+        }
+        
+        tripsHtml += `
             </tr>
         `;
     });
