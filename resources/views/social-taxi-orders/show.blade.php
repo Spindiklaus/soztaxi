@@ -21,6 +21,10 @@
                         @include('social-taxi-orders.show-components.closure-tab')
                     </div>
                 </div>
+                
+                <!-- Модальное окно с поездками клиента -->
+                @include('social-taxi-orders.show-components.client-trips-modal')
+                
             @else
                 <div class="bg-white shadow rounded-lg p-6">
                     <div class="text-center text-red-600">
@@ -38,4 +42,6 @@
 
     <!-- JavaScript для переключения вкладок -->
     @include('social-taxi-orders.show-components.tabs-script')
+    <!-- JavaScript для модального окна -->
+    @include('social-taxi-orders.show-components.modal-scripts')
 </x-app-layout>

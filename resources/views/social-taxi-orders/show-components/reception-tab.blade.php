@@ -180,21 +180,26 @@
                         <span class="text-red-600 font-semibold">{{ $order->category ? $order->category->kol_p : '0' }} поездок/мес</span>
                     </span>
                     @if($order->category && $order->category->kat_dop)
-                        <span class="text-lg">
+                    <span class="text-lg">
                         <span class="font-medium text-gray-700">Категория скидок:</span>
                         <span class="text-blue-600 font-semibold">{{ $order->category->kat_dop }}</span>
-                        </span>
+                    </span>
                     @endif
                 </div>
             </div>
-            
-            <!-- Сведения для расчета -->
+
+            <!-- Количество поездок клиента -->
             <div class="bg-gray-50 p-4 rounded-lg">
-                <div class="flex flex-wrap items-center gap-2 md:gap-4">
-                    <span class="text-lg font-semibold text-gray-800">Количество поездок клиента в этом месяце: {{$tripCount}}</span>
+                <div class="flex items-center">
+                    <span class="text-lg font-semibold text-gray-800">Количество поездок клиента в этом месяце:</span>
+                    <button 
+                        onclick="showClientTrips({{ $order->client_id }}, '{{ $order->visit_data ? $order->visit_data->format('Y-m') : date('Y-m') }}')"
+                        class="ml-2 inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors">
+                        {{ getClientTripsCountInMonthByVisitDate($order->client_id, $order->visit_data) }}
+                    </button>
                 </div>
-            </div>    
-            
+            </div>
+
         </div>   
     </div>
     <!-- Предварительный расчет -->
