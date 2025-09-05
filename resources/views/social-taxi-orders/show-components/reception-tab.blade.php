@@ -3,7 +3,7 @@
         <!-- Сведения о заказе -->
         <div>
             <div class="border border-gray-200 rounded-lg p-4 mb-6">
-                <h2 class="text-lg font-semibold text-gray-800 mb-4">Сведения о заказе</h2>
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">Прием заказа:</h2>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                     <div>
@@ -119,22 +119,22 @@
                             Сведения о поездке: 
                             <span class="inline-flex items-center ml-2">
                                 @if($order->visit_data)
-                                <span class="inline-flex items-center px-2 py-1 rounded-l text-sm font-medium bg-blue-100 text-blue-800">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    <span class="inline-flex items-center px-2 py-1 rounded-l text-sm font-medium bg-blue-100 text-blue-800">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
                                     {{ $order->visit_data->format('d.m.Y') }}
-                                </span>
-                                <span class="inline-flex items-center px-2 py-1 rounded-r text-sm font-medium bg-blue-50 text-blue-700 border-l border-blue-200">
+                                    </span>
+                                    <span class="inline-flex items-center px-2 py-1 rounded-r text-sm font-medium bg-blue-50 text-blue-700 border-l border-blue-200">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                     {{ $order->visit_data->format('H:i') }}
-                                </span>
+                                    </span>
                                 @else
-                                <span class="inline-flex items-center px-2 py-1 rounded text-sm font-medium bg-gray-100 text-gray-800">
-                                    Не указана
-                                </span>
+                                    <span class="inline-flex items-center px-2 py-1 rounded text-sm font-medium bg-gray-100 text-gray-800">
+                                        Не указана
+                                    </span>
                                 @endif
                             </span>
                         </h2>
@@ -165,113 +165,136 @@
                 </div>
             </div>
 
-            <!-- Льготы по поездке -->
-            <div class="bg-gray-50 p-4 rounded-lg">
-                <div class="flex flex-wrap items-center gap-2 md:gap-4">
-                    <span class="text-lg font-semibold text-gray-800">Льготы по поездке:</span>
+            <!-- Сведения о заказе -->
+            <div class="bg-gray-50 rounded-lg mb-6">
+                <!-- Заголовок с кнопкой раскрытия -->
+                <div class="px-4 py-3 bg-gray-100 rounded-t-lg border-b border-gray-200">
+                    <button type="button" 
+                            onclick="toggleBenefits()"
+                            class="flex items-center justify-between w-full text-left">
+                        <h2 class="text-lg font-semibold text-gray-800">Сведения о заказе:</h2>
+                        <svg id="benefits-arrow" class="h-5 w-5 transform transition-transform text-gray-500" 
+                             xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </div>
 
-                    <span class="text-lg">
-                        <span class="font-medium text-gray-700">скидка</span>
-                        <span class="text-red-600 font-semibold">{{ $order->category ? $order->category->skidka . '%' : '0%' }}</span>
-                    </span>
+                <!-- Содержимое льгот (скрыто по умолчанию) -->
+                <div id="benefits-content" class="p-4 hidden">
+                    <div class="flex flex-wrap items-center gap-2 md:gap-4">
+                        <span class="text-lg">
+                            <span class="font-medium text-gray-700">Скидка:</span>
+                            <span class="text-red-600 font-semibold">{{ $order->category ? $order->category->skidka . '%' : '0%' }}</span>
+                        </span>
 
-                    <span class="text-lg">
-                        <span class="font-medium text-gray-700">лимит</span>
-                        <span class="text-red-600 font-semibold">{{ $order->category ? $order->category->kol_p : '0' }} поездок/мес</span>
-                    </span>
-                    @if($order->category && $order->category->kat_dop)
-                    <span class="text-lg">
-                        <span class="font-medium text-gray-700">Категория скидок:</span>
-                        <span class="text-blue-600 font-semibold">{{ $order->category->kat_dop }}</span>
-                    </span>
-                    @endif
+                        <span class="text-lg">
+                            <span class="font-medium text-gray-700">Лимит:</span>
+                            <span class="text-red-600 font-semibold">{{ $order->category ? $order->category->kol_p : '0' }} поездок/мес</span>
+                        </span>
+
+                        @if($order->category && $order->category->kat_dop)
+                        <span class="text-lg">
+                            <span class="font-medium text-gray-700">Категория скидок:</span>
+                            <span class="text-blue-600 font-semibold">{{ $order->category->kat_dop }}</span>
+                        </span>
+                        @endif
+
+                        @if($order->category)
+                        <span class="text-lg">
+                            <span class="font-medium text-gray-700">NMV:</span>
+                            <span class="text-gray-600 font-semibold">{{ $order->category->nmv }}</span>
+                        </span>
+                        @endif
+                    </div>
+                    <!-- Количество поездок клиента -->
+                    <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                        <div class="flex items-center">
+                            <span class="text-lg font-semibold text-gray-800">Количество поездок клиента в этом месяце:</span>
+                            <button 
+                                onclick="showClientTrips({{ $order->client_id }}, '{{ $order->visit_data ? $order->visit_data->format('Y-m') : date('Y-m') }}')"
+                                class="ml-2 inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors">
+                                {{ getClientTripsCountInMonthByVisitDate($order->client_id, $order->visit_data) }}
+                            </button>
+                        </div>
+
+                        <!-- Число фактических поездок в месяц -->
+                        <div class="flex items-center mt-2">
+                            <span class="text-lg font-semibold text-gray-800">Число фактических поездок в месяц:</span>
+                            <button 
+                                onclick="showClientActualTrips({{ $order->client_id }}, '{{ $order->visit_data ? $order->visit_data->format('Y-m') : date('Y-m') }}')"
+                                class="ml-2 inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-green-100 text-green-800 hover:bg-green-200 transition-colors">
+                                {{ getClientActualTripsCountInMonthByVisitDate($order->client_id, $order->visit_data) }}
+                            </button>
+                        </div>
+
+                        <!-- Число поездок переданных в такси -->
+                        <div class="flex items-center mt-2">
+                            <span class="text-lg font-semibold text-gray-800">Число поездок, переданных оператору такси:</span>
+                            <button 
+                                onclick="showClientTaxiSentTrips({{ $order->client_id }}, '{{ $order->visit_data ? $order->visit_data->format('Y-m') : date('Y-m') }}')"
+                                class="ml-2 inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-yellow-100 text-yellow-800 hover:bg-yellow-200 transition-colors">
+                                {{ getClientTaxiSentTripsCountInMonthByVisitDate($order->client_id, $order->visit_data) }}
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Количество поездок клиента -->
-            <div class="bg-gray-50 p-4 rounded-lg mb-6">
-                <div class="flex items-center">
-                    <span class="text-lg font-semibold text-gray-800">Количество поездок клиента в этом месяце:</span>
-                    <button 
-                        onclick="showClientTrips({{ $order->client_id }}, '{{ $order->visit_data ? $order->visit_data->format('Y-m') : date('Y-m') }}')"
-                        class="ml-2 inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors">
-                        {{ getClientTripsCountInMonthByVisitDate($order->client_id, $order->visit_data) }}
-                    </button>
-                </div>
 
-                <!-- Число фактических поездок в месяц -->
-                <div class="flex items-center mt-2">
-                    <span class="text-lg font-semibold text-gray-800">Число фактических поездок в месяц:</span>
-                    <button 
-                        onclick="showClientActualTrips({{ $order->client_id }}, '{{ $order->visit_data ? $order->visit_data->format('Y-m') : date('Y-m') }}')"
-                        class="ml-2 inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-green-100 text-green-800 hover:bg-green-200 transition-colors">
-                        {{ getClientActualTripsCountInMonthByVisitDate($order->client_id, $order->visit_data) }}
-                    </button>
-                </div>
-
-                <!-- Число поездок переданных в такси -->
-                <div class="flex items-center mt-2">
-                    <span class="text-lg font-semibold text-gray-800">Число поездок, переданных оператору такси:</span>
-                    <button 
-                        onclick="showClientTaxiSentTrips({{ $order->client_id }}, '{{ $order->visit_data ? $order->visit_data->format('Y-m') : date('Y-m') }}')"
-                        class="ml-2 inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-yellow-100 text-yellow-800 hover:bg-yellow-200 transition-colors">
-                        {{ getClientTaxiSentTripsCountInMonthByVisitDate($order->client_id, $order->visit_data) }}
-                    </button>
-                </div>
-            </div>
 
         </div>   
     </div>
     <!-- Предварительный расчет -->
-<div class="col-span-1">
-    <div class="bg-gray-50 rounded-lg mb-6">
-        <!-- Заголовок с кнопкой раскрытия -->
-        <div class="px-4 py-3 bg-gray-100 rounded-t-lg border-b border-gray-200">
-            <button type="button" 
-                    onclick="toggleCalculation()"
-                    class="flex items-center justify-between w-full text-left">
-                <h2 class="text-lg font-semibold text-gray-800">Предварительный расчет</h2>
-                <svg id="calculation-arrow" class="h-5 w-5 transform transition-transform text-gray-500" 
-                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+    <div class="col-span-1">
+        <div class="bg-gray-50 rounded-lg mb-6">
+            <!-- Заголовок с кнопкой раскрытия -->
+            <div class="px-4 py-3 bg-gray-100 rounded-t-lg border-b border-gray-200">
+                <button type="button" 
+                        onclick="toggleCalculation()"
+                        class="flex items-center justify-between w-full text-left">
+                    <h2 class="text-lg font-semibold text-gray-800">Предварительный расчет:</h2>
+                    <svg id="calculation-arrow" class="h-5 w-5 transform transition-transform text-gray-500" 
+                         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                </svg>
-            </button>
-        </div>
-        
-        <!-- Содержимое расчета (скрыто по умолчанию) -->
-        <div id="calculation-content" class="p-4 hidden">
-            <div class="space-y-3">
-                <div class="flex justify-between">
-                    <span class="text-sm font-medium text-gray-700">Оператор такси</span>
-                    <span class="text-sm text-gray-900">
-                        @if($order->taxi)
-                        {{ $order->taxi->name }} (#{{ $order->taxi->id }})
-                        @else
-                        {{ $order->taxi_id ? 'Оператор #' . $order->taxi_id : 'Не выбран' }}
-                        @endif
-                    </span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-sm font-medium text-gray-700">Дальность, км</span>
-                    <span class="text-sm text-gray-900">{{  number_format($order->predv_way,3,',', ' ') ?? '0' }} км</span>
-                </div>
+                    </svg>
+                </button>
+            </div>
 
-                <div class="flex justify-between">
-                    <span class="text-sm font-medium text-gray-700">Цена поездки полная, без учета посадки, руб.</span>
-                    <span class="text-sm text-gray-900">{{ number_format(calculateFullTripPrice($order, 11), 11, ',', ' ') }} руб.</span>
-                </div>
+            <!-- Содержимое расчета (скрыто по умолчанию) -->
+            <div id="calculation-content" class="p-4 hidden">
+                <div class="space-y-3">
+                    <div class="flex justify-between">
+                        <span class="text-sm font-medium text-gray-700">Оператор такси</span>
+                        <span class="text-sm text-gray-900">
+                            @if($order->taxi)
+                            {{ $order->taxi->name }} (#{{ $order->taxi->id }})
+                            @else
+                            {{ $order->taxi_id ? 'Оператор #' . $order->taxi_id : 'Не выбран' }}
+                            @endif
+                        </span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm font-medium text-gray-700">Дальность, км</span>
+                        <span class="text-sm text-gray-900">{{  number_format($order->predv_way,3,',', ' ') ?? '0' }} км</span>
+                    </div>
 
-                <div class="flex justify-between">
-                    <span class="text-sm font-medium text-gray-700">Сумма к оплате, руб.</span>
-                    <span class="text-sm text-blue-600 font-semibold">{{ number_format(calculateClientPaymentAmount($order, 11), 11, ',', ' ') }} руб.</span>
-                </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm font-medium text-gray-700">Цена поездки полная, без учета посадки, руб.</span>
+                        <span class="text-sm text-gray-900">{{ number_format(calculateFullTripPrice($order, 11), 11, ',', ' ') }} руб.</span>
+                    </div>
 
-                <div class="flex justify-between">
-                    <span class="text-sm font-medium text-gray-700">Сумма к возмещению, руб.</span>
-                    <span class="text-sm text-orange-600 font-semibold">{{ number_format(calculateReimbursementAmount($order, 11), 11, ',', ' ') }} руб.</span>
+                    <div class="flex justify-between">
+                        <span class="text-sm font-medium text-gray-700">Сумма к оплате, руб.</span>
+                        <span class="text-sm text-blue-600 font-semibold">{{ number_format(calculateClientPaymentAmount($order, 11), 11, ',', ' ') }} руб.</span>
+                    </div>
+
+                    <div class="flex justify-between">
+                        <span class="text-sm font-medium text-gray-700">Сумма к возмещению, руб.</span>
+                        <span class="text-sm text-orange-600 font-semibold">{{ number_format(calculateReimbursementAmount($order, 11), 11, ',', ' ') }} руб.</span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 </div>

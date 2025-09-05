@@ -73,6 +73,7 @@ class SocialTaxiOrderController extends BaseController {
                 'category',
                 'dopus',
                 'statusHistory.statusOrder',
+                'statusHistory.user', // Загружаем пользователя для истории статусов
                 'user',
                 'taxi' // Загружаем оператора такси
             ]);

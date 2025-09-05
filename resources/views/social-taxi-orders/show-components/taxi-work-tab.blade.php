@@ -1,55 +1,59 @@
 <div id="taxi-work" class="tab-content hidden">
     <div class="bg-gray-50 p-4 rounded-lg mb-6">
         <h2 class="text-lg font-semibold text-gray-800 mb-4">Работа с такси</h2>
-        
+
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-                <label class="block text-sm font-medium text-gray-700">Дата передачи в такси</label>
+                <label class="block text-sm font-medium text-gray-700">Дата передачи сведений (звонка) в такси</label>
                 <div class="mt-1 bg-gray-100 p-2 rounded-md">
                     {{ $order->taxi_sent_at ? $order->taxi_sent_at->format('d.m.Y H:i') : 'Не указана' }}
                 </div>
             </div>
-            
+
             <div>
                 <label class="block text-sm font-medium text-gray-700">Оператор такси</label>
                 <div class="mt-1 bg-gray-100 p-2 rounded-md">
-                    {{ $order->taxi_id ? 'Оператор #' . $order->taxi_id : 'Не выбран' }}
+                    {{ $order->taxi->name }} (#{{ $order->taxi->id }})
                 </div>
             </div>
-            
+
             <div>
-                <label class="block text-sm font-medium text-gray-700">Адрес отправки</label>
-                <div class="mt-1 bg-gray-100 p-2 rounded-md">{{ $order->adres_trips_id ?? 'Не указано' }}</div>
+                <label class="block text-sm font-medium text-gray-700">Дата поездки</label>
+                <div class="mt-1 bg-gray-100 p-2 rounded-md">{{ $order->visit_data->format('d.m.Y') ?? 'Не указано' }}</div>
             </div>
-            
+
             <div>
-                <label class="block text-sm font-medium text-gray-700">Дистанция поездки</label>
-                <div class="mt-1 bg-gray-100 p-2 rounded-md">{{ $order->taxi_way ?? '0' }} км</div>
+                <label class="block text-sm font-medium text-gray-700">Откуда ехать</label>
+                <div class="mt-1 bg-gray-100 p-2 rounded-md">{{ $order->adres_otkuda ?? 'Не указано' }}</div>
             </div>
-            
+
             <div>
-                <label class="block text-sm font-medium text-gray-700">Цена поездки</label>
-                <div class="mt-1 bg-gray-100 p-2 rounded-md">{{ $order->taxi_price ?? '0' }} руб.</div>
+                <label class="block text-sm font-medium text-gray-700">Куда ехать</label>
+                <div class="mt-1 bg-gray-100 p-2 rounded-md">{{ $order->adres_kuda ?? 'Не указано' }}</div>
             </div>
-            
+
             <div>
-                <label class="block text-sm font-medium text-gray-700">Статус поездки</label>
-                <div class="mt-1 bg-gray-100 p-2 rounded-md">
-                    @if($order->cancelled_at)
-                        Отменён
-                    @elseif($order->closed_at)
-                        Закрыт
-                    @else
-                        Выполняется
-                    @endif
-                </div>
+                <label class="block text-sm font-medium text-gray-700">Обратный путь</label>
+                <div class="mt-1 bg-gray-100 p-2 rounded-md">{{ $order->adres_obratno ?? 'Не указано' }}</div>
+            </div>
+
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Статус заказа</label>
+                @php
+                $status = $order->currentStatus->statusOrder;
+                $colorClass = !empty($status->color) ? $status->color : 'bg-gray-100 text-gray-800';
+                @endphp
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $colorClass }}">
+                    {{ $status->name }}
+                </span>
             </div>
         </div>
     </div>
-    
+
     <div class="bg-gray-50 p-4 rounded-lg">
-        <h2 class="text-lg font-semibold text-gray-800 mb-4">История статусов</h2>
-        
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">История статусов заказа</h2>
+
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
@@ -71,7 +75,13 @@
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {{ $history->user_id ? 'Оператор #' . $history->user_id : 'Не указан' }}
+                            @if($history->user)
+                                {{ $history->user->name }}
+                            @elseif($history->user_id)
+                                Оператор #{{ $history->user_id }}
+                            @else
+                                Не указан
+                            @endif
                         </td>
                     </tr>
                     @empty

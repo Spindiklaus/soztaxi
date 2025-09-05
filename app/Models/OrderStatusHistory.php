@@ -22,6 +22,10 @@ class OrderStatusHistory extends Model
     {
         return $this->belongsTo(StatusOrder::class, 'status_order_id');
     }
+    
+    /**
+     * Пользователь (оператор)
+     */
     public function user()
     {
         return $this->belongsTo(User::class);

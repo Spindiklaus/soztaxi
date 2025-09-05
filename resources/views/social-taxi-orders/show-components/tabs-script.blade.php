@@ -80,4 +80,17 @@ function toggleCalculation() {
     }
 }
 
+function toggleBenefits() {
+    const content = document.getElementById('benefits-content');
+    const arrow = document.getElementById('benefits-arrow');
+    
+    if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        arrow.classList.add('rotate-180');
+    } else {
+        content.classList.add('hidden');
+        arrow.classList.remove('rotate-180');
+    }
+}
+
 </script>
