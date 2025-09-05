@@ -109,5 +109,13 @@ class Order extends Model {
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * Оператор такси
+     */
+    public function taxi()
+    {
+        return $this->belongsTo(Taxi::class, 'taxi_id');
+    }
+
 
 }

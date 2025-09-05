@@ -31,7 +31,8 @@
         },
         "files": [
             "app/Helpers/OrderHelper.php",
-            "app/Helpers/ClientHelper.php"
+            "app/Helpers/ClientHelper.php",
+            "app/Helpers/TaxiPriceHelper.php"
         ]
     },
     "autoload-dev": {

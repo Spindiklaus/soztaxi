@@ -24,6 +24,9 @@ class SocialTaxiOrderController extends BaseController {
         $sort = $request->get('sort', 'pz_data');
         $direction = $request->get('direction', 'desc');
 
+        // Собираем параметры для передачи в шаблон
+        $urlParams = $request->only(['sort', 'direction', 'show_deleted', 'pz_nom', 'type_order', 'status_order_id', 'date_from', 'date_to']);
+
         $query = $this->queryBuilder->build($request, $showDeleted == '1');
         $orders = $query->paginate(15)->appends($request->all());
 
@@ -31,7 +34,8 @@ class SocialTaxiOrderController extends BaseController {
                         'orders',
                         'showDeleted',
                         'sort',
-                        'direction'
+                        'direction',
+                        'urlParams' // Передаем параметры в шаблон
         ));
     }
 
@@ -63,14 +67,27 @@ class SocialTaxiOrderController extends BaseController {
             }
 
 //            \Log::info('Найден заказ', ['order_id' => $order->id, 'deleted_at' => $order->deleted_at]);
-
             // Загружаем все необходимые отношения
-            $order->load(['client', 'category', 'dopus', 'statusHistory.statusOrder', 'user']);
-            
-            // Получаем количество поездок клиента в месяце
-           $tripCount = getClientTripsCountInMonthByVisitDate($order->client_id, $order->visit_data);
+            $order->load([
+                'client',
+                'category',
+                'dopus',
+                'statusHistory.statusOrder',
+                'user',
+                'taxi' // Загружаем оператора такси
+            ]);
 
-            return view('social-taxi-orders.show', compact('order', 'tripCount'));
+            // Получаем количество поездок клиента в месяце
+            $tripCount = getClientTripsCountInMonthByVisitDate($order->client_id, $order->visit_data);
+
+            // Собираем параметры для кнопки "Назад"
+            $backUrlParams = request()->only(['sort', 'direction', 'show_deleted', 'pz_nom', 'type_order', 'status_order_id', 'date_from', 'date_to']);
+
+            return view('social-taxi-orders.show', compact(
+                            'order',
+                            'tripCount',
+                            'backUrlParams' // Передаем параметры для кнопки "Назад"
+            ));
         } catch (\Exception $e) {
             return redirect()->route('social-taxi-orders.index')
                             ->with('error', 'ЗПроизошла ошибка при открытии заказа.');

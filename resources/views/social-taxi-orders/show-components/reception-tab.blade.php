@@ -211,7 +211,7 @@
 
                 <!-- Число поездок переданных в такси -->
                 <div class="flex items-center mt-2">
-                    <span class="text-lg font-semibold text-gray-800">Число поездок переданных в такси:</span>
+                    <span class="text-lg font-semibold text-gray-800">Число поездок, переданных оператору такси:</span>
                     <button 
                         onclick="showClientTaxiSentTrips({{ $order->client_id }}, '{{ $order->visit_data ? $order->visit_data->format('Y-m') : date('Y-m') }}')"
                         class="ml-2 inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-yellow-100 text-yellow-800 hover:bg-yellow-200 transition-colors">
@@ -223,38 +223,55 @@
         </div>   
     </div>
     <!-- Предварительный расчет -->
-    <div class="col-span-1">
-        <div class="bg-gray-50 p-4 rounded-lg mb-6">
-            <h2 class="text-lg font-semibold text-gray-800 mb-4">Предварительный расчет</h2>
-
+<div class="col-span-1">
+    <div class="bg-gray-50 rounded-lg mb-6">
+        <!-- Заголовок с кнопкой раскрытия -->
+        <div class="px-4 py-3 bg-gray-100 rounded-t-lg border-b border-gray-200">
+            <button type="button" 
+                    onclick="toggleCalculation()"
+                    class="flex items-center justify-between w-full text-left">
+                <h2 class="text-lg font-semibold text-gray-800">Предварительный расчет</h2>
+                <svg id="calculation-arrow" class="h-5 w-5 transform transition-transform text-gray-500" 
+                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+            </button>
+        </div>
+        
+        <!-- Содержимое расчета (скрыто по умолчанию) -->
+        <div id="calculation-content" class="p-4 hidden">
             <div class="space-y-3">
                 <div class="flex justify-between">
-                    <span class="text-sm font-medium text-gray-700">Дальность, км</span>
-                    <span class="text-sm text-gray-900">{{ $order->predv_way ?? '0' }} км</span>
-                </div>
-
-                <div class="flex justify-between">
                     <span class="text-sm font-medium text-gray-700">Оператор такси</span>
-                    <span class="text-sm text-gray-900">{{ $order->taxi_id ? 'Оператор #' . $order->taxi_id : 'Не выбран' }}</span>
+                    <span class="text-sm text-gray-900">
+                        @if($order->taxi)
+                        {{ $order->taxi->name }} (#{{ $order->taxi->id }})
+                        @else
+                        {{ $order->taxi_id ? 'Оператор #' . $order->taxi_id : 'Не выбран' }}
+                        @endif
+                    </span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-sm font-medium text-gray-700">Дальность, км</span>
+                    <span class="text-sm text-gray-900">{{  number_format($order->predv_way,3,',', ' ') ?? '0' }} км</span>
                 </div>
 
                 <div class="flex justify-between">
-                    <span class="text-sm font-medium text-gray-700">Цена поездки полная, руб.</span>
-                    <span class="text-sm text-gray-900">{{ $order->taxi_price ?? '0' }} руб.</span>
+                    <span class="text-sm font-medium text-gray-700">Цена поездки полная, без учета посадки, руб.</span>
+                    <span class="text-sm text-gray-900">{{ number_format(calculateFullTripPrice($order, 11), 11, ',', ' ') }} руб.</span>
                 </div>
 
                 <div class="flex justify-between">
                     <span class="text-sm font-medium text-gray-700">Сумма к оплате, руб.</span>
-                    <span class="text-sm text-blue-600 font-semibold">{{ $order->taxi_price ?? '0' }} руб.</span>
+                    <span class="text-sm text-blue-600 font-semibold">{{ number_format(calculateClientPaymentAmount($order, 11), 11, ',', ' ') }} руб.</span>
                 </div>
 
                 <div class="flex justify-between">
                     <span class="text-sm font-medium text-gray-700">Сумма к возмещению, руб.</span>
-                    <span class="text-sm text-orange-600 font-semibold">{{ $order->taxi_price ?? '0' }} руб.</span>
+                    <span class="text-sm text-orange-600 font-semibold">{{ number_format(calculateReimbursementAmount($order, 11), 11, ',', ' ') }} руб.</span>
                 </div>
             </div>
         </div>
-
-
     </div>
+</div>
 </div>

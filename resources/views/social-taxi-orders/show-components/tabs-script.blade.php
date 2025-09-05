@@ -67,4 +67,17 @@ function toggleTripInfo() { // раскрывает данные по поезд
     arrow.classList.toggle('rotate-180');
 }
 
+function toggleCalculation() {
+    const content = document.getElementById('calculation-content');
+    const arrow = document.getElementById('calculation-arrow');
+    
+    if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        arrow.classList.add('rotate-180');
+    } else {
+        content.classList.add('hidden');
+        arrow.classList.remove('rotate-180');
+    }
+}
+
 </script>
