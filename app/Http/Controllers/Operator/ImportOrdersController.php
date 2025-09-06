@@ -7,7 +7,6 @@ use App\Models\Order;
 use App\Models\FioDtrn;
 use App\Models\Category;
 use App\Models\Taxi;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -37,9 +36,9 @@ class ImportOrdersController extends BaseController {
             'id', 'type_order', 'kl_id', 'client_tel', 'client_invalid', 'client_sopr',
             'nmv', 'category_skidka', 'category_limit', 'dopus_id', 'skidka_dop_all',
             'kol_p_limit', 'pz_nom', 'pz_data', 'adres_otkuda', 'adres_kuda', 'adres_obratno',
-            'zena_type', 'visit_data', 'predv_way', 'taxi_id', 'taxi_data', 'adres_trips_id',
-            'taxi_sent_at', 'taxi_price', 'taxi_way', 'otmena_data', 'otmena_taxi', 'closed_at',
-            'komment', 'user_id', 'created_at', 'updated_at', 'deleted_at'
+            'zena_type', 'visit_data', 'predv_way', 'taxi_id', 'taxi_sent_at', 'adres_trips_id',
+            'taxi_price', 'taxi_way', 'otmena_data', 'otmena_taxi', 'closed_at',
+            'komment', 'user_id', 'created_at', 'updated_at', 'deleted_at', 'visit_obratno'
         ];
 
         if ($header !== $allowedHeaders) {
@@ -82,12 +81,12 @@ class ImportOrdersController extends BaseController {
                 // Преобразование дат
                 $data['pz_data'] = $this->convertDate($data['pz_data']);
                 $data['visit_data'] = $this->convertDate($data['visit_data']);
-                $data['taxi_data'] = $this->convertDate($data['taxi_data']);
                 $data['taxi_sent_at'] = $this->convertDate($data['taxi_sent_at']);
                 $data['otmena_data'] = $this->convertDate($data['otmena_data']);
                 $data['closed_at'] = $this->convertDate($data['closed_at']);
                 $data['created_at'] = $this->convertDate($data['created_at']);
                 $data['updated_at'] = $this->convertDate($data['updated_at']);
+                $data['visit_obratno'] = $this->convertDate($data['visit_obratno']);
 
                 // Обработка deleted_at: 0 = не удален, 1 = удален (ставим дату)
                 if ($data['deleted_at'] == '1') {
@@ -166,7 +165,8 @@ class ImportOrdersController extends BaseController {
                     'user_id' => (int) $data['user_id'],
                     'created_at' => $data['created_at'],
                     'updated_at' => $data['updated_at'],
-                    'deleted_at' => $data['deleted_at'],
+                    'deleted_at' => $data['deleted_at'] ?? null,
+                    'visit_obratno' => $data['visit_obratno'] ?? null
                 ];
 
                 // Убираем null ID, если он пустой
@@ -351,22 +351,40 @@ class ImportOrdersController extends BaseController {
         return $client;
     }
 
-    private function convertDate($dateString) {
-        if (empty($dateString) || $dateString === '  -   -  : :' || $dateString === '-' || $dateString === '0') {
-            return null;
-        }
-
-        // Формат даты в CSV: дд.мм.гг чч:мм или дд.мм.гггг чч:мм
-        if (preg_match('/^(\d{2})\.(\d{2})\.(\d{2,4})\s+(\d{2}):(\d{2})$/', $dateString, $matches)) {
-            $day = $matches[1];
-            $month = $matches[2];
-            $year = strlen($matches[3]) == 2 ? '20' . $matches[3] : $matches[3];
-            $hour = $matches[4];
-            $minute = $matches[5];
-            return "$year-$month-$day $hour:$minute:00";
-        }
-
+   private function convertDate($dateString) {
+    // Проверяем пустые значения
+    if (empty($dateString) || 
+        $dateString === '  -   -  : :' || 
+        $dateString === '-' || 
+        $dateString === '0' ||
+        $dateString === ':' ||
+        trim($dateString) === '' ||
+        trim($dateString) === '-   -  : :') {
         return null;
     }
-
+    
+    // Убираем пробелы по краям и специальные символы
+    $dateString = trim($dateString);
+    
+    // Отладка - посмотрим, что приходит
+    \Log::info('convertDate debug', ['input' => $dateString, 'length' => strlen($dateString)]);
+    
+    // Формат даты в CSV: дд.мм.гг чч:мм или дд.мм.гггг чч:мм
+    // Используем более гибкое регулярное выражение
+    if (preg_match('/^(\d{1,2})\.(\d{1,2})\.(\d{2,4})\s+(\d{1,2}):(\d{2})/', $dateString, $matches)) {
+        $day = str_pad($matches[1], 2, '0', STR_PAD_LEFT);
+        $month = str_pad($matches[2], 2, '0', STR_PAD_LEFT);
+        $year = strlen($matches[3]) == 2 ? '20' . $matches[3] : $matches[3];
+        $hour = str_pad($matches[4], 2, '0', STR_PAD_LEFT);
+        $minute = $matches[5];
+        
+        $result = "$year-$month-$day $hour:$minute:00";
+        \Log::info('convertDate success', ['input' => $dateString, 'output' => $result]);
+        return $result;
+    }
+    
+    // Если формат не распознан, возвращаем null
+    \Log::warning('Не удалось распознать формат даты', ['dateString' => $dateString]);
+    return null;
+}
 }

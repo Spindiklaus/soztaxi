@@ -29,6 +29,8 @@ class UpdateSocialTaxiOrderRequest extends FormRequest
             'client_tel' => 'required|string|max:255',
             'adres_otkuda' => 'required|string|max:255',
             'adres_kuda' => 'required|string|max:255',
+            'adres_obratno' => 'nullable|string|max:255',
+            'visit_obratno' => 'nullable|date',
             'pz_nom' => 'required|string|max:255',
             'pz_data' => 'required|date',
             'visit_data' => 'required|date',

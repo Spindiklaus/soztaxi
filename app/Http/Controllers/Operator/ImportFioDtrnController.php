@@ -7,58 +7,73 @@ use App\Models\FioDtrn;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Log; // включаем логирование
+use Illuminate\Support\Facades\Log;
 
-class ImportFioDtrnController extends BaseController
-{
- // Форма импорта клиентов
-    public function showClientsImportForm()
-    {
-//        dd("Форма импорта открыта!");
+class ImportFioDtrnController extends BaseController {
+
+    // Форма импорта клиентов
+    public function showClientsImportForm() {
         return view('fiodtrns.import');
     }
 
     // Обработка импорта клиентов
-    public function importClients(Request $request)
-    {
+    public function importClients(Request $request) {
         // Проверка файла
         $request->validate([
             'csv_file' => 'required|mimes:csv,txt',
         ]);
+
         $path = $request->file('csv_file')->getRealPath();
-        Log::info("Файл загружен", ['path' => $path]); // 📌 Запись в лог
-//        dd( $path);        
-        
+        Log::info("Файл загружен", ['path' => $path]);
+
+        // Читаем содержимое и удаляем BOM
+        $content = file_get_contents($path);
+        $content = $this->removeBOM($content);
+        file_put_contents($path, $content);
+
         $rows = [];
         $handle = fopen($path, 'r');
 
         if ($handle === false) {
             return back()->with('error', 'Не удалось открыть файл');
         }
+
+        // Чтение заголовка
+        $header = fgetcsv($handle, 0, ';');
+
+        if ($header === false) {
+            fclose($handle);
+            return back()->with('import_errors', ['Не удалось прочитать заголовок CSV файла.']);
+        }
+
+        // Нормализуем заголовок
+        $header = array_map('trim', $header);
+
+        Log::info("Полученный заголовок", ['header' => $header]);
+
+        // Разрешённые заголовки
+        $allowedHeaders = ['kl_id', 'fio', 'data_r', 'sex', 'rip_at', 'created_rip', 'komment'];
+
+        Log::info("Ожидаемый заголовок", ['expected' => $allowedHeaders]);
+
+        // Проверяем заголовок
+        if ($header !== $allowedHeaders) {
+            Log::error("Неверный заголовок CSV", [
+                'expected' => implode(';', $allowedHeaders),
+                'got' => implode(';', $header)
+            ]);
+            fclose($handle);
+            return back()->with('import_errors', [
+                        'Неверный формат CSV. Заголовки должны быть: ' . implode(';', $allowedHeaders),
+                        'Получено: ' . implode(';', $header)
+            ]);
+        }
+
+        // Чтение строк данных
         while (($row = fgetcsv($handle, 0, ';')) !== false) {
             $rows[] = $row;
         }
         fclose($handle);
-        $header = array_shift($rows); // Убираем заголовок
-
-        $allowedHeaders = ['kl_id', 'fio', 'data_r', 'sex', 'rip_at', 'created_rip', 'komment'];
-
-        if ($header !== $allowedHeaders && $header !== [implode(';', $allowedHeaders)]) {
-            Log::error("Неверный заголовок CSV", ['expected' => $allowedHeaders, 'got' => $header]);
-            return back()->with('import_errors', ['Неверный формат CSV. Заголовки должны быть: ' . implode(';', $allowedHeaders)]);
-        }
-        // Если заголовок пришёл как строка — разбей её
-        if (is_array($header) && count($header) === 1) {
-            $header = explode(';', $header[0]);
-        } elseif (!is_array($header)) {
-            $header = explode(';', (string)$header);
-        }
-        
-        // Теперь проверяем
-        if ($header !== $allowedHeaders) {
-            Log::error("Неверный заголовок CSV", ['expected' => $allowedHeaders, 'got' => $header]);
-            return back()->with('import_errors', ['Неверный заголовок CSV. Должен быть: ' . implode(';', $allowedHeaders)]);
-        }
 
         $errors = [];
         $successCount = 0;
@@ -71,10 +86,21 @@ class ImportFioDtrnController extends BaseController
                 continue;
             }
 
+            // Сопоставление данных
             $data = array_combine($allowedHeaders, $row);
 
+            // Нормализуем данные
+            foreach ($data as $key => $value) {
+                // Убираем специальные символы и приводим к NULL если нужно
+                if (in_array($value, ['  -   -  : :', '-', '0', ':', '  -   -  :', '  -  : :', '  -   -', ''])) {
+                    $data[$key] = null;
+                }
+                else {
+                    $data[$key] = trim($value);
+                }
+            }
+
             try {
-//                dd($data['sex'], bin2hex($data['sex'])); смотрим кодировку
                 Validator::make($data, [
                     'kl_id' => 'required|string|max:255',
                     'fio' => 'required|string|max:255',
@@ -86,13 +112,18 @@ class ImportFioDtrnController extends BaseController
                 ])->validate();
 
                 // Преобразование дат
-                $data['data_r'] = $data['data_r'] ? Carbon::createFromFormat('d.m.Y', $data['data_r'])->toDateString() : null;
-                $data['rip_at'] = $data['rip_at'] ? Carbon::createFromFormat('d.m.Y', $data['rip_at'])->toDateString() : null;
-                $data['created_rip'] = $data['created_rip'] ? Carbon::createFromFormat('d.m.Y H:i', $data['created_rip'])->toDateTimeString() : null;
-
+                if (!empty($data['data_r'])) {
+                    $data['data_r'] = Carbon::createFromFormat('d.m.Y', $data['data_r'])->format('Y-m-d');
+                }
+                if (!empty($data['rip_at'])) {
+                    $data['rip_at'] = Carbon::createFromFormat('d.m.Y', $data['rip_at'])->format('Y-m-d');
+                }
+                if (!empty($data['created_rip'])) {
+                    $data['created_rip'] = Carbon::createFromFormat('d.m.Y H:i', $data['created_rip'])->format('Y-m-d H:i:s');
+                }
                 // Проверка дубликата
                 if (FioDtrn::where('kl_id', $data['kl_id'])->exists()) {
-                     $errorMsg = "Строка " . ($index + 2) . ": клиент с ID {$data['kl_id']} уже существует.";
+                    $errorMsg = "Строка " . ($index + 2) . ": клиент с ID {$data['kl_id']} уже существует.";
                     Log::info($errorMsg);
                     $errors[] = $errorMsg;
                     continue;
@@ -100,12 +131,12 @@ class ImportFioDtrnController extends BaseController
 
                 // Сохранение клиента
                 FioDtrn::create(array_merge($data, [
-                    'user_id' => auth()->id(),
+                    'user_id' => auth()->id() ?? 1,
                 ]));
 
                 $successCount++;
                 Log::info("Клиент импортирован", ['kl_id' => $data['kl_id'], 'fio' => $data['fio']]);
-            } catch (ValidationException $e) { // Ловим ошибки валидации
+            } catch (ValidationException $e) {
                 $errorMsg = "Строка " . ($index + 2) . ": " . collect($e->validator->errors()->all())->join(', ');
                 Log::warning($errorMsg);
                 $errors[] = $errorMsg;
@@ -115,14 +146,27 @@ class ImportFioDtrnController extends BaseController
                 $errors[] = $errorMsg;
             }
         }
-        if (!empty($errors)) {
 
+        if (!empty($errors)) {
             return back()
-                ->with('import_errors', $errors)
-                ->with('success_count', $successCount);
+                            ->with('import_errors', $errors)
+                            ->with('success_count', $successCount);
         }
+
         Log::info("Импорт завершён успешно", ['success_count' => $successCount]);
         return redirect()->route('fiodtrns.index')
-            ->with('success', "Успешно импортировано: {$successCount} клиент(ов)");
+                        ->with('success', "Успешно импортировано: {$successCount} клиент(ов)");
     }
+
+    /**
+     * Удаление BOM символа
+     */
+    private function removeBOM($str) {
+        // Удаляем UTF-8 BOM если есть
+        if (substr($str, 0, 3) === "\xEF\xBB\xBF") {
+            $str = substr($str, 3);
+        }
+        return $str;
+    }
+
 }
