@@ -29,6 +29,7 @@ class Order extends Model {
         'adres_otkuda',
         'adres_kuda',
         'adres_obratno',
+        'visit_obratno',
         'zena_type',
         'visit_data',
         'predv_way',
@@ -47,6 +48,7 @@ class Order extends Model {
     protected $casts = [
         'pz_data' => 'datetime',
         'visit_data' => 'datetime',
+        'visit_obratno' => 'datetime',
         'taxi_sent_at' => 'datetime',
         'taxi_data' => 'datetime',
         'cancelled_at' => 'datetime',

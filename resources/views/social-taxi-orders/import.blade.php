@@ -19,9 +19,10 @@
                 
                 <h3 class="text-md font-medium text-gray-700 mb-1">Пример содержимого:</h3>
                 <pre class="bg-gray-100 p-3 rounded text-xs overflow-x-auto">
-id;type_order;kl_id;client_tel;client_invalid;client_sopr;nmv;category_skidka;category_limit;dopus_id;skidka_dop_all;kol_p_limit;pz_nom;pz_data;adres_otkuda;adres_kuda;adres_obratno;zena_type;visit_data;predv_way;taxi_id;taxi_data;adres_trips_id;taxi_sent_at;taxi_price;taxi_way;otmena_data;otmena_taxi;closed_at;komment;user_id;created_at;updated_at;deleted_at
-318;1;36 04^448902;123123;;;10440;50;10;0;50;10;1-А;11.09.16 21:24;Самара, ул. Мичурина, 125;куда то;;1;14.09.16 08:00;0;3;11.09.16 22:23;44;11.09.16 22:23;300;10;  -   -  : :;0;14.09.16 22:19;;1;11.09.16 21:24;11.09.16 21:25;1
-319;1;36 04^448902;123123;;;600160;50;10;0;50;10;2-А;11.09.16 21:25;г. Самара, п. Берёза (Аэропорт Курумоч), квартал 2, дом 12.;куда то;;1;14.09.16 08:00;0;3;11.09.16 22:26;12;11.09.16 22:26;400;30;  -   -  : :;0;15.09.16 21:21;;1;11.09.16 21:25;11.09.16 21:27;1
+id;type_order;kl_id;client_tel;client_invalid;client_sopr;nmv;category_skidka;kol_p_kl;dopus_id;skidka_dop_all;kol_p_limit;pz_nom;pz_data;adres_otkuda;adres_kuda;adres_obratno;zena_type;visit_data;predv_way;taxi_id;taxi_sent_at;adres_trips_id;taxi_price;taxi_way;otmena_data;otmena_taxi;closed_at;komment;user_id;created_at;updated_at;deleted_at;visit_obratno
+19;3;36 10^402702;89276974380;1538772;;600170;100;10;0;100;10;15212756-Eka;16.05.2025 09:49:04;Кирова пр. 365 п1 + инв коляска;Калинина ул. 32 (приемный покой) + инв коляска;Кирова пр. 365 п1 + инв коляска;2;19.05.2025 08:29:59;;3;16.05.2025 16:20:59;0;3625,96;;  -   -  : :;0;02.06.2025 13:56:59;;5;16.05.2025 09:49:04;20.05.2025 16:22:04;0;19.05.2025 10:30:00
+22;3;36 08^898996;89379873863;2681052;;600170;100;10;0;100;10;15212974-Das;19.05.2025 14:02:52;Кирова пр-т 365, п1+ инв. кресло;Базарная ул, 30 (МЛЦ)+ инв. кресло;Кирова пр-т 365, п1+ инв. Кресло;2;24.05.2025 12:20:00;;3;23.05.2025 09:09:00;0;3625,96378904938;;  -   -  : :;0;02.06.2025 13:56:59;;10;19.05.2025 14:02:52;19.05.2025 14:22:50;0;24.05.2025 15:00:00
+
                 </pre>
             </div>
 
