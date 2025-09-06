@@ -19,16 +19,12 @@
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700">Статус заказа</label>
-                @php
-                $status = $order->currentStatus->statusOrder;
-                $colorClass = !empty($status->color) ? $status->color : 'bg-gray-100 text-gray-800';
-                @endphp
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $colorClass }}">
-                    {{ $status->name }}
-                </span>
+                <label class="block text-sm font-medium text-gray-700">Дата поездки</label>
+                <div class="mt-1 bg-gray-100 p-2 rounded-md">
+                    {{ $order->visit_data ? $order->visit_data->format('d.m.Y H:i') : 'Не указана' }}
+                </div>
             </div>
-
+            
             <!-- Вторая строчка -->
             <div>
                 <label class="block text-sm font-medium text-gray-700">Откуда ехать</label>

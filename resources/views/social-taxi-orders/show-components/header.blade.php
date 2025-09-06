@@ -66,10 +66,14 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Тип заказа</label>
-                        <div class="mt-1 bg-gray-100 p-2 rounded-md {{ getOrderTypeColor($order->type_order) }} font-semibold">
-                            {{ getOrderTypeName($order->type_order) }}
-                        </div>
-                    </div>
+                        <label class="block text-sm font-medium text-gray-700">Статус заказа</label>
+                        @php
+                            $status = $order->currentStatus->statusOrder;
+                            $colorClass = !empty($status->color) ? $status->color : 'bg-gray-100 text-gray-800';
+                        @endphp
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $colorClass }}">
+                            {{ $status->name }}
+                        </span>
+                    </div>    
                 </div>
-            </div>
+</div>

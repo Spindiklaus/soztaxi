@@ -1,5 +1,7 @@
 <?php
 
+// тип поездки
+
 if (!function_exists('getOrderTypeName')) {
     /**
      * Получить название типа заказа

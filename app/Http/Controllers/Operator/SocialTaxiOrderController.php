@@ -78,7 +78,7 @@ class SocialTaxiOrderController extends BaseController {
                 'taxi' // Загружаем оператора такси
             ]);
 
-            // Получаем количество поездок клиента в месяце
+            // Получаем количество поездок клиента в месяце поездки
             $tripCount = getClientTripsCountInMonthByVisitDate($order->client_id, $order->visit_data);
 
             // Собираем параметры для кнопки "Назад"
