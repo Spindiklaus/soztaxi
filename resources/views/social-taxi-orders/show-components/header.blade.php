@@ -33,4 +33,43 @@
             </a>
         @endif
     </div>
+  
 </div>
+
+<div class="border border-gray-200 rounded-lg p-4 mb-6 bg-white shadow">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">Прием заказа:</h2>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Дата приема заказа</label>
+                        <div class="mt-1 bg-gray-100 p-2 rounded-md">
+                            {{ $order->pz_data ? $order->pz_data->format('d.m.Y H:i') : 'Не указана' }}
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Номер заказа</label>
+                        <div class="mt-1 bg-gray-100 p-2 rounded-md">{{ $order->pz_nom ?? 'Не указан' }}</div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Оператор</label>
+                        <div class="mt-1 bg-gray-100 p-2 rounded-md">
+                            @if($order->user)
+                                {{ $order->user->name }} (#{{ $order->user_id }})
+                            @elseif($order->user_id)
+                                #{{ $order->user_id }}
+                            @else
+                                Не указан
+                            @endif
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Тип заказа</label>
+                        <div class="mt-1 bg-gray-100 p-2 rounded-md {{ getOrderTypeColor($order->type_order) }} font-semibold">
+                            {{ getOrderTypeName($order->type_order) }}
+                        </div>
+                    </div>
+                </div>
+            </div>

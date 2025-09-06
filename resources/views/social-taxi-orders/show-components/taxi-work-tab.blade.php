@@ -2,7 +2,8 @@
     <div class="bg-gray-50 p-4 rounded-lg mb-6">
         <h2 class="text-lg font-semibold text-gray-800 mb-4">Работа с такси</h2>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Первая строчка -->
             <div>
                 <label class="block text-sm font-medium text-gray-700">Дата передачи сведений (звонка) в такси</label>
                 <div class="mt-1 bg-gray-100 p-2 rounded-md">
@@ -18,10 +19,17 @@
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700">Дата поездки</label>
-                <div class="mt-1 bg-gray-100 p-2 rounded-md">{{ $order->visit_data->format('d.m.Y') ?? 'Не указано' }}</div>
+                <label class="block text-sm font-medium text-gray-700">Статус заказа</label>
+                @php
+                $status = $order->currentStatus->statusOrder;
+                $colorClass = !empty($status->color) ? $status->color : 'bg-gray-100 text-gray-800';
+                @endphp
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $colorClass }}">
+                    {{ $status->name }}
+                </span>
             </div>
 
+            <!-- Вторая строчка -->
             <div>
                 <label class="block text-sm font-medium text-gray-700">Откуда ехать</label>
                 <div class="mt-1 bg-gray-100 p-2 rounded-md">{{ $order->adres_otkuda ?? 'Не указано' }}</div>
@@ -36,18 +44,6 @@
                 <label class="block text-sm font-medium text-gray-700">Обратный путь</label>
                 <div class="mt-1 bg-gray-100 p-2 rounded-md">{{ $order->adres_obratno ?? 'Не указано' }}</div>
             </div>
-
-
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Статус заказа</label>
-                @php
-                $status = $order->currentStatus->statusOrder;
-                $colorClass = !empty($status->color) ? $status->color : 'bg-gray-100 text-gray-800';
-                @endphp
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $colorClass }}">
-                    {{ $status->name }}
-                </span>
-            </div>
         </div>
     </div>
 
@@ -59,7 +55,7 @@
                 <thead class="bg-gray-50">
                     <tr>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Дата</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Статус</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Назначенный статус</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Оператор</th>
                     </tr>
                 </thead>

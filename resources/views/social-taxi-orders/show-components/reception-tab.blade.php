@@ -2,44 +2,7 @@
     <div class="grid">
         <!-- Сведения о заказе -->
         <div>
-            <div class="border border-gray-200 rounded-lg p-4 mb-6">
-                <h2 class="text-lg font-semibold text-gray-800 mb-4">Прием заказа:</h2>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Дата приема заказа</label>
-                        <div class="mt-1 bg-gray-100 p-2 rounded-md">
-                            {{ $order->pz_data ? $order->pz_data->format('d.m.Y H:i') : 'Не указана' }}
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Номер заказа</label>
-                        <div class="mt-1 bg-gray-100 p-2 rounded-md">{{ $order->pz_nom ?? 'Не указан' }}</div>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Оператор</label>
-                        <div class="mt-1 bg-gray-100 p-2 rounded-md">
-                            @if($order->user)
-                            {{ $order->user->name }} (#{{ $order->user_id }})
-                            @elseif($order->user_id)
-                            #{{ $order->user_id }}
-                            @else
-                            Не указан
-                            @endif
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Тип заказа</label>
-                        <div class="mt-1 bg-gray-100 p-2 rounded-md {{ getOrderTypeColor($order->type_order) }} font-semibold">
-                            {{ getOrderTypeName($order->type_order) }}
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+            
             <!-- Клиент -->
             <div class="border border-gray-200 rounded-lg mb-6">
                 <div class="bg-gray-50 px-4 py-3 rounded-t-lg">
@@ -172,7 +135,31 @@
                     <button type="button" 
                             onclick="toggleBenefits()"
                             class="flex items-center justify-between w-full text-left">
-                        <h2 class="text-lg font-semibold text-gray-800">Сведения о заказе:</h2>
+                        <h2 class="text-lg font-semibold text-gray-800">Сведения о заказе:
+                            <span class="text-lg">
+                                <span class="font-medium text-gray-700">скидка </span>
+                                <span class="text-red-600 font-semibold">{{ $order->category ? $order->category->skidka . '%' : '0%' }}</span>
+                            </span>
+
+                            <span class="text-lg">
+                                <span class="font-medium text-gray-700">лимит </span>
+                                <span class="text-red-600 font-semibold">{{ $order->category ? $order->category->kol_p : '0' }} поездок/мес</span>
+                            </span>
+
+                            @if($order->category && $order->category->kat_dop)
+                                <span class="text-lg">
+                                    <span class="font-medium text-gray-700">категория скидок:</span>
+                                    <span class="text-blue-600 font-semibold">{{ $order->category->kat_dop }}</span>
+                                </span>
+                            @endif
+
+                            @if($order->category)
+                            <span class="text-lg">
+                                <span class="font-medium text-gray-700">(NMV:</span>
+                                <span class="text-gray-600 font-semibold">{{ $order->category->nmv }})</span>
+                            </span>
+                            @endif
+                        </h2>
                         <svg id="benefits-arrow" class="h-5 w-5 transform transition-transform text-gray-500" 
                              xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -183,29 +170,7 @@
                 <!-- Содержимое льгот (скрыто по умолчанию) -->
                 <div id="benefits-content" class="p-4 hidden">
                     <div class="flex flex-wrap items-center gap-2 md:gap-4">
-                        <span class="text-lg">
-                            <span class="font-medium text-gray-700">Скидка:</span>
-                            <span class="text-red-600 font-semibold">{{ $order->category ? $order->category->skidka . '%' : '0%' }}</span>
-                        </span>
-
-                        <span class="text-lg">
-                            <span class="font-medium text-gray-700">Лимит:</span>
-                            <span class="text-red-600 font-semibold">{{ $order->category ? $order->category->kol_p : '0' }} поездок/мес</span>
-                        </span>
-
-                        @if($order->category && $order->category->kat_dop)
-                        <span class="text-lg">
-                            <span class="font-medium text-gray-700">Категория скидок:</span>
-                            <span class="text-blue-600 font-semibold">{{ $order->category->kat_dop }}</span>
-                        </span>
-                        @endif
-
-                        @if($order->category)
-                        <span class="text-lg">
-                            <span class="font-medium text-gray-700">NMV:</span>
-                            <span class="text-gray-600 font-semibold">{{ $order->category->nmv }}</span>
-                        </span>
-                        @endif
+                        
                     </div>
                     <!-- Количество поездок клиента -->
                     <div class="bg-gray-50 p-4 rounded-lg mb-6">
