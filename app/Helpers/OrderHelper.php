@@ -58,3 +58,30 @@ if (!function_exists('getOrderTypeBadgeColor')) {
         return $colors[$typeId] ?? 'bg-gray-100 text-gray-800';
     }
 }
+
+if (!function_exists('generateOrderNumber')) {
+    /**
+     * Генерация номера заказа по типу
+     *
+     * @param int $type Тип заказа
+     * @return string Номер заказа
+     */
+    function generateOrderNumber($type) 
+    {
+        // Определяем префикс по типу заказа
+        $prefixes = [
+            1 => 'ST',  // Соцтакси
+            2 => 'LA',  // Легковое авто
+            3 => 'GA',  // ГАЗель
+        ];
+        
+        $prefix = $prefixes[$type] ?? 'UNK';
+        
+        // Получаем максимальный ID для данного типа заказа
+        $maxId = \App\Models\Order::where('type_order', $type)->max('id') ?? 0;
+        $nextId = $maxId + 1;
+        
+        // Формируем номер заказа: ST-000001, LA-000001, GA-000001
+        return $prefix . '-' . str_pad($nextId, 6, '0', STR_PAD_LEFT);
+    }
+}

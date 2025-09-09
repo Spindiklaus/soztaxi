@@ -71,6 +71,8 @@ Route::middleware(['web', 'auth', IsAdmin::class])->group(function () {
     Route::resource('social-taxi-orders', SocialTaxiOrderController::class)->names('social-taxi-orders'); 
     // маршрут для восстановления
     Route::patch('/social-taxi-orders/{social_taxi_order}/restore', [SocialTaxiOrderController::class, 'restore'])->name('social-taxi-orders.restore');
+    Route::get('/social-taxi-orders/create/type/{type}', [SocialTaxiOrderController::class, 'createByType'])->name('social-taxi-orders.create.by-type');
+    Route::post('/social-taxi-orders/store/type/{type}', [SocialTaxiOrderController::class, 'storeByType'])->name('social-taxi-orders.store.by-type');
 });
 
 Route::get('/clear', function() {   // для очиски кэша сайта

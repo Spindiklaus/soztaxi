@@ -4,7 +4,13 @@ namespace App\Http\Controllers\Operator;
 
 use App\Queries\OrderQueryBuilder;
 use App\Models\Order;
+use App\Models\FioDtrn;
+use App\Models\Category;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 use App\Http\Requests\StoreSocialTaxiOrderRequest;
 use App\Http\Requests\UpdateSocialTaxiOrderRequest;
 
@@ -137,6 +143,129 @@ class SocialTaxiOrderController extends BaseController {
         }
 
         return redirect()->back()->with('error', 'Заказ не был удален.');
+    }
+    
+    // Показать форму создания заказа по типу
+    public function createByType($type) 
+    {
+        // Проверяем допустимый тип
+        $allowedTypes = [1, 2, 3]; // 1 - Соцтакси, 2 - Легковое авто, 3 - ГАЗель
+        if (!in_array($type, $allowedTypes)) {
+            return redirect()->route('social-taxi-orders.index')
+                            ->with('error', 'Недопустимый тип заказа.');
+        }
+        
+        // Получаем список клиентов для выпадающего списка
+        $clients = FioDtrn::whereNull('rip_at') // Только живые клиенты
+                          ->orderBy('fio')
+                          ->get();
+        
+        // Получаем список категорий для выпадающего списка
+        $categories = Category::where('is_soz', 1) // Только действующие категории
+                             ->orderBy('nmv')
+                             ->get();
+        
+        return view('social-taxi-orders.create-by-type', compact('type', 'clients', 'categories'));
+    }
+    
+    // Сохранить новый заказ по типу
+    public function storeByType(Request $request, $type) 
+    {
+        // Проверяем допустимый тип
+        $allowedTypes = [1, 2, 3]; // 1 - Соцтакси, 2 - Легковое авто, 3 - ГАЗель
+        if (!in_array($type, $allowedTypes)) {
+            return redirect()->route('social-taxi-orders.index')
+                            ->with('error', 'Недопустимый тип заказа.');
+        }
+        
+        // Валидация данных
+        $validated = $request->validate([
+            'client_id' => 'required|exists:fio_dtrns,id',
+            'visit_data' => 'required|date',
+            'adres_otkuda' => 'required|string|max:255',
+            'adres_kuda' => 'required|string|max:255',
+            'adres_obratno' => 'nullable|string|max:255',
+            'category_id' => 'required|exists:categories,id',
+            'client_tel' => 'nullable|string|max:255',
+            'client_invalid' => 'nullable|string|max:255',
+            'client_sopr' => 'nullable|string|max:255',
+        ], [
+            'client_id.required' => 'Клиент обязателен для выбора.',
+            'client_id.exists' => 'Выбранный клиент не существует.',
+            'visit_data.required' => 'Дата поездки обязательна для заполнения.',
+            'visit_data.date' => 'Дата поездки должна быть корректной датой.',
+            'adres_otkuda.required' => 'Адрес отправки обязателен для заполнения.',
+            'adres_otkuda.string' => 'Адрес отправки должен быть строкой.',
+            'adres_otkuda.max' => 'Адрес отправки не может быть длиннее 255 символов.',
+            'adres_kuda.required' => 'Адрес назначения обязателен для заполнения.',
+            'adres_kuda.string' => 'Адрес назначения должен быть строкой.',
+            'adres_kuda.max' => 'Адрес назначения не может быть длиннее 255 символов.',
+            'adres_obratno.string' => 'Обратный адрес должен быть строкой.',
+            'adres_obratno.max' => 'Обратный адрес не может быть длиннее 255 символов.',
+            'category_id.required' => 'Категория обязательна для выбора.',
+            'category_id.exists' => 'Выбранная категория не существует.',
+            'client_tel.string' => 'Телефон клиента должен быть строкой.',
+            'client_tel.max' => 'Телефон клиента не может быть длиннее 255 символов.',
+            'client_invalid.string' => 'Удостоверение инвалида должно быть строкой.',
+            'client_invalid.max' => 'Удостоверение инвалида не может быть длиннее 255 символов.',
+            'client_sopr.string' => 'Сопровождающий должен быть строкой.',
+            'client_sopr.max' => 'Сопровождающий не может быть длиннее 255 символов.',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            // Генерируем номер заказа
+            $pzNom = $this->generateOrderNumber($type);
+            
+            // Подготавливаем данные для создания заказа
+            $orderData = [
+                'type_order' => (int)$type,
+                'client_id' => (int)$validated['client_id'],
+                'client_tel' => $validated['client_tel'] ?? null,
+                'client_invalid' => $validated['client_invalid'] ?? null,
+                'client_sopr' => $validated['client_sopr'] ?? null,
+                'category_id' => (int)$validated['category_id'],
+                'adres_otkuda' => $validated['adres_otkuda'],
+                'adres_kuda' => $validated['adres_kuda'],
+                'adres_obratno' => $validated['adres_obratno'] ?? null,
+                'pz_nom' => $pzNom,
+                'pz_data' => now(),
+                'visit_data' => $validated['visit_data'],
+                'user_id' => auth()->id() ?? 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+
+            // Создаем заказ
+            $order = Order::create($orderData);
+
+            // Устанавливаем начальный статус "Принят"
+            $this->setInitialStatus($order, 1); // ID статуса "Принят"
+
+            DB::commit();
+
+            return redirect()->route('social-taxi-orders.show', $order)
+                            ->with('success', 'Заказ успешно создан.');
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error("Ошибка при создании заказа", ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            return back()->with('error', 'Ошибка при создании заказа: ' . $e->getMessage())
+                        ->withInput();
+        }
+    }
+    
+    
+    // Установка начального статуса заказа
+    private function setInitialStatus(Order $order, $statusId) 
+    {
+        DB::table('order_status_histories')->insert([
+            'order_id' => $order->id,
+            'status_order_id' => $statusId,
+            'user_id' => auth()->id() ?? 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 
 }

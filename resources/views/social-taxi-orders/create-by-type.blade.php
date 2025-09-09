@@ -1,0 +1,250 @@
+<x-app-layout>
+    <div class="bg-gray-100 py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Заголовок -->
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-3xl font-bold text-gray-800">
+                    Создание нового заказа: 
+                    <span class="{{ getOrderTypeColor($type) }} font-medium">
+                        {{ getOrderTypeName($type) }}
+                    </span>
+                </h1>
+                
+                <a href="{{ route('social-taxi-orders.index') }}" 
+                   class="inline-flex items-center px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    Назад к списку
+                </a>
+            </div>
+
+            <!-- Сообщения об ошибках -->
+            @if ($errors->any())
+                <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
+                    <p class="font-bold">Ошибки при создании заказа:</p>
+                    <ul class="list-disc pl-5 mt-2">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
+                    {{ session('error') }}
+                </div>
+            @endif
+
+            <!-- Форма создания заказа -->
+            <form action="{{ route('social-taxi-orders.store.by-type', $type) }}" method="POST" class="bg-white shadow rounded-lg p-6">
+                @csrf
+                
+                <!-- Предварительная информация о заказе -->
+                <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                    <h2 class="text-lg font-semibold text-gray-800 mb-4">Прием заказа</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Номер заказа</label>
+                            <div class="mt-1 bg-gray-100 p-2 rounded-md font-medium">
+                                {{ generateOrderNumber($type) }}
+                            </div>
+                            <p class="mt-1 text-xs text-gray-500">Устанавливается автоматически</p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Дата и время приема заказа</label>
+                            <div class="mt-1 bg-gray-100 p-2 rounded-md font-medium">
+                                {{ now()->format('d.m.Y H:i:s') }}
+                            </div>
+                            <p class="mt-1 text-xs text-gray-500">Устанавливается автоматически</p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Тип заказа</label>
+                            <div class="mt-1 bg-gray-100 p-2 rounded-md font-medium {{ getOrderTypeColor($type) }}">
+                                {{ getOrderTypeName($type) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Левая колонка -->
+                    <div>
+                        <!-- Сведения о клиенте -->
+                        <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                            <h2 class="text-lg font-semibold text-gray-800 mb-4">Сведения о клиенте</h2>
+                            
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="client_id" class="block text-sm font-medium text-gray-700">Клиент *</label>
+                                    <select name="client_id" id="client_id" required
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                        <option value="">Выберите клиента</option>
+                                        @foreach($clients as $client)
+                                            <option value="{{ $client->id }}" {{ old('client_id') == $client->id ? 'selected' : '' }}>
+                                                {{ $client->fio }} (#{{ $client->id }})
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('client_id')
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <div>
+                                    <label for="category_id" class="block text-sm font-medium text-gray-700">Категория инвалидности *</label>
+                                    <select name="category_id" id="category_id" required
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                        <option value="">Выберите категорию</option>
+                                        @foreach($categories as $category)
+                                            <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                                                {{ $category->nmv }} - {{ $category->name }} (Скидка: {{ $category->skidka }}%, Лимит: {{ $category->kol_p }} поездок/мес)
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('category_id')
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <div>
+                                    <label for="client_tel" class="block text-sm font-medium text-gray-700">Телефон для связи</label>
+                                    <input type="text" name="client_tel" id="client_tel" 
+                                           value="{{ old('client_tel') }}"
+                                           placeholder="Введите телефон клиента"
+                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                    @error('client_tel')
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <div>
+                                    <label for="client_invalid" class="block text-sm font-medium text-gray-700">Удостоверение инвалида</label>
+                                    <input type="text" name="client_invalid" id="client_invalid" 
+                                           value="{{ old('client_invalid') }}"
+                                           placeholder="Введите номер удостоверения"
+                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                    @error('client_invalid')
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <div>
+                                    <label for="client_sopr" class="block text-sm font-medium text-gray-700">ФИО (сопровождающий)</label>
+                                    <input type="text" name="client_sopr" id="client_sopr" 
+                                           value="{{ old('client_sopr') }}"
+                                           placeholder="Введите ФИО сопровождающего"
+                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                    @error('client_sopr')
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Правая колонка -->
+                    <div>
+                        <!-- Сведения о поездке -->
+                        <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                            <h2 class="text-lg font-semibold text-gray-800 mb-4">Сведения о поездке</h2>
+                            
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="visit_data" class="block text-sm font-medium text-gray-700">Дата и время поездки *</label>
+                                    <input type="datetime-local" name="visit_data" id="visit_data" 
+                                           value="{{ old('visit_data') }}"
+                                           required
+                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                    @error('visit_data')
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <div>
+                                    <label for="adres_otkuda" class="block text-sm font-medium text-gray-700">Откуда ехать *</label>
+                                    <textarea name="adres_otkuda" id="adres_otkuda" 
+                                              rows="3" 
+                                              required
+                                              placeholder="Введите адрес отправки"
+                                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('adres_otkuda') }}</textarea>
+                                    @error('adres_otkuda')
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <div>
+                                    <label for="adres_kuda" class="block text-sm font-medium text-gray-700">Куда ехать *</label>
+                                    <textarea name="adres_kuda" id="adres_kuda" 
+                                              rows="3" 
+                                              required
+                                              placeholder="Введите адрес назначения"
+                                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('adres_kuda') }}</textarea>
+                                    @error('adres_kuda')
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <div>
+                                    <label for="adres_obratno" class="block text-sm font-medium text-gray-700">Обратный адрес</label>
+                                    <textarea name="adres_obratno" id="adres_obratno" 
+                                              rows="3" 
+                                              placeholder="Введите обратный адрес (если есть)"
+                                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('adres_obratno') }}</textarea>
+                                    @error('adres_obratno')
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Кнопки действия -->
+                        <div class="flex justify-end space-x-3">
+                            <a href="{{ route('social-taxi-orders.index') }}" 
+                               class="inline-flex items-center px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400">
+                                Отмена
+                            </a>
+                            <button type="submit" 
+                                    class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                Создать заказ
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript для автоматического заполнения данных клиента -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const clientSelect = document.getElementById('client_id');
+            const clientTelInput = document.getElementById('client_tel');
+            const clientInvalidInput = document.getElementById('client_invalid');
+            const clientSoprInput = document.getElementById('client_sopr');
+            
+            if (clientSelect) {
+                clientSelect.addEventListener('change', function() {
+                    const clientId = this.value;
+                    if (clientId) {
+                        // Здесь можно добавить AJAX запрос для получения данных клиента
+                        // Пока оставим автоматическое заполнение через JavaScript
+                        fetchClientData(clientId);
+                    }
+                });
+            }
+            
+            function fetchClientData(clientId) {
+                // Пока просто логируем, позже добавим AJAX
+                console.log('Запрос данных клиента:', clientId);
+            }
+        });
+    </script>
+</x-app-layout>
