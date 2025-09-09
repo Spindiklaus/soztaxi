@@ -40,6 +40,25 @@
                 <label class="block text-sm font-medium text-gray-700">Обратный путь</label>
                 <div class="mt-1 bg-gray-100 p-2 rounded-md">{{ $order->adres_obratno ?? 'Не указано' }}</div>
             </div>
+            
+            <!-- Третья строчка -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Цена по факту поездки</label>
+                <div class="mt-1 bg-gray-100 p-2 rounded-md">{{ number_format($order->taxi_price ?? 0, 11, ',', ' ') }} руб.</div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Сумма к оплате</label>
+                @if ($order->taxi_price!=0)
+                    <div class="mt-1 bg-gray-100 p-2 rounded-md">{{ number_format($order->taxi_price - $order->taxi_vozm ?? 0, 11, ',', ' ') }} руб.</div>
+                @endif    
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Сумма к возмещению</label>
+                @if ($order->taxi_price!=0)
+                    <div class="mt-1 bg-gray-100 p-2 rounded-md">{{ number_format($order->taxi_vozm ?? 0, 11, ',', ' ') }} руб.</div>
+                @endif   
+            </div>
+            
         </div>
     </div>
 

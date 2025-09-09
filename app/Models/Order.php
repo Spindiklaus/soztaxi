@@ -37,6 +37,7 @@ class Order extends Model {
         'taxi_sent_at',
         'taxi_price',
         'taxi_way',
+        'taxi_vozm',
         'cancelled_at',
         'otmena_taxi',
         'closed_at',
@@ -57,6 +58,7 @@ class Order extends Model {
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
+        'taxi_vozm' => 'decimal:11',
     ];
 
     /**

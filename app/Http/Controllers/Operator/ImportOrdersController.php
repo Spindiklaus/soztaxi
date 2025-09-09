@@ -37,7 +37,7 @@ class ImportOrdersController extends BaseController {
             'nmv', 'category_skidka', 'category_limit', 'dopus_id', 'skidka_dop_all',
             'kol_p_limit', 'pz_nom', 'pz_data', 'adres_otkuda', 'adres_kuda', 'adres_obratno',
             'zena_type', 'visit_data', 'predv_way', 'taxi_id', 'taxi_sent_at', 'adres_trips_id',
-            'taxi_price', 'taxi_way', 'otmena_data', 'otmena_taxi', 'closed_at',
+            'taxi_price', 'taxi_way', 'taxi_vozm', 'otmena_data', 'otmena_taxi', 'closed_at',
             'komment', 'user_id', 'created_at', 'updated_at', 'deleted_at', 'visit_obratno'
         ];
 
@@ -158,6 +158,7 @@ class ImportOrdersController extends BaseController {
                     'taxi_sent_at' => $data['taxi_sent_at'],
                     'taxi_price' => $data['taxi_price'] ? (float) $data['taxi_price'] : null,
                     'taxi_way' => $data['taxi_way'] ? (float) $data['taxi_way'] : null,
+                    'taxi_vozm' => $data['taxi_vozm'] ? (float) $data['taxi_vozm'] : null,
                     'cancelled_at' => $data['otmena_data'],
                     'otmena_taxi' => (int) $data['otmena_taxi'],
                     'closed_at' => $data['closed_at'],
