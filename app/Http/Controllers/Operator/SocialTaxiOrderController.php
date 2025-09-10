@@ -30,10 +30,9 @@ class SocialTaxiOrderController extends BaseController {
 
         $sort = $request->get('sort', 'pz_data');
         $direction = $request->get('direction', 'desc');
-        
+
         // Получаем список операторов для фильтра
         $operators = User::orderBy('name')->get();
-        
 
         // Собираем параметры для передачи в шаблон
         $urlParams = $request->only(['sort', 'direction', 'show_deleted', 'pz_nom', 'type_order', 'status_order_id', 'date_from', 'date_to']);
@@ -159,17 +158,39 @@ class SocialTaxiOrderController extends BaseController {
             return redirect()->route('social-taxi-orders.index')
                             ->with('error', 'Недопустимый тип заказа.');
         }
+        
 
-        // Получаем список клиентов для выпадающего списка
-        $clients = FioDtrn::whereNull('rip_at') // Только живые клиенты
-                ->orderBy('fio')
-                ->get();
-
-        // Получаем список категорий для выпадающего списка
-        $categories = Category::where('is_soz', 1) // Только действующие категории
+        $categories = Category::where(function ($query) use ($type) {
+                    switch ($type) {
+                        case 1: // Соцтакси
+                            $query->where('is_soz', 1);
+                            break;
+                        case 2: // Легковое авто
+                            $query->where('is_auto', 1);
+                            break;
+                        case 3: // ГАЗель
+                            $query->where('is_gaz', 1);
+                            break;
+                    }
+                })
                 ->orderBy('nmv')
                 ->get();
-
+        
+        // Получаем ID разрешенных категорий
+        $allowedCategoryIds = $categories->pluck('id')->toArray();        
+                
+                
+        // Получаем список клиентов, которые имели заказы в разрешенных категориях
+        $clients = FioDtrn::whereNull('rip_at') // Только живые клиенты
+            ->whereHas('orders', function ($query) use ($allowedCategoryIds) {
+                $query->whereIn('category_id', $allowedCategoryIds)
+                      ->whereNull('deleted_at')
+                      ->whereNull('cancelled_at');
+            })
+            ->orderBy('fio')
+            ->get();
+                
+                
         // Генерируем номер заказа заранее
         $orderNumber = generateOrderNumber($type, auth()->id());
         $orderDateTime = now();
@@ -281,6 +302,52 @@ class SocialTaxiOrderController extends BaseController {
             Log::error("Ошибка при создании заказа", ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             return back()->with('error', 'Ошибка при создании заказа: ' . $e->getMessage())
                             ->withInput();
+        }
+    }
+
+    // Получить данные клиента по AJAX
+    public function getClientData($clientId) {
+        try {
+            // Получаем клиента
+            $client = FioDtrn::find($clientId);
+            if (!$client) {
+                return response()->json(['error' => 'Клиент не найден'], 404);
+            }
+
+            // Получаем последние данные из предыдущих заказов клиента
+            $lastOrder = Order::where('client_id', $clientId)
+                    ->whereNotNull('visit_data')
+                    ->whereNull('deleted_at')
+                    ->whereNull('cancelled_at')
+                    ->orderBy('visit_data', 'desc')
+                    ->first();
+
+            // Получаем категории клиента из предыдущих заказов
+            $clientCategories = Order::where('client_id', $clientId)
+                    ->whereNotNull('category_id')
+                    ->whereNull('deleted_at')
+                    ->whereNull('cancelled_at')
+                    ->distinct()
+                    ->pluck('category_id')
+                    ->toArray();
+
+            return response()->json([
+                        'client' => [
+                            'id' => $client->id,
+                            'fio' => $client->fio,
+                            'kl_id' => $client->kl_id,
+                            'rip_at' => $client->rip_at,
+                        ],
+                        'last_order_data' => $lastOrder ? [
+                    'client_tel' => $lastOrder->client_tel,
+                    'client_invalid' => $lastOrder->client_invalid,
+                    'client_sopr' => $lastOrder->client_sopr,
+                    'category_id' => $lastOrder->category_id,
+                        ] : null,
+                        'client_categories' => $clientCategories,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Ошибка получения данных клиента: ' . $e->getMessage()], 500);
         }
     }
 

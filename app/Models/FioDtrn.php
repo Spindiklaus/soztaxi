@@ -21,17 +21,39 @@ class FioDtrn extends Model
         'created_rip',
         'user_rip',
         'user_id',
-        'komment'
+        'komment',
+        'created_at',
+        'updated_at',
     ];
     protected $casts = [
         'data_r' => 'date',
         'rip_at' => 'date',
         'created_rip' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
     
+    /**
+     * Пользователь (оператор), создавший запись клиента
+     */
     public function user()
     {
         return $this->belongsTo(User::class);
     }
     
+    /**
+     * Заказы клиента
+     */
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'client_id');
+    }
+    
+    /**
+     * Пользователь (оператор), установивший RIP
+     */
+    public function ripUser()
+    {
+        return $this->belongsTo(User::class, 'user_rip');
+    }
 }
