@@ -158,7 +158,7 @@ class SocialTaxiOrderController extends BaseController {
             return redirect()->route('social-taxi-orders.index')
                             ->with('error', 'Недопустимый тип заказа.');
         }
-        
+
 
         $categories = Category::where(function ($query) use ($type) {
                     switch ($type) {
@@ -175,22 +175,20 @@ class SocialTaxiOrderController extends BaseController {
                 })
                 ->orderBy('nmv')
                 ->get();
-        
+
         // Получаем ID разрешенных категорий
-        $allowedCategoryIds = $categories->pluck('id')->toArray();        
-                
-                
+        $allowedCategoryIds = $categories->pluck('id')->toArray();
+
         // Получаем список клиентов, которые имели заказы в разрешенных категориях
         $clients = FioDtrn::whereNull('rip_at') // Только живые клиенты
-            ->whereHas('orders', function ($query) use ($allowedCategoryIds) {
-                $query->whereIn('category_id', $allowedCategoryIds)
-                      ->whereNull('deleted_at')
-                      ->whereNull('cancelled_at');
-            })
-            ->orderBy('fio')
-            ->get();
-                
-                
+                ->whereHas('orders', function ($query) use ($allowedCategoryIds) {
+                    $query->whereIn('category_id', $allowedCategoryIds)
+                    ->whereNull('deleted_at')
+                    ->whereNull('cancelled_at');
+                })
+                ->orderBy('fio')
+                ->get();
+
         // Генерируем номер заказа заранее
         $orderNumber = generateOrderNumber($type, auth()->id());
         $orderDateTime = now();
@@ -222,6 +220,24 @@ class SocialTaxiOrderController extends BaseController {
             'pz_data' => 'required|date', // Дата заказа из формы
             'type_order' => 'required|integer|in:1,2,3', // Тип заказа из формы
             'user_id' => 'required|integer|exists:users,id', // ID оператора из формы
+            // Дополнительные поля (могут отсутствовать)
+            'taxi_id' => 'nullable|exists:taxis,id',
+            'taxi_price' => 'nullable|numeric',
+            'taxi_way' => 'nullable|numeric',
+            'taxi_sent_at' => 'nullable|date',
+            'otmena_data' => 'nullable|date',
+            'otmena_taxi' => 'nullable|integer',
+            'closed_at' => 'nullable|date',
+            'komment' => 'nullable|string',
+            'visit_obratno' => 'nullable|date',
+            'predv_way' => 'nullable|numeric',
+            'zena_type' => 'nullable|integer',
+            'dopus_id' => 'nullable|exists:skidka_dops,id',
+        'skidka_dop_all' => 'nullable|integer',
+        'kol_p_limit' => 'nullable|integer',
+        'category_skidka' => 'nullable|integer',
+        'category_limit' => 'nullable|integer',
+            
                 ], [
             'client_id.required' => 'Клиент обязателен для выбора.',
             'client_id.exists' => 'Выбранный клиент не существует.',
@@ -243,12 +259,39 @@ class SocialTaxiOrderController extends BaseController {
             'client_invalid.max' => 'Удостоверение инвалида не может быть длиннее 255 символов.',
             'client_sopr.string' => 'Сопровождающий должен быть строкой.',
             'client_sopr.max' => 'Сопровождающий не может быть длиннее 255 символов.',
+            'pz_nom.required' => 'Номер заказа обязателен для заполнения.',
+            'pz_nom.string' => 'Номер заказа должен быть строкой.',
+            'pz_nom.max' => 'Номер заказа не может быть длиннее 255 символов.',
+            'pz_data.required' => 'Дата заказа обязательна для заполнения.',
+            'pz_data.date' => 'Дата заказа должна быть корректной датой.',
+            'type_order.required' => 'Тип заказа обязателен для выбора.',
+            'type_order.integer' => 'Тип заказа должен быть целым числом.',
+            'type_order.in' => 'Недопустимый тип заказа.',
+            'user_id.required' => 'Оператор обязателен для выбора.',
+            'user_id.integer' => 'ID оператора должен быть целым числом.',
+            'user_id.exists' => 'Выбранный оператор не существует.',
+            'taxi_id.exists' => 'Выбранный оператор такси не существует.',
+            'taxi_price.numeric' => 'Цена такси должна быть числом.',
+            'taxi_way.numeric' => 'Дальность такси должна быть числом.',
+            'taxi_sent_at.date' => 'Дата отправки в такси должна быть корректной датой.',
+            'otmena_data.date' => 'Дата отмены должна быть корректной датой.',
+            'otmena_taxi.integer' => 'Отмена такси должна быть целым числом.',
+            'closed_at.date' => 'Дата закрытия должна быть корректной датой.',
+            'komment.string' => 'Комментарий должен быть строкой.',
+            'visit_obratno.date' => 'Дата обратной поездки должна быть корректной датой.',
+            'predv_way.numeric' => 'Предварительная дальность должна быть числом.',
+            'zena_type.integer' => 'Тип цены должен быть целым числом.',
+            'dopus_id.exists' => 'Выбранные дополнительные условия не существуют.',
+            'skidka_dop_all.integer' => 'Скидка по дополнительным условиям должна быть целым числом.',
+            'kol_p_limit.integer' => 'Лимит поездок должен быть целым числом.',
+            'category_skidka.integer' => 'Скидка по категории должна быть целым числом.',
+            'category_limit.integer' => 'Лимит по категории должен быть целым числом.',
         ]);
 
         DB::beginTransaction();
         try {
             // Используем номер заказа из формы
-            $pzNom = validated['pz_nom'];
+            $pzNom = $validated['pz_nom'];
 
             // Проверяем, существует ли уже заказ с таким номером
             if (Order::where('pz_nom', $pzNom)->exists()) {
@@ -259,32 +302,41 @@ class SocialTaxiOrderController extends BaseController {
 
             // Подготавливаем данные для создания заказа
             $orderData = [
-                'type_order' => (int) $validated['type_order'],
-                'client_id' => (int) $validated['client_id'],
+                'type_order' => (int) ($validated['type_order'] ?? 1),
+                'client_id' => (int) ($validated['client_id'] ?? 0),
                 'client_tel' => $validated['client_tel'] ?? null,
                 'client_invalid' => $validated['client_invalid'] ?? null,
                 'client_sopr' => $validated['client_sopr'] ?? null,
-                'category_id' => (int) $validated['category_id'],
-                'adres_otkuda' => $validated['adres_otkuda'],
-                'adres_kuda' => $validated['adres_kuda'],
+                'category_id' => (int) ($validated['category_id'] ?? 0),
+                'category_skidka' => 0, // Будет заполнено позже
+                'category_limit' => 0, // Будет заполнено позже
+                'dopus_id' => 0, // Будет заполнено позже
+                'skidka_dop_all' => 0, // Будет заполнено позже
+                'kol_p_limit' => 0, // Будет заполнено позже
+                'pz_nom' => $pzNom,
+                'pz_data' => $validated['pz_data'] ?? now(),
+                'adres_otkuda' => $validated['adres_otkuda'] ?? null,
+                'adres_kuda' => $validated['adres_kuda'] ?? null,
                 'adres_obratno' => $validated['adres_obratno'] ?? null,
                 'zena_type' => (int) ($validated['zena_type'] ?? 1),
-                'pz_nom' => $pzNom,
-                'pz_data' => $validated['pz_data'],
                 'visit_data' => $validated['visit_data'] ?? null,
-                'visit_obratno' => $validated['visit_obratno'] ?? null,
-                'predv_way' => $validated['predv_way'] ? (float) str_replace(',', '.', $validated['predv_way']) : null,
+                'predv_way' => isset($validated['predv_way']) && $validated['predv_way'] !== '' && $validated['predv_way'] !== null ? 
+                   (float) str_replace(',', '.', $validated['predv_way']) : null,
                 'taxi_id' => !empty($validated['taxi_id']) ? (int) $validated['taxi_id'] : null,
                 'taxi_sent_at' => $validated['taxi_sent_at'] ?? null,
-                'taxi_price' => $validated['taxi_price'] ? (float) str_replace(',', '.', $validated['taxi_price']) : null,
-                'taxi_way' => $validated['taxi_way'] ? (float) str_replace(',', '.', $validated['taxi_way']) : null,
+                'taxi_price' => isset($validated['taxi_price']) && $validated['taxi_price'] !== '' && $validated['taxi_price'] !== null ? 
+                    (float) str_replace(',', '.', $validated['taxi_price']) : null,
+                'taxi_way' => isset($validated['taxi_way']) && $validated['taxi_way'] !== '' && $validated['taxi_way'] !== null ? 
+                  (float) str_replace(',', '.', $validated['taxi_way']) : null,
                 'cancelled_at' => $validated['otmena_data'] ?? null,
                 'otmena_taxi' => (int) ($validated['otmena_taxi'] ?? 0),
                 'closed_at' => $validated['closed_at'] ?? null,
                 'komment' => $validated['komment'] ?? null,
-                'user_id' => auth()->id() ?? 1,
+                'user_id' => (int) ($validated['user_id'] ?? auth()->id() ?? 1),
                 'created_at' => now(),
                 'updated_at' => now(),
+                'deleted_at' => null,
+                'visit_obratno' => $validated['visit_obratno'] ?? null,
             ];
 
             // Создаем заказ

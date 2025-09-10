@@ -20,7 +20,7 @@
                 </a>
             </div>
 
-            <!-- Сообщения об ошибках -->
+<!--             Сообщения об ошибках 
             @if ($errors->any())
             <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
                 <p class="font-bold">Ошибки при создании заказа:</p>
@@ -30,13 +30,13 @@
                     @endforeach
                 </ul>
             </div>
-            @endif
+            @endif-->
 
-            @if(session('error'))
+<!--            @if(session('error'))
             <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
                 {{ session('error') }}
             </div>
-            @endif
+            @endif-->
 
             <!-- Форма создания заказа -->
             <form action="{{ route('social-taxi-orders.store.by-type', $type) }}" method="POST" class="bg-white shadow rounded-lg p-6">
