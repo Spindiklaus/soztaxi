@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
  * 
  * Используется для уменьшения "толщины" контроллера и соблюдения принципа 
  * единственной ответственности (SRP).
+ * 
  */
 class OrderQueryBuilder
 {
@@ -45,6 +46,7 @@ class OrderQueryBuilder
      * - поиск по номеру заказа
      * - фильтр по типу заказа
      * - фильтр по диапазону дат
+     * - фильтр по оператору (user_id)
      * 
      * @param Request $request HTTP-запрос с параметрами фильтрации
      * @return self Возвращает себя для цепочного вызова
@@ -70,6 +72,11 @@ class OrderQueryBuilder
     // Фильтрация по диапазону дат
     $dateFrom = $request->input('date_from', '2016-08-01');
     $dateTo = $request->input('date_to', date('Y-m-d'));
+    
+    // Фильтрация по оператору (user_id)
+    if ($request->filled('user_id')) {
+        $this->query->where('user_id', $request->input('user_id'));
+    }
     
     if ($dateFrom) {
         $this->query->whereDate('pz_data', '>=', $dateFrom);

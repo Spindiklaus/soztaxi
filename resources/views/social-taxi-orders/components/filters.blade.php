@@ -16,7 +16,7 @@
     <div id="filters-content" class="p-4 hidden">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
             <!-- Скрытое поле для сохранения параметров сортировки -->
-            @foreach(request()->except(['pz_nom', 'type_order', 'show_deleted', 'status_order_id', 'page', 'date_from', 'date_to']) as $key => $value)
+            @foreach(request()->except(['pz_nom', 'type_order', 'show_deleted', 'status_order_id', 'user_id', 'page', 'date_from', 'date_to']) as $key => $value)
                 <input type="hidden" name="{{ $key }}" value="{{ $value }}">
             @endforeach
 
@@ -53,6 +53,20 @@
                     <option value="4" {{ request('status_order_id') == '4' ? 'selected' : '' }}>Закрыт</option>
                 </select>
             </div>
+            <!-- фильтр по операторам -->
+            <div>
+                <label for="filter_user_id" class="block text-sm font-medium text-gray-700">Оператор</label>
+                <select name="user_id" id="filter_user_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    <option value="">Все операторы</option>
+                    @foreach($operators as $operator)
+                        <option value="{{ $operator->id }}" {{ request('user_id') == $operator->id ? 'selected' : '' }}>
+                            {{ $operator->name }} ({{ $operator->litera ?? 'Без литеры' }})
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            
+            
 
             <div class="md:col-span-2">
                 <label class="block text-sm font-medium text-gray-700">Дата приема заказа</label>
@@ -116,6 +130,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if ($key === 'date_from' && $value === '2016-08-01') return false;
             if ($key === 'date_to' && $value === date('Y-m-d')) return false;
             if ($key === 'show_deleted' && $value === '0') return false;
+            if ($key === 'user_id' && $value === '0') return false;
             return !empty($value);
         })->isNotEmpty() ? 'true' : 'false' 
     }};

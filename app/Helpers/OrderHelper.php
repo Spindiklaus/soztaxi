@@ -64,10 +64,23 @@ if (!function_exists('generateOrderNumber')) {
      * Генерация номера заказа по типу
      *
      * @param int $type Тип заказа
+     * @param int|null $userId ID пользователя (оператора)
      * @return string Номер заказа
      */
-    function generateOrderNumber($type) 
+    function generateOrderNumber($type, $userId = null) 
     {
+        // Если ID пользователя не указан, берем текущего авторизованного пользователя
+        if (!$userId && auth()->check()) {
+            $userId = auth()->id();
+        }
+        
+        // Получаем литеру оператора
+        $litera = 'UNK'; // По умолчанию
+        if ($userId) {
+            $user = \App\Models\User::find($userId);
+            $litera = $user && $user->litera ? strtoupper($user->litera) : 'UNK';
+        }
+        
         // Определяем префикс по типу заказа
         $prefixes = [
             1 => 'ST',  // Соцтакси
@@ -77,11 +90,24 @@ if (!function_exists('generateOrderNumber')) {
         
         $prefix = $prefixes[$type] ?? 'UNK';
         
-        // Получаем максимальный ID для данного типа заказа
-        $maxId = \App\Models\Order::where('type_order', $type)->max('id') ?? 0;
-        $nextId = $maxId + 1;
-        
-        // Формируем номер заказа: ST-000001, LA-000001, GA-000001
-        return $prefix . '-' . str_pad($nextId, 6, '0', STR_PAD_LEFT);
+        // Получаем максимальный номер заказа для этого оператора и префикса
+    $maxNumber = 0;
+    $lastOrders = \App\Models\Order::where('user_id', $userId)
+        ->where('pz_nom', 'like', $prefix . '-______' . $litera)
+        ->get();
+    
+     foreach ($lastOrders as $order) {
+        // Извлекаем номер из pz_nom
+        if (preg_match('/^' . $prefix . '-(\d+)' . $litera . '$/', $order->pz_nom, $matches)) {
+            $number = (int)$matches[1];
+            if ($number > $maxNumber) {
+                $maxNumber = $number;
+            }
+        }
+    }
+    $nextNumber = $maxNumber + 1;
+    
+        // Формируем номер заказа: ST-000499SEM, LA-000001SEM, GA-000001SEM
+        return $prefix . '-' . str_pad($nextNumber, 6, '0', STR_PAD_LEFT) . $litera;
     }
 }
