@@ -7,7 +7,7 @@ use App\Models\Order;
 use App\Models\User;
 use App\Models\FioDtrn;
 use App\Models\Category;
-use App\Models\OrderStatusHistory;
+use App\Models\SkidkaDop;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -202,8 +202,20 @@ class SocialTaxiOrderController extends BaseController {
         // Генерируем номер заказа заранее
         $orderNumber = generateOrderNumber($type, auth()->id());
         $orderDateTime = now();
+        
+        // Получаем список дополнительных условий для скидок
+        $dopusConditions = SkidkaDop::where('life', 1) // Только действующие условия
+            ->orderBy('name')
+            ->get();
 
-        return view('social-taxi-orders.create-by-type', compact('type', 'clients', 'categories', 'orderNumber', 'orderDateTime'));
+        return view('social-taxi-orders.create-by-type', compact(
+                'type', 
+                'clients', 
+                'categories', 
+                'orderNumber', 
+                'orderDateTime',
+                'dopusConditions' // дополнительные условия
+        ));
     }
 
     // Сохранить новый заказ по типу
@@ -243,11 +255,10 @@ class SocialTaxiOrderController extends BaseController {
             'predv_way' => 'nullable|numeric',
             'zena_type' => 'nullable|integer',
             'dopus_id' => 'nullable|exists:skidka_dops,id',
-        'skidka_dop_all' => 'nullable|integer',
-        'kol_p_limit' => 'nullable|integer',
-        'category_skidka' => 'nullable|integer',
-        'category_limit' => 'nullable|integer',
-            
+            'skidka_dop_all' => 'nullable|integer|in:50,100',
+            'kol_p_limit' => 'nullable|integer|in:10,26',
+            'category_skidka' => 'nullable|integer|in:50,100',
+            'category_limit' => 'nullable|integer|min:10|max:10',
                 ], [
             'client_id.required' => 'Клиент обязателен для выбора.',
             'client_id.exists' => 'Выбранный клиент не существует.',
@@ -294,8 +305,10 @@ class SocialTaxiOrderController extends BaseController {
             'dopus_id.exists' => 'Выбранные дополнительные условия не существуют.',
             'skidka_dop_all.integer' => 'Скидка по дополнительным условиям должна быть целым числом.',
             'kol_p_limit.integer' => 'Лимит поездок должен быть целым числом.',
+            'kol_p_limit.in' => 'Лимит поездок может быть только 10 или 26 поездок в месяц.',
             'category_skidka.integer' => 'Скидка по категории должна быть целым числом.',
             'category_limit.integer' => 'Лимит по категории должен быть целым числом.',
+            'category_limit.in' => 'Лимит поездок по категории может быть только 10.',
         ]);
 
         DB::beginTransaction();
@@ -318,11 +331,11 @@ class SocialTaxiOrderController extends BaseController {
                 'client_invalid' => $validated['client_invalid'] ?? null,
                 'client_sopr' => $validated['client_sopr'] ?? null,
                 'category_id' => (int) ($validated['category_id'] ?? 0),
-                'category_skidka' => 0, // Будет заполнено позже
-                'category_limit' => 0, // Будет заполнено позже
-                'dopus_id' => 0, // Будет заполнено позже
-                'skidka_dop_all' => 0, // Будет заполнено позже
-                'kol_p_limit' => 0, // Будет заполнено позже
+                'category_skidka' => $validated['category_skidka'] ? (int) $validated['category_skidka'] : null, 
+                'category_limit' => $validated['category_limit'] ? (int) $validated['category_limit'] : null,   
+                'dopus_id' => !empty($validated['dopus_id']) ? (int) $validated['dopus_id'] : null,
+                'skidka_dop_all' => $validated['skidka_dop_all'] ? (int) $validated['skidka_dop_all'] : null,
+                'kol_p_limit' => $validated['kol_p_limit'] ? (int) $validated['kol_p_limit'] : null,
                 'pz_nom' => $pzNom,
                 'pz_data' => $validated['pz_data'] ?? now(),
                 'adres_otkuda' => $validated['adres_otkuda'] ?? null,

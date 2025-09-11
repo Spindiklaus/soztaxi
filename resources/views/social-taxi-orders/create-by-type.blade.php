@@ -20,32 +20,12 @@
                 </a>
             </div>
 
-<!--             Сообщения об ошибках 
-            @if ($errors->any())
-            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
-                <p class="font-bold">Ошибки при создании заказа:</p>
-                <ul class="list-disc pl-5 mt-2">
-                    @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-            @endif-->
-
-<!--            @if(session('error'))
-            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
-                {{ session('error') }}
-            </div>
-            @endif-->
-
             <!-- Форма создания заказа -->
             <form action="{{ route('social-taxi-orders.store.by-type', $type) }}" method="POST" class="bg-white shadow rounded-lg p-6">
                 @csrf
 
                 <!-- Предварительная информация о заказе -->
                 <div class="bg-gray-50 p-4 rounded-lg mb-6">
-                    <h2 class="text-lg font-semibold text-gray-800 mb-4">Прием заказа</h2>
-
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Номер заказа</label>
@@ -126,6 +106,33 @@
                                     @enderror
                                 </div>
 
+                                <!-- Добавлены поля category_skidka и category_limit -->
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="category_skidka" class="block text-sm font-medium text-gray-700">Скидка по категории, %</label>
+                                        <input type="number" name="category_skidka" id="category_skidka" 
+                                               value="{{ old('category_skidka') }}"
+                                               min="0" max="100" step="1"
+                                               placeholder="Введите скидку по категории"
+                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                            @error('category_skidka')
+                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                            @enderror
+                                    </div>
+
+                                    <div>
+                                        <label for="category_limit" class="block text-sm font-medium text-gray-700">Лимит поездок по категории в месяц</label>
+                                        <input type="number" name="category_limit" id="category_limit" 
+                                               value="{{ old('category_limit') }}"
+                                               min="0" max="100" step="1"
+                                               placeholder="Введите лимит поездок"
+                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                            @error('category_limit')
+                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                            @enderror
+                                    </div>
+                                </div>
+
                                 <div>
                                     <label for="client_tel" class="block text-sm font-medium text-gray-700">Телефон для связи</label>
                                     <input type="text" name="client_tel" id="client_tel" 
@@ -158,6 +165,55 @@
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                         @enderror
                                 </div>
+                            </div>
+                        </div>
+
+                        <!-- Льготы по поездке -->
+                        <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                            <h2 class="text-lg font-semibold text-gray-800 mb-4">Льготы по поездке</h2>
+
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="dopus_id" class="block text-sm font-medium text-gray-700">Дополнительные условия для скидок</label>
+                                    <select name="dopus_id" id="dopus_id"
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                        <option value="">Выберите дополнительные условия</option>
+                                        @foreach($dopusConditions as $dopus)
+                                        <option value="{{ $dopus->id }}" {{ old('dopus_id') == $dopus->id ? 'selected' : '' }}>
+                                            {{ $dopus->name }} (Скидка: {{ $dopus->skidka }}%, Лимит: {{ $dopus->kol_p }} поездок/мес)
+                                        </option>
+                                        @endforeach
+                                    </select>
+                                    @error('dopus_id')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                            
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="skidka_dop_all" class="block text-sm font-medium text-gray-700">Окончательная скидка инвалиду, %</label>
+                                    <input type="number" name="skidka_dop_all" id="skidka_dop_all" 
+                                           value="{{ old('skidka_dop_all') }}"
+                                           min="0" max="100" step="1"
+                                           placeholder="Введите окончательную скидку"
+                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                        @error('skidka_dop_all')
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                        @enderror
+                                </div>
+
+                                <div>
+                                    <label for="kol_p_limit" class="block text-sm font-medium text-gray-700">Окончательный лимит поездок</label>
+                                    <input type="number" name="kol_p_limit" id="kol_p_limit" 
+                                           value="{{ old('kol_p_limit') }}"
+                                           min="0" max="100" step="1"
+                                           placeholder="Введите окончательный лимит поездок"
+                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                        @error('kol_p_limit')
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                        @enderror
+                                </div>
+                                </div>    
                             </div>
                         </div>
                     </div>
@@ -233,119 +289,10 @@
                         </div>
                     </div>
                 </div>
-              
-
             </form>
         </div>
     </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const clientSelect = document.getElementById('client_id');
-
-    if (clientSelect) {
-        clientSelect.addEventListener('change', function () {
-            const clientId = this.value;
-            if (clientId) {
-                fetchClientData(clientId);
-            } else {
-                // Очищаем поля при сбросе клиента
-                clearClientData();
-            }
-        });
-    }
-
-    function fetchClientData(clientId) {
-        // Показываем индикатор загрузки
-        showLoadingIndicator();
-
-        // Используем API маршрут
-        fetch(`/api/social-taxi-orders/client-data/${clientId}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.error) {
-                    throw new Error(data.error);
-                }
-                populateClientData(data);
-            })
-            .catch(error => {
-                console.error('Ошибка получения данных клиента:', error);
-                hideLoadingIndicator();
-                alert('Ошибка получения данных клиента: ' + error.message);
-            });
-    }
-
-    function populateClientData(data) {
-        // Получаем элементы каждый раз заново
-        const clientTelInput = document.getElementById('client_tel');
-        const clientInvalidInput = document.getElementById('client_invalid');
-        const clientSoprInput = document.getElementById('client_sopr');
-        const categorySelect = document.getElementById('category_id');
-
-        // Очищаем все поля перед заполнением
-        clearClientData();
-
-        // Заполняем поля данными из последнего заказа
-        if (data.last_order_data) {
-            if (clientTelInput) {
-                clientTelInput.value = data.last_order_data.client_tel || '';
-            }
-            if (clientInvalidInput) {
-                clientInvalidInput.value = data.last_order_data.client_invalid || '';
-            }
-            if (clientSoprInput) {
-                clientSoprInput.value = data.last_order_data.client_sopr || '';
-            }
-            
-            // Устанавливаем категорию из последнего заказа
-            if (categorySelect && data.last_order_data.category_id) {
-                categorySelect.value = data.last_order_data.category_id;
-            }
-        }
-        
-        // Если нет данных из последнего заказа, но есть категории клиента
-        if (!data.last_order_data && data.client_categories.length > 0) {
-            // Устанавливаем первую доступную категорию клиента
-            if (categorySelect) {
-                categorySelect.value = data.client_categories[0] || '';
-            }
-        }
-
-        hideLoadingIndicator();
-    }
-
-    function clearClientData() {
-        // Получаем элементы каждый раз заново
-        const clientTelInput = document.getElementById('client_tel');
-        const clientInvalidInput = document.getElementById('client_invalid');
-        const clientSoprInput = document.getElementById('client_sopr');
-        const categorySelect = document.getElementById('category_id');
-
-        // Очищаем все поля данных клиента
-        if (clientTelInput) clientTelInput.value = '';
-        if (clientInvalidInput) clientInvalidInput.value = '';
-        if (clientSoprInput) clientSoprInput.value = '';
-        if (categorySelect) categorySelect.value = '';
-    }
-
-    function showLoadingIndicator() {
-        const clientSelect = document.getElementById('client_id');
-        if (clientSelect) {
-            clientSelect.disabled = true;
-        }
-    }
-
-    function hideLoadingIndicator() {
-        const clientSelect = document.getElementById('client_id');
-        if (clientSelect) {
-            clientSelect.disabled = false;
-        }
-    }
-});
-</script>
+    <!-- JavaScript -->
+    @include('social-taxi-orders.create-components.scripts')
 </x-app-layout>
