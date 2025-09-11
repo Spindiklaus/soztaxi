@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\User;
 use App\Models\FioDtrn;
 use App\Models\Category;
+use App\Models\OrderStatusHistory;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -126,6 +127,15 @@ class SocialTaxiOrderController extends BaseController {
         if (!$order) {
             return redirect()->back()->with('error', 'Заказ не найден.');
         }
+        
+        // Проверяем текущий статус заказа
+        $currentStatus = $order->currentStatus;
+        $statusId = $currentStatus ? $currentStatus->status_order_id : 1; // По умолчанию "Принят"
+
+    // Разрешаем удаление только для заказов со статусом "Принят" (ID = 1)
+    if ($statusId != 1) {
+        return redirect()->back()->with('error', 'Удаление возможно только для заказов со статусом "Принят". Текущий статус: ' . ($currentStatus->statusOrder->name ?? 'Неизвестный статус'));
+    }
 
         // Принудительно устанавливаем deleted_at
         $order->deleted_at = now();
