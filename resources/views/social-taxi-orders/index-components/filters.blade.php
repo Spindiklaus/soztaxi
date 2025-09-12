@@ -66,6 +66,15 @@
                 </select>
             </div>
             
+            <!-- Новый фильтр по ФИО клиента -->
+            <div>
+                <label for="filter_client_fio" class="block text-sm font-medium text-gray-700">ФИО клиента</label>
+                <input type="text" name="client_fio" id="filter_client_fio" 
+                       value="{{ request('client_fio') }}" 
+                       placeholder="%Поиск по ФИО%"
+                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <p class="mt-1 text-xs text-gray-500">Поиск по ФИО клиента</p>
+            </div>
             
 
             <div class="md:col-span-2">
@@ -90,14 +99,14 @@
                     Применить фильтр
                 </button>
                 @php
-    // Собираем параметры для сброса - оставляем только базовые
-    $baseParams = request()->only(['sort', 'direction']);
-    $resetParams = array_merge($baseParams, [
-        'date_from' => '2016-08-01',
-        'date_to' => date('Y-m-d'),
-        'show_deleted' => '0'
-    ]);
-@endphp
+                    // Собираем параметры для сброса - оставляем только базовые
+                    $baseParams = request()->only(['sort', 'direction']);
+                    $resetParams = array_merge($baseParams, [
+                        'date_from' => '2016-08-01',
+                        'date_to' => date('Y-m-d'),
+                        'show_deleted' => '0'
+                     ]);
+                @endphp
 <a href="{{ route('social-taxi-orders.index', $resetParams) }}"
    class="inline-flex items-center px-4 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-gray-800 hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition ease-in-out duration-150">
     Сбросить фильтры
@@ -131,6 +140,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if ($key === 'date_to' && $value === date('Y-m-d')) return false;
             if ($key === 'show_deleted' && $value === '0') return false;
             if ($key === 'user_id' && $value === '0') return false;
+            if ($key === 'client_fio' && $value === '') return false;
             return !empty($value);
         })->isNotEmpty() ? 'true' : 'false' 
     }};

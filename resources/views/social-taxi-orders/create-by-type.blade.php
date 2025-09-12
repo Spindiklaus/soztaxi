@@ -233,7 +233,7 @@
                                     <label for="visit_data" class="block text-sm font-medium text-gray-700">Дата и время поездки *</label>
                                     <input type="datetime-local" name="visit_data" id="visit_data" 
                                            value="{{ old('visit_data') }}"
-                                           min="{{ date('Y-m-d\TH:i', strtotime('2025-08-01 00:00')) }}"
+                                           min="{{ date('Y-m-d\TH:i', strtotime('2016-08-01 00:00')) }}"
                                            max="{{ date('Y-m-d\TH:i', strtotime('+1 year')) }}" 
                                            step="300" 
                                            required

@@ -47,6 +47,7 @@ class OrderQueryBuilder
      * - фильтр по типу заказа
      * - фильтр по диапазону дат
      * - фильтр по оператору (user_id)
+     * - фильтр по ФИО клиента (client_fio)
      * 
      * @param Request $request HTTP-запрос с параметрами фильтрации
      * @return self Возвращает себя для цепочного вызова
@@ -84,6 +85,12 @@ class OrderQueryBuilder
     if ($dateTo) {
         $this->query->whereDate('pz_data', '<=', $dateTo);
     }
+    // Фильтрация по ФИО клиента
+        if ($request->filled('client_fio')) {
+            $this->query->whereHas('client', function ($q) use ($request) {
+                $q->where('fio', 'like', '%' . $request->input('client_fio') . '%');
+            });
+        }
     
     return $this;
 }
