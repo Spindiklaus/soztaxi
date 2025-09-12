@@ -238,16 +238,28 @@ class SocialTaxiOrderController extends BaseController {
             return redirect()->route('social-taxi-orders.index')
                             ->with('error', 'Недопустимый тип заказа.');
         }
+        
+        // Получаем текущую дату и время
+        $now = now();
+        // Завтрашняя дата от приема заказа (минимальная дата поездки)
+        $minVisitDate = $now->copy()->addDay()->startOfDay();
+         // Максимальная дата поездки - через полгода
+        $maxVisitDate = $now->copy()->addMonths(6)->endOfDay();
 
         // Валидация данных
         $validated = $request->validate([
             'client_id' => 'required|exists:fio_dtrns,id',
-            'visit_data' => 'required|date',
+            'visit_data' => [
+            'required',
+            'date',
+            'after:' . $minVisitDate->format('Y-m-d H:i:s'), // Дата поездки должна быть после завтрашней даты
+            'before:' . $maxVisitDate->format('Y-m-d H:i:s') // Дата поездки должна быть не позже чем через полгода                
+            ],
             'adres_otkuda' => 'required|string|max:255',
             'adres_kuda' => 'required|string|max:255',
             'adres_obratno' => 'nullable|string|max:255',
             'category_id' => 'required|exists:categories,id',
-            'client_tel' => 'nullable|string|max:255',
+            'client_tel' => 'required|string|max:255',
             'client_invalid' => 'nullable|string|max:255',
             'client_sopr' => 'nullable|string|max:255',
             'pz_nom' => 'required|string|max:255', // Номер заказа из формы
@@ -264,7 +276,7 @@ class SocialTaxiOrderController extends BaseController {
             'closed_at' => 'nullable|date',
             'komment' => 'nullable|string',
             'visit_obratno' => 'nullable|date',
-            'predv_way' => 'nullable|numeric',
+            'predv_way' => 'nullable|numeric|min:0|max:100',
             'zena_type' => 'nullable|integer',
             'dopus_id' => 'nullable|exists:skidka_dops,id',
             'skidka_dop_all' => 'nullable|integer|in:50,100',
@@ -276,6 +288,8 @@ class SocialTaxiOrderController extends BaseController {
             'client_id.exists' => 'Выбранный клиент не существует.',
             'visit_data.required' => 'Дата поездки обязательна для заполнения.',
             'visit_data.date' => 'Дата поездки должна быть корректной датой.',
+            'visit_data.after' => 'Дата поездки должна быть не раньше завтрашней даты (' . $minVisitDate->format('d.m.Y') . ').',
+            'visit_data.before' => 'Дата поездки должна быть не позже чем через полгода (' . $maxVisitDate->format('d.m.Y') . ').',
             'adres_otkuda.required' => 'Адрес отправки обязателен для заполнения.',
             'adres_otkuda.string' => 'Адрес отправки должен быть строкой.',
             'adres_otkuda.max' => 'Адрес отправки не может быть длиннее 255 символов.',
@@ -286,6 +300,7 @@ class SocialTaxiOrderController extends BaseController {
             'adres_obratno.max' => 'Обратный адрес не может быть длиннее 255 символов.',
             'category_id.required' => 'Категория обязательна для выбора.',
             'category_id.exists' => 'Выбранная категория не существует.',
+            'client_tel.required' => 'Телефон для связи обязателен.',
             'client_tel.string' => 'Телефон клиента должен быть строкой.',
             'client_tel.max' => 'Телефон клиента не может быть длиннее 255 символов.',
             'client_invalid.string' => 'Удостоверение инвалида должно быть строкой.',
@@ -314,6 +329,8 @@ class SocialTaxiOrderController extends BaseController {
             'komment.string' => 'Комментарий должен быть строкой.',
             'visit_obratno.date' => 'Дата обратной поездки должна быть корректной датой.',
             'predv_way.numeric' => 'Предварительная дальность должна быть числом.',
+            'predv_way.min' => 'Предварительная дальность поездки не может быть отрицательной.',
+            'predv_way.max' => 'Предварительная дальность поездки не может быть больше 100км.',
             'zena_type.integer' => 'Тип цены должен быть целым числом.',
             'dopus_id.exists' => 'Выбранные дополнительные условия не существуют.',
             'skidka_dop_all.integer' => 'Скидка по дополнительным условиям должна быть целым числом.',

@@ -125,8 +125,8 @@
                                         <label for="category_limit" class="block text-sm font-medium text-gray-700">Лимит поездок по категории</label>
                                         <input type="number" name="category_limit" id="category_limit" 
                                                value="{{ old('category_limit') }}"
-                                               min="0" max="100" step="1"
-                                               placeholder="Введите лимит поездок"
+                                               min="10" max="26" step="1"
+                                               placeholder="Введите лимит поездок по категории"
                                                readonly
                                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 cursor-not-allowed">
                                             @error('category_limit')
@@ -196,7 +196,7 @@
                                         <label for="skidka_dop_all" class="block text-sm font-medium text-gray-700">Окончательная скидка инвалиду, %</label>
                                         <input type="number" name="skidka_dop_all" id="skidka_dop_all" 
                                                value="{{ old('skidka_dop_all') }}"
-                                               min="0" max="100" step="1"
+                                               min="50" max="100" step="1"
                                                placeholder="Введите окончательную скидку"
                                                readonly
                                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 cursor-not-allowed">
@@ -209,7 +209,7 @@
                                         <label for="kol_p_limit" class="block text-sm font-medium text-gray-700">Окончательный лимит поездок</label>
                                         <input type="number" name="kol_p_limit" id="kol_p_limit" 
                                                value="{{ old('kol_p_limit') }}"
-                                               min="0" max="100" step="1"
+                                               min="10" max="26" step="1"
                                                placeholder="Введите окончательный лимит поездок"
                                                readonly
                                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 cursor-not-allowed">
@@ -233,18 +233,22 @@
                                     <label for="visit_data" class="block text-sm font-medium text-gray-700">Дата и время поездки *</label>
                                     <input type="datetime-local" name="visit_data" id="visit_data" 
                                            value="{{ old('visit_data') }}"
-                                           min="{{ date('Y-m-d\TH:i', strtotime('2016-08-01 00:00')) }}"
-                                           max="{{ date('Y-m-d\TH:i', strtotime('+1 year')) }}" 
+                                           min="{{ now()->addDay()->format('Y-m-d\TH:i') }}"
+                                           max="{{ now()->addMonths(6)->format('Y-m-d\TH:i') }}" 
                                            step="300" 
                                            required
                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                                         @error('visit_data')
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                         @enderror
-                                        <p class="mt-1 text-xs text-gray-500">Время указывается с шагом 5 минут</p>
+                                        <p class="mt-1 text-xs text-gray-500">
+                                            Время указывается с шагом 5 минут.
+                                            Дата поездки должна быть не раньше завтра ({{ now()->addDay()->format('d.m.Y') }}) 
+                                            и не позже чем через полгода ({{ now()->addMonths(6)->format('d.m.Y') }})
+                                        </p>
                                 </div>
 
-                                <!-- Новый обязательный выбор оператора такси -->
+                                <!-- обязательный выбор оператора такси -->
                                 <div>
                                     <label for="taxi_id" class="block text-sm font-medium text-gray-700">Оператор такси *</label>
                                     <select name="taxi_id" id="taxi_id" 
@@ -262,10 +266,6 @@
                                     @enderror
                                     <p class="mt-1 text-xs text-gray-500">Выбор оператора такси обязателен для сохранения заказа</p>
                                 </div>
-
-
-
-
                                 <div>
                                     <label for="adres_otkuda" class="block text-sm font-medium text-gray-700">Откуда ехать *</label>
                                     <textarea name="adres_otkuda" id="adres_otkuda" 
@@ -290,6 +290,8 @@
                                     @enderror
                                 </div>
 
+                                <!-- Обратный адрес (показываем только для типов 2 и 3 - легковое авто и ГАЗель) -->
+                                @if($type != 1)
                                 <div>
                                     <label for="adres_obratno" class="block text-sm font-medium text-gray-700">Обратный адрес</label>
                                     <textarea name="adres_obratno" id="adres_obratno" 
@@ -299,7 +301,26 @@
                                     @error('adres_obratno')
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
+                                    <p class="mt-1 text-xs text-gray-500">Обратный адрес используется только для легкового авто и ГАЗели</p>
                                 </div>
+                                @else
+                                <!-- Скрытое поле для соцтакси -->
+                                <input type="hidden" name="adres_obratno" value="">
+                                    <!-- Предварительная дальность поездки -->
+                                    <div>
+                                        <label for="predv_way" class="block text-sm font-medium text-gray-700">Предварительная дальность поездки, км</label>
+                                        <input type="number" name="predv_way" id="predv_way" 
+                                               value="{{ old('predv_way') }}"
+                                               min="0" 
+                                               step="0.1"
+                                               placeholder="Введите предварительную дальность поездки"
+                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                            @error('predv_way')
+                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                            @enderror
+                                            <p class="mt-1 text-xs text-gray-500">Предварительная дальность поездки в километрах</p>
+                                    </div>    
+                                    @endif
                             </div>
                         </div>
 
