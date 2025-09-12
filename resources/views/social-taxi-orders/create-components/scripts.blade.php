@@ -46,9 +46,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function fetchClientData(clientId, typeOrder) {
-        // Показываем индикатор загрузки
-        showLoadingIndicator();
-
         // Используем API маршрут
         fetch(`/api/social-taxi-orders/client-data/${clientId}?type_order=${typeOrder}`)
             .then(response => {
@@ -65,15 +62,12 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .catch(error => {
                 console.error('Ошибка получения данных клиента:', error);
-                hideLoadingIndicator();
                 alert('Ошибка получения данных клиента: ' + error.message);
             });
     }
 
     // Получение данных категории по AJAX
     function fetchCategoryData(categoryId) {
-        showLoadingIndicator();
-        
         fetch(`/api/categories/${categoryId}`)
             .then(response => {
                 if (!response.ok) {
@@ -89,15 +83,12 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .catch(error => {
                 console.error('Ошибка получения данных категории:', error);
-                hideLoadingIndicator();
                 alert('Ошибка получения данных категории: ' + error.message);
             });
     }
 
     // Получение данных дополнительных условий по AJAX
     function fetchDopusData(dopusId) {
-        showLoadingIndicator();
-        
         fetch(`/api/skidka-dops/${dopusId}`)
             .then(response => {
                 if (!response.ok) {
@@ -113,7 +104,6 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .catch(error => {
                 console.error('Ошибка получения данных дополнительных условий:', error);
-                hideLoadingIndicator();
                 alert('Ошибка получения данных дополнительных условий: ' + error.message);
             });
     }
@@ -185,16 +175,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
         }
-
-        hideLoadingIndicator();
     }
 
     // Заполнение данных категории
     function populateCategoryData(data) {
         const categorySkidkaInput = document.getElementById('category_skidka');
         const categoryLimitInput = document.getElementById('category_limit');
-        const skidkaDopAllInput = document.getElementById('skidka_dop_all'); // Добавлено
-        const kolPLimitInput = document.getElementById('kol_p_limit');       // Добавлено
+        const skidkaDopAllInput = document.getElementById('skidka_dop_all'); 
+        const kolPLimitInput = document.getElementById('kol_p_limit');       
         
         if (categorySkidkaInput) {
             categorySkidkaInput.value = data.skidka || '';
@@ -208,8 +196,6 @@ document.addEventListener('DOMContentLoaded', function () {
         if (kolPLimitInput) {
             kolPLimitInput.value = data.kol_p || '';     // Устанавливаем лимит из категории
         }
-        
-        hideLoadingIndicator();
     }
 
     // Заполнение данных дополнительных условий
@@ -223,8 +209,6 @@ document.addEventListener('DOMContentLoaded', function () {
         if (kolPLimitInput) {
             kolPLimitInput.value = data.kol_p || '';
         }
-        
-        hideLoadingIndicator();
     }
 
     function clearClientData() {
@@ -271,26 +255,6 @@ document.addEventListener('DOMContentLoaded', function () {
         
         if (skidkaDopAllInput) skidkaDopAllInput.value = '';
         if (kolPLimitInput) kolPLimitInput.value = '';
-    }
-
-    function showLoadingIndicator() {
-        const clientSelect = document.getElementById('client_id');
-        const categorySelect = document.getElementById('category_id');
-        const dopusSelect = document.getElementById('dopus_id');
-        
-        if (clientSelect) clientSelect.disabled = true;
-        if (categorySelect) categorySelect.disabled = true;
-        if (dopusSelect) dopusSelect.disabled = true;
-    }
-
-    function hideLoadingIndicator() {
-        const clientSelect = document.getElementById('client_id');
-        const categorySelect = document.getElementById('category_id');
-        const dopusSelect = document.getElementById('dopus_id');
-        
-        if (clientSelect) clientSelect.disabled = false;
-        if (categorySelect) categorySelect.disabled = false;
-        if (dopusSelect) dopusSelect.disabled = false;
     }
     
     if (visitDataInput) {
