@@ -418,6 +418,11 @@ class SocialTaxiOrderController extends BaseController {
                     'client_invalid' => $lastOrder->client_invalid,
                     'client_sopr' => $lastOrder->client_sopr,
                     'category_id' => $lastOrder->category_id,
+                    'category_skidka' => $lastOrder->category_skidka,
+                'category_limit' => $lastOrder->category_limit,
+                'dopus_id' => $lastOrder->dopus_id,
+                'skidka_dop_all' => $lastOrder->skidka_dop_all,
+                'kol_p_limit' => $lastOrder->kol_p_limit,        
                         ] : null,
                         'client_categories' => $clientCategories,
             ]);

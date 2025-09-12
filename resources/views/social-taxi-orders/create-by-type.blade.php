@@ -114,19 +114,21 @@
                                                value="{{ old('category_skidka') }}"
                                                min="0" max="100" step="1"
                                                placeholder="Введите скидку по категории"
-                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                               readonly
+                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 cursor-not-allowed">
                                             @error('category_skidka')
                                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                             @enderror
                                     </div>
 
                                     <div>
-                                        <label for="category_limit" class="block text-sm font-medium text-gray-700">Лимит поездок по категории в месяц</label>
+                                        <label for="category_limit" class="block text-sm font-medium text-gray-700">Лимит поездок по категории</label>
                                         <input type="number" name="category_limit" id="category_limit" 
                                                value="{{ old('category_limit') }}"
                                                min="0" max="100" step="1"
                                                placeholder="Введите лимит поездок"
-                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                               readonly
+                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 cursor-not-allowed">
                                             @error('category_limit')
                                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                             @enderror
@@ -196,7 +198,8 @@
                                            value="{{ old('skidka_dop_all') }}"
                                            min="0" max="100" step="1"
                                            placeholder="Введите окончательную скидку"
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                           readonly
+                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 cursor-not-allowed">
                                         @error('skidka_dop_all')
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                         @enderror
@@ -208,7 +211,8 @@
                                            value="{{ old('kol_p_limit') }}"
                                            min="0" max="100" step="1"
                                            placeholder="Введите окончательный лимит поездок"
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                           readonly
+                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 cursor-not-allowed">
                                         @error('kol_p_limit')
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                         @enderror

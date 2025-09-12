@@ -45,6 +45,11 @@ document.addEventListener('DOMContentLoaded', function () {
         const clientInvalidInput = document.getElementById('client_invalid');
         const clientSoprInput = document.getElementById('client_sopr');
         const categorySelect = document.getElementById('category_id');
+        const categorySkidkaInput = document.getElementById('category_skidka');
+        const categoryLimitInput = document.getElementById('category_limit');
+        const dopusSelect = document.getElementById('dopus_id');
+        const skidkaDopAllInput = document.getElementById('skidka_dop_all');
+        const kolPLimitInput = document.getElementById('kol_p_limit');
 
         // Очищаем все поля перед заполнением
         clearClientData();
@@ -65,10 +70,27 @@ document.addEventListener('DOMContentLoaded', function () {
             if (categorySelect && data.last_order_data.category_id) {
                 categorySelect.value = data.last_order_data.category_id;
             }
+            
+            // Устанавливаем дополнительные поля из последнего заказа (только если они существуют)
+            if (categorySkidkaInput && data.last_order_data.category_skidka !== undefined && data.last_order_data.category_skidka !== null) {
+                categorySkidkaInput.value = data.last_order_data.category_skidka;
+            }
+            if (categoryLimitInput && data.last_order_data.category_limit !== undefined && data.last_order_data.category_limit !== null) {
+                categoryLimitInput.value = data.last_order_data.category_limit;
+            }
+            if (dopusSelect && data.last_order_data.dopus_id) {
+                dopusSelect.value = data.last_order_data.dopus_id;
+            }
+            if (skidkaDopAllInput && data.last_order_data.skidka_dop_all !== undefined && data.last_order_data.skidka_dop_all !== null) {
+                skidkaDopAllInput.value = data.last_order_data.skidka_dop_all;
+            }
+            if (kolPLimitInput && data.last_order_data.kol_p_limit !== undefined && data.last_order_data.kol_p_limit !== null) {
+                kolPLimitInput.value = data.last_order_data.kol_p_limit;
+            }
         }
         
         // Если нет данных из последнего заказа, но есть категории клиента
-        if (!data.last_order_data && data.client_categories.length > 0) {
+        if (!data.last_order_data && data.client_categories && data.client_categories.length > 0) {
             // Устанавливаем первую доступную категорию клиента
             if (categorySelect) {
                 categorySelect.value = data.client_categories[0] || '';
@@ -84,12 +106,22 @@ document.addEventListener('DOMContentLoaded', function () {
         const clientInvalidInput = document.getElementById('client_invalid');
         const clientSoprInput = document.getElementById('client_sopr');
         const categorySelect = document.getElementById('category_id');
+        const categorySkidkaInput = document.getElementById('category_skidka');
+        const categoryLimitInput = document.getElementById('category_limit');
+        const dopusSelect = document.getElementById('dopus_id');
+        const skidkaDopAllInput = document.getElementById('skidka_dop_all');
+        const kolPLimitInput = document.getElementById('kol_p_limit');
 
-        // Очищаем все поля данных клиента
+        // Очищаем все поля данных клиента (только если элементы существуют)
         if (clientTelInput) clientTelInput.value = '';
         if (clientInvalidInput) clientInvalidInput.value = '';
         if (clientSoprInput) clientSoprInput.value = '';
         if (categorySelect) categorySelect.value = '';
+        if (categorySkidkaInput) categorySkidkaInput.value = '';
+        if (categoryLimitInput) categoryLimitInput.value = '';
+        if (dopusSelect) dopusSelect.value = '';
+        if (skidkaDopAllInput) skidkaDopAllInput.value = '';
+        if (kolPLimitInput) kolPLimitInput.value = '';
     }
 
     function showLoadingIndicator() {
