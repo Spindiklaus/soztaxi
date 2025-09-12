@@ -4,12 +4,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const categorySelect = document.getElementById('category_id');
     const dopusSelect = document.getElementById('dopus_id');
     const visitDataInput = document.getElementById('visit_data');
+    const typeOrder = {{ $type }}; // Тип заказа из PHP
+
 
     if (clientSelect) {
         clientSelect.addEventListener('change', function () {
             const clientId = this.value;
             if (clientId) {
-                fetchClientData(clientId);
+                fetchClientData(clientId, typeOrder);
             } else {
                 // Очищаем поля при сбросе клиента
                 clearClientData();
@@ -43,12 +45,12 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    function fetchClientData(clientId) {
+    function fetchClientData(clientId, typeOrder) {
         // Показываем индикатор загрузки
         showLoadingIndicator();
 
         // Используем API маршрут
-        fetch(`/api/social-taxi-orders/client-data/${clientId}`)
+        fetch(`/api/social-taxi-orders/client-data/${clientId}?type_order=${typeOrder}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -191,12 +193,20 @@ document.addEventListener('DOMContentLoaded', function () {
     function populateCategoryData(data) {
         const categorySkidkaInput = document.getElementById('category_skidka');
         const categoryLimitInput = document.getElementById('category_limit');
+        const skidkaDopAllInput = document.getElementById('skidka_dop_all'); // Добавлено
+        const kolPLimitInput = document.getElementById('kol_p_limit');       // Добавлено
         
         if (categorySkidkaInput) {
             categorySkidkaInput.value = data.skidka || '';
         }
         if (categoryLimitInput) {
             categoryLimitInput.value = data.kol_p || '';
+        }
+        if (skidkaDopAllInput) {
+            skidkaDopAllInput.value = data.skidka || ''; // Устанавливаем скидку из категории
+        }
+        if (kolPLimitInput) {
+            kolPLimitInput.value = data.kol_p || '';     // Устанавливаем лимит из категории
         }
         
         hideLoadingIndicator();
@@ -245,9 +255,13 @@ document.addEventListener('DOMContentLoaded', function () {
     function clearCategoryData() {
         const categorySkidkaInput = document.getElementById('category_skidka');
         const categoryLimitInput = document.getElementById('category_limit');
+        const skidkaDopAllInput = document.getElementById('skidka_dop_all'); // Добавлено
+        const kolPLimitInput = document.getElementById('kol_p_limit');       // Добавлено
         
         if (categorySkidkaInput) categorySkidkaInput.value = '';
         if (categoryLimitInput) categoryLimitInput.value = '';
+        if (skidkaDopAllInput) skidkaDopAllInput.value = ''; // Очищаем поле скидки
+        if (kolPLimitInput) kolPLimitInput.value = '';       // Очищаем поле лимита
     }
 
     // Очистка данных дополнительных условий

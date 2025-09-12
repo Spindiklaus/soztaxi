@@ -420,9 +420,13 @@ class SocialTaxiOrderController extends BaseController {
             if (!$client) {
                 return response()->json(['error' => 'Клиент не найден'], 404);
             }
+            
+            // Получаем тип заказа из запроса (если есть)
+            $typeOrder = request()->get('type_order', 1); // По умолчанию соцтакси
 
             // Получаем последние данные из предыдущих заказов клиента
             $lastOrder = Order::where('client_id', $clientId)
+                    ->where('type_order', $typeOrder) // Учитываем тип заказа
                     ->whereNotNull('visit_data')
                     ->whereNull('deleted_at')
                     ->whereNull('cancelled_at')
@@ -431,6 +435,7 @@ class SocialTaxiOrderController extends BaseController {
 
             // Получаем категории клиента из предыдущих заказов
             $clientCategories = Order::where('client_id', $clientId)
+                    ->where('type_order', $typeOrder) // Учитываем тип заказа
                     ->whereNotNull('category_id')
                     ->whereNull('deleted_at')
                     ->whereNull('cancelled_at')

@@ -136,7 +136,7 @@
                                 </div>
 
                                 <div>
-                                    <label for="client_tel" class="block text-sm font-medium text-gray-700">Телефон для связи</label>
+                                    <label for="client_tel" class="block text-sm font-medium text-gray-700">Телефон для связи*</label>
                                     <input type="text" name="client_tel" id="client_tel" 
                                            value="{{ old('client_tel') }}"
                                            placeholder="Введите телефон клиента"
