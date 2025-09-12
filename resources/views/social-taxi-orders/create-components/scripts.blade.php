@@ -5,6 +5,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const dopusSelect = document.getElementById('dopus_id');
     const visitDataInput = document.getElementById('visit_data');
     const typeOrder = {{ $type }}; // Тип заказа из PHP
+    
+    // Сохраняем начальное состояние dopusSelect
+    if (dopusSelect && typeOrder != 1) {
+        dopusSelect.readOnly = true;
+        dopusSelect.disabled = true;
+    }
 
 
     if (clientSelect) {
@@ -135,6 +141,20 @@ document.addEventListener('DOMContentLoaded', function () {
                 clientSoprInput.value = data.last_order_data.client_sopr || '';
             }
             
+            // Устанавливаем значения полей из последнего заказа
+            if (categorySkidkaInput && data.last_order_data.category_skidka !== null) {
+                categorySkidkaInput.value = data.last_order_data.category_skidka;
+            }
+            if (categoryLimitInput && data.last_order_data.category_limit !== null) {
+                categoryLimitInput.value = data.last_order_data.category_limit;
+            }
+            if (skidkaDopAllInput && data.last_order_data.skidka_dop_all !== null) {
+                skidkaDopAllInput.value = data.last_order_data.skidka_dop_all;
+            }
+            if (kolPLimitInput && data.last_order_data.kol_p_limit !== null) {
+                kolPLimitInput.value = data.last_order_data.kol_p_limit;
+            }
+            
             // Устанавливаем категорию из последнего заказа
             if (categorySelect && data.last_order_data.category_id) {
                 categorySelect.value = data.last_order_data.category_id;
@@ -149,19 +169,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 fetchDopusData(data.last_order_data.dopus_id);
             }
             
-            // Устанавливаем значения полей из последнего заказа
-            if (categorySkidkaInput && data.last_order_data.category_skidka !== null) {
-                categorySkidkaInput.value = data.last_order_data.category_skidka;
-            }
-            if (categoryLimitInput && data.last_order_data.category_limit !== null) {
-                categoryLimitInput.value = data.last_order_data.category_limit;
-            }
-            if (skidkaDopAllInput && data.last_order_data.skidka_dop_all !== null) {
-                skidkaDopAllInput.value = data.last_order_data.skidka_dop_all;
-            }
-            if (kolPLimitInput && data.last_order_data.kol_p_limit !== null) {
-                kolPLimitInput.value = data.last_order_data.kol_p_limit;
-            }
+            
         }
         
         // Если нет данных из последнего заказа, но есть категории клиента
@@ -247,14 +255,37 @@ document.addEventListener('DOMContentLoaded', function () {
         if (skidkaDopAllInput) skidkaDopAllInput.value = ''; // Очищаем поле скидки
         if (kolPLimitInput) kolPLimitInput.value = '';       // Очищаем поле лимита
     }
+    
+    // Восстановление значений из категории при сбросе дополнительных условий
+    function restoreCategoryValues() {
+        const skidkaDopAllInput = document.getElementById('skidka_dop_all');
+        const kolPLimitInput = document.getElementById('kol_p_limit');
+        const categorySkidkaInput = document.getElementById('category_skidka');
+        const categoryLimitInput = document.getElementById('category_limit');
+        
+        // Восстанавливаем значения из категории
+        if (skidkaDopAllInput && categorySkidkaInput) {
+            skidkaDopAllInput.value = categorySkidkaInput.value || '';
+        }
+        if (kolPLimitInput && categoryLimitInput) {
+            kolPLimitInput.value = categoryLimitInput.value || '';
+        }
+    }
 
     // Очистка данных дополнительных условий
     function clearDopusData() {
         const skidkaDopAllInput = document.getElementById('skidka_dop_all');
         const kolPLimitInput = document.getElementById('kol_p_limit');
+        const categorySkidkaInput = document.getElementById('category_skidka');
+        const categoryLimitInput = document.getElementById('category_limit');
         
-        if (skidkaDopAllInput) skidkaDopAllInput.value = '';
-        if (kolPLimitInput) kolPLimitInput.value = '';
+        // Восстанавливаем значения из категории
+        if (skidkaDopAllInput && categorySkidkaInput) {
+            skidkaDopAllInput.value = categorySkidkaInput.value || '';
+        }
+        if (kolPLimitInput && categoryLimitInput) {
+            kolPLimitInput.value = categoryLimitInput.value || '';
+        }
     }
     
     if (visitDataInput) {

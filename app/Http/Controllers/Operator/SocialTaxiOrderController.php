@@ -353,8 +353,6 @@ class SocialTaxiOrderController extends BaseController {
                 throw new \Exception("Заказ с номером {$pzNom} уже существует.");
             }
 
-
-
             // Подготавливаем данные для создания заказа
             $orderData = [
                 'type_order' => (int) ($validated['type_order'] ?? 1),

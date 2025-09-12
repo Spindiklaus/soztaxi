@@ -1,0 +1,42 @@
+<!-- Предварительная информация о заказе -->
+<!-- resources/views/social-taxi-orders/create-components/order-info.blade.php -->
+<div class="bg-gray-50 p-4 rounded-lg mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Номер заказа</label>
+            <div class="mt-1 bg-gray-100 p-2 rounded-md font-medium">
+                {{ $orderNumber }}
+            </div>
+            <p class="mt-1 text-xs text-gray-500">Устанавливается автоматически</p>
+            <!-- Скрытое поле для передачи номера в форму -->
+            <input type="hidden" name="pz_nom" value="{{ $orderNumber }}">
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Дата и время приема заказа</label>
+            <div class="mt-1 bg-gray-100 p-2 rounded-md font-medium">
+                {{ $orderDateTime->format('d.m.Y H:i:s') }}
+            </div>
+            <p class="mt-1 text-xs text-gray-500">Устанавливается автоматически</p>
+            <!-- Скрытое поле для передачи даты в форму -->
+            <input type="hidden" name="pz_data" value="{{ $orderDateTime->format('Y-m-d H:i:s') }}">
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Тип заказа</label>
+            <div class="mt-1 bg-gray-100 p-2 rounded-md font-medium {{ getOrderTypeColor($type) }}">
+                {{ getOrderTypeName($type) }}
+            </div>
+            <!-- Скрытое поле для передачи типа в форму -->
+            <input type="hidden" name="type_order" value="{{ $type }}">
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Оператор</label>
+            <div class="mt-1 bg-gray-100 p-2 rounded-md font-medium">
+                {{ auth()->user()->name ?? 'Неизвестный оператор' }} ({{ auth()->user()->litera ?? 'UNK' }})
+            </div>
+            <!-- Скрытое поле для передачи ID оператора в форму -->
+            <input type="hidden" name="user_id" value="{{ auth()->id() ?? 1 }}">
+        </div>
+    </div>
+</div>
