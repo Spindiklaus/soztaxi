@@ -172,7 +172,7 @@
 
                         <!-- Льготы по поездке -->
                         <div class="bg-gray-50 p-4 rounded-lg mb-6">
-                            <h2 class="text-lg font-semibold text-gray-800 mb-4">Льготы по поездке</h2>
+                            <h2 class="text-lg font-semibold text-gray-800 mb-4">Дополнительные льготы по поездке</h2>
 
                             <div class="space-y-4">
                                 <div>
@@ -190,33 +190,33 @@
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
                                 </div>
-                            
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div>
-                                    <label for="skidka_dop_all" class="block text-sm font-medium text-gray-700">Окончательная скидка инвалиду, %</label>
-                                    <input type="number" name="skidka_dop_all" id="skidka_dop_all" 
-                                           value="{{ old('skidka_dop_all') }}"
-                                           min="0" max="100" step="1"
-                                           placeholder="Введите окончательную скидку"
-                                           readonly
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 cursor-not-allowed">
-                                        @error('skidka_dop_all')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                        @enderror
-                                </div>
 
-                                <div>
-                                    <label for="kol_p_limit" class="block text-sm font-medium text-gray-700">Окончательный лимит поездок</label>
-                                    <input type="number" name="kol_p_limit" id="kol_p_limit" 
-                                           value="{{ old('kol_p_limit') }}"
-                                           min="0" max="100" step="1"
-                                           placeholder="Введите окончательный лимит поездок"
-                                           readonly
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 cursor-not-allowed">
-                                        @error('kol_p_limit')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                        @enderror
-                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="skidka_dop_all" class="block text-sm font-medium text-gray-700">Окончательная скидка инвалиду, %</label>
+                                        <input type="number" name="skidka_dop_all" id="skidka_dop_all" 
+                                               value="{{ old('skidka_dop_all') }}"
+                                               min="0" max="100" step="1"
+                                               placeholder="Введите окончательную скидку"
+                                               readonly
+                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 cursor-not-allowed">
+                                            @error('skidka_dop_all')
+                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                            @enderror
+                                    </div>
+
+                                    <div>
+                                        <label for="kol_p_limit" class="block text-sm font-medium text-gray-700">Окончательный лимит поездок</label>
+                                        <input type="number" name="kol_p_limit" id="kol_p_limit" 
+                                               value="{{ old('kol_p_limit') }}"
+                                               min="0" max="100" step="1"
+                                               placeholder="Введите окончательный лимит поездок"
+                                               readonly
+                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 cursor-not-allowed">
+                                            @error('kol_p_limit')
+                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                            @enderror
+                                    </div>
                                 </div>    
                             </div>
                         </div>
@@ -233,12 +233,38 @@
                                     <label for="visit_data" class="block text-sm font-medium text-gray-700">Дата и время поездки *</label>
                                     <input type="datetime-local" name="visit_data" id="visit_data" 
                                            value="{{ old('visit_data') }}"
+                                           min="{{ date('Y-m-d\TH:i', strtotime('2025-08-01 00:00')) }}"
+                                           max="{{ date('Y-m-d\TH:i', strtotime('+1 year')) }}" 
+                                           step="300" 
                                            required
                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                                         @error('visit_data')
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                         @enderror
+                                        <p class="mt-1 text-xs text-gray-500">Время указывается с шагом 5 минут</p>
                                 </div>
+
+                                <!-- Новый обязательный выбор оператора такси -->
+                                <div>
+                                    <label for="taxi_id" class="block text-sm font-medium text-gray-700">Оператор такси *</label>
+                                    <select name="taxi_id" id="taxi_id" 
+                                            required
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                        <option value="">Выберите оператора такси</option>
+                                        @foreach($taxis as $taxi)
+                                        <option value="{{ $taxi->id }}" {{ (old('taxi_id', $defaultTaxiId) == $taxi->id) ? 'selected' : '' }}>
+                                            {{ $taxi->name }} (#{{ $taxi->id }})
+                                        </option>
+                                        @endforeach
+                                    </select>
+                                    @error('taxi_id')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                    <p class="mt-1 text-xs text-gray-500">Выбор оператора такси обязателен для сохранения заказа</p>
+                                </div>
+
+
+
 
                                 <div>
                                     <label for="adres_otkuda" class="block text-sm font-medium text-gray-700">Откуда ехать *</label>

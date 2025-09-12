@@ -14,6 +14,10 @@
      window.location.href = url.toString();
      }
      }" x-cloak class="bg-white shadow overflow-hidden sm:rounded-lg">
+    <!-- Для отладки -->
+                <div class="p-4 text-sm text-gray-600">
+                    Текущая сортировка: <strong x-text="`Поле: ${sortField}, Направление: ${sortDirection}`"></strong>
+                </div>  
     <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-blue-800 text-gray-200">

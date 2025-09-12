@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\FioDtrn;
 use App\Models\Category;
 use App\Models\SkidkaDop;
+use App\Models\Taxi;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -127,15 +128,14 @@ class SocialTaxiOrderController extends BaseController {
         if (!$order) {
             return redirect()->back()->with('error', 'Заказ не найден.');
         }
-        
+
         // Проверяем текущий статус заказа
         $currentStatus = $order->currentStatus;
         $statusId = $currentStatus ? $currentStatus->status_order_id : 1; // По умолчанию "Принят"
-
-    // Разрешаем удаление только для заказов со статусом "Принят" (ID = 1)
-    if ($statusId != 1) {
-        return redirect()->back()->with('error', 'Удаление возможно только для заказов со статусом "Принят". Текущий статус: ' . ($currentStatus->statusOrder->name ?? 'Неизвестный статус'));
-    }
+        // Разрешаем удаление только для заказов со статусом "Принят" (ID = 1)
+        if ($statusId != 1) {
+            return redirect()->back()->with('error', 'Удаление возможно только для заказов со статусом "Принят". Текущий статус: ' . ($currentStatus->statusOrder->name ?? 'Неизвестный статус'));
+        }
 
         // Принудительно устанавливаем deleted_at
         $order->deleted_at = now();
@@ -186,6 +186,16 @@ class SocialTaxiOrderController extends BaseController {
                 ->orderBy('nmv')
                 ->get();
 
+        // Получаем список операторов такси для выпадающего списка
+        $taxis = Taxi::where('life', 1) // Только действующие операторы такси
+                ->orderBy('name')
+                ->get();
+        // Если есть только один действующий оператор такси, устанавливаем его по умолчанию
+    $defaultTaxiId = null;
+    if ($taxis->count() == 1) {
+        $defaultTaxiId = $taxis->first()->id;
+    }
+
         // Получаем ID разрешенных категорий
         $allowedCategoryIds = $categories->pluck('id')->toArray();
 
@@ -202,19 +212,21 @@ class SocialTaxiOrderController extends BaseController {
         // Генерируем номер заказа заранее
         $orderNumber = generateOrderNumber($type, auth()->id());
         $orderDateTime = now();
-        
+
         // Получаем список дополнительных условий для скидок
         $dopusConditions = SkidkaDop::where('life', 1) // Только действующие условия
-            ->orderBy('name')
-            ->get();
+                ->orderBy('name')
+                ->get();
 
         return view('social-taxi-orders.create-by-type', compact(
-                'type', 
-                'clients', 
-                'categories', 
-                'orderNumber', 
-                'orderDateTime',
-                'dopusConditions' // дополнительные условия
+                        'type',
+                        'clients',
+                        'categories',
+                        'taxis',
+                        'defaultTaxiId',
+                        'orderNumber',
+                        'orderDateTime',
+                        'dopusConditions' // дополнительные условия
         ));
     }
 
@@ -242,8 +254,8 @@ class SocialTaxiOrderController extends BaseController {
             'pz_data' => 'required|date', // Дата заказа из формы
             'type_order' => 'required|integer|in:1,2,3', // Тип заказа из формы
             'user_id' => 'required|integer|exists:users,id', // ID оператора из формы
-            // Дополнительные поля (могут отсутствовать)
-            'taxi_id' => 'nullable|exists:taxis,id',
+            'taxi_id' => 'required|exists:taxis,id',
+            // Дополнительные поля (могут отсутствовать)            
             'taxi_price' => 'nullable|numeric',
             'taxi_way' => 'nullable|numeric',
             'taxi_sent_at' => 'nullable|date',
@@ -291,6 +303,7 @@ class SocialTaxiOrderController extends BaseController {
             'user_id.required' => 'Оператор обязателен для выбора.',
             'user_id.integer' => 'ID оператора должен быть целым числом.',
             'user_id.exists' => 'Выбранный оператор не существует.',
+            'taxi_id.required' => 'Выбор оператора такси обязателен для сохранения заказа.',        
             'taxi_id.exists' => 'Выбранный оператор такси не существует.',
             'taxi_price.numeric' => 'Цена такси должна быть числом.',
             'taxi_way.numeric' => 'Дальность такси должна быть числом.',
@@ -304,9 +317,11 @@ class SocialTaxiOrderController extends BaseController {
             'zena_type.integer' => 'Тип цены должен быть целым числом.',
             'dopus_id.exists' => 'Выбранные дополнительные условия не существуют.',
             'skidka_dop_all.integer' => 'Скидка по дополнительным условиям должна быть целым числом.',
+            'skidka_dop_all.in' => 'Скидка по поездке может быть только 50 или 100%.',
             'kol_p_limit.integer' => 'Лимит поездок должен быть целым числом.',
             'kol_p_limit.in' => 'Лимит поездок может быть только 10 или 26 поездок в месяц.',
             'category_skidka.integer' => 'Скидка по категории должна быть целым числом.',
+            'category_skidka.in' => 'Скидка по категории может быть только 50 или 100%.',                    
             'category_limit.integer' => 'Лимит по категории должен быть целым числом.',
             'category_limit.in' => 'Лимит поездок по категории может быть только 10.',
         ]);
@@ -331,8 +346,8 @@ class SocialTaxiOrderController extends BaseController {
                 'client_invalid' => $validated['client_invalid'] ?? null,
                 'client_sopr' => $validated['client_sopr'] ?? null,
                 'category_id' => (int) ($validated['category_id'] ?? 0),
-                'category_skidka' => $validated['category_skidka'] ? (int) $validated['category_skidka'] : null, 
-                'category_limit' => $validated['category_limit'] ? (int) $validated['category_limit'] : null,   
+                'category_skidka' => $validated['category_skidka'] ? (int) $validated['category_skidka'] : null,
+                'category_limit' => $validated['category_limit'] ? (int) $validated['category_limit'] : null,
                 'dopus_id' => !empty($validated['dopus_id']) ? (int) $validated['dopus_id'] : null,
                 'skidka_dop_all' => $validated['skidka_dop_all'] ? (int) $validated['skidka_dop_all'] : null,
                 'kol_p_limit' => $validated['kol_p_limit'] ? (int) $validated['kol_p_limit'] : null,
@@ -343,14 +358,14 @@ class SocialTaxiOrderController extends BaseController {
                 'adres_obratno' => $validated['adres_obratno'] ?? null,
                 'zena_type' => (int) ($validated['zena_type'] ?? 1),
                 'visit_data' => $validated['visit_data'] ?? null,
-                'predv_way' => isset($validated['predv_way']) && $validated['predv_way'] !== '' && $validated['predv_way'] !== null ? 
-                   (float) str_replace(',', '.', $validated['predv_way']) : null,
+                'predv_way' => isset($validated['predv_way']) && $validated['predv_way'] !== '' && $validated['predv_way'] !== null ?
+                (float) str_replace(',', '.', $validated['predv_way']) : null,
                 'taxi_id' => !empty($validated['taxi_id']) ? (int) $validated['taxi_id'] : null,
                 'taxi_sent_at' => $validated['taxi_sent_at'] ?? null,
-                'taxi_price' => isset($validated['taxi_price']) && $validated['taxi_price'] !== '' && $validated['taxi_price'] !== null ? 
-                    (float) str_replace(',', '.', $validated['taxi_price']) : null,
-                'taxi_way' => isset($validated['taxi_way']) && $validated['taxi_way'] !== '' && $validated['taxi_way'] !== null ? 
-                  (float) str_replace(',', '.', $validated['taxi_way']) : null,
+                'taxi_price' => isset($validated['taxi_price']) && $validated['taxi_price'] !== '' && $validated['taxi_price'] !== null ?
+                (float) str_replace(',', '.', $validated['taxi_price']) : null,
+                'taxi_way' => isset($validated['taxi_way']) && $validated['taxi_way'] !== '' && $validated['taxi_way'] !== null ?
+                (float) str_replace(',', '.', $validated['taxi_way']) : null,
                 'cancelled_at' => $validated['otmena_data'] ?? null,
                 'otmena_taxi' => (int) ($validated['otmena_taxi'] ?? 0),
                 'closed_at' => $validated['closed_at'] ?? null,
@@ -419,10 +434,10 @@ class SocialTaxiOrderController extends BaseController {
                     'client_sopr' => $lastOrder->client_sopr,
                     'category_id' => $lastOrder->category_id,
                     'category_skidka' => $lastOrder->category_skidka,
-                'category_limit' => $lastOrder->category_limit,
-                'dopus_id' => $lastOrder->dopus_id,
-                'skidka_dop_all' => $lastOrder->skidka_dop_all,
-                'kol_p_limit' => $lastOrder->kol_p_limit,        
+                    'category_limit' => $lastOrder->category_limit,
+                    'dopus_id' => $lastOrder->dopus_id,
+                    'skidka_dop_all' => $lastOrder->skidka_dop_all,
+                    'kol_p_limit' => $lastOrder->kol_p_limit,
                         ] : null,
                         'client_categories' => $clientCategories,
             ]);
