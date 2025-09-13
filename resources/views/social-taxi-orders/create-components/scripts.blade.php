@@ -4,6 +4,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const categorySelect = document.getElementById('category_id');
     const dopusSelect = document.getElementById('dopus_id');
     const visitDataInput = document.getElementById('visit_data');
+    const zenaTypeSelect = document.getElementById('zena_type');
+    const adresObratnoInput = document.getElementById('adres_obratno');
     const typeOrder = {{ $type }}; // Тип заказа из PHP
     
     // Сохраняем начальное состояние dopusSelect
@@ -11,7 +13,6 @@ document.addEventListener('DOMContentLoaded', function () {
         dopusSelect.readOnly = true;
         dopusSelect.disabled = true;
     }
-
 
     if (clientSelect) {
         clientSelect.addEventListener('change', function () {
@@ -31,9 +32,13 @@ document.addEventListener('DOMContentLoaded', function () {
             const categoryId = this.value;
             if (categoryId) {
                 fetchCategoryData(categoryId);
+                // Сбрасываем поля дополнительных условий при изменении категории
+                resetDopusFields();
             } else {
                 // Очищаем поля категории при сбросе
                 clearCategoryData();
+                // Сбрасываем поля дополнительных условий
+                resetDopusFields();
             }
         });
     }
@@ -46,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 fetchDopusData(dopusId);
             } else {
                 // Очищаем поля дополнительных условий при сбросе
-                clearDopusData();
+                restoreFromCategory();
             }
         });
     }
@@ -141,18 +146,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 clientSoprInput.value = data.last_order_data.client_sopr || '';
             }
             
-            // Устанавливаем значения полей из последнего заказа
+            // Устанавливаем значения полей из последнего заказа (до установки селектов!)
             if (categorySkidkaInput && data.last_order_data.category_skidka !== null) {
                 categorySkidkaInput.value = data.last_order_data.category_skidka;
             }
             if (categoryLimitInput && data.last_order_data.category_limit !== null) {
                 categoryLimitInput.value = data.last_order_data.category_limit;
-            }
-            if (skidkaDopAllInput && data.last_order_data.skidka_dop_all !== null) {
-                skidkaDopAllInput.value = data.last_order_data.skidka_dop_all;
-            }
-            if (kolPLimitInput && data.last_order_data.kol_p_limit !== null) {
-                kolPLimitInput.value = data.last_order_data.kol_p_limit;
             }
             
             // Устанавливаем категорию из последнего заказа
@@ -167,9 +166,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 dopusSelect.value = data.last_order_data.dopus_id;
                 // После установки доп.условий заполняем связанные поля
                 fetchDopusData(data.last_order_data.dopus_id);
+            } else {
+                // Если доп.условий нет в прошлом заказе, устанавливаем окончательные значения из категории
+                if (skidkaDopAllInput && categorySkidkaInput) {
+                    skidkaDopAllInput.value = categorySkidkaInput.value || '';
+                }
+                if (kolPLimitInput && categoryLimitInput) {
+                    kolPLimitInput.value = categoryLimitInput.value || '';
+                }
             }
-            
-            
         }
         
         // Если нет данных из последнего заказа, но есть категории клиента
@@ -180,6 +185,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 // После установки категории заполняем связанные поля
                 if (data.client_categories[0]) {
                     fetchCategoryData(data.client_categories[0]);
+                    // Сбрасываем поля дополнительных условий после установки категории
+                    resetDopusFields();
                 }
             }
         }
@@ -189,8 +196,8 @@ document.addEventListener('DOMContentLoaded', function () {
     function populateCategoryData(data) {
         const categorySkidkaInput = document.getElementById('category_skidka');
         const categoryLimitInput = document.getElementById('category_limit');
-        const skidkaDopAllInput = document.getElementById('skidka_dop_all'); 
-        const kolPLimitInput = document.getElementById('kol_p_limit');       
+        const skidkaDopAllInput = document.getElementById('skidka_dop_all');
+        const kolPLimitInput = document.getElementById('kol_p_limit');
         
         if (categorySkidkaInput) {
             categorySkidkaInput.value = data.skidka || '';
@@ -198,11 +205,13 @@ document.addEventListener('DOMContentLoaded', function () {
         if (categoryLimitInput) {
             categoryLimitInput.value = data.kol_p || '';
         }
-        if (skidkaDopAllInput) {
-            skidkaDopAllInput.value = data.skidka || ''; // Устанавливаем скидку из категории
+        
+        // Автоматически обновляем поля скидки и лимита из категории
+        if (skidkaDopAllInput && categorySkidkaInput) {
+            skidkaDopAllInput.value = categorySkidkaInput.value || '';
         }
-        if (kolPLimitInput) {
-            kolPLimitInput.value = data.kol_p || '';     // Устанавливаем лимит из категории
+        if (kolPLimitInput && categoryLimitInput) {
+            kolPLimitInput.value = categoryLimitInput.value || '';
         }
     }
 
@@ -247,17 +256,13 @@ document.addEventListener('DOMContentLoaded', function () {
     function clearCategoryData() {
         const categorySkidkaInput = document.getElementById('category_skidka');
         const categoryLimitInput = document.getElementById('category_limit');
-        const skidkaDopAllInput = document.getElementById('skidka_dop_all'); // Добавлено
-        const kolPLimitInput = document.getElementById('kol_p_limit');       // Добавлено
         
         if (categorySkidkaInput) categorySkidkaInput.value = '';
         if (categoryLimitInput) categoryLimitInput.value = '';
-        if (skidkaDopAllInput) skidkaDopAllInput.value = ''; // Очищаем поле скидки
-        if (kolPLimitInput) kolPLimitInput.value = '';       // Очищаем поле лимита
     }
-    
+
     // Восстановление значений из категории при сбросе дополнительных условий
-    function restoreCategoryValues() {
+    function restoreFromCategory() {
         const skidkaDopAllInput = document.getElementById('skidka_dop_all');
         const kolPLimitInput = document.getElementById('kol_p_limit');
         const categorySkidkaInput = document.getElementById('category_skidka');
@@ -272,12 +277,18 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Очистка данных дополнительных условий
-    function clearDopusData() {
+    // Функция для сброса полей дополнительных условий
+    function resetDopusFields() {
+        const dopusSelect = document.getElementById('dopus_id');
         const skidkaDopAllInput = document.getElementById('skidka_dop_all');
         const kolPLimitInput = document.getElementById('kol_p_limit');
         const categorySkidkaInput = document.getElementById('category_skidka');
         const categoryLimitInput = document.getElementById('category_limit');
+        
+        // Сбрасываем селект дополнительных условий
+        if (dopusSelect) {
+            dopusSelect.value = '';
+        }
         
         // Восстанавливаем значения из категории
         if (skidkaDopAllInput && categorySkidkaInput) {
@@ -286,6 +297,15 @@ document.addEventListener('DOMContentLoaded', function () {
         if (kolPLimitInput && categoryLimitInput) {
             kolPLimitInput.value = categoryLimitInput.value || '';
         }
+    }
+
+    // Очистка данных дополнительных условий
+    function clearDopusData() {
+        const skidkaDopAllInput = document.getElementById('skidka_dop_all');
+        const kolPLimitInput = document.getElementById('kol_p_limit');
+        
+        if (skidkaDopAllInput) skidkaDopAllInput.value = '';
+        if (kolPLimitInput) kolPLimitInput.value = '';
     }
     
     if (visitDataInput) {
@@ -326,5 +346,57 @@ document.addEventListener('DOMContentLoaded', function () {
         element.value = `${datePart}T${formattedHours}:${formattedMinutes}`;
     }
     
-});
+    
+    
+    // Инициализация состояния поля обратного адреса при загрузке страницы
+    initializeAdresObratnoState();
+
+    // Добавляем обработчик изменения типа поездки
+    if (zenaTypeSelect) {
+        zenaTypeSelect.addEventListener('change', function() {
+            updateAdresObratnoState(this.value);
+        });
+    }
+
+    
+    
+    // Инициализация состояния поля обратного адреса
+    function initializeAdresObratnoState() {
+        // Только для легкового авто и ГАЗели
+        if (typeOrder != 2 && typeOrder != 3) {
+            return;
+        }
+        
+        if (zenaTypeSelect && adresObratnoInput) {
+            const zenaType = zenaTypeSelect.value || '1'; // По умолчанию "в одну сторону"
+            updateAdresObratnoState(zenaType);
+        }
+    }
+
+    // Обновление состояния поля обратного адреса в зависимости от типа поездки
+    function updateAdresObratnoState(zenaType) {
+        const adresObratnoInput = document.getElementById('adres_obratno');
+        
+        if (!adresObratnoInput) {
+            return;
+        }
+        
+        if (zenaType == '1') {
+            // В одну сторону - очищаем и делаем только для чтения
+            adresObratnoInput.value = '';
+            adresObratnoInput.readOnly = true;
+            adresObratnoInput.disabled = true;
+            adresObratnoInput.classList.add('bg-gray-100', 'cursor-not-allowed');
+            adresObratnoInput.placeholder = 'Поле недоступно для поездки в одну сторону';
+        } else if (zenaType == '2') {
+            // В обе стороны - делаем доступным для записи
+            adresObratnoInput.readOnly = false;
+            adresObratnoInput.disabled = false;
+            adresObratnoInput.classList.remove('bg-gray-100', 'cursor-not-allowed');
+            adresObratnoInput.placeholder = 'Введите обратный адрес';
+        }
+    }
+    
+    
+ });
 </script>

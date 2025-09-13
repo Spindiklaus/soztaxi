@@ -53,6 +53,8 @@
                     {{ session('info') }}
                 </x-alert>
                 @endif
+                <!-- Ошибки валидации -->
+                <x-validation-errors-alert />
                 <!-- Содержимое страницы -->
                 {{ $slot }}
             </main>

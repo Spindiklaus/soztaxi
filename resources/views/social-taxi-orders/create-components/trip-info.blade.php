@@ -4,6 +4,32 @@
     <h2 class="text-lg font-semibold text-gray-800 mb-4">Сведения о поездке</h2>
 
     <div class="space-y-4">
+        <!-- Тип поездки -->
+        <div>
+            <label for="zena_type" class="block text-sm font-medium text-gray-700">Тип поездки *</label>
+            @if($type == 1) {{-- Для соцтакси всегда 1 и только для чтения --}}
+                <select name="zena_type" id="zena_type" 
+                        readonly disabled
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 cursor-not-allowed">
+                    <option value="1" selected>Поездка в одну сторону</option>
+                </select>
+                <input type="hidden" name="zena_type" value="1"> {{-- Скрытое поле для передачи значения --}}
+                <p class="mt-1 text-xs text-gray-500">Для соцтакси тип поездки всегда "в одну сторону"</p>
+            @else {{-- Для легкового авто и ГАЗели --}}
+                <select name="zena_type" id="zena_type" 
+                        required
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    <option value="1" {{ old('zena_type', 1) == '1' ? 'selected' : '' }}>Поездка в одну сторону</option>
+                    <option value="2" {{ old('zena_type') == '2' ? 'selected' : '' }}>Поездка в обе стороны</option>
+                </select>
+                @error('zena_type')
+                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+                <p class="mt-1 text-xs text-gray-500">Выберите тип поездки: в одну или обе стороны</p>
+            @endif
+        </div>
+        
+        
         <div>
             <label for="visit_data" class="block text-sm font-medium text-gray-700">Дата и время поездки *</label>
             <input type="datetime-local" name="visit_data" id="visit_data" 
@@ -67,16 +93,21 @@
         <!-- Обратный адрес (показываем только для типов 2 и 3 - легковое авто и ГАЗель) -->
         @if($type != 1)
         <div>
-            <label for="adres_obratno" class="block text-sm font-medium text-gray-700">Обратный адрес</label>
-            <textarea name="adres_obratno" id="adres_obratno" 
-                      rows="3" 
-                      placeholder="Введите обратный адрес (если есть)"
-                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('adres_obratno') }}</textarea>
-            @error('adres_obratno')
-            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-            @enderror
-            <p class="mt-1 text-xs text-gray-500">Обратный адрес используется только для легкового авто и ГАЗели</p>
-        </div>
+    <label for="adres_obratno" class="block text-sm font-medium text-gray-700">Обратный адрес</label>
+    <textarea name="adres_obratno" id="adres_obratno" 
+              rows="3" 
+              placeholder="{{ ($type == 2 || $type == 3) && (old('zena_type', 1) == '2') ? 'Введите обратный адрес' : 'Поле недоступно для поездки в одну сторону' }}"
+              {{ ($type == 2 || $type == 3) && (old('zena_type', 1) == '1') ? 'readonly disabled' : '' }}
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 {{ ($type == 2 || $type == 3) && (old('zena_type', 1) == '1') ? 'bg-gray-100 cursor-not-allowed' : '' }}">{{ old('adres_obratno') }}</textarea>
+    @error('adres_obratno')
+    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+    @enderror
+    @if($type == 2 || $type == 3)
+        <p class="mt-1 text-xs text-gray-500">
+            Обратный адрес доступен только для поездки в обе стороны
+        </p>
+    @endif
+</div>
         @else
         <!-- Скрытое поле для соцтакси -->
         <input type="hidden" name="adres_obratno" value="">

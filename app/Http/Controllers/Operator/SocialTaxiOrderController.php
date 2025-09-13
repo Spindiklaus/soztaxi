@@ -191,10 +191,10 @@ class SocialTaxiOrderController extends BaseController {
                 ->orderBy('name')
                 ->get();
         // Если есть только один действующий оператор такси, устанавливаем его по умолчанию
-    $defaultTaxiId = null;
-    if ($taxis->count() == 1) {
-        $defaultTaxiId = $taxis->first()->id;
-    }
+        $defaultTaxiId = null;
+        if ($taxis->count() == 1) {
+            $defaultTaxiId = $taxis->first()->id;
+        }
 
         // Получаем ID разрешенных категорий
         $allowedCategoryIds = $categories->pluck('id')->toArray();
@@ -238,26 +238,41 @@ class SocialTaxiOrderController extends BaseController {
             return redirect()->route('social-taxi-orders.index')
                             ->with('error', 'Недопустимый тип заказа.');
         }
-        
+
         // Получаем текущую дату и время
         $now = now();
         // Завтрашняя дата от приема заказа (минимальная дата поездки)
         $minVisitDate = $now->copy()->addDay()->startOfDay();
-         // Максимальная дата поездки - через полгода
+        // Максимальная дата поездки - через полгода
         $maxVisitDate = $now->copy()->addMonths(6)->endOfDay();
 
         // Валидация данных
+        // $attribute - имя поля (например, 'visit_data')
+        // $value - значение поля (например, '2024-01-15 23:30:00')
+        // $fail - функция для вызова ошибки валидации
         $validated = $request->validate([
             'client_id' => 'required|exists:fio_dtrns,id',
             'visit_data' => [
-            'required',
-            'date',
-            'after:' . $minVisitDate->format('Y-m-d H:i:s'), // Дата поездки должна быть после завтрашней даты
-            'before:' . $maxVisitDate->format('Y-m-d H:i:s') // Дата поездки должна быть не позже чем через полгода                
+                'required',
+                'date',
+                'after:' . $minVisitDate->format('Y-m-d H:i:s'), // Дата поездки должна быть после завтрашней даты
+                'before:' . $maxVisitDate->format('Y-m-d H:i:s'), // Дата поездки должна быть не позже чем через полгода                
+                function ($attribute, $value, $fail) {
+                   $visitHour = Carbon::parse($value)->hour;
+                   // Проверяем, что час не в запрещенном диапазоне
+                   if ($visitHour >= 22 || $visitHour < 6) {
+                        $fail('Время поездки не может быть с 22:00 до 06:00.');
+                    }
+                }
             ],
             'adres_otkuda' => 'required|string|max:255',
             'adres_kuda' => 'required|string|max:255',
-            'adres_obratno' => 'nullable|string|max:255',
+            'adres_obratno' => [
+                'nullable',
+                'max:255',
+                'required_if:zena_type,2', // Обязательно, если zena_type = 2
+                'prohibited_if:zena_type,1' // Запрещено, если zena_type = 1
+            ],
             'category_id' => 'required|exists:categories,id',
             'client_tel' => 'required|string|max:255',
             'client_invalid' => 'nullable|string|max:255',
@@ -277,7 +292,7 @@ class SocialTaxiOrderController extends BaseController {
             'komment' => 'nullable|string',
             'visit_obratno' => 'nullable|date',
             'predv_way' => 'nullable|numeric|min:0|max:100',
-            'zena_type' => 'nullable|integer',
+            'zena_type' => 'required|integer|in:1,2', // Тип поездки
             'dopus_id' => 'nullable|exists:skidka_dops,id',
             'skidka_dop_all' => 'nullable|integer|in:50,100',
             'kol_p_limit' => 'nullable|integer|in:10,26',
@@ -290,14 +305,16 @@ class SocialTaxiOrderController extends BaseController {
             'visit_data.date' => 'Дата поездки должна быть корректной датой.',
             'visit_data.after' => 'Дата поездки должна быть не раньше завтрашней даты (' . $minVisitDate->format('d.m.Y') . ').',
             'visit_data.before' => 'Дата поездки должна быть не позже чем через полгода (' . $maxVisitDate->format('d.m.Y') . ').',
+            'visit_data.custom' => 'Время поездки не может быть с 22:00 до 06:00.',                    
             'adres_otkuda.required' => 'Адрес отправки обязателен для заполнения.',
             'adres_otkuda.string' => 'Адрес отправки должен быть строкой.',
             'adres_otkuda.max' => 'Адрес отправки не может быть длиннее 255 символов.',
             'adres_kuda.required' => 'Адрес назначения обязателен для заполнения.',
             'adres_kuda.string' => 'Адрес назначения должен быть строкой.',
             'adres_kuda.max' => 'Адрес назначения не может быть длиннее 255 символов.',
-            'adres_obratno.string' => 'Обратный адрес должен быть строкой.',
             'adres_obratno.max' => 'Обратный адрес не может быть длиннее 255 символов.',
+            'adres_obratno.required_if' => 'При типе поездки "в обе стороны" обратный адрес обязателен для заполнения.',
+            'adres_obratno.prohibited_if' => 'При типе поездки "в одну сторону" поле обратного адреса должно быть пустым.',        
             'category_id.required' => 'Категория обязательна для выбора.',
             'category_id.exists' => 'Выбранная категория не существует.',
             'client_tel.required' => 'Телефон для связи обязателен.',
@@ -318,7 +335,7 @@ class SocialTaxiOrderController extends BaseController {
             'user_id.required' => 'Оператор обязателен для выбора.',
             'user_id.integer' => 'ID оператора должен быть целым числом.',
             'user_id.exists' => 'Выбранный оператор не существует.',
-            'taxi_id.required' => 'Выбор оператора такси обязателен для сохранения заказа.',        
+            'taxi_id.required' => 'Выбор оператора такси обязателен для сохранения заказа.',
             'taxi_id.exists' => 'Выбранный оператор такси не существует.',
             'taxi_price.numeric' => 'Цена такси должна быть числом.',
             'taxi_way.numeric' => 'Дальность такси должна быть числом.',
@@ -331,14 +348,16 @@ class SocialTaxiOrderController extends BaseController {
             'predv_way.numeric' => 'Предварительная дальность должна быть числом.',
             'predv_way.min' => 'Предварительная дальность поездки не может быть отрицательной.',
             'predv_way.max' => 'Предварительная дальность поездки не может быть больше 100км.',
-            'zena_type.integer' => 'Тип цены должен быть целым числом.',
+            'zena_type.required' => 'Тип поездки обязателен для выбора.',
+            'zena_type.integer' => 'Тип поездки должен быть целым числом.',
+            'zena_type.in' => 'Недопустимый тип поездки. Выберите 1 (в одну сторону) или 2 (в обе стороны).',
             'dopus_id.exists' => 'Выбранные дополнительные условия не существуют.',
             'skidka_dop_all.integer' => 'Скидка по дополнительным условиям должна быть целым числом.',
             'skidka_dop_all.in' => 'Скидка по поездке может быть только 50 или 100%.',
             'kol_p_limit.integer' => 'Лимит поездок должен быть целым числом.',
             'kol_p_limit.in' => 'Лимит поездок может быть только 10 или 26 поездок в месяц.',
             'category_skidka.integer' => 'Скидка по категории должна быть целым числом.',
-            'category_skidka.in' => 'Скидка по категории может быть только 50 или 100%.',                    
+            'category_skidka.in' => 'Скидка по категории может быть только 50 или 100%.',
             'category_limit.integer' => 'Лимит по категории должен быть целым числом.',
             'category_limit.in' => 'Лимит поездок по категории может быть только 10.',
         ]);
@@ -418,10 +437,9 @@ class SocialTaxiOrderController extends BaseController {
             if (!$client) {
                 return response()->json(['error' => 'Клиент не найден'], 404);
             }
-            
+
             // Получаем тип заказа из запроса (если есть)
             $typeOrder = request()->get('type_order', 1); // По умолчанию соцтакси
-
             // Получаем последние данные из предыдущих заказов клиента
             $lastOrder = Order::where('client_id', $clientId)
                     ->where('type_order', $typeOrder) // Учитываем тип заказа
