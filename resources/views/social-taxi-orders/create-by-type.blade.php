@@ -39,8 +39,19 @@
     <!-- Модальное окно с поездками клиента -->
     @include('social-taxi-orders.show-components.client-trips-modal')
 
-    <!-- JavaScript -->
-    @include('social-taxi-orders.create-components.scripts')
+    <!-- JavaScript - подключаем по логическим блокам -->
+     основная инициализация и обработчики событий
+    @include('social-taxi-orders.create-components.scripts.main')
+    <!--работа с данными клиента-->
+    @include('social-taxi-orders.create-components.scripts.client-data')
+    <!--работа с данными категории-->
+    @include('social-taxi-orders.create-components.scripts.category-data')
+    <!--работа с дополнительными условиями-->
+    @include('social-taxi-orders.create-components.scripts.dopus-data')
+    <!--расчеты и вспомогательные функции-->
+    @include('social-taxi-orders.create-components.scripts.calculations')
+    <!--работа с информацией о поездках-->
+    @include('social-taxi-orders.create-components.scripts.trip-info')
    
     <!-- JavaScript для модального окна (ПОДКЛЮЧАЕМ ПОСЛЕ основного скрипта) -->
     @include('social-taxi-orders.show-components.modal-scripts')
