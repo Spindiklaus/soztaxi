@@ -257,11 +257,30 @@ class SocialTaxiOrderController extends BaseController {
                 'date',
                 'after:' . $minVisitDate->format('Y-m-d H:i:s'), // Дата поездки должна быть после завтрашней даты
                 'before:' . $maxVisitDate->format('Y-m-d H:i:s'), // Дата поездки должна быть не позже чем через полгода                
-                function ($attribute, $value, $fail) {
-                   $visitHour = Carbon::parse($value)->hour;
-                   // Проверяем, что час не в запрещенном диапазоне
-                   if ($visitHour >= 22 || $visitHour < 6) {
+                      
+                function ($attribute, $value, $fail) use ($request) {
+                    $visitTime = Carbon::parse($value);
+                    $visitHour = $visitTime->hour;
+
+                    // Проверяем, что час не в запрещенном диапазоне
+                    if ($visitHour >= 22 || $visitHour < 6) {
                         $fail('Время поездки не может быть с 22:00 до 06:00.');
+                    }
+
+                    // Проверяем, что у клиента нет поездок в течение ±1 часа
+                    if (!empty($request->client_id) && $value) {
+                        $startTime = $visitTime->copy()->subHour();
+                        $endTime = $visitTime->copy()->addHour();
+
+                        $existingOrder = Order::where('client_id', $request->client_id)
+                                ->whereBetween('visit_data', [$startTime, $endTime])
+                                ->whereNull('deleted_at')
+                                ->first();
+
+                        if ($existingOrder) {
+                            $existingTime = Carbon::parse($existingOrder->visit_data)->format('d.m.Y H:i');
+                            $fail("У данного клиента уже есть поездка на {$existingTime}. Нельзя создавать поездки в течение часа друг от друга.");
+                        }
                     }
                 }
             ],
@@ -305,7 +324,6 @@ class SocialTaxiOrderController extends BaseController {
             'visit_data.date' => 'Дата поездки должна быть корректной датой.',
             'visit_data.after' => 'Дата поездки должна быть не раньше завтрашней даты (' . $minVisitDate->format('d.m.Y') . ').',
             'visit_data.before' => 'Дата поездки должна быть не позже чем через полгода (' . $maxVisitDate->format('d.m.Y') . ').',
-            'visit_data.custom' => 'Время поездки не может быть с 22:00 до 06:00.',                    
             'adres_otkuda.required' => 'Адрес отправки обязателен для заполнения.',
             'adres_otkuda.string' => 'Адрес отправки должен быть строкой.',
             'adres_otkuda.max' => 'Адрес отправки не может быть длиннее 255 символов.',
@@ -314,7 +332,7 @@ class SocialTaxiOrderController extends BaseController {
             'adres_kuda.max' => 'Адрес назначения не может быть длиннее 255 символов.',
             'adres_obratno.max' => 'Обратный адрес не может быть длиннее 255 символов.',
             'adres_obratno.required_if' => 'При типе поездки "в обе стороны" обратный адрес обязателен для заполнения.',
-            'adres_obratno.prohibited_if' => 'При типе поездки "в одну сторону" поле обратного адреса должно быть пустым.',        
+            'adres_obratno.prohibited_if' => 'При типе поездки "в одну сторону" поле обратного адреса должно быть пустым.',
             'category_id.required' => 'Категория обязательна для выбора.',
             'category_id.exists' => 'Выбранная категория не существует.',
             'client_tel.required' => 'Телефон для связи обязателен.',
