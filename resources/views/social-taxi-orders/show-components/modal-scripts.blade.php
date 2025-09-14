@@ -1,3 +1,4 @@
+<!-- resources/views/social-taxi-orders/show-components/modal-scripts.blade.php -->
 <script>
 // Функции для отображения типа заказа
 function getOrderTypeName(typeId) {
@@ -161,11 +162,11 @@ function displayClientTrips(data, type = 'normal') {
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Тип заказа</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Тип заказа<br>Номер заказа<</th>
                         <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Дата поездки</th>
                         <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Откуда</th>
                         <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Куда</th>
-                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Номер заказа</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Обратно</th>
     `;
     
     // Добавляем дополнительные колонки в зависимости от типа
@@ -201,9 +202,12 @@ function displayClientTrips(data, type = 'normal') {
         tripsHtml += `
             <tr>
                 <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
-                    <span class="${getOrderTypeColor(trip.type_order)} font-medium">
+                    <div class="${getOrderTypeColor(trip.type_order)} font-medium">
                         ${getOrderTypeName(trip.type_order)}
-                    </span>
+                    </div>
+                    <div class="text-xs text-gray-500 mt-1">
+                        ${trip.pz_nom || '-'}
+                    </div>
                 </td>
                 <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
                     ${visitDate}
@@ -211,7 +215,7 @@ function displayClientTrips(data, type = 'normal') {
                 </td>
                 <td class="px-4 py-2 text-sm text-gray-900 max-w-xs truncate" title="${trip.adres_otkuda || '-'}">${trip.adres_otkuda || '-'}</td>
                 <td class="px-4 py-2 text-sm text-gray-900 max-w-xs truncate" title="${trip.adres_kuda || '-'}">${trip.adres_kuda || '-'}</td>
-                <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">${trip.pz_nom || '-'}</td>
+                <td class="px-4 py-2 text-sm text-gray-900 max-w-xs truncate" title="${trip.adres_obratno || '-'}">${trip.adres_obratno || '-'}</td>
         `;
         
         // Добавляем дополнительные данные в зависимости от типа

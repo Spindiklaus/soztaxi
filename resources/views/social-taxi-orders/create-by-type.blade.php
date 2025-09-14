@@ -36,6 +36,12 @@
         </div>
     </div>
     
+    <!-- Модальное окно с поездками клиента -->
+    @include('social-taxi-orders.show-components.client-trips-modal')
+
     <!-- JavaScript -->
     @include('social-taxi-orders.create-components.scripts')
+   
+    <!-- JavaScript для модального окна (ПОДКЛЮЧАЕМ ПОСЛЕ основного скрипта) -->
+    @include('social-taxi-orders.show-components.modal-scripts')
 </x-app-layout>
