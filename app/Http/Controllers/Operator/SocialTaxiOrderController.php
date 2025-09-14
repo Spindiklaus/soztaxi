@@ -259,7 +259,6 @@ class SocialTaxiOrderController extends BaseController {
                 'date',
                 'after:' . $minVisitDate->format('Y-m-d H:i:s'), // Дата поездки должна быть после завтрашней даты
                 'before:' . $maxVisitDate->format('Y-m-d H:i:s'), // Дата поездки должна быть не позже чем через полгода                
-                      
                 function ($attribute, $value, $fail) use ($request) {
                     $visitTime = Carbon::parse($value);
                     $visitHour = $visitTime->hour;
@@ -316,7 +315,24 @@ class SocialTaxiOrderController extends BaseController {
             'zena_type' => 'required|integer|in:1,2', // Тип поездки
             'dopus_id' => 'nullable|exists:skidka_dops,id',
             'skidka_dop_all' => 'nullable|integer|in:50,100',
-            'kol_p_limit' => 'nullable|integer|in:10,26',
+            'kol_p_limit' => [
+                'integer',
+                'in:10,26',
+                function ($attribute, $value, $fail) use ($request) {
+                    // Проверяем для всех типов заказов
+                    if ($value && $request->client_id && $request->visit_data) {
+                        $visitDate = Carbon::parse($request->visit_data);
+
+                        // Используем существующую функцию хелпера для получения количества поездок клиента в месяц
+                        $clientTripsCount = getClientTripsCountInMonthByVisitDate($request->client_id, $visitDate);
+
+                        // Проверяем, не превышает ли лимит (учитываем, что создается новый заказ)
+                        if ($clientTripsCount >= $value) {
+                            $fail("Клиент уже совершил {$clientTripsCount} поездок из доступных {$value} в этом месяце. Невозможно создать новый заказ.");
+                        }
+                    }
+                }
+            ],
             'category_skidka' => 'nullable|integer|in:50,100',
             'category_limit' => 'nullable|integer|min:10|max:10',
                 ], [

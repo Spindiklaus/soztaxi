@@ -40,7 +40,7 @@
     @include('social-taxi-orders.show-components.client-trips-modal')
 
     <!-- JavaScript - подключаем по логическим блокам -->
-     основная инициализация и обработчики событий
+    <!-- основная инициализация и обработчики событий-->
     @include('social-taxi-orders.create-components.scripts.main')
     <!--работа с данными клиента-->
     @include('social-taxi-orders.create-components.scripts.client-data')
