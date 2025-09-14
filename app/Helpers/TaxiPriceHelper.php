@@ -1,138 +1,90 @@
 <?php
 
-if (!function_exists('calculateFullTripPrice')) {
+if (!function_exists('calculateSocialTaxiValues')) {
     /**
-     * Рассчитать предварительную полную цену поездки без учета посадки
+     * Рассчитать все значения для соцтакси
      *
-     * @param mixed $order Заказ (модель или массив данных)
-     * @param int $kol_znak Количество знаков после запятой для округления
+     * @param float $predvWay Предварительная дальность поездки
      * @param mixed $taxi Оператор такси (модель или массив данных)
-     * @return float Цена поездки
+     * @param int $discount Скидка клиента (0, 50, 100)
+     * @param int $kol_znak Количество знаков после запятой для округления
+     * @return array Массив с рассчитанными значениями
      */
+    function calculateSocialTaxiValues($predvWay, $taxi, $discount = 0, $kol_znak = 2)
+    {
+        // Проверка входных данных
+        if (!$predvWay || $predvWay <= 0 || !$taxi) {
+            return [
+                'full_trip_price' => 0,
+                'reimbursement_amount' => 0,
+                'client_payment_amount' => 0
+            ];
+        }
+
+        // Расчет полной цены поездки без посадки
+        $fullTripPrice = 0;
+        if ($discount == 100) {
+            $fullTripPrice = ($taxi->koef ?? 0) * $predvWay;
+        } elseif ($discount == 50) {
+            $fullTripPrice = ($taxi->koef50 ?? 0) * $predvWay;
+        }
+
+        // Расчет суммы к возмещению
+        $reimbursementAmount = 0;
+        if ($discount == 100) {
+            $reimbursementAmount = ($taxi->koef ?? 0) * $predvWay + ($taxi->posadka ?? 0);
+        } elseif ($discount == 50) {
+            $reimbursementAmount = ($taxi->koef50 ?? 0) * $predvWay + ($taxi->posadka50 ?? 0);
+        }
+
+        // Расчет суммы к оплате клиентом
+        $fullReimbursement = ($taxi->koef ?? 0) * $predvWay + ($taxi->posadka ?? 0);
+        $clientPaymentAmount = $fullReimbursement - $reimbursementAmount;
+
+        return [
+            'full_trip_price' => round($fullTripPrice, $kol_znak),
+            'reimbursement_amount' => round($reimbursementAmount, $kol_znak),
+            'client_payment_amount' => round($clientPaymentAmount, $kol_znak)
+        ];
+    }
+}
+
+// Обновите существующие функции, чтобы они использовали общую логику:
+if (!function_exists('calculateFullTripPrice')) {
     function calculateFullTripPrice($order, $kol_znak=2, $taxi = null)
     {
-        // Если заказ не передан или нет дальности поездки
-        if (!$order || empty($order->predv_way)) {
+        if (!$order || empty($order->predv_way) || !$taxi) {
             return 0;
         }
 
-        // Если оператор такси не передан, пытаемся получить его из заказа
-        if (!$taxi && isset($order->taxi)) {
-            $taxi = $order->taxi;
-        }
-
-        // Если нет оператора такси
-        if (!$taxi) {
-            return 0;
-        }
-
-        // Получаем скидку клиента
         $discount = $order->skidka_dop_all ?? 0;
-
-        // Рассчитываем цену в зависимости от скидки
-        $price = 0;
-        if ($discount == 100) {
-            // Полная скидка - используем коэффициент koef
-            $price = ($taxi->koef ?? 0) * ($order->predv_way ?? 0);
-        } elseif ($discount == 50) {
-            // 50% скидка - используем коэффициент koef50
-            $price = ($taxi->koef50 ?? 0) * ($order->predv_way ?? 0);
-        } else {
-            // Без скидки или другая скидка - используем koef
-            $price = 0;
-        }
-
-        // Округляем
-        return round($price, $kol_znak);
+        $values = calculateSocialTaxiValues($order->predv_way, $taxi, $discount, $kol_znak);
+        return $values['full_trip_price'];
     }
 }
 
 if (!function_exists('calculateReimbursementAmount')) {
-    /**
-     * Рассчитать предварительную сумму к возмещению
-     *
-     * @param mixed $order Заказ (модель или массив данных)
-     * @param int $kol_znak Количество знаков после запятой для округления 
-     * @param mixed $taxi Оператор такси (модель или массив данных)
-     * @return float Сумма к возмещению
-     */
     function calculateReimbursementAmount($order, $kol_znak=2, $taxi = null)
     {
-        // Если заказ не передан или нет дальности поездки
-        if (!$order || empty($order->predv_way)) {
+        if (!$order || empty($order->predv_way) || !$taxi) {
             return 0;
         }
 
-        // Если оператор такси не передан, пытаемся получить его из заказа
-        if (!$taxi && isset($order->taxi)) {
-            $taxi = $order->taxi;
-        }
-
-        // Если нет оператора такси
-        if (!$taxi) {
-            return 0;
-        }
-
-        // Получаем скидку клиента
         $discount = $order->skidka_dop_all ?? 0;
-
-        // Рассчитываем цену в зависимости от скидки
-        $price = 0;
-        if ($discount == 100) {
-            // Полная скидка - используем коэффициент koef
-            $price = ($taxi->koef ?? 0) * ($order->predv_way ?? 0) + $taxi->posadka;
-        } elseif ($discount == 50) {
-            // 50% скидка - используем коэффициент koef50
-            $price = ($taxi->koef50 ?? 0) * ($order->predv_way ?? 0) + $taxi->posadka50;
-        } else {
-            // Без скидки или другая скидка - используем koef
-            $price = 0;
-        }
-
-        // Округляем
-        return round($price, $kol_znak);
+        $values = calculateSocialTaxiValues($order->predv_way, $taxi, $discount, $kol_znak);
+        return $values['reimbursement_amount'];
     }
 }
 
 if (!function_exists('calculateClientPaymentAmount')) {
-    /**
-     * Рассчитать сумму к оплате клиентом
-     * Формула: сумма к возмещению при 100% скидке - сумма к возмещению текущего заказа
-     *
-     * @param mixed $order Заказ (модель или массив данных)
-     * @param int $kol_znak Количество знаков после запятой для округления
-     * @param mixed $taxi Оператор такси (модель или массив данных)
-     * @return float Сумма к оплате
-     */
     function calculateClientPaymentAmount($order, $kol_znak = 2, $taxi = null)
     {
-        // Если заказ не передан или нет дальности поездки
-        if (!$order || empty($order->predv_way)) {
+        if (!$order || empty($order->predv_way) || !$taxi) {
             return 0;
         }
 
-        // Если оператор такси не передан, пытаемся получить его из заказа
-        if (!$taxi && isset($order->taxi)) {
-            $taxi = $order->taxi;
-        }
-
-        // Если нет оператора такси
-        if (!$taxi) {
-            return 0;
-        }
-
-        // Рассчитываем сумму к возмещению при 100% скидке
-        $fullReimbursement = 0;
-        $fullReimbursement = ($taxi->koef ?? 0) * ($order->predv_way ?? 0) + ($taxi->posadka ?? 0);
-        $fullReimbursement = round($fullReimbursement, $kol_znak);
-
-        // Рассчитываем сумму к возмещению текущего заказа
-        $currentReimbursement = calculateReimbursementAmount($order, $kol_znak, $taxi);
-
-        // Сумма к оплате = разница между полной суммой и текущей суммой
-        $paymentAmount = $fullReimbursement - $currentReimbursement;
-
-        // Округляем
-        return round($paymentAmount, $kol_znak);
+        $discount = $order->skidka_dop_all ?? 0;
+        $values = calculateSocialTaxiValues($order->predv_way, $taxi, $discount, $kol_znak);
+        return $values['client_payment_amount'];
     }
 }

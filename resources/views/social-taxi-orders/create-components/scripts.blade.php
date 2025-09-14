@@ -7,6 +7,16 @@ document.addEventListener('DOMContentLoaded', function () {
     const zenaTypeSelect = document.getElementById('zena_type');
     const adresObratnoInput = document.getElementById('adres_obratno');
     const typeOrder = {{ $type }}; // Тип заказа из PHP
+    const skidkaDopAllInput = document.getElementById('skidka_dop_all');
+    
+    // Добавленные переменные для расчета
+    const predvWayInput = document.getElementById('predv_way');
+    const taxiSelect = document.getElementById('taxi_id');
+    const calculationResults = document.getElementById('calculation-results');
+    const fullTripPrice = document.getElementById('full-trip-price');
+    const clientPaymentAmount = document.getElementById('client-payment-amount');
+    const reimbursementAmount = document.getElementById('reimbursement-amount');
+    const taxiName = document.getElementById('taxi-name'); // Может быть null, это нормально
     
     // Сохраняем начальное состояние dopusSelect
     if (dopusSelect && typeOrder != 1) {
@@ -79,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Получение данных категории по AJAX
     function fetchCategoryData(categoryId) {
-        fetch(`/api/categories/${categoryId}`)
+        return fetch(`/api/categories/${categoryId}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -91,16 +101,18 @@ document.addEventListener('DOMContentLoaded', function () {
                     throw new Error(data.error);
                 }
                 populateCategoryData(data);
+                return data; // Возвращаем данные
             })
             .catch(error => {
                 console.error('Ошибка получения данных категории:', error);
                 alert('Ошибка получения данных категории: ' + error.message);
+                throw error; // Пробрасываем ошибку дальше
             });
     }
 
     // Получение данных дополнительных условий по AJAX
     function fetchDopusData(dopusId) {
-        fetch(`/api/skidka-dops/${dopusId}`)
+        return fetch(`/api/skidka-dops/${dopusId}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -112,10 +124,16 @@ document.addEventListener('DOMContentLoaded', function () {
                     throw new Error(data.error);
                 }
                 populateDopusData(data);
+                // Вызываем пересчет, если это соцтакси
+                if (typeOrder == 1) {
+                    setTimeout(triggerCalculationIfNeeded, 100);
+                }
+                return data;
             })
             .catch(error => {
                 console.error('Ошибка получения данных дополнительных условий:', error);
                 alert('Ошибка получения данных дополнительных условий: ' + error.message);
+                throw error; // Пробрасываем ошибку дальше
             });
     }
 
@@ -146,51 +164,64 @@ document.addEventListener('DOMContentLoaded', function () {
                 clientSoprInput.value = data.last_order_data.client_sopr || '';
             }
             
-            // Устанавливаем значения полей из последнего заказа (до установки селектов!)
-            if (categorySkidkaInput && data.last_order_data.category_skidka !== null) {
-                categorySkidkaInput.value = data.last_order_data.category_skidka;
-            }
-            if (categoryLimitInput && data.last_order_data.category_limit !== null) {
-                categoryLimitInput.value = data.last_order_data.category_limit;
-            }
-            
-            // Устанавливаем категорию из последнего заказа
-            if (categorySelect && data.last_order_data.category_id) {
-                categorySelect.value = data.last_order_data.category_id;
-                // После установки категории заполняем связанные поля
-                fetchCategoryData(data.last_order_data.category_id);
-            }
-            
-            // Устанавливаем дополнительные условия из последнего заказа
-            if (dopusSelect && data.last_order_data.dopus_id) {
-                dopusSelect.value = data.last_order_data.dopus_id;
-                // После установки доп.условий заполняем связанные поля
-                fetchDopusData(data.last_order_data.dopus_id);
-            } else {
-                // Если доп.условий нет в прошлом заказе, устанавливаем окончательные значения из категории
-                if (skidkaDopAllInput && categorySkidkaInput) {
-                    skidkaDopAllInput.value = categorySkidkaInput.value || '';
-                }
-                if (kolPLimitInput && categoryLimitInput) {
-                    kolPLimitInput.value = categoryLimitInput.value || '';
-                }
-            }
+         // Устанавливаем категорию из последнего заказа
+        if (categorySelect && data.last_order_data.category_id) {
+            categorySelect.value = data.last_order_data.category_id;
+            // Загружаем данные категории
+            fetchCategoryData(data.last_order_data.category_id)
+                .then(() => {
+                    // После загрузки категории устанавливаем значения из последнего заказа
+                    setTimeout(() => {
+                        // Устанавливаем значения из последнего заказа поверх данных категории
+                        if (categorySkidkaInput && data.last_order_data.category_skidka !== null) {
+                            categorySkidkaInput.value = data.last_order_data.category_skidka;
+                        }
+                        if (categoryLimitInput && data.last_order_data.category_limit !== null) {
+                            categoryLimitInput.value = data.last_order_data.category_limit;
+                        }
+                        
+                        // Обновляем поля скидки и лимита
+                        updateDiscountAndLimitFields();
+                        
+                        // Устанавливаем дополнительные условия из последнего заказа
+                        if (dopusSelect && data.last_order_data.dopus_id) {
+                            dopusSelect.value = data.last_order_data.dopus_id;
+                            // Загружаем данные дополнительных условий
+                            fetchDopusData(data.last_order_data.dopus_id);
+                        } else {
+                            // Вызываем пересчет, если это соцтакси
+                            if (typeOrder == 1) {
+                                setTimeout(triggerCalculationIfNeeded, 100);
+                            }
+                        }
+                    }, 50);
+                })
+                .catch(error => {
+                    console.error('Ошибка при загрузке категории:', error);
+                    // Даже если ошибка, продолжаем работу
+                    if (typeOrder == 1) {
+                        setTimeout(triggerCalculationIfNeeded, 100);
+                    }
+                });
         }
-        
-        // Если нет данных из последнего заказа, но есть категории клиента
-        if (!data.last_order_data && data.client_categories.length > 0) {
-            // Устанавливаем первую доступную категорию клиента
-            if (categorySelect) {
-                categorySelect.value = data.client_categories[0] || '';
-                // После установки категории заполняем связанные поля
-                if (data.client_categories[0]) {
-                    fetchCategoryData(data.client_categories[0]);
-                    // Сбрасываем поля дополнительных условий после установки категории
-                    resetDopusFields();
-                }
-            }
         }
     }
+    
+    // Функция для обновления полей скидки и лимита
+function updateDiscountAndLimitFields() {
+    const skidkaDopAllInput = document.getElementById('skidka_dop_all');
+    const kolPLimitInput = document.getElementById('kol_p_limit');
+    const categorySkidkaInput = document.getElementById('category_skidka');
+    const categoryLimitInput = document.getElementById('category_limit');
+    
+    // Обновляем поля скидки и лимита из категории
+    if (skidkaDopAllInput && categorySkidkaInput) {
+        skidkaDopAllInput.value = categorySkidkaInput.value || '';
+    }
+    if (kolPLimitInput && categoryLimitInput) {
+        kolPLimitInput.value = categoryLimitInput.value || '';
+    }
+}
 
     // Заполнение данных категории
     function populateCategoryData(data) {
@@ -209,6 +240,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Автоматически обновляем поля скидки и лимита из категории
         if (skidkaDopAllInput && categorySkidkaInput) {
             skidkaDopAllInput.value = categorySkidkaInput.value || '';
+            triggerCalculationIfNeeded(); 
         }
         if (kolPLimitInput && categoryLimitInput) {
             kolPLimitInput.value = categoryLimitInput.value || '';
@@ -222,6 +254,7 @@ document.addEventListener('DOMContentLoaded', function () {
         
         if (skidkaDopAllInput) {
             skidkaDopAllInput.value = data.skidka || '';
+            triggerCalculationIfNeeded(); // Добавляем вызов пересчета
         }
         if (kolPLimitInput) {
             kolPLimitInput.value = data.kol_p || '';
@@ -267,6 +300,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const kolPLimitInput = document.getElementById('kol_p_limit');
         const categorySkidkaInput = document.getElementById('category_skidka');
         const categoryLimitInput = document.getElementById('category_limit');
+        triggerCalculationIfNeeded();
         
         // Восстанавливаем значения из категории
         if (skidkaDopAllInput && categorySkidkaInput) {
@@ -394,6 +428,110 @@ document.addEventListener('DOMContentLoaded', function () {
             adresObratnoInput.disabled = false;
             adresObratnoInput.classList.remove('bg-gray-100', 'cursor-not-allowed');
             adresObratnoInput.placeholder = 'Введите обратный адрес';
+        }
+    }
+    
+    // Показываем расчеты только для соцтакси
+    if (typeOrder == 1 && predvWayInput && taxiSelect) {
+        // Добавляем обработчики событий
+        const calculateTriggerElements = [predvWayInput, taxiSelect];
+        if (dopusSelect) calculateTriggerElements.push(dopusSelect);
+        if (skidkaDopAllInput) calculateTriggerElements.push(skidkaDopAllInput);
+        
+        calculateTriggerElements.forEach(element => {
+            if (element) {
+                element.addEventListener('input', debounce(calculateValues, 500));
+                element.addEventListener('change', calculateValues);
+            }
+        });
+        
+        // Инициализация при загрузке страницы, если есть необходимые значения
+        setTimeout(calculateValues, 100);
+    }
+    
+    function calculateValues() {
+    const predvWay = predvWayInput?.value;
+    const taxiId = taxiSelect?.value;
+    
+    // Получаем скидку из скрытого поля или из других источников
+    let discount = 0;
+    if (skidkaDopAllInput) {
+        discount = parseInt(skidkaDopAllInput.value) || 0;
+    }
+    
+    // Проверяем, что есть все необходимые данные
+    if (!predvWay || predvWay <= 0 || !taxiId) {
+        if (calculationResults) {
+            calculationResults.style.display = 'none';
+        }
+        return;
+    }
+    
+    // Делаем AJAX-запрос для расчета значений
+    fetch('/api/calculate-social-taxi-values', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+        },
+        body: JSON.stringify({
+            predv_way: parseFloat(predvWay),
+            taxi_id: parseInt(taxiId),
+            skidka_dop_all: discount
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && calculationResults && fullTripPrice && clientPaymentAmount && reimbursementAmount) {
+            // Показываем блок с расчетами
+            calculationResults.style.display = 'block';
+            
+            // Обновляем значения
+            fullTripPrice.textContent = formatNumber(data.full_trip_price);
+            clientPaymentAmount.textContent = formatNumber(data.client_payment_amount);
+            reimbursementAmount.textContent = formatNumber(data.reimbursement_amount);
+            if (taxiName) {
+                taxiName.textContent = data.taxi_name;
+            }
+        } else {
+            if (calculationResults) {
+                calculationResults.style.display = 'none';
+            }
+            if (data.error) {
+                console.error('Ошибка расчета:', data.error);
+            }
+        }
+    })
+    .catch(error => {
+        if (calculationResults) {
+            calculationResults.style.display = 'none';
+        }
+        console.error('Ошибка запроса:', error);
+    });
+}
+    
+    function formatNumber(num) {
+        return parseFloat(num).toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    }
+    
+    // Функция для debounce (отложенного выполнения)
+    // для предотвращения множественных запросов при быстром вводе
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+    
+    // Функция для вызова предварительного расчета после обновления полей
+    function triggerCalculationIfNeeded() {
+        if (typeOrder == 1 && predvWayInput?.value && taxiSelect?.value) {
+            setTimeout(calculateValues, 100);
         }
     }
     

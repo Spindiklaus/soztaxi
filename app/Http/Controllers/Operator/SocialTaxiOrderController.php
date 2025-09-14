@@ -72,6 +72,7 @@ class SocialTaxiOrderController extends BaseController {
         try {
             // Сначала попробуем найти заказ
             $order = Order::withTrashed()->find($id);
+            $taxi = Taxi::find($order->taxi_id);
 
             if (!$order) {
                 \Log::warning('Заказ не найден', ['order_id' => $id]);
@@ -100,7 +101,8 @@ class SocialTaxiOrderController extends BaseController {
             return view('social-taxi-orders.show', compact(
                             'order',
                             'tripCount',
-                            'backUrlParams' // Передаем параметры для кнопки "Назад"
+                            'backUrlParams', // Передаем параметры для кнопки "Назад"
+                            'taxi'
             ));
         } catch (\Exception $e) {
             return redirect()->route('social-taxi-orders.index')

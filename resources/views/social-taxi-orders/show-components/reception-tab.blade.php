@@ -263,17 +263,17 @@
 
                     <div class="flex justify-between">
                         <span class="text-sm font-medium text-gray-700">Цена поездки полная, без учета посадки, руб.</span>
-                        <span class="text-sm text-gray-900">{{ number_format(calculateFullTripPrice($order, 11), 11, ',', ' ') }} руб.</span>
+                        <span class="text-sm text-gray-900">{{ number_format(calculateFullTripPrice($order, 11, $taxi), 11, ',', ' ') }} руб.</span>
                     </div>
 
                     <div class="flex justify-between">
                         <span class="text-sm font-medium text-gray-700">Сумма к оплате, руб.</span>
-                        <span class="text-sm text-blue-600 font-semibold">{{ number_format(calculateClientPaymentAmount($order, 11), 11, ',', ' ') }} руб.</span>
+                        <span class="text-sm text-blue-600 font-semibold">{{ number_format(calculateClientPaymentAmount($order, 11, $taxi), 11, ',', ' ') }} руб.</span>
                     </div>
 
                     <div class="flex justify-between">
                         <span class="text-sm font-medium text-gray-700">Сумма к возмещению, руб.</span>
-                        <span class="text-sm text-orange-600 font-semibold">{{ number_format(calculateReimbursementAmount($order, 11), 11, ',', ' ') }} руб.</span>
+                        <span class="text-sm text-orange-600 font-semibold">{{ number_format(calculateReimbursementAmount($order, 11, $taxi), 11, ',', ' ') }} руб.</span>
                     </div>
                 </div>
             </div>
