@@ -72,3 +72,18 @@ Route::post('/calculate-social-taxi-values', function(\Illuminate\Http\Request $
     }
 })->name('api.calculate-social-taxi-values');
 
+Route::get('/taxis/{id}', function($id) {
+    $taxi = \App\Models\Taxi::find($id);
+    if (!$taxi) {
+        return response()->json(['error' => 'Такси не найдено'], 404);
+    }
+    return response()->json([
+        'id' => $taxi->id,
+        'name' => $taxi->name,
+        'zena1_auto' => $taxi->zena1_auto,
+        'zena2_auto' => $taxi->zena2_auto,
+        'zena1_gaz' => $taxi->zena1_gaz,
+        'zena2_gaz' => $taxi->zena2_gaz,
+    ]);
+})->name('api.taxis.show');
+

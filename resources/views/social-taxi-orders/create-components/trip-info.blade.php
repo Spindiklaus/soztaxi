@@ -108,6 +108,31 @@
             </p>
             @endif
         </div>
+        <!-- Цена поездки -->
+        <div>
+            <label for="taxi_price" class="block text-sm font-medium text-gray-700">Цена поездки</label>
+            <input type="number" name="taxi_price" id="taxi_price" 
+                   value="{{ old('taxi_price') }}"
+                   step="0.01"
+                   readonly
+                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 cursor-not-allowed focus:border-blue-500 focus:ring-blue-500">
+            @error('taxi_price')
+            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+            @enderror
+        </div>
+
+        <!-- Сумма возмещения -->
+        <div>
+            <label for="taxi_vozm" class="block text-sm font-medium text-gray-700">Сумма возмещения</label>
+            <input type="number" name="taxi_vozm" id="taxi_vozm" 
+                   value="{{ old('taxi_vozm') }}"
+                   step="0.01"
+                   readonly
+                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 cursor-not-allowed focus:border-blue-500 focus:ring-blue-500">
+            @error('taxi_vozm')
+            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+            @enderror
+        </div>
         @else
         <!-- Скрытое поле для соцтакси -->
         <input type="hidden" name="adres_obratno" value="">

@@ -314,7 +314,17 @@ class SocialTaxiOrderController extends BaseController {
             'predv_way' => 'nullable|numeric|min:0|max:100',
             'zena_type' => 'required|integer|in:1,2', // Тип поездки
             'dopus_id' => 'nullable|exists:skidka_dops,id',
-            'skidka_dop_all' => 'nullable|integer|in:50,100',
+            'skidka_dop_all' => [
+                'nullable',
+                'integer',
+                'in:50,100',
+                function ($attribute, $value, $fail) use ($request, $type) {
+                    // Для легкового авто и ГАЗели скидка должна быть 100%
+                    if (($type == 2 || $type == 3) && $value != 100) {
+                        $fail('Для легкового авто и ГАЗели скидка должна быть 100%.');
+                    }
+                }
+            ],
             'kol_p_limit' => [
                 'integer',
                 'in:10,26',

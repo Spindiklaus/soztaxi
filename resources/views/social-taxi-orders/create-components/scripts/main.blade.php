@@ -123,5 +123,31 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
     
+    // Работаем только для легкового авто и ГАЗели
+    if (typeOrder != 1 && taxiSelect && zenaTypeSelect) {
+        // Делаем поля только для чтения
+        const taxiPriceInput = document.getElementById('taxi_price');
+        const taxiVozmInput = document.getElementById('taxi_vozm');
+        if (taxiPriceInput) {
+            taxiPriceInput.readOnly = true;
+            taxiPriceInput.classList.add('bg-gray-100', 'cursor-not-allowed');
+        }
+        if (taxiVozmInput) {
+            taxiVozmInput.readOnly = true;
+            taxiVozmInput.classList.add('bg-gray-100', 'cursor-not-allowed');
+        }
+        
+        // Добавляем обработчики событий
+        taxiSelect.addEventListener('change', updateTaxiPriceAndCompensation);
+        zenaTypeSelect.addEventListener('change', updateTaxiPriceAndCompensation);
+        
+        if (skidkaDopAllInput) {
+            skidkaDopAllInput.addEventListener('change', updateTaxiPriceAndCompensation);
+        }
+        
+        // Инициализация при загрузке страницы
+        setTimeout(updateTaxiPriceAndCompensation, 250);
+    }
+    
  });
 </script>
