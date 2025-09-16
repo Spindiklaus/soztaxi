@@ -69,7 +69,8 @@
             <label for="client_tel" class="block text-sm font-medium text-gray-700">Телефон для связи*</label>
             <input type="text" name="client_tel" id="client_tel" 
                    value="{{ old('client_tel') }}"
-                   placeholder="Введите телефон клиента"
+                   placeholder="Введите телефон для связи"
+                   required
                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 @error('client_tel')
                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>

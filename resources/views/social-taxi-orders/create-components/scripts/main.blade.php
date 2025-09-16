@@ -1,3 +1,5 @@
+<!--main.blade.php -->
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const clientSelect = document.getElementById('client_id');
@@ -18,6 +20,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const reimbursementAmount = document.getElementById('reimbursement-amount');
     const taxiName = document.getElementById('taxi-name'); // Может быть null, это нормально
     
+       
     // Сохраняем начальное состояние dopusSelect
     if (dopusSelect && typeOrder != 1) {
         dopusSelect.readOnly = true;

@@ -66,17 +66,29 @@
             @enderror
             <p class="mt-1 text-xs text-gray-500">Выбор оператора такси обязателен для сохранения заказа</p>
         </div>
-        <div>
-            <label for="adres_otkuda" class="block text-sm font-medium text-gray-700">Откуда ехать *</label>
-            <textarea name="adres_otkuda" id="adres_otkuda" 
-                      rows="3" 
-                      required
-                      placeholder="Введите адрес отправки"
-                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('adres_otkuda') }}</textarea>
-            @error('adres_otkuda')
-            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-            @enderror
-        </div>
+        <!-- Кнопка для выбора из истории адресов -->
+<div class="flex items-end space-x-2 mt-2">
+    <div class="flex-1">
+        <label for="adres_otkuda" class="block text-sm font-medium text-gray-700">Откуда ехать *</label>
+        <textarea name="adres_otkuda" id="adres_otkuda" 
+                  rows="3" 
+                  required
+                  placeholder="Введите адрес отправки"
+                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('adres_otkuda') }}</textarea>
+        @error('adres_otkuda')
+        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+        @enderror
+    </div>
+    
+    <button type="button" 
+            id="open-address-history-btn"
+            class="mt-6 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+        <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        История
+    </button>
+</div>
 
         <div>
             <label for="adres_kuda" class="block text-sm font-medium text-gray-700">Куда ехать *</label>

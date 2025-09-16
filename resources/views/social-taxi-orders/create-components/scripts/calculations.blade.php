@@ -1,3 +1,5 @@
+<!--calculations.blade.php -->
+
 <script>
 // Функции расчетов и вспомогательные функции
 function calculateValues() {

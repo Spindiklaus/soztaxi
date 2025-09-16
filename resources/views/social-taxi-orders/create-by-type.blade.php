@@ -54,7 +54,10 @@
     @include('social-taxi-orders.create-components.scripts.trip-info')
     <!--работа с оплатой такси ГАЗ и ЛА-->
     @include('social-taxi-orders.create-components.scripts.taxi-type')
+    <!--история поездок-->
+    @include('social-taxi-orders.create-components.scripts.trip-history-scripts')
    
     <!-- JavaScript для модального окна (ПОДКЛЮЧАЕМ ПОСЛЕ основного скрипта) -->
     @include('social-taxi-orders.show-components.modal-scripts')
+    @include('social-taxi-orders.create-components.trip-history-modal')
 </x-app-layout>
