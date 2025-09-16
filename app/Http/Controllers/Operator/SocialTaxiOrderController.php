@@ -306,8 +306,17 @@ class SocialTaxiOrderController extends BaseController {
             'taxi_price' => 'nullable|numeric',
             'taxi_way' => 'nullable|numeric',
             'taxi_sent_at' => 'nullable|date',
-            'otmena_data' => 'nullable|date',
-            'otmena_taxi' => 'nullable|integer',
+            'taxi_vozm' => [
+                'nullable',
+                'numeric',
+                function ($attribute, $value, $fail) use ($request) {
+                    // Для легкового авто и ГАЗели (zena_type != 1) проверяем, что taxi_vozm = taxi_price
+                    if (($request->type_order == 2 || $request->type_order == 3) &&
+                            abs((float) $request->taxi_price - (float) $value) > 0.00000000001) {
+                        $fail('Для легкового авто и ГАЗели сумма возмещения должна равняться цене поездки.');
+                    }
+                }
+            ],
             'closed_at' => 'nullable|date',
             'komment' => 'nullable|string',
             'visit_obratno' => 'nullable|date',
@@ -444,6 +453,8 @@ class SocialTaxiOrderController extends BaseController {
                 'taxi_sent_at' => $validated['taxi_sent_at'] ?? null,
                 'taxi_price' => isset($validated['taxi_price']) && $validated['taxi_price'] !== '' && $validated['taxi_price'] !== null ?
                 (float) str_replace(',', '.', $validated['taxi_price']) : null,
+                'taxi_vozm' => isset($validated['taxi_vozm']) && $validated['taxi_vozm'] !== '' && $validated['taxi_vozm'] !== null ?
+                (float) str_replace(',', '.', $validated['taxi_vozm']) : null,
                 'taxi_way' => isset($validated['taxi_way']) && $validated['taxi_way'] !== '' && $validated['taxi_way'] !== null ?
                 (float) str_replace(',', '.', $validated['taxi_way']) : null,
                 'cancelled_at' => $validated['otmena_data'] ?? null,

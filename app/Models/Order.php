@@ -58,6 +58,7 @@ class Order extends Model {
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
+        'taxi_price' => 'decimal:11',
         'taxi_vozm' => 'decimal:11',
     ];
 

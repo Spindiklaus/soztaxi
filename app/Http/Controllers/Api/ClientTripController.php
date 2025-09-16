@@ -64,6 +64,7 @@ class ClientTripController extends Controller {
                     'visit_data',
                     'adres_otkuda',
                     'adres_kuda', 
+                    'adres_obratno',
                     'type_order',
                     'pz_nom',
                     'client_id',
