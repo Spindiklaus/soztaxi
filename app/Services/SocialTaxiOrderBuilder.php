@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Queries;
+namespace App\Services;
 
 use App\Models\Order;
 use Illuminate\Http\Request;
 
 /**
- * Построитель запросов для таблицы заказов
+ * Построитель запросов для таблицы заказов социального такси
  * 
  * Этот класс инкапсулирует всю логику построения запросов к таблице orders,
  * включая фильтрацию, сортировку и работу с удаленными записями.
@@ -15,7 +15,7 @@ use Illuminate\Http\Request;
  * единственной ответственности (SRP).
  * 
  */
-class OrderQueryBuilder
+class SocialTaxiOrderBuilder
 {
     /**
      * @var \Illuminate\Database\Eloquent\Builder Экземпляр построителя запросов
@@ -53,47 +53,47 @@ class OrderQueryBuilder
      * @return self Возвращает себя для цепочного вызова
      */
     public function applyFilters(Request $request): self
-{
-    // Фильтрация
-    if ($request->filled('pz_nom')) {
-        $this->query->where('pz_nom', 'like', '%' . $request->input('pz_nom') . '%');
-    }
-    
-    if ($request->filled('type_order')) {
-        $this->query->where('type_order', $request->input('type_order'));
-    }
-    
-    // Фильтрация по статусу заказа
-    if ($request->filled('status_order_id')) {
-        $this->query->whereHas('currentStatus', function ($q) use ($request) {
-            $q->where('status_order_id', $request->input('status_order_id'));
-        });
-    }
-    
-    // Фильтрация по диапазону дат
-    $dateFrom = $request->input('date_from', '2016-08-01');
-    $dateTo = $request->input('date_to', date('Y-m-d'));
-    
-    // Фильтрация по оператору (user_id)
-    if ($request->filled('user_id')) {
-        $this->query->where('user_id', $request->input('user_id'));
-    }
-    
-    if ($dateFrom) {
-        $this->query->whereDate('pz_data', '>=', $dateFrom);
-    }
-    if ($dateTo) {
-        $this->query->whereDate('pz_data', '<=', $dateTo);
-    }
-    // Фильтрация по ФИО клиента
+    {
+        // Фильтрация
+        if ($request->filled('pz_nom')) {
+            $this->query->where('pz_nom', 'like', '%' . $request->input('pz_nom') . '%');
+        }
+        
+        if ($request->filled('type_order')) {
+            $this->query->where('type_order', $request->input('type_order'));
+        }
+        
+        // Фильтрация по статусу заказа
+        if ($request->filled('status_order_id')) {
+            $this->query->whereHas('currentStatus', function ($q) use ($request) {
+                $q->where('status_order_id', $request->input('status_order_id'));
+            });
+        }
+        
+        // Фильтрация по диапазону дат
+        $dateFrom = $request->input('date_from', '2016-08-01');
+        $dateTo = $request->input('date_to', date('Y-m-d'));
+        
+        // Фильтрация по оператору (user_id)
+        if ($request->filled('user_id')) {
+            $this->query->where('user_id', $request->input('user_id'));
+        }
+        
+        if ($dateFrom) {
+            $this->query->whereDate('pz_data', '>=', $dateFrom);
+        }
+        if ($dateTo) {
+            $this->query->whereDate('pz_data', '<=', $dateTo);
+        }
+        // Фильтрация по ФИО клиента
         if ($request->filled('client_fio')) {
             $this->query->whereHas('client', function ($q) use ($request) {
                 $q->where('fio', 'like', '%' . $request->input('client_fio') . '%');
             });
         }
-    
-    return $this;
-}
+        
+        return $this;
+    }
 
     /**
      * Применяет сортировку к запросу
