@@ -1,4 +1,4 @@
-<-- trip-history-scripts -->
+<!-- trip-history-scripts -->
 
 <script>
 // Функция для открытия модального окна с историей адресов
