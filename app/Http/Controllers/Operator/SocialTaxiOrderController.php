@@ -4,10 +4,6 @@ namespace App\Http\Controllers\Operator;
 
 use App\Models\Order;
 use App\Models\User;
-use App\Models\FioDtrn;
-use App\Models\Category;
-use App\Models\SkidkaDop;
-use App\Models\Taxi;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreSocialTaxiOrderRequest;
 use App\Http\Requests\UpdateSocialTaxiOrderRequest;
