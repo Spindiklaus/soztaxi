@@ -237,5 +237,67 @@ class SocialTaxiOrderService {
             'dopusConditions' => $dopusConditions,
         ];
     }
+    
+    /**
+     * Подготавливает данные для формы создания заказа.
+     * @param int $type
+     * @return array
+     */
+    public function getOrderCreateData(int $type): array
+    {
+
+        // Получаем список категорий
+        $categories = Category::where(function ($query) use ($type) {
+            switch ($type) {
+                case 1:
+                    $query->where('is_soz', 1);
+                    break;
+                case 2:
+                    $query->where('is_auto', 1);
+                    break;
+                case 3:
+                    $query->where('is_gaz', 1);
+                    break;
+            }
+        })->orderBy('nmv')->get();
+
+        // Получаем список операторов такси
+        $taxis = Taxi::where('life', 1)->orderBy('name')->get();
+        $defaultTaxiId = null;
+        if ($taxis->count() == 1) {
+            $defaultTaxiId = $taxis->first()->id;
+        }
+
+        // Получаем ID разрешенных категорий
+        $allowedCategoryIds = $categories->pluck('id')->toArray();
+
+        // Получаем список клиентов, которые имели заказы в разрешенных категориях
+        $clients = FioDtrn::whereNull('rip_at')
+            ->whereHas('orders', function ($query) use ($allowedCategoryIds) {
+                $query->whereIn('category_id', $allowedCategoryIds)
+                    ->whereNull('deleted_at')
+                    ->whereNull('cancelled_at');
+            })
+            ->orderBy('fio')
+            ->get();
+        
+        // Генерация номера заказа и времени
+        $orderNumber = generateOrderNumber($type, auth()->id());
+        $orderDateTime = now();
+
+        // Получаем список дополнительных условий
+        $dopusConditions = SkidkaDop::where('life', 1)->orderBy('name')->get();
+
+        return compact(
+            'type',
+            'clients',
+            'categories',
+            'taxis',
+            'defaultTaxiId',
+            'orderNumber',
+            'orderDateTime',
+            'dopusConditions'
+        );
+    }
 
 }

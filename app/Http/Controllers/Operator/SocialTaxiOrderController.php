@@ -174,93 +174,21 @@ class SocialTaxiOrderController extends BaseController {
         return redirect()->back()->with('error', 'Заказ не был удален.');
     }
 
-    // Показать форму создания заказа по типу
-    public function createByType($type) {
-        // Проверяем допустимый тип соцзаказа
+    /**
+     * Показать форму создания заказа по типу
+     * @param int $type
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
+     */
+    public function createByType(int $type) {
+        // Проверяем допустимый тип
         if (!in_array($type, self::ALLOWED_TYPES)) {
-            return redirect()->route('social-taxi-orders.index')
-                            ->with('error', 'Недопустимый тип заказа.');
+            return redirect()->route('social-taxi-orders.index')->with('error', 'Недопустимый тип заказа.');
         }
 
+        // Вызываем новый сервисный метод для получения данных
+        $data = $this->orderService->getOrderCreateData($type);
 
-        $categories = Category::where(function ($query) use ($type) {
-                    switch ($type) {
-                        case 1: // Соцтакси
-                            $query->where('is_soz', 1);
-                            break;
-                        case 2: // Легковое авто
-                            $query->where('is_auto', 1);
-                            break;
-                        case 3: // ГАЗель
-                            $query->where('is_gaz', 1);
-                            break;
-                    }
-                })
-                ->orderBy('nmv')
-                ->get();
-
-        // Получаем список операторов такси для выпадающего списка
-        $taxis = Taxi::where('life', 1) // Только действующие операторы такси
-                ->orderBy('name')
-                ->get();
-        // Если есть только один действующий оператор такси, устанавливаем его по умолчанию
-        $defaultTaxiId = null;
-        if ($taxis->count() == 1) {
-            $defaultTaxiId = $taxis->first()->id;
-        }
-
-        // Получаем ID разрешенных категорий
-        $allowedCategoryIds = $categories->pluck('id')->toArray();
-
-        // Получаем список клиентов, которые имели заказы в разрешенных категориях
-        $clients = FioDtrn::whereNull('rip_at') // Только живые клиенты
-                ->whereHas('orders', function ($query) use ($allowedCategoryIds) {
-                    $query->whereIn('category_id', $allowedCategoryIds)
-                    ->whereNull('deleted_at')
-                    ->whereNull('cancelled_at');
-                })
-                ->orderBy('fio')
-                ->get();
-
-        // Генерируем номер заказа заранее
-        $orderNumber = generateOrderNumber($type, auth()->id());
-        $orderDateTime = now();
-
-        // Получаем список дополнительных условий для скидок
-        $dopusConditions = SkidkaDop::where('life', 1) // Только действующие условия
-                ->orderBy('name')
-                ->get();
-
-        return view('social-taxi-orders.create-by-type', compact(
-                        'type',
-                        'clients',
-                        'categories',
-                        'taxis',
-                        'defaultTaxiId',
-                        'orderNumber',
-                        'orderDateTime',
-                        'dopusConditions' // дополнительные условия
-        ));
-    }
-
-    // Сохранить новый заказ по типу
-    public function storeByType(StoreSocialTaxiOrderByTypeRequest $request, $type) {
-        // Проверяем допустимый тип соцзаказа
-        if (!in_array($type, self::ALLOWED_TYPES)) {
-            return redirect()->route('social-taxi-orders.index')
-                            ->with('error', 'Недопустимый тип заказа.');
-        }
-
-        try {
-            $validated = $request->validated();
-            $order = $this->orderService->createOrderByType($validated, $type);
-
-            return redirect()->route('social-taxi-orders.show', $order)
-                            ->with('success', 'Заказ успешно создан.');
-        } catch (\Exception $e) {
-            return back()->with('error', 'Ошибка при создании заказа: ' . $e->getMessage())
-                            ->withInput();
-        }
+        return view('social-taxi-orders.create-by-type', $data);
     }
 
     // Получить данные клиента по AJAX
