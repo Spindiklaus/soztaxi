@@ -15,8 +15,15 @@ use App\Http\Requests\StoreSocialTaxiOrderByTypeRequest;
 use App\Services\SocialTaxiOrderService;
 use App\Services\SocialTaxiOrderBuilder;
 
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class SocialTaxiOrderController extends BaseController {
+
+    /**
+     * Константа для разрешенных типов заказа.
+     * 1 - Соцтакси, 2 - Легковое авто, 3 - ГАЗель
+     */
+    protected const ALLOWED_TYPES = [1, 2, 3];
 
     protected $queryBuilder; // 
     protected $orderService; // бизнес-логика (создание заказов, работа с данными)
@@ -65,58 +72,66 @@ class SocialTaxiOrderController extends BaseController {
 
     // Показать конкретный заказ
     public function show($id) {
-
 //        \Log::info('Попытка открыть заказ', ['order_id' => $id]);
-
         try {
-            // Сначала попробуем найти заказ
-            $order = Order::withTrashed()->find($id);
-            $taxi = Taxi::find($order->taxi_id);
-
-            if (!$order) {
-                \Log::warning('Заказ не найден', ['order_id' => $id]);
-                return redirect()->route('social-taxi-orders.index')
-                                ->with('error', 'Заказ не найден.');
-            }
-
-//            \Log::info('Найден заказ', ['order_id' => $order->id, 'deleted_at' => $order->deleted_at]);
-            // Загружаем все необходимые отношения
-            $order->load([
-                'client',
-                'category',
-                'dopus',
-                'statusHistory.statusOrder',
-                'statusHistory.user', // Загружаем пользователя для истории статусов
-                'user',
-                'taxi' // Загружаем оператора такси
-            ]);
-
-            // Получаем количество поездок клиента в месяце поездки
-            $tripCount = getClientTripsCountInMonthByVisitDate($order->client_id, $order->visit_data);
+            // Вызываем метод сервиса для получения всех необходимых данных
+            $data = $this->orderService->getOrderDetails($id);
 
             // Собираем параметры для кнопки "Назад"
             $backUrlParams = request()->only(['sort', 'direction', 'show_deleted', 'pz_nom', 'type_order', 'status_order_id', 'date_from', 'date_to']);
 
-            return view('social-taxi-orders.show', compact(
-                            'order',
-                            'tripCount',
-                            'backUrlParams', // Передаем параметры для кнопки "Назад"
-                            'taxi'
-            ));
+            // Передаем данные в представление, используя распаковку массива
+            return view('social-taxi-orders.show', array_merge($data, ['backUrlParams' => $backUrlParams]));
+        } catch (ModelNotFoundException $e) {
+            // Обработка случая, когда заказ не найден
+            \Log::warning('Заказ не найден', ['order_id' => $id]);
+            return redirect()->route('social-taxi-orders.index')->with('error', $e->getMessage());
         } catch (\Exception $e) {
-            return redirect()->route('social-taxi-orders.index')
-                            ->with('error', 'ЗПроизошла ошибка при открытии заказа.');
+            // Помещаем ошибку в лог с уровнем 'error'.
+            // Вторым аргументом можно передать массив контекстных данных.
+            \Log::error('Ошибка при открытии заказа: ' . $e->getMessage(), [
+                'exception' => $e,
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return redirect()->route('social-taxi-orders.index')->with('error', 'Произошла ошибка при открытии заказа.');
         }
     }
 
     // Показать форму редактирования заказа
-    public function edit(Order $order) {
-        dd(__METHOD__);        
+    public function edit(Order $social_taxi_order) {
+        try {
+            $data = $this->orderService->getOrderEditData($social_taxi_order->id);
+
+            // Передаем параметры для кнопки "Назад", если они нужны
+            $backUrlParams = request()->only(['sort', 'direction', 'show_deleted', 'pz_nom', 'type_order', 'status_order_id', 'date_from', 'date_to']);
+
+            return view('social-taxi-orders.edit', array_merge($data, ['backUrlParams' => $backUrlParams]));
+        } catch (ModelNotFoundException $e) {
+            \Log::error('Заказ для редактирования не найден.', ['order_id' => $social_taxi_order->id]);
+            return redirect()->route('social-taxi-orders.index')->with('error', $e->getMessage());
+        } catch (\Exception $e) {
+            \Log::error('Ошибка при подготовке формы редактирования заказа.', ['order_id' => $social_taxi_order->id, 'exception' => $e]);
+            return redirect()->back()->with('error', 'Произошла ошибка при открытии формы редактирования.');
+        }
     }
 
     // Обновить заказ
-    public function update(UpdateSocialTaxiOrderRequest $request, Order $order) { 
-        dd(__METHOD__);
+    public function update(UpdateSocialTaxiOrderRequest $request, Order $order) {
+//        dd(__METHOD__);
+        try {
+            $validated = $request->validated();
+
+            // Передаем в сервис валидированные данные и объект заказа для обновления
+            $this->orderService->updateOrder($order, $validated);
+
+            return redirect()->route('social-taxi-orders.show', $order)
+                            ->with('success', 'Заказ успешно обновлен.');
+        } catch (\Exception $e) {
+            \Log::error('Ошибка при обновлении заказа.', ['order_id' => $order->id, 'exception' => $e]);
+            return back()->with('error', 'Ошибка при обновлении заказа: ' . $e->getMessage())
+                            ->withInput();
+        }
     }
 
     // Удалить заказ (мягкое удаление)
@@ -161,9 +176,8 @@ class SocialTaxiOrderController extends BaseController {
 
     // Показать форму создания заказа по типу
     public function createByType($type) {
-        // Проверяем допустимый тип
-        $allowedTypes = [1, 2, 3]; // 1 - Соцтакси, 2 - Легковое авто, 3 - ГАЗель
-        if (!in_array($type, $allowedTypes)) {
+        // Проверяем допустимый тип соцзаказа
+        if (!in_array($type, self::ALLOWED_TYPES)) {
             return redirect()->route('social-taxi-orders.index')
                             ->with('error', 'Недопустимый тип заказа.');
         }
@@ -231,9 +245,8 @@ class SocialTaxiOrderController extends BaseController {
 
     // Сохранить новый заказ по типу
     public function storeByType(StoreSocialTaxiOrderByTypeRequest $request, $type) {
-        // Проверяем допустимый тип
-        $allowedTypes = [1, 2, 3]; // 1 - Соцтакси, 2 - Легковое авто, 3 - ГАЗель
-        if (!in_array($type, $allowedTypes)) {
+        // Проверяем допустимый тип соцзаказа
+        if (!in_array($type, self::ALLOWED_TYPES)) {
             return redirect()->route('social-taxi-orders.index')
                             ->with('error', 'Недопустимый тип заказа.');
         }
@@ -246,7 +259,7 @@ class SocialTaxiOrderController extends BaseController {
                             ->with('success', 'Заказ успешно создан.');
         } catch (\Exception $e) {
             return back()->with('error', 'Ошибка при создании заказа: ' . $e->getMessage())
-                        ->withInput();
+                            ->withInput();
         }
     }
 
@@ -261,4 +274,5 @@ class SocialTaxiOrderController extends BaseController {
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
 }

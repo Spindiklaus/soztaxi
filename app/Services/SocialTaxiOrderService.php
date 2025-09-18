@@ -6,14 +6,19 @@ use App\Models\Order;
 use App\Models\FioDtrn;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Models\Category;
+use App\Models\Taxi;
+use App\Models\SkidkaDop;
 
-class SocialTaxiOrderService
-{
+
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+
+class SocialTaxiOrderService {
+
     /**
      * Создание заказа по типу
      */
-    public function createOrderByType(array $validatedData, int $type)
-    {
+    public function createOrderByType(array $validatedData, int $type) {
         DB::beginTransaction();
         try {
             // Используем номер заказа из формы
@@ -39,21 +44,17 @@ class SocialTaxiOrderService
         } catch (\Exception $e) {
             DB::rollback();
             Log::error("Ошибка при создании заказа", [
-                'error' => $e->getMessage(), 
+                'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
             throw $e;
         }
     }
-    
 
-   
-
-        /**
+    /**
      * Получение данных клиента
      */
-    public function getClientData(int $clientId, int $typeOrder = 1)
-    {
+    public function getClientData(int $clientId, int $typeOrder = 1) {
         try {
             // Получаем клиента
             $client = FioDtrn::find($clientId);
@@ -63,22 +64,22 @@ class SocialTaxiOrderService
 
             // Получаем последние данные из предыдущих заказов клиента
             $lastOrder = Order::where('client_id', $clientId)
-                ->where('type_order', $typeOrder)
-                ->whereNotNull('visit_data')
-                ->whereNull('deleted_at')
-                ->whereNull('cancelled_at')
-                ->orderBy('visit_data', 'desc')
-                ->first();
+                    ->where('type_order', $typeOrder)
+                    ->whereNotNull('visit_data')
+                    ->whereNull('deleted_at')
+                    ->whereNull('cancelled_at')
+                    ->orderBy('visit_data', 'desc')
+                    ->first();
 
             // Получаем категории клиента из предыдущих заказов
             $clientCategories = Order::where('client_id', $clientId)
-                ->where('type_order', $typeOrder)
-                ->whereNotNull('category_id')
-                ->whereNull('deleted_at')
-                ->whereNull('cancelled_at')
-                ->distinct()
-                ->pluck('category_id')
-                ->toArray();
+                    ->where('type_order', $typeOrder)
+                    ->whereNotNull('category_id')
+                    ->whereNull('deleted_at')
+                    ->whereNull('cancelled_at')
+                    ->distinct()
+                    ->pluck('category_id')
+                    ->toArray();
 
             return [
                 'client' => [
@@ -88,15 +89,15 @@ class SocialTaxiOrderService
                     'rip_at' => $client->rip_at,
                 ],
                 'last_order_data' => $lastOrder ? [
-                    'client_tel' => $lastOrder->client_tel,
-                    'client_invalid' => $lastOrder->client_invalid,
-                    'client_sopr' => $lastOrder->client_sopr,
-                    'category_id' => $lastOrder->category_id,
-                    'category_skidka' => $lastOrder->category_skidka,
-                    'category_limit' => $lastOrder->category_limit,
-                    'dopus_id' => $lastOrder->dopus_id,
-                    'skidka_dop_all' => $lastOrder->skidka_dop_all,
-                    'kol_p_limit' => $lastOrder->kol_p_limit,
+            'client_tel' => $lastOrder->client_tel,
+            'client_invalid' => $lastOrder->client_invalid,
+            'client_sopr' => $lastOrder->client_sopr,
+            'category_id' => $lastOrder->category_id,
+            'category_skidka' => $lastOrder->category_skidka,
+            'category_limit' => $lastOrder->category_limit,
+            'dopus_id' => $lastOrder->dopus_id,
+            'skidka_dop_all' => $lastOrder->skidka_dop_all,
+            'kol_p_limit' => $lastOrder->kol_p_limit,
                 ] : null,
                 'client_categories' => $clientCategories,
             ];
@@ -104,12 +105,11 @@ class SocialTaxiOrderService
             throw new \Exception('Ошибка получения данных клиента: ' . $e->getMessage());
         }
     }
-    
-     /**
+
+    /**
      * Подготовка данных заказа
      */
-    private function prepareOrderData(array $validatedData): array
-    {
+    private function prepareOrderData(array $validatedData): array {
         return [
             'type_order' => (int) ($validatedData['type_order'] ?? 1),
             'client_id' => (int) ($validatedData['client_id'] ?? 0),
@@ -130,15 +130,15 @@ class SocialTaxiOrderService
             'zena_type' => (int) ($validatedData['zena_type'] ?? 1),
             'visit_data' => $validatedData['visit_data'] ?? null,
             'predv_way' => isset($validatedData['predv_way']) && $validatedData['predv_way'] !== '' && $validatedData['predv_way'] !== null ?
-                (float) str_replace(',', '.', $validatedData['predv_way']) : null,
+            (float) str_replace(',', '.', $validatedData['predv_way']) : null,
             'taxi_id' => !empty($validatedData['taxi_id']) ? (int) $validatedData['taxi_id'] : null,
             'taxi_sent_at' => $validatedData['taxi_sent_at'] ?? null,
             'taxi_price' => isset($validatedData['taxi_price']) && $validatedData['taxi_price'] !== '' && $validatedData['taxi_price'] !== null ?
-                (float) str_replace(',', '.', $validatedData['taxi_price']) : null,
+            (float) str_replace(',', '.', $validatedData['taxi_price']) : null,
             'taxi_vozm' => isset($validatedData['taxi_vozm']) && $validatedData['taxi_vozm'] !== '' && $validatedData['taxi_vozm'] !== null ?
-                (float) str_replace(',', '.', $validatedData['taxi_vozm']) : null,
+            (float) str_replace(',', '.', $validatedData['taxi_vozm']) : null,
             'taxi_way' => isset($validatedData['taxi_way']) && $validatedData['taxi_way'] !== '' && $validatedData['taxi_way'] !== null ?
-                (float) str_replace(',', '.', $validatedData['taxi_way']) : null,
+            (float) str_replace(',', '.', $validatedData['taxi_way']) : null,
             'cancelled_at' => $validatedData['otmena_data'] ?? null,
             'otmena_taxi' => (int) ($validatedData['otmena_taxi'] ?? 0),
             'closed_at' => $validatedData['closed_at'] ?? null,
@@ -150,12 +150,11 @@ class SocialTaxiOrderService
             'visit_obratno' => $validatedData['visit_obratno'] ?? null,
         ];
     }
-    
+
     /**
      * Установка начального статуса заказа
      */
-    private function setInitialStatus(Order $order, int $statusId)
-    {
+    private function setInitialStatus(Order $order, int $statusId) {
         DB::table('order_status_histories')->insert([
             'order_id' => $order->id,
             'status_order_id' => $statusId,
@@ -163,6 +162,80 @@ class SocialTaxiOrderService
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+    }
+
+    /**
+     * Возвращает детали заказа для отображения.
+     *
+     * @param int $id
+     * @return array
+     * @throws ModelNotFoundException
+     */
+    public function getOrderDetails(int $id): array {
+        // Поиск заказа с удаленными записями
+        $order = Order::withTrashed()->find($id);
+
+        if (!$order) {
+            // Бросаем исключение, которое может быть обработано в контроллере или глобально
+            throw new ModelNotFoundException('Заказ не найден.');
+        }
+
+        // Загружаем все необходимые отношения
+        $order->load([
+            'client',
+            'category',
+            'dopus',
+            'statusHistory.statusOrder',
+            'statusHistory.user',
+            'user',
+            'taxi'
+        ]);
+        $tripCount = getClientTripsCountInMonthByVisitDate($order->client_id, $order->visit_data);
+
+        // Возвращаем массив данных, готовый для передачи в представление
+        return [
+            'order' => $order,
+            'tripCount' => $tripCount,
+            'taxi' => $order->taxi // Такси уже загружено через load()
+        ];
+    }
+
+    public function getOrderEditData(int $id): array {
+        $order = Order::find($id);
+
+        if (!$order) {
+            throw new ModelNotFoundException('Заказ не найден.');
+        }
+
+        // Загружаем только необходимые отношения
+        $order->load(['client', 'category', 'dopus']);
+
+        // Получаем списки для выпадающих меню
+        $categories = Category::where(function ($query) use ($order) {
+                    // Убедитесь, что логика здесь соответствует вашей
+                    switch ($order->type_order) {
+                        case 1:
+                            $query->where('is_soz', 1);
+                            break;
+                        case 2:
+                            $query->where('is_auto', 1);
+                            break;
+                        case 3:
+                            $query->where('is_gaz', 1);
+                            break;
+                    }
+                })->orderBy('nmv')->get();
+
+        $taxis = Taxi::where('life', 1)->orderBy('name')->get();
+        $dopusConditions = SkidkaDop::where('life', 1)->orderBy('name')->get();
+
+        return [
+            'order' => $order,
+            'clients' => FioDtrn::orderBy('fio')->get(), // Получаем всех клиентов
+            'categories' => $categories,
+            'taxis' => $taxis,
+            'dopusConditions' => $dopusConditions,
+        ];
     }
 
 }
