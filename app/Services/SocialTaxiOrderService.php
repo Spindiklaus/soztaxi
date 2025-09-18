@@ -10,7 +10,7 @@ use App\Models\Category;
 use App\Models\Taxi;
 use App\Models\SkidkaDop;
 
-
+use App\Http\Requests\StoreSocialTaxiOrderByTypeRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class SocialTaxiOrderService {

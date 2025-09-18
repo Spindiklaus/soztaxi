@@ -174,11 +174,7 @@ class SocialTaxiOrderController extends BaseController {
         return redirect()->back()->with('error', 'Заказ не был удален.');
     }
 
-    /**
-     * Показать форму создания заказа по типу
-     * @param int $type
-     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
-     */
+    // Показать форму создания заказа по типу
     public function createByType(int $type) {
         // Проверяем допустимый тип
         if (!in_array($type, self::ALLOWED_TYPES)) {
@@ -189,6 +185,25 @@ class SocialTaxiOrderController extends BaseController {
         $data = $this->orderService->getOrderCreateData($type);
 
         return view('social-taxi-orders.create-by-type', $data);
+    }
+    // Сохранить новый заказ по типу
+    public function storeByType(StoreSocialTaxiOrderByTypeRequest $request, $type) {
+        // Проверяем допустимый тип соцзаказа
+        if (!in_array($type, self::ALLOWED_TYPES)) {
+            return redirect()->route('social-taxi-orders.index')
+                            ->with('error', 'Недопустимый тип заказа.');
+        }
+
+        try {
+            $validated = $request->validated();
+            $order = $this->orderService->createOrderByType($validated, $type);
+
+            return redirect()->route('social-taxi-orders.show', $order)
+                            ->with('success', 'Заказ успешно создан.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Ошибка при создании заказа: ' . $e->getMessage())
+                            ->withInput();
+        }
     }
 
     // Получить данные клиента по AJAX
