@@ -50,6 +50,35 @@ class SocialTaxiOrderService {
             throw $e;
         }
     }
+    
+    /**
+     * Обновление заказа
+     */
+    public function updateOrder(Order $order, array $validatedData) {
+        DB::beginTransaction();
+        try {
+            // Подготавливаем данные для обновления заказа
+            $orderData = $this->prepareOrderData($validatedData);
+
+            // Обновляем заказ
+            $order->update($orderData);
+
+            DB::commit();
+
+            return $order;
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error("Ошибка при обновлении заказа", [
+                'order_id' => $order->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            throw $e;
+        }
+    }
+
+    
+    
 
     /**
      * Получение данных клиента

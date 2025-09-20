@@ -153,12 +153,12 @@
                         <h2 class="text-lg font-semibold text-gray-800">
                             <span class="text-lg">
                                 <span class="font-medium text-gray-700">Скидка </span>
-                                <span class="text-red-600 font-semibold">{{ $order->category ? $order->category->skidka . '%' : '0%' }}</span>
+                                <span class="text-red-600 font-semibold">{{ $order->kidka_dop_all . '%' ?? '0%' }}</span>
                             </span>
 
                             <span class="text-lg">
                                 <span class="font-medium text-gray-700">лимит </span>
-                                <span class="text-red-600 font-semibold">{{ $order->category ? $order->category->kol_p : '0' }} поездок/мес</span>
+                                <span class="text-red-600 font-semibold">{{$order->kol_p_limit ?? '0' }} поездок/мес</span>
                             </span>
 
                             @if($order->category && $order->category->kat_dop)

@@ -113,18 +113,18 @@ class SocialTaxiOrderController extends BaseController {
     }
 
     // Обновить заказ
-    public function update(UpdateSocialTaxiOrderRequest $request, Order $order) {
+    public function update(UpdateSocialTaxiOrderRequest $request, Order $social_taxi_order) {
 //        dd(__METHOD__);
         try {
             $validated = $request->validated();
 
             // Передаем в сервис валидированные данные и объект заказа для обновления
-            $this->orderService->updateOrder($order, $validated);
+            $this->orderService->updateOrder($social_taxi_order, $validated);
 
-            return redirect()->route('social-taxi-orders.show', $order)
+            return redirect()->route('social-taxi-orders.show', $social_taxi_order)
                             ->with('success', 'Заказ успешно обновлен.');
         } catch (\Exception $e) {
-            \Log::error('Ошибка при обновлении заказа.', ['order_id' => $order->id, 'exception' => $e]);
+            \Log::error('Ошибка при обновлении заказа.', ['order_id' => $social_taxi_order->id, 'exception' => $e]);
             return back()->with('error', 'Ошибка при обновлении заказа: ' . $e->getMessage())
                             ->withInput();
         }
