@@ -1,3 +1,5 @@
+<!-- social-taxi-orders.index-components/table.blade.php -->
+
 <div x-data="{
      sortField: '{{ $sort ?? 'pz_data' }}',
      sortDirection: '{{ $direction ?? 'desc' }}',

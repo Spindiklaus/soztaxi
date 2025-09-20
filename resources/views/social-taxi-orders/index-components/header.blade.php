@@ -1,6 +1,7 @@
 <div class="flex justify-between items-center mb-6">
     <h1 class="text-3xl font-bold text-gray-800">Заказы</h1>
 
+    <!-- social-taxi-orders.index-components/header.blade.php -->
     <div class="space-x-2 flex relative">
         <a href="{{ route('import.orders.form') }}"
            class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-white hover:bg-green-700"
