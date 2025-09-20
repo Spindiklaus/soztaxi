@@ -1,3 +1,4 @@
+<!-- trip-info.blade.php -->
 <script>
 // Функции работы с информацией о поездках
 function updateClientTripsInfo(clientId, visitDate) {
