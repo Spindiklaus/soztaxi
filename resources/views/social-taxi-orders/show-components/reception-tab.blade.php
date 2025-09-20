@@ -153,7 +153,7 @@
                         <h2 class="text-lg font-semibold text-gray-800">
                             <span class="text-lg">
                                 <span class="font-medium text-gray-700">Скидка </span>
-                                <span class="text-red-600 font-semibold">{{ $order->kidka_dop_all . '%' ?? '0%' }}</span>
+                                <span class="text-red-600 font-semibold">{{ $order->skidka_dop_all . '%' ?? '0%' }}</span>
                             </span>
 
                             <span class="text-lg">

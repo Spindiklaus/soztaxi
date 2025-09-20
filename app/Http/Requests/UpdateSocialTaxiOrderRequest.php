@@ -183,16 +183,21 @@ class UpdateSocialTaxiOrderRequest extends FormRequest
         if (!empty($this->client_id) && $value) {
             $startTime = $visitTime->copy()->subHour();
             $endTime = $visitTime->copy()->addHour();
-
+            
+            // Получаем ID текущего заказа из параметров маршрута
+            $currentOrderId = $this->route('social_taxi_order')->id;
             $existingOrder = \App\Models\Order::where('client_id', $this->client_id)
                 ->whereBetween('visit_data', [$startTime, $endTime])
                 ->whereNull('deleted_at')
+                ->whereNull('cancelled_at')
+                ->where('id', '!=', $currentOrderId)  // Исключаем текущий заказ  
                 ->first();
 
             if ($existingOrder) {
                 $existingTime = Carbon::parse($existingOrder->visit_data)->format('d.m.Y H:i');
                 $fail("У данного клиента уже есть поездка на {$existingTime}. Нельзя создавать поездки в течение часа друг от друга.");
             }
+            \Log::debug('Current order ID:', ['id' => $currentOrderId]);
         }
     }
 

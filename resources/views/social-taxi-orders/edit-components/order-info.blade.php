@@ -30,26 +30,26 @@
         </div>
         
         <div>
-            <label class="block text-sm font-medium text-gray-700">Оператор</label>
+            <label class="block text-sm font-medium text-gray-700">Оператор приема</label>
             <div class="mt-1 bg-gray-100 p-2 rounded-md font-medium">
-                {{ auth()->user()->name ?? 'Неизвестный оператор' }} ({{ auth()->user()->litera ?? 'UNK' }})
+                {{  $order->user_id }}
             </div>
             <!-- Скрытое поле для передачи ID оператора в форму -->
-            <input type="hidden" name="user_id" value="{{ auth()->id() ?? 1 }}">
+            <input type="hidden" name="user_id" value="{{ $order->user_id}}">
         </div>
     </div>
     
     <!-- Количество поездок клиента - в одной строке -->
-    <div id="client-trips-info" class="mt-4 p-3 bg-white rounded-lg border border-gray-200" style="display: none;">
+    <div id="client-trips-info" class="mt-4 p-3 bg-white rounded-lg border border-gray-200" style="display: block;">
         <div class="flex flex-wrap items-center gap-4">
             <div class="flex items-center">
                 <span class="text-sm font-medium text-gray-700">Всего поездок:</span>
                 <button 
                     id="client-trips-button"
                     type="button"
-                    onclick="showClientTrips(0, '')"
+                    onclick="showClientTrips({{$order->client_id}}, '{{$order->visit_data->format('Y-m')}}')"
                     class="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors">
-                    0
+                     <span class="loading">Загрузка...</span>
                 </button>
             </div>
 
@@ -58,9 +58,9 @@
                 <button 
                     id="client-actual-trips-button"
                     type="button"
-                    onclick="showClientActualTrips(0, '')"
+                    onclick="showClientActualTrips({{$order->client_id}}, '{{$order->visit_data->format('Y-m')}}')"
                     class="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800 hover:bg-green-200 transition-colors">
-                    0
+                     <span class="loading">Загрузка...</span>
                 </button>
             </div>
 
@@ -69,9 +69,9 @@
                 <button 
                     id="client-taxi-sent-trips-button"
                     type="button"
-                    onclick="showClientTaxiSentTrips(0, '')"
+                    onclick="showClientTaxiSentTrips({{$order->client_id}}, '{{$order->visit_data->format('Y-m')}}')"
                     class="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-800 hover:bg-yellow-200 transition-colors">
-                    0
+                     <span class="loading">Загрузка...</span>
                 </button>
             </div>
         </div>

@@ -7,7 +7,7 @@
         <div>
             <label for="dopus_id" class="block text-sm font-medium text-gray-700">Дополнительные условия для скидок</label>
             <select name="dopus_id" id="dopus_id"
-                     @if($order->zena_type != 1) readonly disabled @endif
+                      readonly disabled
                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 <option value="">Выберите дополнительные условия</option>
                 @foreach($dopusConditions as $dopus)

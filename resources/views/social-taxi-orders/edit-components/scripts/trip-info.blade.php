@@ -1,3 +1,5 @@
+<!-- trip-info.blade.php -->
+
 <script>
 // Функции работы с информацией о поездках
 function updateClientTripsInfo(clientId, visitDate) {
@@ -99,11 +101,24 @@ function updateTripsInfoOnDateChange() {
     }
 }
 
+// Добавляем инициализацию при загрузке страницы
+document.addEventListener('DOMContentLoaded', function () {
+    // Если у заказа уже есть клиент и дата поездки, загружаем данные
+    @if($order->client_id && $order->visit_data)
+        setTimeout(() => {
+            const clientId = {{ $order->client_id }};
+            const visitDate = '{{ $order->visit_data->format('Y-m-d') }}';
+            updateClientTripsInfo(clientId, visitDate);
+        }, 100);
+    @endif
+});
+
+
 // Функция для скрытия информации о поездках
 function hideClientTripsInfo() {
     const clientTripsInfo = document.getElementById('client-trips-info');
     if (clientTripsInfo) {
-        clientTripsInfo.style.display = 'none';
+        clientTripsInfo.style.display = 'block';
     }
 }
 </script>

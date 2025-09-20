@@ -162,7 +162,7 @@ function displayClientTrips(data, type = 'normal') {
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Тип заказа<br>Номер заказа<</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Тип заказа<br>Номер заказа</th>
                         <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Дата поездки</th>
                         <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Откуда</th>
                         <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Куда</th>
@@ -194,9 +194,12 @@ function displayClientTrips(data, type = 'normal') {
         let visitDate = '-';
         let visitTime = '';
         if (trip.visit_data) {
-            const dateObj = new Date(trip.visit_data);
-            visitDate = dateObj.toLocaleDateString('ru-RU');
-            visitTime = dateObj.toLocaleTimeString('ru-RU', {hour: '2-digit', minute:'2-digit'});
+            // Извлекаем дату и время напрямую из строки ISO без учета часовых поясов
+            const dateTimeParts = trip.visit_data.split('T');
+            if (dateTimeParts.length > 1) {
+                visitDate = dateTimeParts[0].split('-').reverse().join('.'); // YYYY-MM-DD to DD.MM.YYYY
+                visitTime = dateTimeParts[1].substring(0, 5); // HH:MM:SS to HH:MM
+            }
         }
         
         tripsHtml += `

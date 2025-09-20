@@ -187,6 +187,7 @@ class StoreSocialTaxiOrderByTypeRequest extends FormRequest
             $existingOrder = \App\Models\Order::where('client_id', $this->client_id)
                 ->whereBetween('visit_data', [$startTime, $endTime])
                 ->whereNull('deleted_at')
+                ->whereNull('cancelled_at')    
                 ->first();
 
             if ($existingOrder) {
