@@ -1,4 +1,4 @@
-<!-- Функция для обновления цены поездки и суммы возмещения taxi-type.blade.php -->
+<!-- Функция для обновления цены поездки и суммы возмещения taxi-type.blade.php
 <script>
 function updateTaxiPriceAndCompensation() {
     const typeOrder = {{ $order->zena_type }}; // Тип заказа из PHP

@@ -26,7 +26,7 @@
                 {{ getOrderTypeName($order->zena_type) }}
             </div>
             <!-- Скрытое поле для передачи типа в форму -->
-            <input type="hidden" name="type_order" value="{{$order->zena_type }}">
+            <input type="hidden" name="type_order" value="{{$order->type_order }}">
         </div>
         
         <div>
