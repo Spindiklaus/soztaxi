@@ -6,38 +6,39 @@
     <div class="space-y-4">
         <div>
             <label for="client_id" class="block text-sm font-medium text-gray-700">Клиент *</label>
-            <select name="client_id" id="client_id" required readonly disabled
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                <option value="">Выберите клиента</option>
-                @foreach($clients as $client)
-                <option value="{{ $client->id }}" {{ old('client_id', $order->client_id) == $client->id ? 'selected' : '' }}>
-                    {{ $client->fio }} (#{{ $client->id }})
-                </option>
-                @endforeach
+            <select name="client_id" id="client_id" required
+                    disabled readonly
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 cursor-not-allowed focus:border-blue-500 focus:ring-blue-500">
+                @if($client)
+                    <option value="{{ $client->id }}" selected>
+                        {{ $client->fio }} (#{{ $client->id }})
+                    </option>
+                @else
+                    <option value="">Клиент не найден</option>
+                @endif
             </select>
-             <input type="hidden" name="client_id" value="{{$order->client_id}}">
+            <input type="hidden" name="client_id" value="{{ old('client_id', $order->client_id) }}">
+            <p class="mt-1 text-xs text-gray-500">Клиент не может быть изменен при редактировании заказа</p>
             @error('client_id')
             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
             @enderror
         </div>
 
-        <div>
+       <div>
             <label for="category_id" class="block text-sm font-medium text-gray-700">Категория инвалидности *</label>
-            <select name="category_id" id="category_id" required disabled
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                <option value="">Выберите категорию</option>
-                @foreach($categories as $category)
-                <option value="{{ $category->id }}" 
-                        data-kat-dop="{{ $category->kat_dop }}"
-                        {{ old('category_id', $order->category_id) == $category->id ? 'selected' : '' }}>
-                    {{ $category->nmv }} - {{ $category->name }} (Скидка: {{ $category->skidka }}%, Лимит: {{ $category->kol_p }} поездок/мес)
-                    @if($category->kat_dop == 2)
-                        [Категория 2]
-                    @endif                    
-                </option>
-                @endforeach
+            <select name="category_id" id="category_id" required
+                    disabled readonly
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 cursor-not-allowed focus:border-blue-500 focus:ring-blue-500">
+                @if($category)
+                    <option value="{{ $category->id }}" selected>
+                        {{ $category->nmv }} - {{ $category->name }} (Скидка: {{ $category->skidka }}%, Лимит: {{ $category->kol_p }} поездок/мес)
+                    </option>
+                @else
+                    <option value="">Категория не найдена</option>
+                @endif
             </select>
-            <input type="hidden" name="category_id" value="{{$order->category_id}}">
+            <input type="hidden" name="category_id" value="{{ old('category_id', $order->category_id) }}">
+            <p class="mt-1 text-xs text-gray-500">Категория не может быть изменена при редактировании заказа</p>
             @error('category_id')
             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
             @enderror

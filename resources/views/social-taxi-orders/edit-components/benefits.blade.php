@@ -9,13 +9,13 @@
             <select name="dopus_id" id="dopus_id"
                       readonly disabled
                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                <option value="">Выберите дополнительные условия</option>
-                @foreach($dopusConditions as $dopus)
+                @if($dopus)
                 <option value="{{ $dopus->id }}" {{ old('dopus_id', $order->dopus_id) == $dopus->id ? 'selected' : '' }}>
                     {{ $dopus->name }} (Скидка: {{ $dopus->skidka }}%, Лимит: {{ $dopus->kol_p }} поездок/мес)
                 </option>
-                @endforeach
+                @endif
             </select>
+             <input type="hidden" name="dopus_id" value="{{ old('dopus_id', $order->dopus_id) }}">
              @if($order->zena_type != 1)
                 <p class="mt-1 text-xs text-gray-500">Дополнительные условия доступны только для соцтакси</p>
              @endif

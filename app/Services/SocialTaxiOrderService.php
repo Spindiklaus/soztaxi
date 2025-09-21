@@ -77,9 +77,6 @@ class SocialTaxiOrderService {
         }
     }
 
-    
-    
-
     /**
      * Получение данных клиента
      */
@@ -229,6 +226,9 @@ class SocialTaxiOrderService {
         ];
     }
 
+    /**
+     * редактирование заказа
+     */
     public function getOrderEditData(int $id): array {
         $order = Order::find($id);
 
@@ -238,32 +238,20 @@ class SocialTaxiOrderService {
 
         // Загружаем только необходимые отношения
         $order->load(['client', 'category', 'dopus']);
-
-        // Получаем списки для выпадающих меню
-        $categories = Category::where(function ($query) use ($order) {
-                    // Убедитесь, что логика здесь соответствует вашей
-                    switch ($order->type_order) {
-                        case 1:
-                            $query->where('is_soz', 1);
-                            break;
-                        case 2:
-                            $query->where('is_auto', 1);
-                            break;
-                        case 3:
-                            $query->where('is_gaz', 1);
-                            break;
-                    }
-                })->orderBy('nmv')->get();
-
+        
+        // Для редактирования получаем только клиента и категорию из текущего заказа
+        $client = FioDtrn::find($order->client_id);
+        $category = Category::find($order->category_id);
+        // Получаем списки для выпадающих меню (только активные записи)
         $taxis = Taxi::where('life', 1)->orderBy('name')->get();
-        $dopusConditions = SkidkaDop::where('life', 1)->orderBy('name')->get();
+        $dopus = SkidkaDop::find($order->dopus_id); // Получаем текущие дополнительные условия
 
         return [
             'order' => $order,
-            'clients' => FioDtrn::orderBy('fio')->get(), // Получаем всех клиентов
-            'categories' => $categories,
+            'client' => $client, 
+            'category' => $category,
             'taxis' => $taxis,
-            'dopusConditions' => $dopusConditions,
+            'dopus' => $dopus, 
         ];
     }
     

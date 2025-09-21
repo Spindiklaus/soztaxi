@@ -1,4 +1,4 @@
-<<script>
+<script>
 // Функции работы с данными клиента
 function fetchClientData(clientId, typeOrder) {
     // Используем API маршрут

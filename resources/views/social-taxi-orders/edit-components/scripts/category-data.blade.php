@@ -1,3 +1,5 @@
+<!--category-data.blade.php -->
+
 <script>
 // Функции работы с данными категории
 function fetchCategoryData(categoryId) {

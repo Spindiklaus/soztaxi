@@ -217,7 +217,7 @@ class StoreSocialTaxiOrderByTypeRequest extends FormRequest
         $type = $this->route('type');
         // Для легкового авто и ГАЗели скидка должна быть 100%
         if (($type == 2 || $type == 3) && $value != 100) {
-            $fail('Для легкового авто и ГАЗели скидка должна быть 100%.');
+            $fail('Для легкового авто и ГАЗели скидка должна быть всегда 100%.');
         }
     }
 

@@ -1,3 +1,5 @@
+<!--dopus-data.blade.php -->
+
 <script>
 // Функции работы с дополнительными условиями
 function fetchDopusData(dopusId) {
