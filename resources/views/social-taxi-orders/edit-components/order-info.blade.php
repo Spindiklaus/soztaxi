@@ -32,7 +32,10 @@
         <div>
             <label class="block text-sm font-medium text-gray-700">Оператор приема</label>
             <div class="mt-1 bg-gray-100 p-2 rounded-md font-medium">
-                {{  $order->user_id }}
+                {{ $order->user->name ?? 'Неизвестный оператор' }} 
+                @if($order->user)
+                    ({{ $order->user->litera ?? 'UNK' }})
+                @endif
             </div>
             <!-- Скрытое поле для передачи ID оператора в форму -->
             <input type="hidden" name="user_id" value="{{ $order->user_id}}">

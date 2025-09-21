@@ -118,12 +118,15 @@ class SocialTaxiOrderController extends BaseController {
         try {
             $validated = $request->validated();
             
-            // Добавим отладку для проверки, приходит ли поле
-        \Log::info('Сохранение заказа', [
-            'visit_obratno_in_request' => $request->visit_obratno,
-            'visit_obratno_in_validated' => $validated['visit_obratno'] ?? 'not_set',
-            'all_data' => $validated
-        ]);
+            // Игнорируем значения из hidden полей и берем их из оригинального заказа на всякий случай
+            $validated['user_id'] = $social_taxi_order->user_id; // Оригинальный оператор
+            $validated['pz_nom'] = $social_taxi_order->pz_nom;   // Оригинальный номер
+            $validated['pz_data'] = $social_taxi_order->pz_data;  // Оригинальная дата
+            $validated['type_order'] = $social_taxi_order->type_order; // Оригинальный тип            
+            $validated['client_id'] = $social_taxi_order->client_id; 
+            $validated['categoty_id'] = $social_taxi_order->category_id; 
+            $validated['kol_limit_all'] = $social_taxi_order->kol_limit_all; 
+            $validated['skidka_dop_all'] = $social_taxi_order->skidka_dop_all; 
 
             // Передаем в сервис валидированные данные и объект заказа для обновления
             $this->orderService->updateOrder($social_taxi_order, $validated);
