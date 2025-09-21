@@ -62,6 +62,7 @@ class ClientTripController extends Controller {
                 ->select([
                     'id',
                     'visit_data',
+                    'visit_obratno',
                     'adres_otkuda',
                     'adres_kuda', 
                     'adres_obratno',

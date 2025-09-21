@@ -118,6 +118,8 @@ function displayClientTrips(data, type = 'normal') {
     if (!content) return;
     
     const { trips, clientName, count, period } = data;
+    // Добавим отладку для проверки данных
+    console.log('Trip data:', trips);
     
     // Обновляем заголовок модального окна в зависимости от типа
     const modalTitle = document.querySelector('#client-trips-modal h3');
@@ -189,7 +191,9 @@ function displayClientTrips(data, type = 'normal') {
                 <tbody class="bg-white divide-y divide-gray-200">
     `;
     
-    trips.forEach(trip => {
+    trips.forEach((trip, index) => {
+        // Добавим отладку для каждой поездки
+        console.log(`Trip ${index}:`, trip);
         // Форматируем дату поездки
         let visitDate = '-';
         let visitTime = '';
@@ -199,6 +203,19 @@ function displayClientTrips(data, type = 'normal') {
             if (dateTimeParts.length > 1) {
                 visitDate = dateTimeParts[0].split('-').reverse().join('.'); // YYYY-MM-DD to DD.MM.YYYY
                 visitTime = dateTimeParts[1].substring(0, 5); // HH:MM:SS to HH:MM
+            }
+        }
+        
+        // Форматируем дату обратной поездки
+        let visitObratnoInfo = '';
+        console.log(`Trip ${index} visit_obratno:`, trip.visit_obratno);
+        
+        if (trip.visit_obratno) {
+            const obratnoDateTimeParts = trip.visit_obratno.split('T');
+            if (obratnoDateTimeParts.length > 1) {
+                const obratnoDate = obratnoDateTimeParts[0].split('-').reverse().join('.');
+                const obratnoTime = obratnoDateTimeParts[1].substring(0, 5);
+                visitObratnoInfo = `<br><span class="text-xs text-blue-600">Обратно: ${obratnoTime}</span>`;
             }
         }
         
@@ -215,6 +232,7 @@ function displayClientTrips(data, type = 'normal') {
                 <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
                     ${visitDate}
                     ${visitTime ? `<br><span class="text-xs text-gray-500">${visitTime}</span>` : ''}
+                    ${visitObratnoInfo}
                 </td>
                 <td class="px-4 py-2 text-sm text-gray-900 max-w-xs truncate" title="${trip.adres_otkuda || '-'}">${trip.adres_otkuda || '-'}</td>
                 <td class="px-4 py-2 text-sm text-gray-900 max-w-xs truncate" title="${trip.adres_kuda || '-'}">${trip.adres_kuda || '-'}</td>
