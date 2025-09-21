@@ -187,18 +187,18 @@
                     </td>
                     <td class="px-6 py-4">
                         @if($order->skidka_dop_all !== null)
-                        <div class="text-sm text-gray-900">
-                            Скидка: <span class="font-medium">{{ $order->skidka_dop_all }}%</span>
-                        </div>
+                            <div class="text-sm text-gray-900">
+                                Скидка: <span class="font-medium">{{ $order->skidka_dop_all }}%</span>
+                            </div>
                         @else
-                        <div class="text-sm text-gray-500">Скидка: -</div>
+                            <div class="text-sm text-gray-500">Скидка: -</div>
                         @endif
                         @if($order->kol_p_limit !== null)
-                        <div class="text-sm text-gray-900 mt-1">
-                            Лимит: <span class="font-medium">{{ $order->kol_p_limit }} поездок/мес</span>
-                        </div>
+                            <div class="text-sm text-gray-900 mt-1">
+                                Лимит: <span class="font-medium">{{ $order->kol_p_limit }} поездок/мес</span>
+                            </div>
                         @else
-                        <div class="text-sm text-gray-500 mt-1">Лимит: -</div>
+                            <div class="text-sm text-gray-500 mt-1">Лимит: -</div>
                         @endif
                     </td>
 
@@ -262,6 +262,16 @@
                                         Восстановить
                                     </button>
                                 </form>
+                            @endif
+                            <!-- Кнопка копирования в actions.blade.php -->
+                            @if(!$order->deleted_at && $status->id == 1)
+                            <a href="{{ route('social-taxi-orders.create.by-type', ['type' => $order->type_order, 'copy_from' => $order->id]) }}" 
+                               class="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-md hover:bg-green-200 text-sm w-full">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                                Копировать
+                            </a>
                             @endif
                         </div>
                     </td>

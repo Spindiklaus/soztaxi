@@ -19,11 +19,11 @@
             <select name="zena_type" id="zena_type" 
                     required
                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                <option value="1" {{ old('zena_type', 1) == '1' ? 'selected' : '' }}>Поездка в одну сторону</option>
-                <option value="2" {{ old('zena_type') == '2' ? 'selected' : '' }}>Поездка в обе стороны</option>
+                    <option value="1" {{ old('zena_type', $copiedOrder->zena_type ?? 1) == '1' ? 'selected' : '' }}>Поездка в одну сторону</option>
+                    <option value="2" {{ old('zena_type', $copiedOrder->zena_type ?? '') == '2' ? 'selected' : '' }}>Поездка в обе стороны</option>
             </select>
             @error('zena_type')
-            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
             @enderror
             <p class="mt-1 text-xs text-gray-500">Выберите тип поездки: в одну или обе стороны</p>
             @endif
@@ -39,7 +39,7 @@
                    required
                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
             @error('visit_data')
-            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
             @enderror
             <p class="mt-1 text-xs text-gray-500">
                 Время указывается с шагом 5 минут.
@@ -56,7 +56,7 @@
                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 <option value="">Выберите оператора такси</option>
                 @foreach($taxis as $taxi)
-                <option value="{{ $taxi->id }}" {{ (old('taxi_id', $defaultTaxiId) == $taxi->id) ? 'selected' : '' }}>
+                <option value="{{ $taxi->id }}" {{ (old('taxi_id', $copiedOrder->taxi_id ?? $defaultTaxiId) == $taxi->id) ? 'selected' : '' }}>
                     {{ $taxi->name }} (#{{ $taxi->id }})
                 </option>
                 @endforeach
@@ -67,16 +67,17 @@
             <p class="mt-1 text-xs text-gray-500">Выбор оператора такси обязателен для сохранения заказа</p>
         </div>
         <!-- Кнопка для выбора из истории адресов -->
-<div class="flex items-end space-x-2 mt-2">
+    <div class="flex items-end space-x-2 mt-2">
     <div class="flex-1">
         <label for="adres_otkuda" class="block text-sm font-medium text-gray-700">Откуда ехать *</label>
         <textarea name="adres_otkuda" id="adres_otkuda" 
                   rows="3" 
                   required
                   placeholder="Введите адрес отправки"
-                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('adres_otkuda') }}</textarea>
+                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('adres_otkuda', $copiedOrder->adres_otkuda ?? '') }}
+        </textarea>
         @error('adres_otkuda')
-        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
         @enderror
     </div>
     
@@ -88,7 +89,7 @@
         </svg>
         История
     </button>
-</div>
+    </div>
 
         <div>
             <label for="adres_kuda" class="block text-sm font-medium text-gray-700">Куда ехать *</label>
@@ -96,7 +97,8 @@
                       rows="3" 
                       required
                       placeholder="Введите адрес назначения"
-                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('adres_kuda') }}</textarea>
+                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('adres_kuda', $copiedOrder->adres_kuda ?? '') }}
+            </textarea>
             @error('adres_kuda')
             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
             @enderror
@@ -123,9 +125,11 @@
             <label for="adres_obratno" class="block text-sm font-medium text-gray-700">Обратный адрес</label>
             <textarea name="adres_obratno" id="adres_obratno" 
                       rows="3" 
-                      placeholder="{{ ($type == 2 || $type == 3) && (old('zena_type', 1) == '2') ? 'Введите обратный адрес' : 'Поле недоступно для поездки в одну сторону' }}"
-                      {{ ($type == 2 || $type == 3) && (old('zena_type', 1) == '1') ? 'readonly disabled' : '' }}
-                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 {{ ($type == 2 || $type == 3) && (old('zena_type', 1) == '1') ? 'bg-gray-100 cursor-not-allowed' : '' }}">{{ old('adres_obratno') }}</textarea>
+                      placeholder="{{ ($type == 2 || $type == 3) && (old('zena_type', $copiedOrder->zena_type ?? 1) == '2') ? 'Введите обратный адрес' : 'Поле недоступно для поездки в одну сторону' }}"
+                      {{ ($type == 2 || $type == 3) && (old('zena_type', $copiedOrder->zena_type ?? 1) == '1') ? 'readonly disabled' : '' }}
+                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 
+                      {{ ($type == 2 || $type == 3) && (old('zena_type', $copiedOrder->zena_type ?? 1) == '1') ? 'bg-gray-100 cursor-not-allowed' : '' }}">{{ old('adres_obratno', $copiedOrder->adres_obratno ?? '') }}
+            </textarea>
             @error('adres_obratno')
             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
             @enderror
@@ -139,7 +143,7 @@
         <div>
             <label for="taxi_price" class="block text-sm font-medium text-gray-700">Цена поездки</label>
             <input type="number" name="taxi_price" id="taxi_price" 
-                   value="{{ old('taxi_price') }}"
+                   value="{{ old('taxi_price', $copiedOrder->taxi_price ?? '') }}"
                    step="0.01"
                    readonly
                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 cursor-not-allowed focus:border-blue-500 focus:ring-blue-500">
@@ -152,12 +156,12 @@
         <div>
             <label for="taxi_vozm" class="block text-sm font-medium text-gray-700">Сумма возмещения</label>
             <input type="number" name="taxi_vozm" id="taxi_vozm" 
-                   value="{{ old('taxi_vozm') }}"
+                   value="{{ old('taxi_vozm', $copiedOrder->taxi_vozm ?? '') }}"
                    step="0.01"
                    readonly
                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 cursor-not-allowed focus:border-blue-500 focus:ring-blue-500">
             @error('taxi_vozm')
-            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
             @enderror
         </div>
         @else
@@ -168,13 +172,13 @@
         <div>
             <label for="predv_way" class="block text-sm font-medium text-gray-700">Предварительная дальность поездки, км</label>
             <input type="number" name="predv_way" id="predv_way" 
-                   value="{{ old('predv_way') }}"
+                   value="{{ old('predv_way', $copiedOrder->predv_way ?? '') }}"
                    min="0" 
                    step="0.1"
                    placeholder="Введите предварительную дальность поездки"
                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
             @error('predv_way')
-            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
             @enderror
             <p class="mt-1 text-xs text-gray-500">Предварительная дальность поездки в километрах</p>
         </div>    

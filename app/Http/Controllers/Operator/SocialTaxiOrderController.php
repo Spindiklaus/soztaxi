@@ -10,7 +10,6 @@ use App\Http\Requests\UpdateSocialTaxiOrderRequest;
 use App\Http\Requests\StoreSocialTaxiOrderByTypeRequest;
 use App\Services\SocialTaxiOrderService;
 use App\Services\SocialTaxiOrderBuilder;
-
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class SocialTaxiOrderController extends BaseController {
@@ -117,16 +116,16 @@ class SocialTaxiOrderController extends BaseController {
 //        dd(__METHOD__);
         try {
             $validated = $request->validated();
-            
+
             // Игнорируем значения из hidden полей и берем их из оригинального заказа на всякий случай
             $validated['user_id'] = $social_taxi_order->user_id; // Оригинальный оператор
             $validated['pz_nom'] = $social_taxi_order->pz_nom;   // Оригинальный номер
             $validated['pz_data'] = $social_taxi_order->pz_data;  // Оригинальная дата
             $validated['type_order'] = $social_taxi_order->type_order; // Оригинальный тип            
-            $validated['client_id'] = $social_taxi_order->client_id; 
-            $validated['categoty_id'] = $social_taxi_order->category_id; 
-            $validated['kol_limit_all'] = $social_taxi_order->kol_limit_all; 
-            $validated['skidka_dop_all'] = $social_taxi_order->skidka_dop_all; 
+            $validated['client_id'] = $social_taxi_order->client_id;
+            $validated['categoty_id'] = $social_taxi_order->category_id;
+            $validated['kol_limit_all'] = $social_taxi_order->kol_limit_all;
+            $validated['skidka_dop_all'] = $social_taxi_order->skidka_dop_all;
 
             // Передаем в сервис валидированные данные и объект заказа для обновления
             $this->orderService->updateOrder($social_taxi_order, $validated);
@@ -180,8 +179,8 @@ class SocialTaxiOrderController extends BaseController {
         return redirect()->back()->with('error', 'Заказ не был удален.');
     }
 
-    // Показать форму создания заказа по типу
-    public function createByType(int $type) {
+    // Показать форму создания заказа по типу с поддержкой копирования
+    public function createByType(int $type, Request $request) {
         // Проверяем допустимый тип
         if (!in_array($type, self::ALLOWED_TYPES)) {
             return redirect()->route('social-taxi-orders.index')->with('error', 'Недопустимый тип заказа.');
@@ -190,8 +189,19 @@ class SocialTaxiOrderController extends BaseController {
         // Вызываем новый сервисный метод для получения данных
         $data = $this->orderService->getOrderCreateData($type);
 
+        // Проверяем, есть ли параметр copy_from (копирование заказа)
+        if ($request->has('copy_from')) {
+            $copyFromId = $request->get('copy_from');
+            $copiedOrderData = $this->orderService->getOrderDataForCopy($copyFromId, $type);
+            if ($copiedOrderData) {
+                // Объединяем данные
+                $data = array_merge($data, $copiedOrderData);
+            }
+        }
+
         return view('social-taxi-orders.create-by-type', $data);
     }
+
     // Сохранить новый заказ по типу
     public function storeByType(StoreSocialTaxiOrderByTypeRequest $request, $type) {
         // Проверяем допустимый тип соцзаказа

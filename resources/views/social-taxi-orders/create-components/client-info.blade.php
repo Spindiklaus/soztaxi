@@ -10,13 +10,13 @@
                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 <option value="">Выберите клиента</option>
                 @foreach($clients as $client)
-                <option value="{{ $client->id }}" {{ old('client_id') == $client->id ? 'selected' : '' }}>
+                <option value="{{ $client->id }}" {{ old('client_id', $copiedOrder->client_id ?? '') == $client->id ? 'selected' : '' }}>
                     {{ $client->fio }} (#{{ $client->id }})
                 </option>
                 @endforeach
             </select>
             @error('client_id')
-            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
             @enderror
         </div>
 
@@ -28,7 +28,7 @@
                 @foreach($categories as $category)
                 <option value="{{ $category->id }}" 
                          data-kat-dop="{{ $category->kat_dop }}"
-                        {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                        {{ old('category_id', $copiedOrder->category_id ?? '') == $category->id ? 'selected' : '' }}>
                     {{ $category->nmv }} - {{ $category->name }} (Скидка: {{ $category->skidka }}%, Лимит: {{ $category->kol_p }} поездок/мес)
                     @if($category->kat_dop == 2)
                         [Категория 2]
@@ -46,7 +46,7 @@
             <div>
                 <label for="category_skidka" class="block text-sm font-medium text-gray-700">Скидка по категории, %</label>
                 <input type="number" name="category_skidka" id="category_skidka" 
-                       value="{{ old('category_skidka') }}"
+                       value="{{ old('category_skidka', $copiedOrder->category_skidka ?? '') }}"
                        min="0" max="100" step="1"
                        placeholder="Введите скидку по категории"
                        readonly
@@ -59,7 +59,7 @@
             <div>
                 <label for="category_limit" class="block text-sm font-medium text-gray-700">Лимит поездок по категории</label>
                 <input type="number" name="category_limit" id="category_limit" 
-                       value="{{ old('category_limit') }}"
+                        value="{{ old('category_limit', $copiedOrder->category_limit ?? '') }}"
                        min="10" max="26" step="1"
                        placeholder="Введите лимит поездок по категории"
                        readonly
@@ -73,7 +73,7 @@
         <div>
             <label for="client_tel" class="block text-sm font-medium text-gray-700">Телефон для связи*</label>
             <input type="text" name="client_tel" id="client_tel" 
-                   value="{{ old('client_tel') }}"
+                   value="{{ old('client_tel', $copiedOrder->client_tel ?? '') }}"
                    placeholder="Введите телефон для связи"
                    required
                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
@@ -85,7 +85,7 @@
         <div>
             <label for="client_invalid" class="block text-sm font-medium text-gray-700">Удостоверение инвалида</label>
             <input type="text" name="client_invalid" id="client_invalid" 
-                   value="{{ old('client_invalid') }}"
+                   value="{{ old('client_invalid', $copiedOrder->client_invalid ?? '') }}"
                    placeholder="Введите номер удостоверения"
                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 @error('client_invalid')
@@ -96,7 +96,7 @@
         <div>
             <label for="client_sopr" class="block text-sm font-medium text-gray-700">ФИО (сопровождающий)</label>
             <input type="text" name="client_sopr" id="client_sopr" 
-                   value="{{ old('client_sopr') }}"
+                   value="{{ old('client_sopr', $copiedOrder->client_sopr ?? '') }}"
                    placeholder="Введите ФИО сопровождающего"
                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 @error('client_sopr')

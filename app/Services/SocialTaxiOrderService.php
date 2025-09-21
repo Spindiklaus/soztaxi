@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Category;
 use App\Models\Taxi;
 use App\Models\SkidkaDop;
-
 use App\Http\Requests\StoreSocialTaxiOrderByTypeRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
@@ -50,7 +49,7 @@ class SocialTaxiOrderService {
             throw $e;
         }
     }
-    
+
     /**
      * Обновление заказа
      */
@@ -239,7 +238,7 @@ class SocialTaxiOrderService {
 
         // Загружаем только необходимые отношения
         $order->load(['client', 'category', 'dopus']);
-        
+
         // Для редактирования получаем только клиента и категорию из текущего заказа
         $client = FioDtrn::find($order->client_id);
         $category = Category::find($order->category_id);
@@ -249,35 +248,34 @@ class SocialTaxiOrderService {
 
         return [
             'order' => $order,
-            'client' => $client, 
+            'client' => $client,
             'category' => $category,
             'taxis' => $taxis,
-            'dopus' => $dopus, 
+            'dopus' => $dopus,
         ];
     }
-    
+
     /**
      * Подготавливает данные для формы создания заказа.
      * @param int $type
      * @return array
      */
-    public function getOrderCreateData(int $type): array
-    {
+    public function getOrderCreateData(int $type): array {
 
         // Получаем список категорий
         $categories = Category::where(function ($query) use ($type) {
-            switch ($type) {
-                case 1:
-                    $query->where('is_soz', 1);
-                    break;
-                case 2:
-                    $query->where('is_auto', 1);
-                    break;
-                case 3:
-                    $query->where('is_gaz', 1);
-                    break;
-            }
-        })->orderBy('nmv')->get();
+                    switch ($type) {
+                        case 1:
+                            $query->where('is_soz', 1);
+                            break;
+                        case 2:
+                            $query->where('is_auto', 1);
+                            break;
+                        case 3:
+                            $query->where('is_gaz', 1);
+                            break;
+                    }
+                })->orderBy('nmv')->get();
 
         // Получаем список операторов такси
         $taxis = Taxi::where('life', 1)->orderBy('name')->get();
@@ -291,14 +289,14 @@ class SocialTaxiOrderService {
 
         // Получаем список клиентов, которые имели заказы в разрешенных категориях
         $clients = FioDtrn::whereNull('rip_at')
-            ->whereHas('orders', function ($query) use ($allowedCategoryIds) {
-                $query->whereIn('category_id', $allowedCategoryIds)
+                ->whereHas('orders', function ($query) use ($allowedCategoryIds) {
+                    $query->whereIn('category_id', $allowedCategoryIds)
                     ->whereNull('deleted_at')
                     ->whereNull('cancelled_at');
-            })
-            ->orderBy('fio')
-            ->get();
-        
+                })
+                ->orderBy('fio')
+                ->get();
+
         // Генерация номера заказа и времени
         $orderNumber = generateOrderNumber($type, auth()->id());
         $orderDateTime = now();
@@ -307,15 +305,44 @@ class SocialTaxiOrderService {
         $dopusConditions = SkidkaDop::where('life', 1)->orderBy('name')->get();
 
         return compact(
-            'type',
-            'clients',
-            'categories',
-            'taxis',
-            'defaultTaxiId',
-            'orderNumber',
-            'orderDateTime',
-            'dopusConditions'
+                'type',
+                'clients',
+                'categories',
+                'taxis',
+                'defaultTaxiId',
+                'orderNumber',
+                'orderDateTime',
+                'dopusConditions'
         );
+    }
+
+    /**
+     * Получение данных заказа для копирования
+     */
+    public function getOrderDataForCopy(int $orderId, int $type): array {
+        try {
+            $order = Order::find($orderId);
+
+            if (!$order) {
+                return [];
+            }
+
+            // Проверяем, что тип совпадает
+            if ($order->type_order != $type) {
+                return [];
+            }
+
+            return [
+                'copiedOrder' => $order,
+            ];
+        } catch (\Exception $e) {
+            \Log::error("Ошибка получения данных для копирования заказа", [
+                'order_id' => $orderId,
+                'type' => $type,
+                'error' => $e->getMessage()
+            ]);
+            return [];
+        }
     }
 
 }
