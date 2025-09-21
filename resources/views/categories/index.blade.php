@@ -34,54 +34,63 @@
 
             </div>            
             <!-- Форма фильтрации -->
-            <div class="bg-white shadow rounded-lg p-4 mb-2">
-                <form action="{{ route('categories.index') }}" method="GET" class="space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <!-- Поиск по названию -->
-                        <div>
-                            <label for="filter_name" class="block text-sm font-medium text-gray-700">Название</label>
-                            <input type="text" name="name" id="filter_name"
-                                   value="{{ request('name') }}"
-                                   placeholder="%Поиск по названию%"
-                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        </div>
-
-                        <!-- Поиск по NMV -->
-                        <div>
-                            <label for="filter_nmv" class="block text-sm font-medium text-gray-700">NMV</label>
-                            <input type="number" name="nmv" id="filter_nmv"
-                                   value="{{ request('nmv') }}"
-                                   placeholder="Фильтр по NMV"
-                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        </div>
-
-                        <!-- Фильтр по скидке -->
-                        <div>
-                            <label for="filter_skidka" class="block text-sm font-medium text-gray-700">Скидка (%)</label>
-                            <select name="skidka" id="filter_skidka"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                                <option value="">Все</option>
-                                <option value="0" {{ request('skidka') == '0' ? 'selected' : '' }}>0%</option>
-                                <option value="50" {{ request('skidka') == '50' ? 'selected' : '' }}>50%</option>
-                                <option value="100" {{ request('skidka') == '100' ? 'selected' : '' }}>100%</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Кнопки -->
-                    <div class="flex justify-end space-x-2 pt-2">
-                        <button type="submit"
-                                class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                            Применить фильтр
-                        </button>
-
-                        <a href="{{ route('categories.index') }}"
-                           class="inline-flex items-center px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400">
-                            Очистить фильтр
-                        </a>
-                    </div>
-                </form>
+            <!-- Форма фильтрации -->
+<div class="bg-white shadow rounded-lg p-4 mb-2">
+    <form action="{{ route('categories.index') }}" method="GET" class="space-y-4">
+        <!-- Скрытое поле для сохранения сортировки -->
+        @if(request('sort'))
+            <input type="hidden" name="sort" value="{{ request('sort') }}">
+        @endif
+        @if(request('direction'))
+            <input type="hidden" name="direction" value="{{ request('direction') }}">
+        @endif
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Поиск по названию -->
+            <div>
+                <label for="filter_name" class="block text-sm font-medium text-gray-700">Название</label>
+                <input type="text" name="name" id="filter_name"
+                       value="{{ request('name') }}"
+                       placeholder="%Поиск по названию%"
+                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
             </div>
+
+            <!-- Поиск по NMV -->
+            <div>
+                <label for="filter_nmv" class="block text-sm font-medium text-gray-700">NMV</label>
+                <input type="number" name="nmv" id="filter_nmv"
+                       value="{{ request('nmv') }}"
+                       placeholder="Фильтр по NMV"
+                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+            </div>
+
+            <!-- Фильтр по скидке -->
+            <div>
+                <label for="filter_skidka" class="block text-sm font-medium text-gray-700">Скидка (%)</label>
+                <select name="skidka" id="filter_skidka"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    <option value="">Все</option>
+                    <option value="0" {{ request('skidka') == '0' ? 'selected' : '' }}>0%</option>
+                    <option value="50" {{ request('skidka') == '50' ? 'selected' : '' }}>50%</option>
+                    <option value="100" {{ request('skidka') == '100' ? 'selected' : '' }}>100%</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Кнопки -->
+        <div class="flex justify-end space-x-2 pt-2">
+            <button type="submit"
+                    class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                Применить фильтр
+            </button>
+
+            <a href="{{ route('categories.index', ['sort' => request('sort'), 'direction' => request('direction')]) }}"
+                class="inline-flex items-center px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400">
+                Очистить фильтр
+            </a>
+        </div>
+    </form>
+</div>
 
             <!-- Таблица -->
 
@@ -99,9 +108,20 @@
                  this.sortField = field;
                  this.sortDirection = 'asc';
                  }
-                 let url = '?sort=' + field + '&direction=' + this.sortDirection;
-                 console.log('Redirecting to:', url); // <-- Отладка
-                 window.location.href = url;
+
+                 // Получаем текущие параметры URL
+                 let url = new URL(window.location.href);
+                 let params = new URLSearchParams(url.search);
+
+                 // Устанавливаем параметры сортировки
+                 params.set('sort', field);
+                 params.set('direction', this.sortDirection);
+
+                 // Формируем новый URL с сохранением всех параметров
+                 url.search = params.toString();
+
+                 console.log('Redirecting to:', url.toString());
+                 window.location.href = url.toString();
                  }
                  }" x-cloak class="bg-white rounded-lg overflow-auto max-h-[70vh] border border-gray-300">
                 <table class="min-w-full divide-y divide-gray-200 bg-white">
@@ -214,7 +234,7 @@
 
             <!-- Пагинация -->
             <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-                {{ $categories->appends(['sort' => $sort, 'direction' => $direction])->links() }}
+                {{ $categories->appends(request()->except('page'))->links() }}
             </div>
         </div>
     </div>
