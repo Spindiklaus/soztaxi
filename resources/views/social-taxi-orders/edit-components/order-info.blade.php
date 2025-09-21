@@ -22,8 +22,8 @@
 
         <div>
             <label class="block text-sm font-medium text-gray-700">Тип заказа</label>
-            <div class="mt-1 bg-gray-100 p-2 rounded-md font-medium {{ getOrderTypeColor($order->zena_type) }}">
-                {{ getOrderTypeName($order->zena_type) }}
+            <div class="mt-1 bg-gray-100 p-2 rounded-md font-medium {{ getOrderTypeColor($order->type_order) }}">
+                {{ getOrderTypeName($order->type_order) }}
             </div>
             <!-- Скрытое поле для передачи типа в форму -->
             <input type="hidden" name="type_order" value="{{$order->type_order }}">

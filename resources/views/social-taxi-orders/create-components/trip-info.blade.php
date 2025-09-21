@@ -104,6 +104,21 @@
 
         <!-- Обратный адрес (показываем только для типов 2 и 3 - легковое авто и ГАЗель) -->
         @if($type != 1)
+         <div>
+            <label for="visit_obratno" class="block text-sm font-medium text-gray-700">Дата и время обратной поездки</label>
+            <input type="datetime-local" name="visit_obratno" id="visit_obratno" 
+                   value="{{ old('visit_obratno') }}"
+                   min="{{ old('visit_data') ? \Carbon\Carbon::parse(old('visit_data'))->addMinutes(5)->format('Y-m-d\TH:i') : now()->addDay()->addMinutes(5)->format('Y-m-d\TH:i') }}"
+                   max="{{ old('visit_data') ? \Carbon\Carbon::parse(old('visit_data'))->addMonths(6)->format('Y-m-d\TH:i') : now()->addMonths(6)->format('Y-m-d\TH:i') }}" 
+                   {{ (old('zena_type', 1) == '1' || !$type) ? 'readonly disabled' : '' }}
+                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 {{ (old('zena_type', 1) == '1' || !$type) ? 'bg-gray-100 cursor-not-allowed' : '' }}">
+            @error('visit_obratno')
+            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+            @enderror
+            <p class="mt-1 text-xs text-gray-500">
+                Дата обратной поездки должна быть позже даты основной поездки
+            </p>
+        </div>
         <div>
             <label for="adres_obratno" class="block text-sm font-medium text-gray-700">Обратный адрес</label>
             <textarea name="adres_obratno" id="adres_obratno" 
@@ -148,6 +163,7 @@
         @else
         <!-- Скрытое поле для соцтакси -->
         <input type="hidden" name="adres_obratno" value="">
+        <input type="hidden" name="visit_obratno" value="">
         <!-- Предварительная дальность поездки -->
         <div>
             <label for="predv_way" class="block text-sm font-medium text-gray-700">Предварительная дальность поездки, км</label>

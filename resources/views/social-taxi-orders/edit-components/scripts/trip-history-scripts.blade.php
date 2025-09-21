@@ -175,7 +175,7 @@ function selectAddressCombination(index) {
     const adresKudaInput = document.getElementById('adres_kuda');
     const adresObratnoInput = document.getElementById('adres_obratno');
     const predvWayInput = document.getElementById('predv_way'); // Для соцтакси
-    const typeOrder = {{ $order->zena_type }}; // Тип заказа из PHP
+    const typeOrder = {{ $order->type_order }}; // Тип заказа из PHP
     
     if (adresOtkudaInput) adresOtkudaInput.value = addressData.adres_otkuda || '';
     if (adresKudaInput) adresKudaInput.value = addressData.adres_kuda || '';

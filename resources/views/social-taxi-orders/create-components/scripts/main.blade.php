@@ -92,6 +92,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (zenaTypeSelect) {
         zenaTypeSelect.addEventListener('change', function() {
             updateAdresObratnoState(this.value);
+            updateVisitObratnoState(this.value);
         });
     }
 
@@ -123,6 +124,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (zenaTypeSelect && adresObratnoInput) {
             const zenaType = zenaTypeSelect.value || '1'; // По умолчанию "в одну сторону"
             updateAdresObratnoState(zenaType);
+            updateVisitObratnoState(zenaType);
         }
     }
     

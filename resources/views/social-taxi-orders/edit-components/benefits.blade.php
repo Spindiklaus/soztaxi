@@ -16,7 +16,7 @@
                 @endif
             </select>
              <input type="hidden" name="dopus_id" value="{{ old('dopus_id', $order->dopus_id) }}">
-             @if($order->zena_type != 1)
+             @if($order->type_order != 1)
                 <p class="mt-1 text-xs text-gray-500">Дополнительные условия доступны только для соцтакси</p>
              @endif
             @error('dopus_id')

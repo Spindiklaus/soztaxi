@@ -155,6 +155,7 @@ class SocialTaxiOrderService {
             'adres_obratno' => $validatedData['adres_obratno'] ?? null,
             'zena_type' => (int) ($validatedData['zena_type'] ?? 1),
             'visit_data' => $validatedData['visit_data'] ?? null,
+            'visit_obratno' => $validatedData['visit_obratno'] ?? null,
             'predv_way' => isset($validatedData['predv_way']) && $validatedData['predv_way'] !== '' && $validatedData['predv_way'] !== null ?
             (float) str_replace(',', '.', $validatedData['predv_way']) : null,
             'taxi_id' => !empty($validatedData['taxi_id']) ? (int) $validatedData['taxi_id'] : null,

@@ -7,25 +7,25 @@
         <!-- Тип поездки -->
         <div>
             <label for="zena_type" class="block text-sm font-medium text-gray-700">Тип поездки *</label>
-            @if($order->zena_type == 1) {{-- Для соцтакси всегда 1 и только для чтения --}}
-                <select name="zena_type" id="zena_type" 
+            @if($order->type_order == 1) {{-- Для соцтакси (type_order == 1) zena_type = 1, только для чтения --}}
+            <select name="zena_type" id="zena_type" 
                     readonly disabled
                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 cursor-not-allowed">
-                    <option value="1" selected>Поездка в одну сторону</option>
-                </select>
-                <input type="hidden" name="zena_type" value="1"> {{-- Скрытое поле для передачи значения --}}
-                <p class="mt-1 text-xs text-gray-500">Для соцтакси тип поездки всегда "в одну сторону"</p>
+                <option value="1" selected>Поездка в одну сторону</option>
+            </select>
+            <input type="hidden" name="zena_type" value="1"> {{-- Скрытое поле для передачи значения --}}
+            <p class="mt-1 text-xs text-gray-500">Для соцтакси тип поездки всегда "в одну сторону"</p>
             @else {{-- Для легкового авто и ГАЗели --}}
-                <select name="zena_type" id="zena_type" 
+            <select name="zena_type" id="zena_type" 
                     required
                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                    <option value="1" {{ $order->zena_type == '1' ? 'selected' : '' }}>Поездка в одну сторону</option>
-                    <option value="2" {{ $order->zena_type == '2' ? 'selected' : '' }}>Поездка в обе стороны</option>
-                </select>
-                @error('zena_type')
-                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                @enderror
-                <p class="mt-1 text-xs text-gray-500">Выберите тип поездки: в одну или обе стороны</p>
+                <option value="1" {{ $order->zena_type == '1' ? 'selected' : '' }}>Поездка в одну сторону</option>
+                <option value="2" {{ $order->zena_type == '2' ? 'selected' : '' }}>Поездка в обе стороны</option>
+            </select>
+            @error('zena_type')
+            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+            @enderror
+            <p class="mt-1 text-xs text-gray-500">Выберите тип поездки: в одну или обе стороны</p>
             @endif
         </div>
 
@@ -39,7 +39,7 @@
                    required
                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
             @error('visit_data')
-                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
             @enderror
             <p class="mt-1 text-xs text-gray-500">
                 Время указывается с шагом 5 минут.
@@ -69,22 +69,22 @@
         <div class="flex items-end space-x-2 mt-2">
             <div class="flex-1">
                 <label for="adres_otkuda" class="block text-sm font-medium text-gray-700">Откуда ехать *</label>
-                    <textarea name="adres_otkuda" id="adres_otkuda" 
-                        rows="3" 
-                        required
-                        placeholder="Введите адрес отправки"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('adres_kuda', $order->adres_otkuda) }}
-                    </textarea>
-                    @error('adres_otkuda')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
+                <textarea name="adres_otkuda" id="adres_otkuda" 
+                          rows="3" 
+                          required
+                          placeholder="Введите адрес отправки"
+                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('adres_kuda', $order->adres_otkuda) }}
+                </textarea>
+                @error('adres_otkuda')
+                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
             </div>
-    
+
             <button type="button" 
-                id="open-address-history-btn"
-                class="mt-6 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    id="open-address-history-btn"
+                    class="mt-6 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                 <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
                 История
             </button>
@@ -103,18 +103,40 @@
         </div>
 
         <!-- Обратный адрес (показываем только для типов 2 и 3 - легковое авто и ГАЗель) -->
-        @if($order->zena_type != 1)
+        @if($order->type_order != 1)
+        <div>
+            <label for="visit_obratno" class="block text-sm font-medium text-gray-700">Дата и время обратной поездки</label>
+            @if($order->zena_type == '1')
+            <!-- Если поездка в одну сторону, показываем значение как readonly и добавляем hidden поле -->
+            <input type="datetime-local" 
+                   value="{{ old('visit_obratno', $order->visit_obratno) }}"
+                   readonly
+                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 cursor-not-allowed">
+            <input type="hidden" name="visit_obratno" value="{{ old('visit_obratno', $order->visit_obratno) }}">
+            @else
+            <!-- Если поездка в обе стороны, поле редактируемое -->
+            <input type="datetime-local" name="visit_obratno" id="visit_obratno" 
+                   value="{{ old('visit_obratno', $order->visit_obratno) }}"
+                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+            @endif
+            @error('visit_obratno')
+            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+            @enderror
+            <p class="mt-1 text-xs text-gray-500">
+                Дата обратной поездки должна быть позже даты основной поездки
+            </p>
+        </div>
         <div>
             <label for="adres_obratno" class="block text-sm font-medium text-gray-700">Обратный адрес</label>
             <textarea name="adres_obratno" id="adres_obratno" 
                       rows="3" 
-                      placeholder="{{ ($order->zena_type == 2 || $order->zena_type == 3) && (old('zena_type', 1) == '2') ? 'Введите обратный адрес' : 'Поле недоступно для поездки в одну сторону' }}"
-                      {{ ($order->zena_type == 2 || $order->zena_type == 3) && ($order->zena_type == '1') ? 'readonly disabled' : '' }}
-                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 {{ ($order->zena_type == 2 || $order->zena_type == 3) && ($order->zena_type == '1') ? 'bg-gray-100 cursor-not-allowed' : '' }}">{{old('adres_obratno', $order->adres_obratno) }}</textarea>
+                      {{ ($order->type_order == 2 || $order->type_order == 3) && ($order->zena_type == '1') ? 'readonly disabled' : '' }}
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 
+                {{ ($order->zena_type == 2 || $order->zena_type == 3) && ($order->zena_type == '1') ? 'bg-gray-100 cursor-not-allowed' : '' }}">{{old('adres_obratno', $order->adres_obratno) }}</textarea>
             @error('adres_obratno')
             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
             @enderror
-            @if($order->zena_type == 2 || $order->zena_type == 3)
+            @if($order->type_order == 2 || $order->type_order == 3)
             <p class="mt-1 text-xs text-gray-500">
                 Обратный адрес доступен только для поездки в обе стороны
             </p>
@@ -146,26 +168,26 @@
             @enderror
         </div>
         @else
-            <!-- Скрытое поле для соцтакси -->
-            <input type="hidden" name="adres_obratno" value="">
-            <!-- Предварительная дальность поездки -->
-            <div>
-                <label for="predv_way" class="block text-sm font-medium text-gray-700">Предварительная дальность поездки, км</label>
-                <input type="number" name="predv_way" id="predv_way" 
+        <!-- Скрытое поле для соцтакси -->
+        <input type="hidden" name="adres_obratno" value="">
+        <!-- Предварительная дальность поездки -->
+        <div>
+            <label for="predv_way" class="block text-sm font-medium text-gray-700">Предварительная дальность поездки, км</label>
+            <input type="number" name="predv_way" id="predv_way" 
                    value="{{  old('predv_way', $order->predv_way)}}"
                    min="0" 
                    step="0.1"
                    placeholder="Введите предварительную дальность поездки"
                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                @error('predv_way')
-                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                @enderror
-                <p class="mt-1 text-xs text-gray-500">Предварительная дальность поездки в километрах</p>
-            </div>    
-            <!-- Расчетные значения для соцтакси -->
-            <div id="calculation-results" class="bg-blue-50 p-4 rounded-lg mt-4" style="display: none;">
-                <h3 class="text-md font-semibold text-blue-800 mb-2">Предварительные значения:</h3>
-                <div class="space-y-2">
+            @error('predv_way')
+            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+            @enderror
+            <p class="mt-1 text-xs text-gray-500">Предварительная дальность поездки в километрах</p>
+        </div>    
+        <!-- Расчетные значения для соцтакси -->
+        <div id="calculation-results" class="bg-blue-50 p-4 rounded-lg mt-4" style="display: none;">
+            <h3 class="text-md font-semibold text-blue-800 mb-2">Предварительные значения:</h3>
+            <div class="space-y-2">
                 <div>
                     <span class="font-medium">Цена поездки полная, без учета посадки:</span>
                     <span id="full-trip-price" class="ml-2 font-bold">0,00</span> руб.

@@ -151,4 +151,25 @@ function updateAdresObratnoState(zenaType) {
         adresObratnoInput.placeholder = 'Введите обратный адрес';
     }
 }
+
+// Функция для обновления состояния поля даты обратной поездки
+function updateVisitObratnoState(zenaType) {
+    const visitObratnoInput = document.getElementById('visit_obratno');
+  
+    if (zenaType == '1') {
+        // В одну сторону - очищаем и делаем только для чтения
+        visitObratnoInput.value = '';
+        visitObratnoInput.readOnly = true;
+        visitObratnoInput.disabled = true;
+        visitObratnoInput.classList.add('bg-gray-100', 'cursor-not-allowed');
+        visitObratnoInput.placeholder = 'Поле недоступно для поездки в одну сторону';
+    } else if (zenaType == '2') {
+        // В обе стороны - делаем доступным для записи
+        visitObratnoInput.readOnly = false;
+        visitObratnoInput.disabled = false;
+        visitObratnoInput.classList.remove('bg-gray-100', 'cursor-not-allowed');
+        visitObratnoInput.placeholder = 'Введите дату и время обратной поездки';
+    }
+}
+
 </script>

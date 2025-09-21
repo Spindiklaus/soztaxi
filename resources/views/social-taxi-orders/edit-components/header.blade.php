@@ -2,8 +2,8 @@
 <div class="flex justify-between items-center mb-6">
     <h1 class="text-3xl font-bold text-gray-800">
         Редактирование заказа: 
-        <span class="{{ getOrderTypeColor($order->zena_type) }} font-medium">
-            {{ getOrderTypeName($order->zena_type) }}
+        <span class="{{ getOrderTypeColor($order->type_order) }} font-medium">
+            {{ getOrderTypeName($order->type_order) }}
         </span>
     </h1>
 

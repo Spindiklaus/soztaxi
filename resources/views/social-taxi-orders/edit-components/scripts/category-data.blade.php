@@ -29,7 +29,7 @@ function populateCategoryData(data) {
     const categoryLimitInput = document.getElementById('category_limit');
     const skidkaDopAllInput = document.getElementById('skidka_dop_all');
     const kolPLimitInput = document.getElementById('kol_p_limit');
-    const typeOrder = {{ $order->zena_type }}; // Тип заказа из PHP
+    const typeOrder = {{ $order->type_order }}; // Тип заказа из PHP
     
     if (categorySkidkaInput) {
         categorySkidkaInput.value = data.skidka || '';
@@ -112,7 +112,7 @@ function checkSpecialDiscountCondition(clientId, visitDate) {
                                   'Окончательная скидка автоматически изменена с 100% на 50% согласно правилам.');
                             
                             // Вызываем пересчет, если это соцтакси
-                            const typeOrder = {{ $order->zena_type }}; // Тип заказа из PHP
+                            const typeOrder = {{ $order->type_order }}; // Тип заказа из PHP
                             if (typeOrder == 1) {
                                 setTimeout(triggerCalculationIfNeeded, 100);
                             }

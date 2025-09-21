@@ -6,15 +6,14 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Carbon\Carbon;
 
-class UpdateSocialTaxiOrderRequest extends FormRequest
-{
+class UpdateSocialTaxiOrderRequest extends FormRequest {
+
     /**
      * Determine if the user is authorized to make this request.
      *
      * @return bool
      */
-    public function authorize()
-    {
+    public function authorize() {
         return true;
     }
 
@@ -23,11 +22,22 @@ class UpdateSocialTaxiOrderRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
-    {
+    public function rules() {
         $now = now();
         $minVisitDate = $now->copy()->addDay()->startOfDay();
         $maxVisitDate = $now->copy()->addMonths(6)->endOfDay();
+//         $request = request();
+//        \Log::info('Валидация visit_obratno', [
+//            'type_order' => $request->type_order ?? 'not_set',
+//            'adres_obratno' => $request->adres_obratno ?? 'not_set',
+//            'zena_type' => $request->zena_type ?? 'not_set',
+//            'visit_obratno_value' => $value ?? 'null',
+//            'has_adres_obratno' => !empty($request->adres_obratno),
+//            'has_visit_obratno' => !empty($value),
+//            'condition_1' => ($request->type_order == 2 || $request->type_order == 3),
+//            'condition_2' => !empty($request->adres_obratno) && empty($value),
+//            'all_request_data_keys' => array_keys($request->all())
+//        ]);
 
         return [
             'client_id' => 'required|exists:fio_dtrns,id',
@@ -40,6 +50,7 @@ class UpdateSocialTaxiOrderRequest extends FormRequest
                     $this->validateVisitTime($attribute, $value, $fail);
                 }
             ],
+            'visit_obratno' => 'nullable|date|after:visit_data',
             'adres_otkuda' => 'required|string|max:255',
             'adres_kuda' => 'required|string|max:255',
             'adres_obratno' => [
@@ -69,7 +80,6 @@ class UpdateSocialTaxiOrderRequest extends FormRequest
             ],
             'closed_at' => 'nullable|date',
             'komment' => 'nullable|string',
-            'visit_obratno' => 'nullable|date',
             'predv_way' => 'nullable|numeric|min:0|max:100',
             'zena_type' => 'required|integer|in:1,2',
             'dopus_id' => 'nullable|exists:skidka_dops,id',
@@ -98,8 +108,7 @@ class UpdateSocialTaxiOrderRequest extends FormRequest
      *
      * @return array
      */
-    public function messages()
-    {
+    public function messages() {
         $now = now();
         $minVisitDate = $now->copy()->addDay()->startOfDay();
         $maxVisitDate = $now->copy()->addMonths(6)->endOfDay();
@@ -111,6 +120,8 @@ class UpdateSocialTaxiOrderRequest extends FormRequest
             'visit_data.date' => 'Дата поездки должна быть корректной датой.',
             'visit_data.after' => 'Дата поездки должна быть не раньше завтрашней даты (' . $minVisitDate->format('d.m.Y') . ').',
             'visit_data.before' => 'Дата поездки должна быть не позже чем через полгода (' . $maxVisitDate->format('d.m.Y') . ').',
+            'visit_obratno.date' => 'Дата обратной поездки должна быть корректной датой.',
+            'visit_obratno.after' => 'Дата обратной поездки должна быть позже даты основной поездки.',
             'adres_otkuda.required' => 'Адрес отправки обязателен для заполнения.',
             'adres_otkuda.string' => 'Адрес отправки должен быть строкой.',
             'adres_otkuda.max' => 'Адрес отправки не может быть длиннее 255 символов.',
@@ -147,7 +158,6 @@ class UpdateSocialTaxiOrderRequest extends FormRequest
             'taxi_sent_at.date' => 'Дата отправки в такси должна быть корректной датой.',
             'closed_at.date' => 'Дата закрытия должна быть корректной датой.',
             'komment.string' => 'Комментарий должен быть строкой.',
-            'visit_obratno.date' => 'Дата обратной поездки должна быть корректной датой.',
             'predv_way.numeric' => 'Предварительная дальность должна быть числом.',
             'predv_way.min' => 'Предварительная дальность поездки не может быть отрицательной.',
             'predv_way.max' => 'Предварительная дальность поездки не может быть больше 100км.',
@@ -166,11 +176,66 @@ class UpdateSocialTaxiOrderRequest extends FormRequest
         ];
     }
 
+    public function withValidator($validator)
+{
+    $validator->after(function ($validator) {
+        $request = request();
+  
+        // Проверяем дату обратной поездки
+        if (!empty($request->visit_obratno)) {
+            // Проверяем, что это корректная дата
+            if (!strtotime($request->visit_obratno)) {
+                $validator->errors()->add('visit_obratno', 'Дата обратной поездки должна быть корректной датой.');
+                return;
+            }
+            
+            // Проверяем, что дата позже основной поездки
+            if (!empty($request->visit_data)) {
+                $visitData = strtotime($request->visit_data);
+                $visitObratno = strtotime($request->visit_obratno);
+                if ($visitObratno <= $visitData) {
+                    $validator->errors()->add('visit_obratno', 'Дата обратной поездки должна быть позже даты основной поездки.');
+                    return;
+                }
+            }
+            
+            // Проверяем, что дата совпадает по дням (день, месяц, год)
+                $visitDataDate = date('Y-m-d', $visitData);
+                $visitObratnoDate = date('Y-m-d', $visitObratno);
+                
+                if ($visitDataDate !== $visitObratnoDate) {
+                    $validator->errors()->add('visit_obratno', 'Дата обратной поездки должна быть в тот же день, что и основная поездка.');
+                    return;
+                }
+            
+            
+        }
+        
+        // Основная логика валидации
+        if (($request->type_order == 2 || $request->type_order == 3)) {
+            // Для легкового авто и ГАЗели
+            if (!empty($request->adres_obratno) && empty($request->visit_obratno)) {
+                // Если есть обратный адрес, то дата обязательна
+                $validator->errors()->add('visit_obratno', 'При наличии обратного адреса дата обратной поездки обязательна.');
+            }
+            if (empty($request->adres_obratno) && !empty($request->visit_obratno)) {
+                // Если нет обратного адреса, то дата должна быть null
+                $validator->errors()->add('visit_obratno', 'При отсутствии обратного адреса дата обратной поездки должна быть пустой.');
+            }
+        } else {
+            // Для соцтакси дата всегда должна быть null
+            if (!empty($request->visit_obratno)) {
+                $validator->errors()->add('visit_obratno', 'Для соцтакси дата обратной поездки должна быть пустой.');
+            }
+        }
+    });
+}
+    
+    
     /**
      * Validate visit time restrictions
      */
-    private function validateVisitTime($attribute, $value, $fail)
-    {
+    private function validateVisitTime($attribute, $value, $fail) {
         $visitTime = Carbon::parse($value);
         $visitHour = $visitTime->hour;
 
@@ -183,32 +248,31 @@ class UpdateSocialTaxiOrderRequest extends FormRequest
         if (!empty($this->client_id) && $value) {
             $startTime = $visitTime->copy()->subHour();
             $endTime = $visitTime->copy()->addHour();
-            
+
             // Получаем ID текущего заказа из параметров маршрута
             $currentOrderId = $this->route('social_taxi_order')->id;
             $existingOrder = \App\Models\Order::where('client_id', $this->client_id)
-                ->whereBetween('visit_data', [$startTime, $endTime])
-                ->whereNull('deleted_at')
-                ->whereNull('cancelled_at')
-                ->where('id', '!=', $currentOrderId)  // Исключаем текущий заказ  
-                ->first();
+                    ->whereBetween('visit_data', [$startTime, $endTime])
+                    ->whereNull('deleted_at')
+                    ->whereNull('cancelled_at')
+                    ->where('id', '!=', $currentOrderId)  // Исключаем текущий заказ  
+                    ->first();
 
             if ($existingOrder) {
                 $existingTime = Carbon::parse($existingOrder->visit_data)->format('d.m.Y H:i');
                 $fail("У данного клиента уже есть поездка на {$existingTime}. Нельзя создавать поездки в течение часа друг от друга.");
             }
-            \Log::debug('Current order ID:', ['id' => $currentOrderId]);
+//            \Log::debug('Current order ID:', ['id' => $currentOrderId]);
         }
     }
 
     /**
      * Validate taxi vozvratshenie
      */
-    private function validateTaxiVozm($attribute, $value, $fail)
-    {
+    private function validateTaxiVozm($attribute, $value, $fail) {
         // Для легкового авто и ГАЗели (zena_type != 1) проверяем, что taxi_vozm = taxi_price
         if (($this->type_order == 2 || $this->type_order == 3) &&
-            abs((float) $this->taxi_price - (float) $value) > 0.00000000001) {
+                abs((float) $this->taxi_price - (float) $value) > 0.00000000001) {
             $fail('Для легкового авто и ГАЗели сумма возмещения должна равняться цене поездки.');
         }
     }
@@ -216,8 +280,7 @@ class UpdateSocialTaxiOrderRequest extends FormRequest
     /**
      * Validate skidka dop all
      */
-    private function validateSkidkaDopAll($attribute, $value, $fail)
-    {
+    private function validateSkidkaDopAll($attribute, $value, $fail) {
         $type = $this->route('type');
         // Для легкового авто и ГАЗели скидка должна быть 100%
         if (($type == 2 || $type == 3) && $value != 100) {
@@ -228,8 +291,7 @@ class UpdateSocialTaxiOrderRequest extends FormRequest
     /**
      * Validate kol p limit
      */
-    private function validateKolPLimit($attribute, $value, $fail)
-    {
+    private function validateKolPLimit($attribute, $value, $fail) {
         // Проверяем для всех типов заказов
         if ($value && $this->client_id && $this->visit_data) {
             $visitDate = Carbon::parse($this->visit_data);
@@ -243,4 +305,5 @@ class UpdateSocialTaxiOrderRequest extends FormRequest
             }
         }
     }
+
 }

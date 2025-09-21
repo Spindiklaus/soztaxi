@@ -16,7 +16,7 @@ function fetchDopusData(dopusId) {
             }
             populateDopusData(data);
             // Вызываем пересчет, если это соцтакси
-            const typeOrder = {{ $order->zena_type }}; // Тип заказа из PHP
+            const typeOrder = {{ $order->type_order }}; // Тип заказа из PHP
             if (typeOrder == 1) {
                 setTimeout(triggerCalculationIfNeeded, 100);
             }

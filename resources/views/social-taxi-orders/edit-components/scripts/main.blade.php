@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const visitDataInput = document.getElementById('visit_data');
     const zenaTypeSelect = document.getElementById('zena_type');
     const adresObratnoInput = document.getElementById('adres_obratno');
-    const typeOrder = {{ $order->zena_type }}; // Тип заказа из PHP
+    const typeOrder = {{ $order->type_order }}; // Тип заказа из PHP
     const skidkaDopAllInput = document.getElementById('skidka_dop_all');
     
     // Добавленные переменные для расчета
@@ -92,6 +92,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (zenaTypeSelect) {
         zenaTypeSelect.addEventListener('change', function() {
             updateAdresObratnoState(this.value);
+            updateVisitObratnoState(this.value);
         });
     }
 
@@ -123,6 +124,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (zenaTypeSelect && adresObratnoInput) {
             const zenaType = zenaTypeSelect.value || '1'; // По умолчанию "в одну сторону"
             updateAdresObratnoState(zenaType);
+            updateVisitObratnoState(zenaType);
         }
     }
     

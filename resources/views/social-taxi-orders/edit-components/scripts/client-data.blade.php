@@ -34,7 +34,7 @@ function populateClientData(data) {
     const dopusSelect = document.getElementById('dopus_id');
     const skidkaDopAllInput = document.getElementById('skidka_dop_all');
     const kolPLimitInput = document.getElementById('kol_p_limit');
-    const typeOrder = {{ $order->zena_type }}; // Тип заказа из PHP
+    const typeOrder = {{ $order->type_order }}; // Тип заказа из PHP
 
     // Очищаем все поля перед заполнением
     clearClientData();
