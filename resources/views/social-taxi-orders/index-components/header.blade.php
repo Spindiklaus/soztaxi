@@ -31,15 +31,15 @@
             <div id="create-order-dropdown" 
                  class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 hidden z-50">
                 <div class="py-1" role="none">
-                    <a href="{{ route('social-taxi-orders.create.by-type', 1) }}" 
+                    <a href="{{ route('social-taxi-orders.create.by-type', array_merge(['type' => 1], $urlParams)) }}"
                        class="block px-4 py-2 text-sm text-blue-700 hover:bg-blue-100" role="menuitem">
                         <span class="font-medium">Соцтакси</span>
                     </a>
-                    <a href="{{ route('social-taxi-orders.create.by-type', 2) }}" 
+                    <a href="{{ route('social-taxi-orders.create.by-type', array_merge(['type' => 2], $urlParams)) }}"
                        class="block px-4 py-2 text-sm text-green-700 hover:bg-green-100" role="menuitem">
                         <span class="font-medium">Легковое авто</span>
                     </a>
-                    <a href="{{ route('social-taxi-orders.create.by-type', 3) }}" 
+                    <a href="{{ route('social-taxi-orders.create.by-type', array_merge(['type' => 3], $urlParams)) }}"
                        class="block px-4 py-2 text-sm text-yellow-700 hover:bg-yellow-100" role="menuitem">
                         <span class="font-medium">ГАЗель</span>
                     </a>

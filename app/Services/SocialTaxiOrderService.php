@@ -9,8 +9,8 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Category;
 use App\Models\Taxi;
 use App\Models\SkidkaDop;
-use App\Http\Requests\StoreSocialTaxiOrderByTypeRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Carbon\Carbon;
 
 class SocialTaxiOrderService {
 
@@ -343,6 +343,53 @@ class SocialTaxiOrderService {
             ]);
             return [];
         }
+    }
+
+    public function cancelOrder(Order $order, array $validatedData) {
+        // Проверяем, что заказ не удален
+        if ($order->deleted_at) {
+            throw new \Exception('Невозможно отменить удаленный заказ.');
+        }
+
+        // Проверяем, что заказ еще не отменен
+        if ($order->cancelled_at) {
+            throw new \Exception('Заказ уже отменен.');
+        }
+
+        // Проверяем, что у заказа есть статус "Принят" (ID = 1)
+        $currentStatus = $order->currentStatus;
+        $statusId = $currentStatus ? $currentStatus->status_order_id : 1;
+
+        if ($statusId != 1) {
+            throw new \Exception('Отмена возможна только для заказов со статусом "Принят".');
+        }
+
+        \DB::beginTransaction();
+        try {
+            // Устанавливаем cancelled_at напрямую - это должно сработать в Observer
+            $order->cancelled_at = $validatedData['cancelled_at'];
+            $order->komment = ($order->komment ? $order->komment . "\n\n" : '') .
+                    'Отмена заказа: ' . $validatedData['reason'] .
+                    '. Оператор: ' . auth()->user()->name .
+                    ' (' . auth()->user()->litera . ')' .
+                    '. Дата отмены: ' . Carbon::parse($validatedData['cancelled_at'])->format('d.m.Y H:i');
+            $order->updated_at = now();
+            $order->save();
+
+            \DB::commit();
+
+            return $order;
+        } catch (\Exception $e) {
+            \DB::rollback();
+            throw $e;
+        }
+    }
+
+    public function getUrlParams() {
+        return request()->only([
+                    'sort', 'direction', 'show_deleted', 'pz_nom',
+                    'type_order', 'status_order_id', 'date_from', 'date_to', 'user_id', 'client_fio'
+        ]);
     }
 
 }
