@@ -194,6 +194,24 @@ class SocialTaxiOrderController extends BaseController {
             $copyFromId = $request->get('copy_from');
             $copiedOrderData = $this->orderService->getOrderDataForCopy($copyFromId, $type);
             if ($copiedOrderData) {
+                // Добавляем автоматический комментарий о копировании
+                $copiedOrder = $copiedOrderData['copiedOrder'] ?? null;
+                if ($copiedOrder) {
+                    $autoComment = "Копирование заказа №{$copiedOrder->pz_nom}, ".
+                            "дата " . now()->format('d.m.Y H:i');
+
+//                    // Объединяем с существующим комментарием, если он есть
+//                    if (!empty($copiedOrder->komment)) {
+//                        $autoComment = $copiedOrder->komment . "\n" . $autoComment;
+//                    }
+
+                    // Добавляем автоматический комментарий в данные
+                    $copiedOrderData['autoComment'] = $autoComment;
+                    // Добавляем флаг копирования для изменения заголовка
+                    $copiedOrderData['isCopying'] = true;
+                    $copiedOrderData['originalOrderNumber'] = $copiedOrder->pz_nom;
+                }
+
                 // Объединяем данные
                 $data = array_merge($data, $copiedOrderData);
             }

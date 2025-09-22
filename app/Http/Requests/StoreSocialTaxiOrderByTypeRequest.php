@@ -69,7 +69,7 @@ class StoreSocialTaxiOrderByTypeRequest extends FormRequest
                 }
             ],
             'closed_at' => 'nullable|date',
-            'komment' => 'nullable|string',
+            'komment' => 'nullable|string|max:1000',
             'predv_way' => 'nullable|numeric|min:0|max:100',
             'zena_type' => 'required|integer|in:1,2',
             'dopus_id' => 'nullable|exists:skidka_dops,id',
@@ -149,6 +149,7 @@ class StoreSocialTaxiOrderByTypeRequest extends FormRequest
             'taxi_sent_at.date' => 'Дата отправки в такси должна быть корректной датой.',
             'closed_at.date' => 'Дата закрытия должна быть корректной датой.',
             'komment.string' => 'Комментарий должен быть строкой.',
+            'komment.max' => 'Комментарий не может быть длиннее 1000 символов.',
             'predv_way.numeric' => 'Предварительная дальность должна быть числом.',
             'predv_way.min' => 'Предварительная дальность поездки не может быть отрицательной.',
             'predv_way.max' => 'Предварительная дальность поездки не может быть больше 100км.',

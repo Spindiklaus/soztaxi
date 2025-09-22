@@ -90,7 +90,6 @@
         История
     </button>
     </div>
-
         <div>
             <label for="adres_kuda" class="block text-sm font-medium text-gray-700">Куда ехать *</label>
             <textarea name="adres_kuda" id="adres_kuda" 
@@ -148,7 +147,7 @@
                    readonly
                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 cursor-not-allowed focus:border-blue-500 focus:ring-blue-500">
             @error('taxi_price')
-            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
             @enderror
         </div>
 
@@ -165,46 +164,57 @@
             @enderror
         </div>
         @else
-        <!-- Скрытое поле для соцтакси -->
-        <input type="hidden" name="adres_obratno" value="">
-        <input type="hidden" name="visit_obratno" value="">
-        <!-- Предварительная дальность поездки -->
-        <div>
-            <label for="predv_way" class="block text-sm font-medium text-gray-700">Предварительная дальность поездки, км</label>
-            <input type="number" name="predv_way" id="predv_way" 
+            <!-- Скрытое поле для соцтакси -->
+            <input type="hidden" name="adres_obratno" value="">
+            <input type="hidden" name="visit_obratno" value="">
+            <!-- Предварительная дальность поездки -->
+            <div>
+                <label for="predv_way" class="block text-sm font-medium text-gray-700">Предварительная дальность поездки, км</label>
+                <input type="number" name="predv_way" id="predv_way" 
                    value="{{ old('predv_way', $copiedOrder->predv_way ?? '') }}"
                    min="0" 
                    step="0.1"
                    placeholder="Введите предварительную дальность поездки"
                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-            @error('predv_way')
-                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-            @enderror
-            <p class="mt-1 text-xs text-gray-500">Предварительная дальность поездки в километрах</p>
-        </div>    
-        <!-- Расчетные значения для соцтакси -->
-        <div id="calculation-results" class="bg-blue-50 p-4 rounded-lg mt-4" style="display: none;">
-            <h3 class="text-md font-semibold text-blue-800 mb-2">Предварительные значения:</h3>
-            <div class="space-y-2">
-                <div>
-                    <span class="font-medium">Цена поездки полная, без учета посадки:</span>
-                    <span id="full-trip-price" class="ml-2 font-bold">0,00</span> руб.
-                </div>
-                <div>
-                    <span class="font-medium">Сумма к оплате:</span>
-                    <span id="client-payment-amount" class="ml-2 font-bold">0,00</span> руб.
-                </div>
-                <div>
-                    <span class="font-medium">Сумма к возмещению:</span>
-                    <span id="reimbursement-amount" class="ml-2 font-bold">0,00</span> руб.
-                </div>
-                <div id="taxi-info" class="text-sm text-gray-600 mt-2">
-                    <span>Оператор такси: </span>
-                    <span id="taxi-name" class="font-semibold"></span>
+                @error('predv_way')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+                <p class="mt-1 text-xs text-gray-500">Предварительная дальность поездки в километрах</p>
+            </div>    
+            <!-- Расчетные значения для соцтакси -->
+            <div id="calculation-results" class="bg-blue-50 p-4 rounded-lg mt-4" style="display: none;">
+                <h3 class="text-md font-semibold text-blue-800 mb-2">Предварительные значения:</h3>
+                <div class="space-y-2">
+                    <div>
+                        <span class="font-medium">Цена поездки полная, без учета посадки:</span>
+                        <span id="full-trip-price" class="ml-2 font-bold">0,00</span> руб.
+                    </div>
+                    <div>
+                        <span class="font-medium">Сумма к оплате:</span>
+                        <span id="client-payment-amount" class="ml-2 font-bold">0,00</span> руб.
+                    </div>
+                    <div>
+                        <span class="font-medium">Сумма к возмещению:</span>
+                        <span id="reimbursement-amount" class="ml-2 font-bold">0,00</span> руб.
+                    </div>
+                    <div id="taxi-info" class="text-sm text-gray-600 mt-2">
+                        <span>Оператор такси: </span>
+                        <span id="taxi-name" class="font-semibold"></span>
+                    </div>
                 </div>
             </div>
-        </div>
-
         @endif
+    </div>
+    <!-- Комментарий -->
+    <div class="mt-4">
+        <label for="komment" class=" block text-sm font-medium text-gray-700">Комментарий</label>
+        <textarea name="komment" id="komment" 
+              rows="3" 
+              placeholder="Введите комментарий к заказу"
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('komment', $autoComment ?? $copiedOrder->komment ?? '') }}</textarea>
+        @error('komment')
+            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+        @enderror
+        <p class="mt-1 text-xs text-gray-500">Произвольный комментарий к заказу</p>
     </div>
 </div>

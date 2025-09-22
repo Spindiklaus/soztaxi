@@ -41,7 +41,7 @@
     </div>
 
     <!-- JavaScript для переключения вкладок -->
-    @include('social-taxi-orders.show-components.tabs-script')
+    @include('social-taxi-orders.show-components.scripts.tabs-script')
     <!-- JavaScript для модального окна -->
-    @include('social-taxi-orders.show-components.modal-scripts')
+    @include('social-taxi-orders.show-components.scripts.modal-scripts')
 </x-app-layout>

@@ -48,7 +48,7 @@
     @include('social-taxi-orders.edit-components.scripts.trip-history-scripts')
    
     <!-- JavaScript для модального окна (ПОДКЛЮЧАЕМ ПОСЛЕ основного скрипта) -->
-    @include('social-taxi-orders.show-components.modal-scripts')
+    @include('social-taxi-orders.show-components.scripts.modal-scripts')
     @include('social-taxi-orders.create-components.trip-history-modal')
     
     </x-app-layout>

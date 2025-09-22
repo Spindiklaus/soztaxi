@@ -9,12 +9,6 @@
                     {{ $order->cancelled_at ? $order->cancelled_at->format('d.m.Y H:i') : 'Не указана' }}
                 </div>
             </div>
-            
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Причина отмены</label>
-                <div class="mt-1 bg-gray-100 p-2 rounded-md">{{ $order->komment ?? 'Не указана' }}</div>
-            </div>
-            
             <div>
                 <label class="block text-sm font-medium text-gray-700">Дата закрытия</label>
                 <div class="mt-1 bg-gray-100 p-2 rounded-md">
