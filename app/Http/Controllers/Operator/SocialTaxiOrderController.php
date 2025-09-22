@@ -11,6 +11,7 @@ use App\Http\Requests\StoreSocialTaxiOrderByTypeRequest;
 use App\Services\SocialTaxiOrderService;
 use App\Services\SocialTaxiOrderBuilder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Carbon\Carbon;
 
 class SocialTaxiOrderController extends BaseController {
 
@@ -98,7 +99,7 @@ class SocialTaxiOrderController extends BaseController {
         try {
             $data = $this->orderService->getOrderEditData($social_taxi_order->id);
 
-            // Передаем параметры для кнопки "Назад", если они нужны
+            // Передаем параметры для кнопки "Назад"
             $backUrlParams = request()->only(['sort', 'direction', 'show_deleted', 'pz_nom', 'type_order', 'status_order_id', 'date_from', 'date_to']);
 
             return view('social-taxi-orders.edit', array_merge($data, ['backUrlParams' => $backUrlParams]));
@@ -160,7 +161,8 @@ class SocialTaxiOrderController extends BaseController {
         $order->deleted_at = now();
         $order->save();
 
-        return redirect()->back()->with('success', 'Заказ успешно удален.');
+        $urlParams = request()->only(['sort', 'direction', 'show_deleted', 'pz_nom', 'type_order', 'status_order_id', 'date_from', 'date_to', 'user_id', 'client_fio']);
+        return redirect()->route('social-taxi-orders.index', $urlParams)->with('success', 'Заказ успешно удален.');
     }
 
     public function restore($id) {
@@ -171,12 +173,14 @@ class SocialTaxiOrderController extends BaseController {
             return redirect()->back()->with('error', 'Заказ не найден.');
         }
 
+        $urlParams = request()->only(['sort', 'direction', 'show_deleted', 'pz_nom', 'type_order', 'status_order_id', 'date_from', 'date_to', 'user_id', 'client_fio']);
+
         if ($order->trashed()) {
             $order->restore();
-            return redirect()->back()->with('success', 'Заказ успешно восстановлен.');
+            return redirect()->route('social-taxi-orders.index', $urlParams)->with('success', 'Заказ успешно восстановлен.');
         }
 
-        return redirect()->back()->with('error', 'Заказ не был удален.');
+        return redirect()->route('social-taxi-orders.index', $urlParams)->with('error', 'Заказ не был удален.');
     }
 
     // Показать форму создания заказа по типу с поддержкой копирования
@@ -197,14 +201,13 @@ class SocialTaxiOrderController extends BaseController {
                 // Добавляем автоматический комментарий о копировании
                 $copiedOrder = $copiedOrderData['copiedOrder'] ?? null;
                 if ($copiedOrder) {
-                    $autoComment = "Копирование заказа №{$copiedOrder->pz_nom}, ".
+                    $autoComment = "Копирование заказа №{$copiedOrder->pz_nom}, " .
                             "дата " . now()->format('d.m.Y H:i');
 
 //                    // Объединяем с существующим комментарием, если он есть
 //                    if (!empty($copiedOrder->komment)) {
 //                        $autoComment = $copiedOrder->komment . "\n" . $autoComment;
 //                    }
-
                     // Добавляем автоматический комментарий в данные
                     $copiedOrderData['autoComment'] = $autoComment;
                     // Добавляем флаг копирования для изменения заголовка
@@ -249,6 +252,119 @@ class SocialTaxiOrderController extends BaseController {
             return response()->json($clientData);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    // Показать форму отмены заказа
+    public function showCancelForm(Order $social_taxi_order) {
+        // Проверяем, что заказ не удален
+        if ($social_taxi_order->deleted_at) {
+            return redirect()->route('social-taxi-orders.show', $social_taxi_order)
+                            ->with('error', 'Невозможно отменить удаленный заказ.');
+        }
+
+        // Проверяем, что заказ еще не отменен
+        if ($social_taxi_order->cancelled_at) {
+            return redirect()->route('social-taxi-orders.show', $social_taxi_order)
+                            ->with('error', 'Заказ уже отменен.');
+        }
+
+        // Проверяем, что у заказа есть статус "Принят" (ID = 1)
+        $currentStatus = $social_taxi_order->currentStatus;
+        $statusId = $currentStatus ? $currentStatus->status_order_id : 1;
+
+        if ($statusId != 1) {
+            return redirect()->route('social-taxi-orders.show', $social_taxi_order)
+                            ->with('error', 'Отмена возможна только для заказов со статусом "Принят".');
+        }
+
+        // Получаем параметры запроса для сохранения фильтров
+        $urlParams = request()->only(['sort', 'direction', 'show_deleted', 'pz_nom', 'type_order', 'status_order_id', 'date_from', 'date_to', 'user_id', 'client_fio']);
+
+        return view('social-taxi-orders.cancel', compact('social_taxi_order', 'urlParams'));
+    }
+
+    // Отменить заказ
+    public function cancel(Request $request, Order $social_taxi_order) {
+        try {
+            // Валидация данных
+            $validated = $request->validate([
+                'reason' => 'required|string|max:1000',
+                'cancelled_at' => [
+                    'required',
+                    'date',
+                    'before_or_equal:now', // Дата отмены не может быть в будущем
+                    function ($attribute, $value, $fail) use ($social_taxi_order) {
+                        // Проверяем, что дата отмены раньше даты поездки
+                        if ($social_taxi_order->visit_data) {
+                            $cancelDate = Carbon::parse($value);
+                            $visitDate = Carbon::parse($social_taxi_order->visit_data);
+
+                            if ($cancelDate >= $visitDate) {
+                                $fail('Дата отмены должна быть раньше даты поездки (' . $visitDate->format('d.m.Y H:i') . ').');
+                            }
+                        }
+                    }
+                ],
+                'user_id' => 'required|integer|exists:users,id',
+                    ], [
+                'reason.required' => 'Причина отмены обязательна для заполнения.',
+                'reason.string' => 'Причина отмены должна быть строкой.',
+                'reason.max' => 'Причина отмены не может быть длиннее 1000 символов.',
+                'cancelled_at.required' => 'Дата отмены обязательна для заполнения.',
+                'cancelled_at.date' => 'Дата отмены должна быть корректной датой.',
+                'cancelled_at.before_or_equal' => 'Дата отмены не может быть в будущем.',
+                'user_id.required' => 'Оператор обязателен для выбора.',
+                'user_id.integer' => 'ID оператора должен быть целым числом.',
+                'user_id.exists' => 'Выбранный оператор не существует.',
+            ]);
+
+            // Проверяем, что заказ не удален
+            if ($social_taxi_order->deleted_at) {
+                return redirect()->route('social-taxi-orders.show', $social_taxi_order)
+                                ->with('error', 'Невозможно отменить удаленный заказ.');
+            }
+
+            // Проверяем, что заказ еще не отменен
+            if ($social_taxi_order->cancelled_at) {
+                return redirect()->route('social-taxi-orders.show', $social_taxi_order)
+                                ->with('error', 'Заказ уже отменен.');
+            }
+
+            // Проверяем, что у заказа есть статус "Принят" (ID = 1)
+            $currentStatus = $social_taxi_order->currentStatus;
+            $statusId = $currentStatus ? $currentStatus->status_order_id : 1;
+
+            if ($statusId != 1) {
+                return redirect()->route('social-taxi-orders.show', $social_taxi_order)
+                                ->with('error', 'Отмена возможна только для заказов со статусом "Принят".');
+            }
+
+            \DB::beginTransaction();
+            try {
+                // Устанавливаем cancelled_at напрямую - это должно сработать в Observer
+                $social_taxi_order->cancelled_at = $validated['cancelled_at'];
+                $social_taxi_order->komment = ($social_taxi_order->komment ? $social_taxi_order->komment . "\n\n" : '') .
+                        'Отмена заказа: ' . $validated['reason'] .
+                        '. Оператор: ' . auth()->user()->name .
+                        ' (' . auth()->user()->litera . ')' .
+                        '. Дата отмены: ' . Carbon::parse($validated['cancelled_at'])->format('d.m.Y H:i');
+                $social_taxi_order->updated_at = now();
+                $social_taxi_order->save();
+
+                \DB::commit();
+
+                $urlParams = request()->only(['sort', 'direction', 'show_deleted', 'pz_nom', 'type_order', 'status_order_id', 'date_from', 'date_to', 'user_id', 'client_fio']);
+                return redirect()->route('social-taxi-orders.show', array_merge(['social_taxi_order' => $social_taxi_order->id], $urlParams))
+                                ->with('success', 'Заказ успешно отменен.');
+            } catch (\Exception $e) {
+                \DB::rollback();
+                throw $e;
+            }
+        } catch (\Exception $e) {
+            $urlParams = request()->only(['sort', 'direction', 'show_deleted', 'pz_nom', 'type_order', 'status_order_id', 'date_from', 'date_to', 'user_id', 'client_fio']);
+            return redirect()->route('social-taxi-orders.index', $urlParams)
+                            ->with('error', 'Ошибка при отмене заказа: ' . $e->getMessage());
         }
     }
 

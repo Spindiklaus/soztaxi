@@ -73,6 +73,12 @@ Route::middleware(['web', 'auth', IsAdmin::class])->group(function () {
     Route::patch('/social-taxi-orders/{social_taxi_order}/restore', [SocialTaxiOrderController::class, 'restore'])->name('social-taxi-orders.restore');
     Route::get('/social-taxi-orders/create/type/{type}', [SocialTaxiOrderController::class, 'createByType'])->name('social-taxi-orders.create.by-type');
     Route::post('/social-taxi-orders/store/type/{type}', [SocialTaxiOrderController::class, 'storeByType'])->name('social-taxi-orders.store.by-type');
+    // Отмена заказа - показ формы
+    Route::get('/social-taxi-orders/{social_taxi_order}/cancel', [SocialTaxiOrderController::class, 'showCancelForm'])
+     ->name('social-taxi-orders.cancel.form');
+    // Отмена заказа - выполнение
+    Route::patch('/social-taxi-orders/{social_taxi_order}/cancel', [SocialTaxiOrderController::class, 'cancel'])
+     ->name('social-taxi-orders.cancel');    
 });
 
 Route::get('/clear', function() {   // для очиски кэша сайта

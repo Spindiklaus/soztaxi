@@ -16,9 +16,8 @@
     <div id="filters-content" class="p-4 hidden">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
             <!-- Скрытое поле для сохранения параметров сортировки -->
-            @foreach(request()->except(['pz_nom', 'type_order', 'show_deleted', 'status_order_id', 'user_id', 'page', 'date_from', 'date_to']) as $key => $value)
-                <input type="hidden" name="{{ $key }}" value="{{ $value }}">
-            @endforeach
+            <input type="hidden" name="sort" value="{{ $sort ?? 'pz_data' }}">
+            <input type="hidden" name="direction" value="{{ $direction ?? 'desc' }}">
 
             <div>
                 <label for="filter_pz_nom" class="block text-sm font-medium text-gray-700">Номер заказа</label>

@@ -24,6 +24,15 @@ class OrderObserver
     public function updated(Order $order): void
     {
         $original = $order->getOriginal();
+        
+        \Log::info('Order updated', [
+        'order_id' => $order->id,
+        'original_cancelled_at' => $original['cancelled_at'],
+        'new_cancelled_at' => $order->cancelled_at,
+        'cancelled_changed' => is_null($original['cancelled_at']) && !is_null($order->cancelled_at)
+    ]);
+        
+        
         // Статус "передан в такси"
         if (is_null($original['taxi_sent_at']) && !is_null($order->taxi_sent_at)) {
             $this->changeStatus($order, 2); // ID статуса "передан в такси"
@@ -31,6 +40,7 @@ class OrderObserver
 
         // Статус "отменён"
         if (is_null($original['cancelled_at']) && !is_null($order->cancelled_at)) {
+            \Log::info('Setting status to cancelled for order ' . $order->id);
             $this->changeStatus($order, 3); // ID статуса "отменён"
         }
 
