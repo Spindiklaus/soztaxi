@@ -14,7 +14,11 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700">Оператор такси</label>
                 <div class="mt-1 bg-gray-100 p-2 rounded-md">
-                    {{ $order->taxi->name }} (#{{ $order->taxi->id }})
+                    @if($order->taxi)
+                        {{ $order->taxi->name }} (#{{ $order->taxi->id }})
+                    @else
+                        Не выбран
+                    @endif    
                 </div>
             </div>
 
