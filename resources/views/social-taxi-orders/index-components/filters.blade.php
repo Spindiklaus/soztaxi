@@ -142,6 +142,8 @@ document.addEventListener('DOMContentLoaded', function() {
             if ($key === 'show_deleted' && $value === '0') return false;
             if ($key === 'user_id' && $value === '0') return false;
             if ($key === 'client_fio' && $value === '') return false;
+            if ($key === 'type_order' && ($value === '' || $value === null)) return false;
+            if ($key === 'pz_nom' && $value === '') return false; // И эту строку
             return !empty($value);
         })->isNotEmpty() ? 'true' : 'false' 
     }};

@@ -30,6 +30,20 @@ class SocialTaxiOrderController extends BaseController {
 
     // Показать список заказов
     public function index(Request $request) {
+        
+        
+        \Log::info('Index params', [
+        'all_request' => $request->all(),
+        'type_order' => $request->get('type_order'),
+        'url_params' => $this->orderService->getUrlParams()
+    ]);
+         $urlParams = $this->orderService->getUrlParams();
+        \Log::info('URL Params Check', [
+        'request_type_order' => $request->get('type_order'),
+        'urlParams_type_order' => $urlParams['type_order'] ?? 'NOT_SET',
+        'urlParams' => $urlParams
+    ]);
+        
 
         // Сбрасываем сессию при входе на общую страницу администратора
         session()->forget(['from_operator_page', 'operator_current_type']);

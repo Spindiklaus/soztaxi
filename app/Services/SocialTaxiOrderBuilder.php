@@ -54,6 +54,18 @@ class SocialTaxiOrderBuilder
      */
     public function applyFilters(Request $request): self
     {
+        \Log::info('Apply filters params', [
+        'pz_nom' => $request->input('pz_nom'),
+        'type_order' => $request->input('type_order'),
+        'status_order_id' => $request->input('status_order_id'),
+        'user_id' => $request->input('user_id'),
+        'client_fio' => $request->input('client_fio'),
+        'date_from' => $request->input('date_from'),
+        'date_to' => $request->input('date_to'),
+        'all_request' => $request->all()
+    ]);
+        
+        
         // Фильтрация
         if ($request->filled('pz_nom')) {
             $this->query->where('pz_nom', 'like', '%' . $request->input('pz_nom') . '%');
