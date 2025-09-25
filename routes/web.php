@@ -4,20 +4,25 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\IsAdmin;
 
-use App\Http\Controllers\Operator\CategoryController;
-use App\Http\Controllers\Operator\UserController;
-use App\Http\Controllers\Operator\RoleController;
-use App\Http\Controllers\Operator\TaxiController;
-use App\Http\Controllers\Operator\FioDtrnController;
-use App\Http\Controllers\Operator\ImportFioDtrnController;
-use App\Http\Controllers\Operator\FioRipController;
-use App\Http\Controllers\Operator\ImportFioRipController;
-use App\Http\Controllers\Operator\SkidkaDopController;
-use App\Http\Controllers\Operator\SocialTaxiOrderController;
-use App\Http\Controllers\Operator\ImportCategoryController;
-use App\Http\Controllers\Operator\ImportOrdersController;
-use App\Http\Controllers\Operator\ImportTaxiController;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\TaxiController;
+use App\Http\Controllers\Admin\TaxiOrderController;
+use App\Http\Controllers\Admin\FioDtrnController;
+use App\Http\Controllers\Admin\FioRipController;
+use App\Http\Controllers\Admin\SkidkaDopController;
+use App\Http\Controllers\Admin\SocialTaxiOrderController;
 
+use App\Http\Controllers\Import\ImportFioDtrnController;
+use App\Http\Controllers\Import\ImportFioRipController;
+use App\Http\Controllers\Import\ImportCategoryController;
+use App\Http\Controllers\Import\ImportOrdersController;
+use App\Http\Controllers\Import\ImportTaxiController;
+
+use App\Http\Controllers\Operator\SocialTaxiController;
+use App\Http\Controllers\Operator\CarController;
+use App\Http\Controllers\Operator\GazelleController;
 
 
 
@@ -36,6 +41,7 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['web', 'auth', IsAdmin::class])->group(function () {
+    // Для админимтраторов
     Route::get('/admin/dashboard', function () {
         return view('admin.dashboard');
     })->name('admin.dashboard');
@@ -78,8 +84,20 @@ Route::middleware(['web', 'auth', IsAdmin::class])->group(function () {
      ->name('social-taxi-orders.cancel.form');
     // Отмена заказа - выполнение
     Route::patch('/social-taxi-orders/{social_taxi_order}/cancel', [SocialTaxiOrderController::class, 'cancel'])
-     ->name('social-taxi-orders.cancel');    
+     ->name('social-taxi-orders.cancel'); 
+    Route::get('/taxi-orders', [TaxiOrderController::class, 'index'])
+     ->name('taxi-orders.index');
 });
+
+Route::middleware(['auth'])->group(function () {
+    // Для операторов
+    Route::prefix('operator')->name('operator.')->group(function () {
+        Route::get('/social-taxi', [SocialTaxiController::class, 'index'])->name('social-taxi.index');
+        Route::get('/car', [CarController::class, 'index'])->name('car.index');
+        Route::get('/gazelle', [GazelleController::class, 'index'])->name('gazelle.index');
+    });
+});
+
 
 Route::get('/clear', function() {   // для очиски кэша сайта
         Artisan::call('cache:clear');    

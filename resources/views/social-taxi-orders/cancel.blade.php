@@ -12,13 +12,34 @@
                     №{{ $social_taxi_order->pz_nom }}
                 </h1>
 
-                <a href="{{ route('social-taxi-orders.index', $urlParams ?? []) }}" 
-   class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700">
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-    </svg>
-    Назад к списку
-</a>
+                @php
+                $fromOperatorPage = session('from_operator_page');
+                $operatorCurrentType = session('operator_current_type');
+
+                $backRoute = route('social-taxi-orders.index', $urlParams ?? []);
+
+                if ($fromOperatorPage && $operatorCurrentType) {
+                $routeMap = [
+                1 => 'operator.social-taxi.index',
+                2 => 'operator.car.index',
+                3 => 'operator.gazelle.index'
+                ];
+
+                if (isset($routeMap[$operatorCurrentType])) {
+                $backRoute = route($routeMap[$operatorCurrentType], array_merge(['type_order' => $operatorCurrentType], $urlParams ?? []));
+                }
+                }
+                @endphp
+
+                <a href="{{ $backRoute }}" 
+                   class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    Назад к списку
+                </a>
+
+
             </div>
 
             <!-- Форма отмены заказа -->
@@ -156,12 +177,12 @@
                 <!-- Кнопки действия -->
                 <div class="flex justify-between items-center">
                     <a href="{{ route('social-taxi-orders.index', $urlParams ?? []) }}" 
-   class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700">
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-    </svg>
-    Назад к списку
-</a>
+                       class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        Назад к списку
+                    </a>
 
                     <div class="flex space-x-2">
                         <button type="submit" 

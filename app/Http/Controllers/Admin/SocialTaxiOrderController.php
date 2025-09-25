@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Operator;
+namespace App\Http\Controllers\Admin;
 
 use App\Models\Order;
 use App\Models\User;
@@ -30,6 +30,10 @@ class SocialTaxiOrderController extends BaseController {
 
     // Показать список заказов
     public function index(Request $request) {
+
+        // Сбрасываем сессию при входе на общую страницу администратора
+        session()->forget(['from_operator_page', 'operator_current_type']);
+
         // По умолчанию показываем только неудаленные записи
         $showDeleted = $request->get('show_deleted', '0');
 
@@ -73,7 +77,7 @@ class SocialTaxiOrderController extends BaseController {
             $data = $this->orderService->getOrderDetails($id);
 
             // Собираем параметры для кнопки "Назад"
-            $backUrlParams =  $this->orderService->getUrlParams();
+            $backUrlParams = $this->orderService->getUrlParams();
 
             // Передаем данные в представление, используя распаковку массива
             return view('social-taxi-orders.show', array_merge($data, ['backUrlParams' => $backUrlParams]));
@@ -129,9 +133,12 @@ class SocialTaxiOrderController extends BaseController {
 
             // Передаем в сервис валидированные данные и объект заказа для обновления
             $this->orderService->updateOrder($social_taxi_order, $validated);
+            
+            $urlParams = $this->orderService->getUrlParams(); // параметры фильтрации
+            $backRoute = $this->getBackRoute($urlParams);
 
-            return redirect()->route('social-taxi-orders.show', $social_taxi_order)
-                            ->with('success', 'Заказ успешно обновлен.');
+            return redirect()->to($backRoute)->with('success', 'Заказ успешно обновлен.');
+            
         } catch (\Exception $e) {
             \Log::error('Ошибка при обновлении заказа.', ['order_id' => $social_taxi_order->id, 'exception' => $e]);
             return back()->with('error', 'Ошибка при обновлении заказа: ' . $e->getMessage())
@@ -160,8 +167,14 @@ class SocialTaxiOrderController extends BaseController {
         $order->deleted_at = now();
         $order->save();
 
-        return redirect()->route('social-taxi-orders.index', $this->orderService->getUrlParams())
-                    ->with('success', 'Заказ удален.');
+        // Определяем маршрут возврата
+        $fromOperatorPage = session('from_operator_page');
+        $operatorCurrentType = session('operator_current_type');
+
+        $urlParams = $this->orderService->getUrlParams(); // параметры фильтрации
+        $backRoute = $this->getBackRoute($urlParams);
+
+        return redirect()->to($backRoute)->with('success', 'Заказ удален.');
     }
 
     public function restore($id) {
@@ -172,14 +185,14 @@ class SocialTaxiOrderController extends BaseController {
             return redirect()->back()->with('error', 'Заказ не найден.');
         }
 
-        $urlParams = request()->only(['sort', 'direction', 'show_deleted', 'pz_nom', 'type_order', 'status_order_id', 'date_from', 'date_to', 'user_id', 'client_fio']);
+        $urlParams = $this->orderService->getUrlParams();        
+        $backRoute = $this->getBackRoute($urlParams);
 
         if ($order->trashed()) {
             $order->restore();
-            return redirect()->route('social-taxi-orders.index', $urlParams)->with('success', 'Заказ успешно восстановлен.');
+            return redirect()->to($backRoute)->with('success', 'Заказ успешно восстановлен.');
         }
-
-        return redirect()->route('social-taxi-orders.index', $urlParams)->with('error', 'Заказ не был удален.');
+        return redirect()->to($backRoute)->with('error', 'Заказ не был удален.');
     }
 
     // Показать форму создания заказа по типу с поддержкой копирования
@@ -191,16 +204,10 @@ class SocialTaxiOrderController extends BaseController {
 
         // Передаем параметры для кнопки "Назад"
         $backUrlParams = $this->orderService->getUrlParams();
-        \Log::info('CreateByType params', [
-        'backUrlParams' => $backUrlParams,
-        'all_request' => $request->all(),
-        'url_params' => $request->only(['sort', 'direction', 'show_deleted', 'pz_nom', 'type_order', 'status_order_id', 'date_from', 'date_to', 'user_id', 'client_fio'])
-    ]);
-        
+
         // Вызываем новый сервисный метод для получения данных
         $data = $this->orderService->getOrderCreateData($type);
-        
-        
+
         // Проверяем, есть ли параметр copy_from (копирование заказа)
         if ($request->has('copy_from')) {
             $copyFromId = $request->get('copy_from');
@@ -225,7 +232,6 @@ class SocialTaxiOrderController extends BaseController {
 
                 // Объединяем данные
                 $data = array_merge($data, $copiedOrderData);
-                
             }
         }
 
@@ -288,8 +294,7 @@ class SocialTaxiOrderController extends BaseController {
         }
 
         // Получаем параметры запроса для сохранения фильтров
-        $urlParams = request()->only(['sort', 'direction', 'show_deleted', 'pz_nom', 'type_order', 'status_order_id', 'date_from', 'date_to', 'user_id', 'client_fio']);
-
+        $urlParams = $this->orderService->getUrlParams();
         return view('social-taxi-orders.cancel', compact('social_taxi_order', 'urlParams'));
     }
 
@@ -297,13 +302,50 @@ class SocialTaxiOrderController extends BaseController {
     public function cancel(CancelSocialTaxiOrderRequest $request, Order $social_taxi_order) {
         try {
             $validated = $request->validated();
+
             $this->orderService->cancelOrder($social_taxi_order, $validated);
 
-            return redirect()->route('social-taxi-orders.index', $this->orderService->getUrlParams())
-                            ->with('success', 'Заказ отменен.');
+            // Определяем маршрут возврата
+            $fromOperatorPage = session('from_operator_page');
+            $operatorCurrentType = session('operator_current_type');
+
+            $urlParams = $this->orderService->getUrlParams(); // параметры фильтрации
+            $backRoute = $this->getBackRoute($urlParams);
+            
+            return redirect()->to($backRoute)->with('success', 'Заказ отменен.');
         } catch (\Exception $e) {
-            return redirect()->route('social-taxi-orders.index', $this->orderService->getUrlParams())
-                            ->with('error', 'Ошибка при отмене заказа: ' . $e->getMessage());
+            $urlParams = $this->orderService->getUrlParams();
+            $backRoute = $this->getBackRoute($urlParams);
+            return redirect()->to($backRoute) ->with('error', 'Ошибка при отмене заказа: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Получить маршрут для типа заказа
+     */
+    private function getOperatorRoute(int $type): string {
+        $routeMap = [
+            1 => 'operator.social-taxi.index',
+            2 => 'operator.car.index',
+            3 => 'operator.gazelle.index'
+        ];
+
+        return $routeMap[$type] ?? 'operator.social-taxi.index';
+    }
+
+    /**
+     * Получить маршрут возврата с учетом сессии
+     */
+    private function getBackRoute(array $urlParams, ?int $type = null): string {
+        $fromOperatorPage = session('from_operator_page');
+        $operatorCurrentType = session('operator_current_type') ?? $type;
+
+        if ($fromOperatorPage && $operatorCurrentType) {
+            $route = $this->getOperatorRoute($operatorCurrentType);
+            return route($route, array_merge(['type_order' => $operatorCurrentType], $urlParams));
+        }
+
+        return route('social-taxi-orders.index', $urlParams);
+    }
+
 }

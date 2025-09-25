@@ -1,7 +1,7 @@
 <?php
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ClientTripController;
-use App\Http\Controllers\Operator\SocialTaxiOrderController;
+use App\Http\Controllers\Admin\SocialTaxiOrderController;
 
 Route::get('/client-trips/{clientId}/{monthYear}', [ClientTripController::class, 'getClientTrips']);
 Route::get('/client-actual-trips/{clientId}/{monthYear}', [ClientTripController::class, 'getClientActualTrips']);

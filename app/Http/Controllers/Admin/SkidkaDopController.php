@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Operator;
+namespace App\Http\Controllers\Admin;
 use App\Models\SkidkaDop;
 use Illuminate\Http\Request;
 

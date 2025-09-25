@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Operator;
+namespace App\Http\Controllers\Import;
 
 use Illuminate\Http\Request;
 use App\Models\Category;
