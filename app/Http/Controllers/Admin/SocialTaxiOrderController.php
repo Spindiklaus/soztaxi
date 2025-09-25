@@ -32,20 +32,7 @@ class SocialTaxiOrderController extends BaseController {
     public function index(Request $request) {
         
         
-        \Log::info('Index params', [
-        'all_request' => $request->all(),
-        'type_order' => $request->get('type_order'),
-        'url_params' => $this->orderService->getUrlParams()
-    ]);
-         $urlParams = $this->orderService->getUrlParams();
-        \Log::info('URL Params Check', [
-        'request_type_order' => $request->get('type_order'),
-        'urlParams_type_order' => $urlParams['type_order'] ?? 'NOT_SET',
-        'urlParams' => $urlParams
-    ]);
-        
-
-        // Сбрасываем сессию при входе на общую страницу администратора
+            // Сбрасываем сессию при входе на общую страницу администратора
         session()->forget(['from_operator_page', 'operator_current_type']);
 
         // По умолчанию показываем только неудаленные записи
@@ -132,6 +119,16 @@ class SocialTaxiOrderController extends BaseController {
     // Обновить заказ
     public function update(UpdateSocialTaxiOrderRequest $request, Order $social_taxi_order) {
 //        dd(__METHOD__);
+        
+        \Log::info('Update params', [
+        'all_request' => $request->all(),
+        'filter_pz_nom' => $request->get('filter_pz_nom'),
+        'filterParams' => $request->only([
+            'sort', 'direction', 'show_deleted', 'filter_type_order', 
+            'status_order_id', 'date_from', 'date_to', 'filter_user_id', 'client_fio', 'filter_pz_nom'
+        ])
+    ]);
+        
         try {
             $validated = $request->validated();
 

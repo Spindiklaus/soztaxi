@@ -23,7 +23,7 @@
 
             <div>
                 <label for="filter_pz_nom" class="block text-sm font-medium text-gray-700">Номер заказа</label>
-                <input type="text" name="pz_nom" id="filter_pz_nom" value="{{ request('pz_nom') }}" placeholder="%Поиск%" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <input type="text" name="filter_pz_nom" id="filter_pz_nom" value="{{ request('filter_pz_nom') }}" placeholder="%Поиск%" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
             </div>
 
             <div>
@@ -143,7 +143,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if ($key === 'user_id' && $value === '0') return false;
             if ($key === 'client_fio' && $value === '') return false;
             if ($key === 'type_order' && ($value === '' || $value === null)) return false;
-            if ($key === 'pz_nom' && $value === '') return false; // И эту строку
+            if ($key === 'filter_pz_nom' && $value === '') return false; // И эту строку
             return !empty($value);
         })->isNotEmpty() ? 'true' : 'false' 
     }};

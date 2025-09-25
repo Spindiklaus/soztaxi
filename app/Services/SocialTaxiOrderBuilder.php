@@ -55,7 +55,7 @@ class SocialTaxiOrderBuilder
     public function applyFilters(Request $request): self
     {
         \Log::info('Apply filters params', [
-        'pz_nom' => $request->input('pz_nom'),
+        'filter_pz_nom' => $request->input('filter_pz_nom'),
         'type_order' => $request->input('type_order'),
         'status_order_id' => $request->input('status_order_id'),
         'user_id' => $request->input('user_id'),
@@ -67,8 +67,8 @@ class SocialTaxiOrderBuilder
         
         
         // Фильтрация
-        if ($request->filled('pz_nom')) {
-            $this->query->where('pz_nom', 'like', '%' . $request->input('pz_nom') . '%');
+        if ($request->filled('filter_pz_nom')) {
+            $this->query->where('pz_nom', 'like', '%' . $request->input('filter_pz_nom') . '%');
         }
         
         if ($request->filled('type_order')) {
