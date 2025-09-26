@@ -22,8 +22,8 @@ class CarController extends BaseController
 
     public function index(Request $request) {
         // Устанавливаем фильтр по типу заказа "Легковой автомобиль" (ID = 2) и по текущему пользователю
-        if (!$request->has('type_order')) {
-            $request->merge(['type_order' => 2]);
+        if (!$request->has('filter_type_order')) {
+            $request->merge(['filter_type_order' => 2]);
         }
         
         if (!$request->has('user_id')) {

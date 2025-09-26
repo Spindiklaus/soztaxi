@@ -1,8 +1,27 @@
 <!-- Кнопки действия -->
 <!-- resources/views/social-taxi-orders/create-components/actions.blade.php -->
 <div class="flex justify-end space-x-3">
-    <a href="{{ route('social-taxi-orders.index') }}" 
-       class="inline-flex items-center px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400">
+    @php
+        $fromOperatorPage = session('from_operator_page');
+        $operatorCurrentType = session('operator_current_type');
+
+        $backRoute = route('social-taxi-orders.index', $backUrlParams ?? []);
+
+        // Если пришли с операторской страницы - возвращаем туда
+        if ($fromOperatorPage && $operatorCurrentType) {
+            $routeMap = [
+                1 => 'operator.social-taxi.index',
+                2 => 'operator.car.index',
+                3 => 'operator.gazelle.index'
+            ];
+
+        if (isset($routeMap[$operatorCurrentType])) {
+            $backRoute = route($routeMap[$operatorCurrentType], array_merge(['type_order' => $operatorCurrentType], $backUrlParams ?? []));
+        }
+    }
+    @endphp
+    <a href="{{ $backRoute }}" 
+       accesskey=""class="inline-flex items-center px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400">
         Отмена
     </a>
     <button type="submit" 

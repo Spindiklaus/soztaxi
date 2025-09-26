@@ -45,8 +45,8 @@
             </div>
 
             <div>
-                <label for="filter_status_order_id" class="block text-sm font-medium text-gray-700">Статус заказа</label>
-                <select name="status_order_id" id="filter_status_order_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <label for="status_order_id" class="block text-sm font-medium text-gray-700">Статус заказа</label>
+                <select name="status_order_id" id="status_order_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                     <option value="">Все статусы</option>
                     <option value="1" {{ request('status_order_id') == '1' ? 'selected' : '' }}>Принят</option>
                     <option value="2" {{ request('status_order_id') == '2' ? 'selected' : '' }}>Передан в такси</option>
@@ -69,7 +69,7 @@
             
             <!-- Новый фильтр по ФИО клиента -->
             <div>
-                <label for="filter_client_fio" class="block text-sm font-medium text-gray-700">ФИО клиента</label>
+                <label for="client_fio" class="block text-sm font-medium text-gray-700">ФИО клиента</label>
                 <input type="text" name="client_fio" id="client_fio" 
                        value="{{ request('client_fio') }}" 
                        placeholder="%Поиск по ФИО%"

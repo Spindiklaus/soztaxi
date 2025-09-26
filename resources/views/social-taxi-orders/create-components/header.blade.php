@@ -18,22 +18,22 @@
     </h1>
 
     @php
-    $fromOperatorPage = session('from_operator_page');
-    $operatorCurrentType = session('operator_current_type');
+        $fromOperatorPage = session('from_operator_page');
+        $operatorCurrentType = session('operator_current_type');
 
-    $backRoute = route('social-taxi-orders.index', $backUrlParams ?? []);
+        $backRoute = route('social-taxi-orders.index', $backUrlParams ?? []);
 
-    // Если пришли с операторской страницы - возвращаем туда
-    if ($fromOperatorPage && $operatorCurrentType) {
-    $routeMap = [
-    1 => 'operator.social-taxi.index',
-    2 => 'operator.car.index',
-    3 => 'operator.gazelle.index'
-    ];
+        // Если пришли с операторской страницы - возвращаем туда
+        if ($fromOperatorPage && $operatorCurrentType) {
+            $routeMap = [
+                1 => 'operator.social-taxi.index',
+                2 => 'operator.car.index',
+                3 => 'operator.gazelle.index'
+            ];
 
-    if (isset($routeMap[$operatorCurrentType])) {
-        $backRoute = route($routeMap[$operatorCurrentType], array_merge(['type_order' => $operatorCurrentType], $backUrlParams ?? []));
-    }
+        if (isset($routeMap[$operatorCurrentType])) {
+            $backRoute = route($routeMap[$operatorCurrentType], array_merge(['type_order' => $operatorCurrentType], $backUrlParams ?? []));
+        }
     }
     @endphp
 

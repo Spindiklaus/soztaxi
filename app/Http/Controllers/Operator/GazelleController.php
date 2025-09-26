@@ -22,8 +22,8 @@ class GazelleController extends BaseController
 
     public function index(Request $request) {
         // Устанавливаем фильтр по типу заказа "ГАЗель" (ID = 3) и по текущему пользователю
-        if (!$request->has('type_order')) {
-            $request->merge(['type_order' => 3]);
+        if (!$request->has('filter_type_order')) {
+            $request->merge(['filter_type_order' => 3]);
         }
         
         if (!$request->has('user_id')) {

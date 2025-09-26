@@ -22,8 +22,8 @@ class SocialTaxiController extends BaseController
 
     public function index(Request $request) {
         // Устанавливаем фильтр по типу заказа "Соцтакси" (ID = 1) и по текущему пользователю
-        if (!$request->has('type_order')) {
-            $request->merge(['type_order' => 1]);
+        if (!$request->has('filter_type_order')) {
+            $request->merge(['filter_type_order' => 1]);
         }
         
         if (!$request->has('user_id')) {

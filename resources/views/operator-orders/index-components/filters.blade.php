@@ -18,7 +18,7 @@
     @php
         $activeFilters = [];
         $filterLabels = [
-            'pz_nom' => 'Номер заказа',
+            'filter_pz_nom' => 'Номер заказа',
             'status_order_id' => 'Статус заказа',
             'client_fio' => 'ФИО клиента',
             'show_deleted' => 'Статус записей',
@@ -34,7 +34,7 @@
         ];
         
         foreach (request()->all() as $key => $value) {
-            if (in_array($key, ['pz_nom', 'status_order_id', 'client_fio', 'show_deleted', 'date_from', 'date_to']) && !empty($value)) {
+            if (in_array($key, ['filter_pz_nom', 'status_order_id', 'client_fio', 'show_deleted', 'date_from', 'date_to']) && !empty($value)) {
                 if ($key === 'status_order_id' && isset($statusLabels[$value])) {
                     $activeFilters[] = $filterLabels[$key] . ': ' . $statusLabels[$value];
                 } elseif ($key === 'show_deleted') {
@@ -67,7 +67,7 @@
     <div id="filters-content" class="p-4 hidden">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
             <!-- Скрытое поле для сохранения типа заказа -->
-            <input type="hidden" name="type_order" value="{{ request('type_order', 1) }}">
+            <input type="hidden" name="filter_type_order" value="{{ request('type_order', 1) }}">
             
             <!-- Скрытое поле для сохранения сортировки -->
             <input type="hidden" name="sort" value="{{ $sort ?? 'pz_data' }}">
@@ -75,7 +75,7 @@
 
             <div>
                 <label for="filter_pz_nom" class="block text-sm font-medium text-gray-700">Номер заказа</label>
-                <input type="text" name="pz_nom" id="filter_pz_nom" value="{{ request('pz_nom') }}" placeholder="%Поиск%" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <input type="text" name="filter_pz_nom" id="filter_pz_nom" value="{{ request('filter_pz_nom') }}" placeholder="%Поиск%" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
             </div>
 
             <div>
@@ -87,8 +87,8 @@
             </div>
 
             <div>
-                <label for="filter_status_order_id" class="block text-sm font-medium text-gray-700">Статус заказа</label>
-                <select name="status_order_id" id="filter_status_order_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <label for="status_order_id" class="block text-sm font-medium text-gray-700">Статус заказа</label>
+                <select name="status_order_id" id="status_order_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                     <option value="">Все статусы</option>
                     <option value="1" {{ request('status_order_id') == '1' ? 'selected' : '' }}>Принят</option>
                     <option value="2" {{ request('status_order_id') == '2' ? 'selected' : '' }}>Передан в такси</option>
@@ -99,8 +99,8 @@
             
             <!-- Новый фильтр по ФИО клиента -->
             <div>
-                <label for="filter_client_fio" class="block text-sm font-medium text-gray-700">ФИО клиента</label>
-                <input type="text" name="client_fio" id="filter_client_fio" 
+                <label for="client_fio" class="block text-sm font-medium text-gray-700">ФИО клиента</label>
+                <input type="text" name="client_fio" id="client_fio" 
                        value="{{ request('client_fio') }}" 
                        placeholder="%Поиск по ФИО%"
                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">

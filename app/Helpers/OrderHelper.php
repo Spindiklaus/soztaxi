@@ -90,22 +90,24 @@ if (!function_exists('generateOrderNumber')) {
         
         $prefix = $prefixes[$type] ?? 'UNK';
         
-        // Получаем максимальный номер заказа для этого оператора и префикса
-    $maxNumber = 0;
-    $lastOrders = \App\Models\Order::where('user_id', $userId)
-        ->where('pz_nom', 'like', $prefix . '-______' . $litera)
-        ->get();
+       // Получаем максимальный номер заказа для этого оператора и префикса
+        // Используем withTrashed() чтобы учитывать удаленные заказы
+        $maxOrder = \App\Models\Order::withTrashed()
+            ->where('user_id', $userId)
+            ->where('pz_nom', 'like', $prefix . '-______' . $litera)
+            ->orderBy('pz_nom', 'desc')
+            ->first();
     
-     foreach ($lastOrders as $order) {
-        // Извлекаем номер из pz_nom
-        if (preg_match('/^' . $prefix . '-(\d+)' . $litera . '$/', $order->pz_nom, $matches)) {
-            $number = (int)$matches[1];
-            if ($number > $maxNumber) {
-                $maxNumber = $number;
+        $maxNumber = 0;
+        if ($maxOrder) {
+            // Извлекаем номер из pz_nom
+            if (preg_match('/^' . $prefix . '-(\d+)' . $litera . '$/', $maxOrder->pz_nom, $matches)) {
+                $maxNumber = (int)$matches[1];
             }
         }
-    }
-    $nextNumber = $maxNumber + 1;
+    
+        $nextNumber = $maxNumber + 1;
+
     
         // Формируем номер заказа: ST-000499SEM, LA-000001SEM, GA-000001SEM
         return $prefix . '-' . str_pad($nextNumber, 6, '0', STR_PAD_LEFT) . $litera;
