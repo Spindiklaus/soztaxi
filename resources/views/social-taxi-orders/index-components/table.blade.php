@@ -17,9 +17,9 @@
      }
      }" x-cloak class="bg-white shadow overflow-hidden sm:rounded-lg">
     <!-- Для отладки -->
-<!--    <div class="p-4 text-sm text-gray-600">
-        Текущая сортировка: <strong x-text="`Поле: ${sortField}, Направление: ${sortDirection}`"></strong>
-    </div>  -->
+    <!--    <div class="p-4 text-sm text-gray-600">
+            Текущая сортировка: <strong x-text="`Поле: ${sortField}, Направление: ${sortDirection}`"></strong>
+        </div>  -->
     <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-blue-800 text-gray-200">
@@ -265,7 +265,7 @@
                             @endif
                             <!-- Кнопка копирования в actions.blade.php -->
                             @if(!$order->deleted_at && $status->id == 1)
-                            <a href="{{ route('social-taxi-orders.create.by-type', ['type' => $order->type_order, 'copy_from' => $order->id]) }}" 
+                            <a href="{{ route('social-taxi-orders.create.by-type', array_merge(['type' => $order->type_order, 'copy_from' => $order->id], $urlParams)) }}" 
                                class="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-md hover:bg-green-200 text-sm w-full">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />

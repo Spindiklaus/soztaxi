@@ -7,9 +7,8 @@
             <form action="{{ route('social-taxi-orders.update', $order) }}" method="POST" class="bg-white shadow rounded-lg p-6">
                 @csrf
                 @method('PUT')
-                @if(request()->has('filter_pz_nom'))
-                    <input type="hidden" name="filter_pz_nom" value="{{ request('filter_pz_nom') }}">
-                @endif
+                
+                @include('social-taxi-orders.components.filter-hidden-fields')
                 
                 @include('social-taxi-orders.edit-components.order-info')
                 

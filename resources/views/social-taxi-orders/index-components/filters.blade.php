@@ -28,11 +28,11 @@
 
             <div>
                 <label for="filter_type_order" class="block text-sm font-medium text-gray-700">Тип заказа</label>
-                <select name="type_order" id="filter_type_order" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <select name="filter_type_order" id="filter_type_order" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                     <option value="">Все</option>
-                    <option value="1" {{ request('type_order') == '1' ? 'selected' : '' }}>Соцтакси</option>
-                    <option value="2" {{ request('type_order') == '2' ? 'selected' : '' }}>Легковое авто</option>
-                    <option value="3" {{ request('type_order') == '3' ? 'selected' : '' }}>ГАЗель</option>
+                    <option value="1" {{ request('filter_type_order') == '1' ? 'selected' : '' }}>Соцтакси</option>
+                    <option value="2" {{ request('filter_type_order') == '2' ? 'selected' : '' }}>Легковое авто</option>
+                    <option value="3" {{ request('filter_type_order') == '3' ? 'selected' : '' }}>ГАЗель</option>
                 </select>
             </div>
 
@@ -57,10 +57,10 @@
             <!-- фильтр по операторам -->
             <div>
                 <label for="filter_user_id" class="block text-sm font-medium text-gray-700">Оператор</label>
-                <select name="user_id" id="filter_user_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <select name="filter_user_id" id="filter_user_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                     <option value="">Все операторы</option>
                     @foreach($operators as $operator)
-                        <option value="{{ $operator->id }}" {{ request('user_id') == $operator->id ? 'selected' : '' }}>
+                        <option value="{{ $operator->id }}" {{ request('filter_user_id') == $operator->id ? 'selected' : '' }}>
                             {{ $operator->name }} ({{ $operator->litera ?? 'Без литеры' }})
                         </option>
                     @endforeach
@@ -70,7 +70,7 @@
             <!-- Новый фильтр по ФИО клиента -->
             <div>
                 <label for="filter_client_fio" class="block text-sm font-medium text-gray-700">ФИО клиента</label>
-                <input type="text" name="client_fio" id="filter_client_fio" 
+                <input type="text" name="client_fio" id="client_fio" 
                        value="{{ request('client_fio') }}" 
                        placeholder="%Поиск по ФИО%"
                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
@@ -140,9 +140,9 @@ document.addEventListener('DOMContentLoaded', function() {
             if ($key === 'date_from' && $value === '2016-08-01') return false;
             if ($key === 'date_to' && $value === date('Y-m-d')) return false;
             if ($key === 'show_deleted' && $value === '0') return false;
-            if ($key === 'user_id' && $value === '0') return false;
+            if ($key === 'filter_user_id' && $value === '0') return false;
             if ($key === 'client_fio' && $value === '') return false;
-            if ($key === 'type_order' && ($value === '' || $value === null)) return false;
+            if ($key === 'filter_type_order' && ($value === '' || $value === null)) return false;
             if ($key === 'filter_pz_nom' && $value === '') return false; // И эту строку
             return !empty($value);
         })->isNotEmpty() ? 'true' : 'false' 

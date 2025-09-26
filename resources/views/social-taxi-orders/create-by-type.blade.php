@@ -10,6 +10,7 @@
             <form action="{{ route('social-taxi-orders.store.by-type', $type) }}" method="POST" class="bg-white shadow rounded-lg p-6">
                 @csrf
                 
+                @include('social-taxi-orders.components.filter-hidden-fields')
                 <!-- Предварительная информация о заказе -->
                 @include('social-taxi-orders.create-components.order-info')
                 

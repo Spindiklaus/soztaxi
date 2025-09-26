@@ -56,9 +56,9 @@ class SocialTaxiOrderBuilder
     {
         \Log::info('Apply filters params', [
         'filter_pz_nom' => $request->input('filter_pz_nom'),
-        'type_order' => $request->input('type_order'),
+        'filter_type_order' => $request->input('filter_type_order'),
         'status_order_id' => $request->input('status_order_id'),
-        'user_id' => $request->input('user_id'),
+        'filter_user_id' => $request->input('filter_user_id'),
         'client_fio' => $request->input('client_fio'),
         'date_from' => $request->input('date_from'),
         'date_to' => $request->input('date_to'),
@@ -71,8 +71,8 @@ class SocialTaxiOrderBuilder
             $this->query->where('pz_nom', 'like', '%' . $request->input('filter_pz_nom') . '%');
         }
         
-        if ($request->filled('type_order')) {
-            $this->query->where('type_order', $request->input('type_order'));
+        if ($request->filled('filter_type_order')) {
+            $this->query->where('type_order', $request->input('filter_type_order'));
         }
         
         // Фильтрация по статусу заказа
@@ -87,8 +87,8 @@ class SocialTaxiOrderBuilder
         $dateTo = $request->input('date_to', date('Y-m-d'));
         
         // Фильтрация по оператору (user_id)
-        if ($request->filled('user_id')) {
-            $this->query->where('user_id', $request->input('user_id'));
+        if ($request->filled('filter_user_id')) {
+            $this->query->where('user_id', $request->input('filter_user_id'));
         }
         
         if ($dateFrom) {

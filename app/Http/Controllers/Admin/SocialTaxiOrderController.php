@@ -148,7 +148,7 @@ class SocialTaxiOrderController extends BaseController {
             $urlParams = $this->orderService->getUrlParams(); // параметры фильтрации
             $backRoute = $this->getBackRoute($urlParams);
 
-            return redirect()->to($backRoute)->with('success', 'Заказ успешно обновлен.');
+            return redirect()->to($backRoute)->with('success', 'Заказ №' . $social_taxi_order->pz_nom . ' успешно обновлен.');
             
         } catch (\Exception $e) {
             \Log::error('Ошибка при обновлении заказа.', ['order_id' => $social_taxi_order->id, 'exception' => $e]);
@@ -253,16 +253,18 @@ class SocialTaxiOrderController extends BaseController {
     public function storeByType(StoreSocialTaxiOrderByTypeRequest $request, $type) {
         // Проверяем допустимый тип соцзаказа
         if (!in_array($type, self::ALLOWED_TYPES)) {
-            return redirect()->route('social-taxi-orders.index')
-                            ->with('error', 'Недопустимый тип заказа.');
+            return back() ->with('error', 'Недопустимый тип заказа.');
         }
 
         try {
             $validated = $request->validated();
             $order = $this->orderService->createOrderByType($validated, $type);
 
-            return redirect()->route('social-taxi-orders.show', $order)
-                            ->with('success', 'Заказ успешно создан.');
+            $urlParams = $this->orderService->getUrlParams();        
+            $backRoute = $this->getBackRoute($urlParams);
+           return redirect()->to($backRoute)
+                   ->with('success', 'Заказ №' . $order->pz_nom . ' успешно создан.');
+
         } catch (\Exception $e) {
             return back()->with('error', 'Ошибка при создании заказа: ' . $e->getMessage())
                             ->withInput();
