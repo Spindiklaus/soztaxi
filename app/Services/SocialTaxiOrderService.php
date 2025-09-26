@@ -35,7 +35,8 @@ class SocialTaxiOrderService {
             $order = Order::create($orderData);
 
             // Устанавливаем начальный статус "Принят"
-            $this->setInitialStatus($order, 1); // ID статуса "Принят"
+            // не надо, а то устанавливает 2 раза статус в order_history_status
+            // $this->setInitialStatus($order, 1); // ID статуса "Принят"
 
             DB::commit();
 

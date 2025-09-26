@@ -106,19 +106,15 @@
         @if($order->type_order != 1)
         <div>
             <label for="visit_obratno" class="block text-sm font-medium text-gray-700">Дата и время обратной поездки</label>
-            @if($order->zena_type == '1')
-            <!-- Если поездка в одну сторону, показываем значение как readonly и добавляем hidden поле -->
+            
+            <!-- Всегда создаем поле с id, но делаем его readonly/disabled в зависимости от zena_type -->
             <input type="datetime-local" 
+                   name="visit_obratno" 
+                   id="visit_obratno"
                    value="{{ old('visit_obratno', $order->visit_obratno) }}"
-                   readonly
-                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 cursor-not-allowed">
-            <input type="hidden" name="visit_obratno" value="{{ old('visit_obratno', $order->visit_obratno) }}">
-            @else
-            <!-- Если поездка в обе стороны, поле редактируемое -->
-            <input type="datetime-local" name="visit_obratno" id="visit_obratno" 
-                   value="{{ old('visit_obratno', $order->visit_obratno) }}"
-                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-            @endif
+                   {{ $order->zena_type == '1' ? 'readonly disabled' : '' }}
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 {{ $order->zena_type == '1' ? 'bg-gray-100 cursor-not-allowed' : '' }}">
+
             @error('visit_obratno')
             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
             @enderror
@@ -128,11 +124,13 @@
         </div>
         <div>
             <label for="adres_obratno" class="block text-sm font-medium text-gray-700">Обратный адрес</label>
-            <textarea name="adres_obratno" id="adres_obratno" 
+            <textarea name="adres_obratno" 
+                      id="adres_obratno" 
                       rows="3" 
-                      {{ ($order->type_order == 2 || $order->type_order == 3) && ($order->zena_type == '1') ? 'readonly disabled' : '' }}
+                      placeholder="{{ $order->zena_type == '2' ? 'Введите обратный адрес' : 'Поле недоступно для поездки в одну сторону' }}"
+                      {{ $order->zena_type == '1' ? 'readonly disabled' : '' }}
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 
-                {{ ($order->zena_type == 2 || $order->zena_type == 3) && ($order->zena_type == '1') ? 'bg-gray-100 cursor-not-allowed' : '' }}">{{old('adres_obratno', $order->adres_obratno) }}</textarea>
+                {{ $order->zena_type == '1' ? 'bg-gray-100 cursor-not-allowed' : '' }}">{{ old('adres_obratno', $order->adres_obratno) }}</textarea>
             @error('adres_obratno')
             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
             @enderror
@@ -142,6 +140,7 @@
             </p>
             @endif
         </div>
+        
         <!-- Цена поездки -->
         <div>
             <label for="taxi_price" class="block text-sm font-medium text-gray-700">Цена поездки</label>

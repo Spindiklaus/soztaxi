@@ -26,8 +26,8 @@ class SocialTaxiController extends BaseController
             $request->merge(['filter_type_order' => 1]);
         }
         
-        if (!$request->has('user_id')) {
-            $request->merge(['user_id' => auth()->id()]);
+        if (!$request->has('filter_user_id')) {
+            $request->merge(['filter_user_id' => auth()->id()]);
         }
 
         $showDeleted = $request->get('show_deleted', '0');

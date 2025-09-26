@@ -319,13 +319,11 @@ class SocialTaxiOrderController extends BaseController {
             $this->orderService->cancelOrder($social_taxi_order, $validated);
 
             // Определяем маршрут возврата
-            $fromOperatorPage = session('from_operator_page');
-            $operatorCurrentType = session('operator_current_type');
-
+           
             $urlParams = $this->orderService->getUrlParams(); // параметры фильтрации
             $backRoute = $this->getBackRoute($urlParams);
             
-            return redirect()->to($backRoute)->with('success', 'Заказ отменен.');
+            return redirect()->to($backRoute)->with('success', 'Заказ №' . $social_taxi_order->pz_nom . ' отменен.');
         } catch (\Exception $e) {
             $urlParams = $this->orderService->getUrlParams();
             $backRoute = $this->getBackRoute($urlParams);

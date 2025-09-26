@@ -14,6 +14,10 @@ class OrderObserver
      */
     public function created(Order $order): void
     {
+        \Log::info('OrderObserver created called', [
+        'order_id' => $order->id,
+        'trace' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10)
+        ]);
         // Статус "принят" имеет ID = 1 (по умолчанию из сидера)
         $this->changeStatus($order, 1); // ID статуса "принят"
     }

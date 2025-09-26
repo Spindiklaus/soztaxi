@@ -73,18 +73,7 @@ Route::middleware(['web', 'auth', IsAdmin::class])->group(function () {
         Route::post('/taxis/import', [ImportTaxiController::class, 'import'])->name('import.taxis.process');
     });
     Route::resource('fio_rips', FioRipController::class)->except(['show']);
-    Route::resource('skidka_dops', SkidkaDopController::class)->except(['show']);
-    Route::resource('social-taxi-orders', SocialTaxiOrderController::class)->names('social-taxi-orders'); 
-    // маршрут для восстановления
-    Route::patch('/social-taxi-orders/{social_taxi_order}/restore', [SocialTaxiOrderController::class, 'restore'])->name('social-taxi-orders.restore');
-    Route::get('/social-taxi-orders/create/type/{type}', [SocialTaxiOrderController::class, 'createByType'])->name('social-taxi-orders.create.by-type');
-    Route::post('/social-taxi-orders/store/type/{type}', [SocialTaxiOrderController::class, 'storeByType'])->name('social-taxi-orders.store.by-type');
-    // Отмена заказа - показ формы
-    Route::get('/social-taxi-orders/{social_taxi_order}/cancel', [SocialTaxiOrderController::class, 'showCancelForm'])
-     ->name('social-taxi-orders.cancel.form');
-    // Отмена заказа - выполнение
-    Route::patch('/social-taxi-orders/{social_taxi_order}/cancel', [SocialTaxiOrderController::class, 'cancel'])
-     ->name('social-taxi-orders.cancel'); 
+    Route::resource('skidka_dops', SkidkaDopController::class)->except(['show']);   
     Route::get('/taxi-orders', [TaxiOrderController::class, 'index'])
      ->name('taxi-orders.index');
 });
@@ -96,6 +85,17 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/car', [CarController::class, 'index'])->name('car.index');
         Route::get('/gazelle', [GazelleController::class, 'index'])->name('gazelle.index');
     });
+    Route::resource('social-taxi-orders', SocialTaxiOrderController::class)->names('social-taxi-orders'); 
+    // маршрут для восстановления
+    Route::patch('/social-taxi-orders/{social_taxi_order}/restore', [SocialTaxiOrderController::class, 'restore'])->name('social-taxi-orders.restore');
+    Route::get('/social-taxi-orders/create/type/{type}', [SocialTaxiOrderController::class, 'createByType'])->name('social-taxi-orders.create.by-type');
+    Route::post('/social-taxi-orders/store/type/{type}', [SocialTaxiOrderController::class, 'storeByType'])->name('social-taxi-orders.store.by-type');
+    // Отмена заказа - показ формы
+    Route::get('/social-taxi-orders/{social_taxi_order}/cancel', [SocialTaxiOrderController::class, 'showCancelForm'])
+     ->name('social-taxi-orders.cancel.form');
+    // Отмена заказа - выполнение
+    Route::patch('/social-taxi-orders/{social_taxi_order}/cancel', [SocialTaxiOrderController::class, 'cancel'])
+     ->name('social-taxi-orders.cancel'); 
 });
 
 

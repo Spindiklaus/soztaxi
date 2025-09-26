@@ -35,4 +35,4 @@
 @endif
 @if (request()->has('date_to')) 
     <input type="hidden" name="date_to" value="{{ request('date_to') }}">
-@endif                
+@endif 

@@ -278,19 +278,19 @@
                         <!-- Кнопка отмены заказа -->
                         @if(!$order->deleted_at && !$order->cancelled_at)
                         @php
-                        $currentStatus = $order->currentStatus;
-                        $statusId = $currentStatus ? $currentStatus->status_order_id : 1;
+                            $currentStatus = $order->currentStatus;
+                            $statusId = $currentStatus ? $currentStatus->status_order_id : 1;
                         @endphp
                         @if($statusId == 1)
-                        <a href="{{ route('social-taxi-orders.cancel.form', array_merge(['social_taxi_order' => $order], $urlParams)) }}" 
-                           class="inline-flex items-center px-3 py-1 bg-red-100 text-red-800 rounded-md hover:bg-red-200 text-sm w-full">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                            Отменить
-                        </a>
+                            <a href="{{ route('social-taxi-orders.cancel.form', array_merge(['social_taxi_order' => $order], $urlParams)) }}" 
+                               accesskey=""class="inline-flex items-center px-3 py-1 bg-red-100 text-red-800 rounded-md hover:bg-red-200 text-sm w-full">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                                Отменить
+                            </a>
                         @else
-                        <button type="button" 
+                            <button type="button" 
                                 class="inline-flex items-center px-3 py-1 bg-gray-300 text-gray-500 rounded-md text-sm w-full cursor-not-allowed" 
                                 disabled 
                                 title="Отмена возможна только для заказов со статусом 'Принят'">

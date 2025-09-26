@@ -46,7 +46,10 @@
             <form action="{{ route('social-taxi-orders.cancel', $social_taxi_order) }}" method="POST" class="bg-white shadow rounded-lg p-6">
                 @csrf
                 @method('PATCH')
+                
+                <input type="hidden" name="user_id" value="{{ auth()->id() }}">
 
+                
                 <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
                     <div class="flex">
                         <div class="flex-shrink-0">
@@ -176,7 +179,28 @@
 
                 <!-- Кнопки действия -->
                 <div class="flex justify-between items-center">
-                    <a href="{{ route('social-taxi-orders.index', $urlParams ?? []) }}" 
+                    @php
+                    $fromOperatorPage = session('from_operator_page');
+                    $operatorCurrentType = session('operator_current_type');
+
+                    if ($fromOperatorPage && $operatorCurrentType) {
+                    $routeMap = [
+                    1 => 'operator.social-taxi.index',
+                    2 => 'operator.car.index',
+                    3 => 'operator.gazelle.index'
+                    ];
+
+                    if (isset($routeMap[$operatorCurrentType])) {
+                    $backRoute = route($routeMap[$operatorCurrentType], array_merge(['filter_type_order' => $operatorCurrentType], $urlParams ?? []));
+                    } else {
+                    $backRoute = route('social-taxi-orders.index', $urlParams ?? []);
+                    }
+                    } else {
+                    $backRoute = route('social-taxi-orders.index', $urlParams ?? []);
+                    }
+                    @endphp
+
+                    <a href="{{ $backRoute }}" 
                        class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
