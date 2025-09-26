@@ -16,36 +16,40 @@
     <div class="flex space-x-2">
         <!-- Кнопка "Назад к списку" с сохранением параметров -->
         @php
-        $backToOperator = request('back_to_operator');
-        $operatorType = request('operator_type');
-
-        if ($backToOperator && $operatorType) {
-            $backRoute = route($backToOperator, array_merge(['type_order' => $operatorType], $backUrlParams ?? []));
-        } else {
-            $backRoute = route('social-taxi-orders.index', $backUrlParams ?? []);
-        }
+            $backToOperator = request('back_to_operator');
+            $operatorType = request('operator_type');
+            $fromTaxiPage = request('from_taxi_page', 0); // Проверяем, откуда пришли
+            
+            if ($backToOperator && $operatorType) {
+                $backRoute = route($backToOperator, array_merge(['type_order' => $operatorType], $backUrlParams ?? []));
+            } elseif ($fromTaxiPage) {
+                // Если пришли со страницы такси, возвращаемся туда
+                $backRoute = route('taxi-orders.index', $backUrlParams ?? []); 
+            } else {
+                $backRoute = route('social-taxi-orders.index', $backUrlParams ?? []);
+            }
         @endphp
-
+       
         <a href="{{ $backRoute }}" 
            class="inline-flex items-center px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400">
             Назад к списку
         </a>
-        
+ {{--       
         @if(isset($order) && $order->exists)
             @if(!$order->deleted_at)
                 @php
                     $status = $order->currentStatus->statusOrder;
                 @endphp
                 @if($status->id == 1)
-                <a href="{{ route('social-taxi-orders.edit', array_merge([$order], $backUrlParams ?? [])) }}" 
+                    <a href="{{ route('social-taxi-orders.edit', array_merge([$order], $backUrlParams ?? [])) }}" 
                    class="inline-flex items-center px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                     Редактировать
-                </a>
+                    </a>
                 @else
-                <button type="button" 
+                    <button type="button" 
                         class="inline-flex items-center px-4 py-2 bg-gray-300 text-gray-500 rounded-md cursor-not-allowed" 
                         disabled 
                         title="Редактирование возможно только для заказов со статусом 'Принят'">
@@ -53,9 +57,9 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                     Редактировать
-                </button>
+                    </button>
                 @endif
-                @else
+            @else
                 <button type="button" 
                         class="inline-flex items-center px-4 py-2 bg-gray-300 text-gray-500 rounded-md cursor-not-allowed" 
                         disabled 
@@ -65,8 +69,9 @@
                     </svg>
                     Редактировать
                 </button>
-                @endif
-                @endif
+            @endif
+        @endif
+--}}        
     </div>
 </div>
 <div class="border border-gray-200 rounded-lg p-4 mb-6 bg-white shadow">

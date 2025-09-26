@@ -1,3 +1,4 @@
+<!-- resources/views/social-taxi-orders/taxi.blade.php -->
 <x-app-layout>
     <div class="bg-gray-100 py-6">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -13,8 +14,13 @@
                     Все заказы
                 </a>
             </div>
+            
+            <!-- Пагинация -->
+            <div class="mt-4 mb-2">
+                {{ $orders->links() }}
+            </div>
 
-            @include('social-taxi-orders.index-components.table')
+            @include('social-taxi-orders.taxi-components.table')
 
             <!-- Пагинация -->
             <div class="mt-6">

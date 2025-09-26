@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Order;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Services\SocialTaxiOrderService;
@@ -23,6 +22,14 @@ class TaxiOrderController extends BaseController
         // Устанавливаем фильтр по статусу "принят" (ID = 1) по умолчанию
         if (!$request->has('status_order_id')) {
             $request->merge(['status_order_id' => 1]);
+        }
+        
+        // Устанавливаем сортировку по дате поездки по возрастанию по умолчанию
+        if (!$request->has('sort')) {
+            $request->merge(['sort' => 'visit_data']);
+        }
+        if (!$request->has('direction')) {
+            $request->merge(['direction' => 'asc']);
         }
         
         // Добавляем параметр для индикации, что это страница принятых заказов
