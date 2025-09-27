@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Admin;
 use Illuminate\Http\Request;
 use App\Services\TaxiOrderService;
 use App\Services\TaxiOrderBuilder;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\TaxiOrdersExport;
+use App\Models\Order;
 
 class TaxiOrderController extends BaseController {
 
@@ -18,15 +21,19 @@ class TaxiOrderController extends BaseController {
 
     // Показать список заказов для передачи в такси
     public function index(Request $request) {
+        \Log::info('Taxi orders index called', [
+        'all_params' => $request->all(),
+        'method' => $request->method()
+    ]);
         
          $sort = $request->get('sort', 'visit_data');
     $direction = $request->get('direction', 'asc');
     
-    \Log::info('Taxi orders sort params', [
-        'sort' => $sort,
-        'direction' => $direction,
-        'all_params' => $request->all()
-    ]);
+//    \Log::info('Taxi orders sort params', [
+//        'sort' => $sort,
+//        'direction' => $direction,
+//        'all_params' => $request->all()
+//    ]);
 
         // Устанавливаем фильтр по дате поездки по умолчанию - сегодня
         if (!$request->has('visit_date_from')) {
@@ -50,5 +57,29 @@ class TaxiOrderController extends BaseController {
             'urlParams'
         ));
     }
+    
+    public function exportToTaxi(Request $request) {
+    \Log::info('Export to taxi called', [
+        'visit_date_from' => $request->get('visit_date_from'),
+        'visit_date_to' => $request->get('visit_date_to'),
+        'all_params' => $request->all()
+    ]);
+    
+    // Используем ТОТ ЖЕ запрос, что и в index
+    $query = $this->queryBuilder->build($request, false);
+    
+    // Получаем ВСЕ заказы (без пагинации)
+    $orders = $query->get();
+    
+    \Log::info('Orders found for export', ['count' => $orders->count()]);
+        
+    // Формируем имя файла и передаем даты в экспорт
+    $visitDateFrom = $request->get('visit_date_from', date('Y-m-d'));
+    $visitDateTo = $request->get('visit_date_to', date('Y-m-d'));
+    $fileName = 'Сведения_для_передачи_оператору_такси_' . $visitDateFrom . '_по_' . $visitDateTo . '.xlsx';
+    
+    // Экспортируем - передаем все три аргумента!
+    return Excel::download(new TaxiOrdersExport($orders, $visitDateFrom, $visitDateTo), $fileName);
+}
 
 }

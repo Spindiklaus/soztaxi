@@ -74,8 +74,8 @@ Route::middleware(['web', 'auth', IsAdmin::class])->group(function () {
     });
     Route::resource('fio_rips', FioRipController::class)->except(['show']);
     Route::resource('skidka_dops', SkidkaDopController::class)->except(['show']);   
-    Route::get('/taxi-orders', [TaxiOrderController::class, 'index'])
-     ->name('taxi-orders.index');
+    Route::get('/taxi-orders', [TaxiOrderController::class, 'index'])->name('taxi-orders.index');
+    Route::get('/taxi-orders/export-to-taxi', [TaxiOrderController::class, 'exportToTaxi'])->name('taxi-orders.export.to.taxi');
 });
 
 Route::middleware(['auth'])->group(function () {
