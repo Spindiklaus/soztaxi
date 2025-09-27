@@ -4,7 +4,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Заголовок -->
             <div class="flex justify-between items-center mb-6">
-                <h1 class="text-3xl font-bold text-gray-800">Заказы со статусом "Принят" для передачи в Такси</h1>
+                <h1 class="text-3xl font-bold text-gray-800">Заказы для передачи в Такси</h1>
                 
                 <a href="{{ route('social-taxi-orders.index', $urlParams) }}" 
                    class="inline-flex items-center px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400">
@@ -14,6 +14,8 @@
                     Все заказы
                 </a>
             </div>
+            
+            @include('social-taxi-orders.taxi-components.filters')
             
             <!-- Пагинация -->
             <div class="mt-4 mb-2">
