@@ -76,10 +76,13 @@ class TaxiOrderController extends BaseController {
     // Формируем имя файла и передаем даты в экспорт
     $visitDateFrom = $request->get('visit_date_from', date('Y-m-d'));
     $visitDateTo = $request->get('visit_date_to', date('Y-m-d'));
+    // Создаем Carbon объекты для форматирования
+    $formattedDateFrom = \Carbon\Carbon::createFromFormat('Y-m-d', $visitDateFrom)->format('d.m.Y');
+    $formattedDateTo = \Carbon\Carbon::createFromFormat('Y-m-d', $visitDateTo)->format('d.m.Y');
     $fileName = 'Сведения_для_передачи_оператору_такси_' . $visitDateFrom . '_по_' . $visitDateTo . '.xlsx';
     
     // Экспортируем - передаем все три аргумента!
-    return Excel::download(new TaxiOrdersExport($orders, $visitDateFrom, $visitDateTo), $fileName);
+    return Excel::download(new TaxiOrdersExport($orders, $formattedDateFrom, $formattedDateTo), $fileName);
 }
 
 }

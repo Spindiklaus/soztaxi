@@ -33,17 +33,18 @@
         <td>{{ getTypeName($order->type_order) }}</td>
         <td>{{ $order->pz_nom }}</td>
         <td>{{ $order->visit_data ? $order->visit_data->format('d.m.Y H:i') : '-' }}</td>
-        <td>{{ $order->adres_otkuda ?? '-' }}</td>
-        <td>{{ $order->adres_kuda ?? '-' }}</td>
-        <td>{{ $order->adres_obratno ?? '-' }}</td>
-        <td>{{ $order->visit_obratno ? $order->visit_obratno->format('d.m.Y H:i') : '-' }}</td>
-        <td>{{ $order->client_tel ?? '-' }}</td>
-        <td>{{ $order->skidka_dop_all ?? '-' }}</td>
-        <td>{{ $order->predv_way ?? '-' }}</td>
-        <td>{{ $order->taxi_price ?? '-' }}</td>
-        <td>{{ $order->taxi_vozm ?? '-' }}</td>
-        <td>{{ $order->category ? $order->category->nmv : '-' }}</td>
-        <td>{{ $order->dopus ? $order->dopus->name : '-' }}</td>
+        <td>{{ $order->adres_otkuda ?? '' }}</td>
+        <td>{{ $order->adres_kuda ?? '' }}</td>
+        <td>{{ $order->adres_obratno ?? '' }}</td>
+        <td>{{ $order->visit_obratno ? $order->visit_obratno->format('d.m.Y H:i') : '' }}</td>
+        <td>{{ $order->client_tel ?? '' }} </td>
+        <td>{{ $order->skidka_dop_all ?? '' }}</td>
+        <td>{{ $order->predv_way ?? '' }}</td>
+        <td>{{ $order->taxi_price ?? '' }}</td>
+        <td></td>
+        <td>{{ $order->taxi_vozm ?? '' }}</td>
+        <td>{{ $order->category ? $order->category->name : '' }}</td>
+        <td>{{ $order->dopus ? $order->dopus->name : '' }}</td>
     </tr>
     @endforeach
 </table>
