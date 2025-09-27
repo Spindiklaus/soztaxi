@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use Illuminate\Http\Request;
-use Illuminate\Database\Eloquent\Builder;
 
 class TaxiOrderBuilder extends SocialTaxiOrderBuilder
 {
@@ -30,4 +29,27 @@ class TaxiOrderBuilder extends SocialTaxiOrderBuilder
         
         return $this;
     }
+    public function applySorting(Request $request): self
+{
+    $sort = $request->get('sort', 'visit_data');
+    $direction = $request->get('direction', 'asc');
+    
+    // Убедитесь, что правильно применяется сортировка
+    switch ($sort) {
+        case 'visit_data':
+            $this->query->orderBy('visit_data', $direction);
+            break;
+        case 'pz_data':
+            $this->query->orderBy('pz_data', $direction);
+            break;
+        case 'client_fio':
+            $this->query->orderBy('client_fio', $direction);
+            break;
+        default:
+            $this->query->orderBy($sort, $direction);
+            break;
+    }
+    
+    return $this;
+}
 }

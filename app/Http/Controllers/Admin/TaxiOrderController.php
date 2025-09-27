@@ -18,8 +18,15 @@ class TaxiOrderController extends BaseController {
 
     // Показать список заказов для передачи в такси
     public function index(Request $request) {
-        $sort = $request->get('sort', 'visit_data');
-        $direction = $request->get('direction', 'asc');
+        
+         $sort = $request->get('sort', 'visit_data');
+    $direction = $request->get('direction', 'asc');
+    
+    \Log::info('Taxi orders sort params', [
+        'sort' => $sort,
+        'direction' => $direction,
+        'all_params' => $request->all()
+    ]);
 
         // Устанавливаем фильтр по дате поездки по умолчанию - сегодня
         if (!$request->has('visit_date_from')) {

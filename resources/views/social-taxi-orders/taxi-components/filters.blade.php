@@ -54,6 +54,21 @@
                     class="inline-flex items-center px-4 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-gray-800 hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition ease-in-out duration-150">
                     Сегодня
                 </a>
+                <!-- Кнопка "Передать в такси" -->
+                <form action="{{ route('taxi-orders.export.to.taxi') }}" method="GET" class="inline">
+                    <input type="hidden" name="visit_date_from" value="{{ request('visit_date_from', date('Y-m-d')) }}">
+                    <input type="hidden" name="visit_date_to" value="{{ request('visit_date_to', date('Y-m-d')) }}">
+                    <input type="hidden" name="sort" value="{{ $sort ?? 'visit_data' }}">
+                    <input type="hidden" name="direction" value="{{ $direction ?? 'asc' }}">
+                    <button type="submit"
+                            class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition ease-in-out duration-150"
+                            onclick="return confirm('Вы уверены, что хотите сформировать список для передачи в такси за выбранный период?')">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                        Передать в такси
+                    </button>
+                </form>
             </div>
         </div>
     </div>

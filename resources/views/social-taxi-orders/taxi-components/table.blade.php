@@ -1,7 +1,7 @@
 <!-- resources/views/social-taxi-orders/taxi-components/table.blade.php -->
 <div x-data="{
-     sortField: '{{ $sort ?? 'pz_data' }}',
-     sortDirection: '{{ $direction ?? 'desc' }}',
+     sortField: '{{ $sort ?? 'visit_data' }}',
+     sortDirection: '{{ $direction ?? 'asc' }}',
      sortBy(field) {
      if (this.sortField === field) {
      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';

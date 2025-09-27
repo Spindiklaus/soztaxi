@@ -390,7 +390,7 @@ class SocialTaxiOrderService {
         $params = request()->only([
                     'sort', 'direction', 'show_deleted', 'filter_pz_nom',
                     'filter_type_order', 'status_order_id', 'date_from', 'date_to', 'filter_user_id', 
-                    'client_fio', 'visit_date_from', 'visit_date_to', 'page'
+                    'client_fio', 'page'
         ]);
         // \Log::info('GetUrlParams result', ['params' => $params]);
         return $params;
