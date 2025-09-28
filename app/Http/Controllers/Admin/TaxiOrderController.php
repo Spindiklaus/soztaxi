@@ -7,6 +7,8 @@ use App\Services\TaxiOrderService;
 use App\Services\TaxiOrderBuilder;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\TaxiOrdersExport;
+use App\Models\Order;
+
 
 class TaxiOrderController extends BaseController {
 
@@ -92,5 +94,69 @@ class TaxiOrderController extends BaseController {
     // Экспортируем - передаем все три аргумента!
     return Excel::download(new TaxiOrdersExport($orders, $formattedDateFrom, $formattedDateTo, $taxi), $fileName);
 }
+
+    public function setSentDate(Request $request) {
+    try {
+        // Валидация данных
+        $validated = $request->validate([
+            'taxi_sent_at' => 'required|date_format:Y-m-d\TH:i',
+            'visit_date_from' => 'required|date_format:Y-m-d',
+            'visit_date_to' => 'required|date_format:Y-m-d',
+            'taxi_id' => 'nullable|integer|exists:taxis,id',
+        ]);
+        
+        // Проверяем, что дата передачи меньше даты поездки
+        $taxiSentAt = \Carbon\Carbon::createFromFormat('Y-m-d\TH:i', $validated['taxi_sent_at']);
+        $visitDateFrom = \Carbon\Carbon::parse($validated['visit_date_from']);
+        
+        if ($taxiSentAt >= $visitDateFrom) {
+            return redirect()->back()->with('error', 'Дата передачи в такси должна быть меньше даты поездки (' . $visitDateFrom->format('d.m.Y') . ').');
+        }
+        
+        // Строим запрос напрямую через Order::where() с правильной фильтрацией по датам
+        $query = Order::whereDate('visit_data', '>=', $validated['visit_date_from'])
+            ->whereDate('visit_data', '<=', $validated['visit_date_to'])
+            ->whereDoesntHave('currentStatus', function ($q) {
+                $q->where('status_order_id', 3); // Исключаем отмененные
+            })
+            ->whereNull('deleted_at')
+            ->whereNull('cancelled_at')
+            ->whereNull('taxi_sent_at'); // Только заказы без даты передачи в такси
+        
+        // Фильтрация по оператору такси
+        if (!empty($validated['taxi_id'])) {
+            $query->where('taxi_id', $validated['taxi_id']);
+        }
+        
+        // Получаем количество заказов для обновления
+        $ordersCount = $query->count();
+       
+        
+        if ($ordersCount === 0) {
+            return redirect()->back()->with('info', 'Нет заказов для обновления (у всех уже установлена дата передачи в такси).');
+        }
+
+        $orders = $query->get();        
+        // Обновляем каждый заказ через модель (вызываются события Eloquent и Observer)
+        foreach ($orders as $order) {
+            $order->taxi_sent_at = $taxiSentAt;
+            $order->save(); // Это вызовет Observer!
+        }
+        // Возвращаемся с параметрами фильтрации
+        $urlParams = $this->orderService->getUrlParams();
+        
+        return redirect()->route('taxi-orders.index', $urlParams)
+                        ->with('success', "Дата передачи в такси установлена для {$ordersCount} заказов.");
+        
+    } catch (\Exception $e) {
+        \Log::error('Ошибка при установке даты передачи в такси', [
+            'exception' => $e,
+            'request_data' => $request->all()
+        ]);
+        
+        return redirect()->back()->with('error', 'Ошибка при установке даты передачи в такси: ' . $e->getMessage());
+    }
+}
+
 
 }

@@ -76,6 +76,7 @@ Route::middleware(['web', 'auth', IsAdmin::class])->group(function () {
     Route::resource('skidka_dops', SkidkaDopController::class)->except(['show']);   
     Route::get('/taxi-orders', [TaxiOrderController::class, 'index'])->name('taxi-orders.index');
     Route::get('/taxi-orders/export-to-taxi', [TaxiOrderController::class, 'exportToTaxi'])->name('taxi-orders.export.to.taxi');
+    Route::post('/taxi-orders/set-sent-date', [TaxiOrderController::class, 'setSentDate'])->name('taxi-orders.set-sent-date');    
 });
 
 Route::middleware(['auth'])->group(function () {
