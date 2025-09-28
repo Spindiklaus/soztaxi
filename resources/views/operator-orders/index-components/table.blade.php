@@ -52,7 +52,7 @@
             </thead>
             <tbody class="divide-y divide-gray-200">
                 @forelse ($orders as $order)
-                <tr @if($order->deleted_at) class="bg-red-50" @endif>
+                    <tr @if($order->deleted_at) class="bg-red-50" @endif>
                     <td class="px-6 py-4">
                         @if($order->deleted_at)
                         <div class="text-sm font-medium text-red-600">
@@ -207,170 +207,155 @@
                         <div class="flex flex-col space-y-1">
                             <!-- Ссылка на просмотр заказа -->
                             @php
-                            $showRoute = route('social-taxi-orders.show', array_merge(['social_taxi_order' => $order], $urlParams));
+                                $showRoute = route('social-taxi-orders.show', array_merge(['social_taxi_order' => $order], $urlParams));
 
-                            // Проверяем, если находимся на странице оператора
-                            $fromOperatorPage = session('from_operator_page');
-                            $operatorCurrentType = session('operator_current_type');
+                                // Проверяем, если находимся на странице оператора
+                                $fromOperatorPage = session('from_operator_page');
+                                $operatorCurrentType = session('operator_current_type');
 
-                            if ($fromOperatorPage && $operatorCurrentType) {
-                            $routeMap = [
-                            1 => 'operator.social-taxi.index',
-                            2 => 'operator.car.index',
-                            3 => 'operator.gazelle.index'
-                            ];
-
-                            if (isset($routeMap[$operatorCurrentType])) {
-                                $showParams = array_merge($urlParams, [
-                                'back_to_operator' => $routeMap[$operatorCurrentType],
-                                'operator_type' => $operatorCurrentType
-                                ]);
-                                $showRoute = route('social-taxi-orders.show', array_merge(['social_taxi_order' => $order], $showParams));
-                            }
-                            }
+                                if ($fromOperatorPage && $operatorCurrentType) {
+                                    $routeMap = [
+                                        1 => 'operator.social-taxi.index',
+                                        2 => 'operator.car.index',
+                                        3 => 'operator.gazelle.index'
+                                    ];
+                                    if (isset($routeMap[$operatorCurrentType])) {
+                                        $showParams = array_merge($urlParams, [
+                                            'back_to_operator' => $routeMap[$operatorCurrentType],
+                                            'operator_type' => $operatorCurrentType
+                                        ]);
+                                        $showRoute = route('social-taxi-orders.show', array_merge(['social_taxi_order' => $order], $showParams));
+                                    }
+                                }
                             @endphp
 
                             <a href="{{ $showRoute }}" class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-md hover:bg-blue-200 text-sm">
                                 Просмотр
                             </a>
-                            
-                            
-                            
-                            @if(!$order->deleted_at)
-                            @if($status->id == 1)
-                            <!-- В таблице, в кнопке редактирования -->
-                            @php
-                            $editRoute = route('social-taxi-orders.edit', array_merge(['social_taxi_order' => $order], $urlParams));
-
-                            // Проверяем, если находимся на странице оператора
-                            $fromOperatorPage = session('from_operator_page');
-                            $operatorCurrentType = session('operator_current_type');
-
-                            if ($fromOperatorPage && $operatorCurrentType) {
-                            $routeMap = [
-                            1 => 'operator.social-taxi.index',
-                            2 => 'operator.car.index',
-                            3 => 'operator.gazelle.index'
-                            ];
-
-                            if (isset($routeMap[$operatorCurrentType])) {
-                            $editParams = array_merge($urlParams, [
-                            'back_to_operator' => $routeMap[$operatorCurrentType],
-                            'operator_type' => $operatorCurrentType
-                            ]);
-                            $editRoute = route('social-taxi-orders.edit', array_merge(['social_taxi_order' => $order], $editParams));
-                            }
-                            }
-                            @endphp
-
-                            <a href="{{ $editRoute }}" class="inline-flex items-center px-3 py-1 bg-yellow-100 text-yellow-800 rounded-md hover:bg-yellow-200 text-sm">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                </svg>
-                                Редактировать
-                            </a>
-                            
-                            @else
-                            <span class="inline-flex items-center px-3 py-1 bg-gray-300 text-gray-500 rounded-md text-sm" title="Редактирование возможно только для заказов со статусом 'Принят'">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                </svg>
-                                Редактировать
-                            </span>
-                            @endif
-                            @endif
 
                             @if(!$order->deleted_at)
-                            @if($status->id == 1)
-                                <form action="{{ route('social-taxi-orders.destroy', array_merge(['social_taxi_order' => $order], $urlParams)) }}" method="POST" class="inline" onsubmit="return confirm('Вы уверены, что надо удалить заказ?')">
+                                @if($status->id == 1)
+                                    <!-- В таблице, в кнопке редактирования -->
+                                    @php
+                                        $editRoute = route('social-taxi-orders.edit', array_merge(['social_taxi_order' => $order], $urlParams));
+                                        // Проверяем, если находимся на странице оператора
+                                        $fromOperatorPage = session('from_operator_page');
+                                        $operatorCurrentType = session('operator_current_type');
+                                        if ($fromOperatorPage && $operatorCurrentType) {
+                                            $routeMap = [
+                                                1 => 'operator.social-taxi.index',
+                                                2 => 'operator.car.index',
+                                                3 => 'operator.gazelle.index'
+                                            ];
+                                            if (isset($routeMap[$operatorCurrentType])) {
+                                                $editParams = array_merge($urlParams, [
+                                                'back_to_operator' => $routeMap[$operatorCurrentType],
+                                                'operator_type' => $operatorCurrentType
+                                                ]);
+                                                $editRoute = route('social-taxi-orders.edit', array_merge(['social_taxi_order' => $order], $editParams));
+                                            }
+                                        }
+                                    @endphp
+                                    <a href="{{ $editRoute }}" class="inline-flex items-center px-3 py-1 bg-yellow-100 text-yellow-800 rounded-md hover:bg-yellow-200 text-sm">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                        Редактировать
+                                    </a>
+                                    <!-- Кнопка УДАЛИТЬ в actions.blade.php -->
+                                    <form action="{{ route('social-taxi-orders.destroy', array_merge(['social_taxi_order' => $order], $urlParams)) }}" method="POST" class="inline" onsubmit="return confirm('Вы уверены, что надо удалить заказ?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="inline-flex items-center px-3 py-1 bg-red-100 text-red-800 rounded-md hover:bg-red-200 text-sm w-full">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                            Удалить
+                                        </button>
+                                    </form>
+                                    <!-- Кнопка копирования в actions.blade.php -->
+                                    <a href="{{ route('social-taxi-orders.create.by-type', array_merge(['type' => $order->type_order, 'copy_from' => $order->id], $urlParams)) }}" 
+                                        class="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-md hover:bg-green-200 text-sm w-full">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                        </svg>
+                                        Копировать
+                                    </a>
+                                @else
+                                    <span class="inline-flex items-center px-3 py-1 bg-gray-300 text-gray-500 rounded-md text-sm" title="Редактирование возможно только для заказов со статусом 'Принят'">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                        Редактировать
+                                    </span>
+                                    <button type="button" class="inline-flex items-center px-3 py-1 bg-gray-300 text-gray-500 rounded-md text-sm w-full cursor-not-allowed" disabled title="Удаление возможно только для заказов со статусом 'Принят'">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                        Удалить
+                                    </button>
+                                @endif
+                            @else    
+                                <form action="{{ route('social-taxi-orders.restore', array_merge(['social_taxi_order' => $order], $urlParams)) }}" method="POST" class="inline">
                                     @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="inline-flex items-center px-3 py-1 bg-red-100 text-red-800 rounded-md hover:bg-red-200 text-sm w-full">
-                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                      </svg>
-                                       Удалить
-                                  </button>
-                             </form>
-                            @else
-                                <button type="button" class="inline-flex items-center px-3 py-1 bg-gray-300 text-gray-500 rounded-md text-sm w-full cursor-not-allowed" disabled title="Удаление возможно только для заказов со статусом 'Принят'">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg>
-                                    Удалить
-                                </button>
-                            @endif
-                            @else
-                            <form action="{{ route('social-taxi-orders.restore', array_merge(['social_taxi_order' => $order], $urlParams)) }}" method="POST" class="inline">
-                                @csrf
-                                @method('PATCH')
-                                <button type="submit" class="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-md hover:bg-green-200 text-sm w-full">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                    </svg>
-                                    Восстановить
-                                </button>
-                            </form>
-                            @endif
-                                <!-- Кнопка копирования в actions.blade.php -->
-                                @if(!$order->deleted_at && $status->id == 1)
-                                <a href="{{ route('social-taxi-orders.create.by-type', array_merge(['type' => $order->type_order, 'copy_from' => $order->id], $urlParams)) }}" 
-                                    class="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-md hover:bg-green-200 text-sm w-full">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                                    </svg>
-                                    Копировать
-                                </a>
+                                    @method('PATCH')
+                                        <button type="submit" class="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-md hover:bg-green-200 text-sm w-full">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                            </svg>
+                                            Восстановить
+                                        </button>
+                                </form>
                             @endif
                         </div>
 
                         <!-- Кнопка отмены заказа -->
                         @if(!$order->deleted_at && !$order->cancelled_at)
-                        @php
-                        $currentStatus = $order->currentStatus;
-                        $statusId = $currentStatus ? $currentStatus->status_order_id : 1;
-                        @endphp
-                        @if($statusId == 1)
-                        <a href="{{ route('social-taxi-orders.cancel.form', array_merge(['social_taxi_order' => $order], $urlParams)) }}" 
-                           class="inline-flex items-center px-3 py-1 bg-red-100 text-red-800 rounded-md hover:bg-red-200 text-sm w-full">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                            Отменить
-                        </a>
+                            @php
+                                $currentStatus = $order->currentStatus;
+                                $statusId = $currentStatus ? $currentStatus->status_order_id : 1;
+                            @endphp
+                            @if($statusId == 1)
+                                <a href="{{ route('social-taxi-orders.cancel.form', array_merge(['social_taxi_order' => $order], $urlParams)) }}" 
+                                    class="inline-flex items-center px-3 py-1 bg-red-100 text-red-800 rounded-md hover:bg-red-200 text-sm w-full">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                    Отменить
+                                </a>
+                            @else
+                                <button type="button" 
+                                    class="inline-flex items-center px-3 py-1 bg-gray-300 text-gray-500 rounded-md text-sm w-full cursor-not-allowed" 
+                                    disabled 
+                                    title="Отмена возможна только для заказов со статусом 'Принят'">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                    Отменить
+                                </button>
+                            @endif
                         @else
-                        <button type="button" 
-                                class="inline-flex items-center px-3 py-1 bg-gray-300 text-gray-500 rounded-md text-sm w-full cursor-not-allowed" 
-                                disabled 
-                                title="Отмена возможна только для заказов со статусом 'Принят'">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                            Отменить
-                        </button>
-                        @endif
-                        @else
-                        <button type="button" 
+                            <button type="button" 
                                 class="inline-flex items-center px-3 py-1 bg-gray-300 text-gray-500 rounded-md text-sm w-full cursor-not-allowed" 
                                 disabled 
                                 title="{{ $order->deleted_at ? 'Заказ удален' : 'Заказ уже отменен' }}">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                            Отменить
-                        </button>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                                Отменить
+                            </button>
                         @endif
 
 
 
                     </td>
-                </tr>
+                    </tr>
                 @empty
-                <tr>
-                    <td colspan="6" class="px-6 py-4 text-center text-gray-500">
-                        Заказы не найдены
-                    </td>
-                </tr>
+                    <tr>
+                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                            Заказы не найдены
+                        </td>
+                    </tr>
                 @endforelse
             </tbody>
         </table>

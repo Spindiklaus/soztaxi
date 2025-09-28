@@ -30,7 +30,7 @@
     @foreach($orders as $index => $order)
     <tr>
         <td>{{ $index + 1 }}</td>
-        <td>{{ getTypeName($order->type_order) }}</td>
+        <td>{{ getOrderTypeName($order->type_order) }}</td>
         <td>{{ $order->pz_nom }}</td>
         <td>{{ $order->visit_data ? $order->visit_data->format('d.m.Y H:i') : '-' }}</td>
         <td>{{ $order->adres_otkuda ?? '' }}</td>
@@ -40,22 +40,32 @@
         <td>{{ $order->client_tel ?? '' }} </td>
         <td>{{ $order->skidka_dop_all ?? '' }}</td>
         <td>{{ $order->predv_way ?? '' }}</td>
-        <td>{{ $order->taxi_price ?? '' }}</td>
-        <td></td>
-        <td>{{ $order->taxi_vozm ?? '' }}</td>
+        <!-- Цена за поездку -->
+        <td>
+            @if($order->type_order == 1) <!-- для соцтакси предварительная -->
+                {{ number_format(calculateFullTripPrice($order, 11, $taxi), 11, ',', ' ') }}
+            @else
+                {{ $order->taxi_price ?? '' }}
+            @endif
+        </td>
+        
+        <!-- Сумма к оплате -->
+        <td>
+            @if($order->type_order == 1) <!-- для соцтакси предварительная -->
+                {{ number_format(calculateClientPaymentAmount($order, 11, $taxi), 11, ',', ' ') }}
+            @endif
+        </td>
+        
+        <!-- Сумма к возмещению -->
+        <td>
+            @if($order->type_order == 1) <!-- для соцтакси предварительная -->
+                {{ number_format(calculateReimbursementAmount($order, 11, $taxi), 11, ',', ' ') }}
+            @else
+                {{ $order->taxi_vozm ?? '' }}
+            @endif
+        </td>
         <td>{{ $order->category ? $order->category->name : '' }}</td>
         <td>{{ $order->dopus ? $order->dopus->name : '' }}</td>
     </tr>
     @endforeach
 </table>
-
-@php
-function getTypeName($typeId) {
-    switch ($typeId) {
-        case 1: return 'Соцтакси';
-        case 2: return 'Легковое авто';
-        case 3: return 'ГАЗель';
-        default: return 'Неизвестный тип';
-    }
-}
-@endphp

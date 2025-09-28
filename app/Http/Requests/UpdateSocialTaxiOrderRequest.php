@@ -80,7 +80,17 @@ class UpdateSocialTaxiOrderRequest extends FormRequest {
             ],
             'closed_at' => 'nullable|date',
             'komment' => 'nullable|string|max:1000',
-            'predv_way' => 'nullable|numeric|min:0|max:100',
+            'predv_way' => [
+                'nullable',
+                'numeric',
+                'min:0',
+                'max:100',
+                function ($attribute, $value, $fail) {
+                    if ($this->type_order == 1 && (!$value || $value <= 0)) {
+                     $fail('Предварительная дальность обязательна и должна быть больше 0 для соцтакси (type_order = 1).');
+                    }
+                }
+            ],
             'zena_type' => 'required|integer|in:1,2',
             'dopus_id' => 'nullable|exists:skidka_dops,id',
             'skidka_dop_all' => [

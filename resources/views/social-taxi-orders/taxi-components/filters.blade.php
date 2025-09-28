@@ -12,64 +12,87 @@
             </svg>
         </button>
     </div>
-    
+
     <!-- Содержимое фильтров (всегда показывается) -->
     <div id="filters-content" class="p-4">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
             <!-- Скрытое поле для сохранения параметров сортировки -->
             <input type="hidden" name="sort" value="{{ $sort ?? 'visit_data' }}">
-            <input type="hidden" name="direction" value="{{ $direction ?? 'asc' }}">
+                <input type="hidden" name="direction" value="{{ $direction ?? 'asc' }}">
 
-            <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700">Дата поездки</label>
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <input type="date" name="visit_date_from" id="visit_date_from" 
-                               value="{{ request('visit_date_from', date('Y-m-d')) }}" 
-                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    <div class="md:col-span-4">
+                        <label class="block text-sm font-medium text-gray-700">Дата поездки</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <input type="date" name="visit_date_from" id="visit_date_from" 
+                                       value="{{ request('visit_date_from', date('Y-m-d')) }}" 
+                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <input type="date" name="visit_date_to" id="visit_date_to" 
+                                       value="{{ request('visit_date_to', date('Y-m-d')) }}" 
+                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            </div>
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">Показываются только активные заказы (не удаленные и не отмененные)</p>
                     </div>
-                    <div>
-                        <input type="date" name="visit_date_to" id="visit_date_to" 
-                               value="{{ request('visit_date_to', date('Y-m-d')) }}" 
-                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                    </div>
-                </div>
-                <p class="mt-1 text-xs text-gray-500">Показываются только активные заказы (не удаленные и не отмененные)</p>
-            </div>
 
-            <div class="md:col-span-2 flex items-end space-x-2">
-                <button type="submit"
-                        class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition ease-in-out duration-150">
-                    Применить фильтр
-                </button>
-                @php
-                    // Собираем параметры для сброса - только базовые + сегодняшняя дата
-                    $resetParams = [
+                    <!-- Фильтр по такси -->
+                    <div class="md:col-span-4">
+                        <label for="taxi_id" class="block text-sm font-medium text-gray-700">Оператор такси</label>
+                        <select name="taxi_id" id="taxi_id" 
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            @foreach($taxis as $taxi)
+                            <option value="{{ $taxi->id }}" {{ request('taxi_id') == $taxi->id ? 'selected' : '' }}>
+                                {{ $taxi->name }} (#{{ $taxi->id }})
+                            </option>
+                            @endforeach
+                        </select>
+                        <p class="mt-1 text-xs text-gray-500">Фильтр по оператору такси</p>
+                    </div>
+
+                    <div class="md:col-span-6">
+                        <label for="taxi_sent_at" class="block text-sm font-medium text-gray-700">Дата передачи в такси</label>
+                        <input type="datetime-local" name="taxi_sent_at" id="taxi_sent_at" 
+                               value="{{ request('taxi_sent_at',  now()->format('Y-m-d\TH:i')) }}"  
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            <p class="mt-1 text-xs text-gray-500">Дата передачи сведений в такси</p>
+                    </div>
+
+
+                    <div class="md:col-span-2 flex items-end space-x-2">
+                        <button type="submit"
+                                class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition ease-in-out duration-150">
+                            Применить фильтр
+                        </button>
+                        @php
+                        // Собираем параметры для сброса - только базовые + сегодняшняя дата
+                        $resetParams = [
                         'sort' => $sort ?? 'visit_data',
                         'direction' => $direction ?? 'asc',
                         'visit_date_from' => date('Y-m-d'),
                         'visit_date_to' => date('Y-m-d')
-                     ];
-                @endphp
-                <a href="{{ route('taxi-orders.index', $resetParams) }}"
-                    class="inline-flex items-center px-4 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-gray-800 hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition ease-in-out duration-150">
-                    Сегодня
-                </a>
-            </div>
-        </div>
-    </div>
-</form>
-<script>
-function toggleFilters() {
-    const content = document.getElementById('filters-content');
-    const arrow = document.getElementById('filter-arrow');
-    
-    if (content.classList.contains('hidden')) {
-        content.classList.remove('hidden');
-        arrow.classList.add('rotate-180');
-    } else {
-        content.classList.add('hidden');
-        arrow.classList.remove('rotate-180');
-    }
-}
-</script>
+                        ];
+                        @endphp
+                        <a href="{{ route('taxi-orders.index', $resetParams) }}"
+                           class="inline-flex items-center px-4 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-gray-800 hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition ease-in-out duration-150">
+                            Сегодня
+                        </a>
+                    </div>
+                    </div>
+                    </div>
+                    </form>
+                    <script>
+                        function toggleFilters() {
+                            const content = document.getElementById('filters-content');
+                            const arrow = document.getElementById('filter-arrow');
+
+                            if (content.classList.contains('hidden')) {
+                                content.classList.remove('hidden');
+                                arrow.classList.add('rotate-180');
+                            } else {
+                                content.classList.add('hidden');
+                                arrow.classList.remove('rotate-180');
+                            }
+                        }
+                    </script>

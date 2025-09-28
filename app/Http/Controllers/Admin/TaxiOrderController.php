@@ -7,7 +7,6 @@ use App\Services\TaxiOrderService;
 use App\Services\TaxiOrderBuilder;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\TaxiOrdersExport;
-use App\Models\Order;
 
 class TaxiOrderController extends BaseController {
 
@@ -24,10 +23,10 @@ class TaxiOrderController extends BaseController {
         \Log::info('Taxi orders index called', [
         'all_params' => $request->all(),
         'method' => $request->method()
-    ]);
+        ]);
         
          $sort = $request->get('sort', 'visit_data');
-    $direction = $request->get('direction', 'asc');
+        $direction = $request->get('direction', 'asc');
     
 //    \Log::info('Taxi orders sort params', [
 //        'sort' => $sort,
@@ -45,6 +44,9 @@ class TaxiOrderController extends BaseController {
 
         // Собираем параметры для передачи в шаблон
         $urlParams = $this->orderService->getUrlParams();
+        
+        // Получаем список активных такси для фильтра
+        $taxis = \App\Models\Taxi::where('life', 1)->orderBy('name')->get();
 
         // Используем упрощенную логику для такси
         $query = $this->queryBuilder->build($request, false);
@@ -54,7 +56,8 @@ class TaxiOrderController extends BaseController {
             'orders',
             'sort',
             'direction',
-            'urlParams'
+            'urlParams',
+            'taxis'    
         ));
     }
     
@@ -62,8 +65,13 @@ class TaxiOrderController extends BaseController {
     \Log::info('Export to taxi called', [
         'visit_date_from' => $request->get('visit_date_from'),
         'visit_date_to' => $request->get('visit_date_to'),
+        'taxi_id' => $request->get('taxi_id'),
         'all_params' => $request->all()
     ]);
+    
+    // Определяем такси - берем из запроса или первый активный
+    $taxiId = $request->get('taxi_id');
+    $taxi = $taxiId ? \App\Models\Taxi::find($taxiId) : \App\Models\Taxi::where('life', 1)->first();
     
     // Используем ТОТ ЖЕ запрос, что и в index
     $query = $this->queryBuilder->build($request, false);
@@ -82,7 +90,7 @@ class TaxiOrderController extends BaseController {
     $fileName = 'Сведения_для_передачи_оператору_такси_' . $visitDateFrom . '_по_' . $visitDateTo . '.xlsx';
     
     // Экспортируем - передаем все три аргумента!
-    return Excel::download(new TaxiOrdersExport($orders, $formattedDateFrom, $formattedDateTo), $fileName);
+    return Excel::download(new TaxiOrdersExport($orders, $formattedDateFrom, $formattedDateTo, $taxi), $fileName);
 }
 
 }

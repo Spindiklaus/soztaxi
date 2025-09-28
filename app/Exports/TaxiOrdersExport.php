@@ -13,12 +13,14 @@ class TaxiOrdersExport implements FromView, WithStyles, WithColumnFormatting
     protected $orders;
     protected $visitDateFrom;
     protected $visitDateTo;
+    protected $taxi;
 
-    public function __construct($orders, $visitDateFrom, $visitDateTo)
+    public function __construct($orders, $visitDateFrom, $visitDateTo, $taxi)
     {
         $this->orders = $orders;
         $this->visitDateFrom = $visitDateFrom;
         $this->visitDateTo = $visitDateTo;
+        $this->taxi = $taxi;
     }
 
     public function view(): View
@@ -27,7 +29,8 @@ class TaxiOrdersExport implements FromView, WithStyles, WithColumnFormatting
             'orders' => $this->orders,
             'visitDateFrom' => $this->visitDateFrom,
             'visitDateTo' => $this->visitDateTo,
-            'generatedAt' => now()
+            'generatedAt' => now(),
+            'taxi' => $this->taxi
         ]);
     }
 

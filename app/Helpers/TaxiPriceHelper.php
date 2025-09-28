@@ -51,6 +51,7 @@ if (!function_exists('calculateSocialTaxiValues')) {
 
 // Обновите существующие функции, чтобы они использовали общую логику:
 if (!function_exists('calculateFullTripPrice')) {
+    // Предварительная цена поездки полная, без учета посадки, руб.
     function calculateFullTripPrice($order, $kol_znak=2, $taxi = null)
     {
         if (!$order || empty($order->predv_way) || !$taxi) {
@@ -64,6 +65,7 @@ if (!function_exists('calculateFullTripPrice')) {
 }
 
 if (!function_exists('calculateReimbursementAmount')) {
+    // Сумма к возмещению, руб.
     function calculateReimbursementAmount($order, $kol_znak=2, $taxi = null)
     {
         if (!$order || empty($order->predv_way) || !$taxi) {
@@ -77,6 +79,7 @@ if (!function_exists('calculateReimbursementAmount')) {
 }
 
 if (!function_exists('calculateClientPaymentAmount')) {
+    // Предварительная сумма к оплате клиентом, руб.
     function calculateClientPaymentAmount($order, $kol_znak = 2, $taxi = null)
     {
         if (!$order || empty($order->predv_way) || !$taxi) {
