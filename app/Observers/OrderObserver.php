@@ -37,9 +37,15 @@ class OrderObserver
     ]);
         
         
-        // Статус "передан в такси"
+        // Статус "передан в такси" - УСТАНОВКА
         if (is_null($original['taxi_sent_at']) && !is_null($order->taxi_sent_at)) {
             $this->changeStatus($order, 2); // ID статуса "передан в такси"
+        }
+        
+         // Статус "принят" - СБРОС (когда taxi_sent_at сбрасывается в null)
+        if (!is_null($original['taxi_sent_at']) && is_null($order->taxi_sent_at)) {
+            \Log::info('Setting status back to accepted for order ' . $order->id);
+            $this->changeStatus($order, 1); // ID статуса "принят"
         }
 
         // Статус "отменён"

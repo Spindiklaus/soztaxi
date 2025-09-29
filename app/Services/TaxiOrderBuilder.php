@@ -25,7 +25,7 @@ class TaxiOrderBuilder extends SocialTaxiOrderBuilder
         
         // Исключаем отмененные заказы
         $this->query->whereDoesntHave('currentStatus', function ($q) {
-            $q->where('status_order_id', 3); // 3 = Отменён
+            $q->whereIn('status_order_id', [3, 4]); // Исключаем отмененные и закрытые
         });
         
         return $this;

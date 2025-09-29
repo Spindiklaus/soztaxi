@@ -38,13 +38,14 @@ if (!function_exists('calculateSocialTaxiValues')) {
         }
 
         // Расчет суммы к оплате клиентом
-        $fullReimbursement = ($taxi->koef ?? 0) * $predvWay + ($taxi->posadka ?? 0);
-        $clientPaymentAmount = $fullReimbursement - $reimbursementAmount;
+        $fullTripPriceWithPickup = ($taxi->koef ?? 0) * $predvWay + ($taxi->posadka ?? 0);
+        $clientPaymentAmount = $fullTripPriceWithPickup - $reimbursementAmount;
 
         return [
-            'full_trip_price' => round($fullTripPrice, $kol_znak),
-            'reimbursement_amount' => round($reimbursementAmount, $kol_znak),
-            'client_payment_amount' => round($clientPaymentAmount, $kol_znak)
+            'full_trip_price' => round($fullTripPrice, $kol_znak), // цена поездки без посадки
+            'reimbursement_amount' => round($reimbursementAmount, $kol_znak), // сумма к возмещению
+            'client_payment_amount' => round($clientPaymentAmount, $kol_znak), // к оплате клиентом
+            'full_trip_price_with_pickup' => round($fullTripPriceWithPickup, $kol_znak) // полная цена поездки
         ];
     }
 }
@@ -65,7 +66,7 @@ if (!function_exists('calculateFullTripPrice')) {
 }
 
 if (!function_exists('calculateReimbursementAmount')) {
-    // Сумма к возмещению, руб.
+    // Предварительная Сумма к возмещению, руб.
     function calculateReimbursementAmount($order, $kol_znak=2, $taxi = null)
     {
         if (!$order || empty($order->predv_way) || !$taxi) {
@@ -89,5 +90,18 @@ if (!function_exists('calculateClientPaymentAmount')) {
         $discount = $order->skidka_dop_all ?? 0;
         $values = calculateSocialTaxiValues($order->predv_way, $taxi, $discount, $kol_znak);
         return $values['client_payment_amount'];
+    }
+}
+
+if (!function_exists('calculateTripPriceWithPickup')) {
+    function calculateTripPriceWithPickup($order, $kol_znak = 2, $taxi = null)
+    {
+        if (!$order || empty($order->predv_way) || !$taxi) {
+            return 0;
+        }
+
+        $discount = $order->skidka_dop_all ?? 0;
+        $values = calculateSocialTaxiValues($order->predv_way, $taxi, $discount, $kol_znak);
+        return $values['full_trip_price_with_pickup'];
     }
 }

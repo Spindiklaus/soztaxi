@@ -58,7 +58,7 @@
         
         <!-- Сумма к возмещению -->
         <td>
-            @if($order->type_order == 1) <!-- для соцтакси предварительная -->
+            @if($order->type_order == 1) <!-- для соцтакси предварительная к возмещению-->
                 {{ number_format(calculateReimbursementAmount($order, 11, $taxi), 11, ',', ' ') }}
             @else
                 {{ $order->taxi_vozm ?? '' }}

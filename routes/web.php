@@ -77,6 +77,8 @@ Route::middleware(['web', 'auth', IsAdmin::class])->group(function () {
     Route::get('/taxi-orders', [TaxiOrderController::class, 'index'])->name('taxi-orders.index');
     Route::get('/taxi-orders/export-to-taxi', [TaxiOrderController::class, 'exportToTaxi'])->name('taxi-orders.export.to.taxi');
     Route::post('/taxi-orders/set-sent-date', [TaxiOrderController::class, 'setSentDate'])->name('taxi-orders.set-sent-date');    
+    Route::patch('/taxi-orders/unset-sent-date', [TaxiOrderController::class, 'unsetSentDate'])->name('taxi-orders.unset-sent-date');
+    Route::patch('/taxi-orders/transfer-predictive-data', [TaxiOrderController::class, 'transferPredictiveData'])->name('taxi-orders.transfer.predictive.data');
 });
 
 Route::middleware(['auth'])->group(function () {
@@ -97,6 +99,7 @@ Route::middleware(['auth'])->group(function () {
     // Отмена заказа - выполнение
     Route::patch('/social-taxi-orders/{social_taxi_order}/cancel', [SocialTaxiOrderController::class, 'cancel'])
      ->name('social-taxi-orders.cancel'); 
+
 });
 
 

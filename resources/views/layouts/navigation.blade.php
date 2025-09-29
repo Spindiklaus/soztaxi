@@ -22,7 +22,7 @@
                         {{ __('Легковой автомобиль') }}
                     </x-nav-link>
                     <x-nav-link :href="route('taxi-orders.index')" :active="request()->routeIs('taxi-orders.index')">
-                        {{ __('Передать сведения в такси') }}
+                        {{ __('Сведения в такси') }}
                     </x-nav-link>
                 </div>
             </div>
