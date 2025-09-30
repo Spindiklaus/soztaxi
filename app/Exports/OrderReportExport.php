@@ -5,7 +5,6 @@ namespace App\Exports;
 use App\Services\OrderReportBuilder;
 use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\AfterSheet;
 use PhpOffice\PhpSpreadsheet\Style\Border;
@@ -33,12 +32,12 @@ class OrderReportExport implements FromArray, WithHeadings, WithEvents
             $data = (array)$data; // Преобразуем в массив, если объект
             foreach ($data['types'] as $typeId => $stats) {
                 $rows[] = [
-                    'visit_date' => $date,
+                    'visit_date' => Carbon::createFromFormat('Y-m-d', $date)->format('d.m.Y'), 
                     'type_order' => getOrderTypeName($typeId),
-                    'status_1_count' => $stats['status_1_count'],
-                    'status_2_count' => $stats['status_2_count'],
-                    'status_3_count' => $stats['status_3_count'],
-                    'status_4_count' => $stats['status_4_count'],
+                    'status_1_count' => $stats['status_1_count'] ?: '', // ✅ Если 0 — пустая строка
+                    'status_2_count' => $stats['status_2_count'] ?: '', // ✅
+                    'status_3_count' => $stats['status_3_count'] ?: '', // ✅
+                    'status_4_count' => $stats['status_4_count'] ?: '', // ✅
                 ];
             }
         }
@@ -71,10 +70,40 @@ class OrderReportExport implements FromArray, WithHeadings, WithEvents
                 $sheet->getStyle('A1')->getAlignment()->setHorizontal('center');
 
                 // Фильтры
-                $sheet->setCellValue('A2', "Период: с {$this->startDate} по {$this->endDate}");
+                $start = Carbon::createFromFormat('Y-m-d', $this->startDate)->format('d.m.Y');
+                $end = Carbon::createFromFormat('Y-m-d', $this->endDate)->format('d.m.Y');
+                $sheet->setCellValue('A2', "Период: с {$start} по {$end}");
                 $sheet->mergeCells('A2:F2');
                 $sheet->getStyle('A2')->getFont()->setItalic(true);
                 $sheet->getStyle('A2')->getAlignment()->setHorizontal('center');
+                
+                 // Вставляем заголовки таблицы в строку 3
+                $sheet->setCellValue('A3', $this->headings()[0]);
+                $sheet->setCellValue('B3', $this->headings()[1]);
+                $sheet->setCellValue('C3', $this->headings()[2]);
+                $sheet->setCellValue('D3', $this->headings()[3]);
+                $sheet->setCellValue('E3', $this->headings()[4]);
+                $sheet->setCellValue('F3', $this->headings()[5]);
+                
+                //                // Шапка таблицы (строка 3)
+//                $sheet->getStyle('A3:F3')->getFont()->setBold(true);
+//                $sheet->getStyle('A3:F3')->getFill()
+//                    ->setFillType(Fill::FILL_SOLID)
+//                    ->getStartColor()->setRGB('D3D3D3'); // Светло-серый фон
+//
+//                // Рамки для шапки
+//                $sheet->getStyle('A3:F3')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+
+                
+
+                // Стили для строки заголовков (строка 3)
+                $sheet->getStyle('A3:F3')->getFont()->setBold(true);
+                $sheet->getStyle('A3:F3')->getFill()
+                    ->setFillType(Fill::FILL_SOLID)
+                    ->getStartColor()->setRGB('D3D3D3'); // Светло-серый фон
+
+                // Рамки для шапки
+                $sheet->getStyle('A3:F3')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
 
                 // Установка ширины колонок
                 $sheet->getColumnDimension('A')->setWidth(15); // Дата поездки
@@ -84,14 +113,6 @@ class OrderReportExport implements FromArray, WithHeadings, WithEvents
                 $sheet->getColumnDimension('E')->setWidth(20); // Отменен
                 $sheet->getColumnDimension('F')->setWidth(20); // Закрыт
 
-                // Шапка таблицы (строка 3)
-                $sheet->getStyle('A3:F3')->getFont()->setBold(true);
-                $sheet->getStyle('A3:F3')->getFill()
-                    ->setFillType(Fill::FILL_SOLID)
-                    ->getStartColor()->setRGB('D3D3D3'); // Светло-серый фон
-
-                // Рамки для шапки
-                $sheet->getStyle('A3:F3')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
 
                 // Рамки для данных (начиная с 4 строки)
                 $lastRow = $sheet->getHighestRow();
