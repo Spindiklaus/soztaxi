@@ -83,6 +83,7 @@ Route::middleware(['web', 'auth', IsAdmin::class])->group(function () {
     Route::patch('/taxi-orders/transfer-predictive-data', [TaxiOrderController::class, 'transferPredictiveData'])->name('taxi-orders.transfer.predictive.data');
     
     Route::get('/reports/orders_visit', [OrderReportController::class, 'index'])->name('orders.report_visit');
+    Route::get('/reports/orders_visit/export', [OrderReportController::class, 'export'])->name('orders.report_visit_export');
 });
 
 Route::middleware(['auth'])->group(function () {
