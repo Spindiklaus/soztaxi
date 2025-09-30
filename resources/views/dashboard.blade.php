@@ -18,20 +18,26 @@
 <section class="grid grid-cols-1 md:grid-cols-3 gap-6 p-10 bg-gray-100">
   <!-- Соцтакси -->
   <div class="p-6 bg-white rounded shadow flex flex-col items-center">
-    <img src="/img/auto_home.jpg" alt="Соцтакси" class="w-full h-100 object-cover mb-4 rounded">
-    <span class="text-center font-medium">Соцтакси</span>
+      <a href="{{route('operator.social-taxi.index')}}">
+        <img src="/img/auto_home.jpg" alt="Соцтакси" class="w-full h-100 object-cover mb-4 rounded">
+        <span class="text-center font-medium">Соцтакси</span>
+      </a>  
   </div>
 
   <!-- ГАЗель -->
   <div class="p-6 bg-white rounded shadow flex flex-col items-center">
-    <img src="/img/gaz_home1.jpg" alt="ГАЗель" class="w-full h-100 object-cover mb-4 rounded">
-    <span class="text-center font-medium">ГАЗель</span>
+    <a href="{{route('operator.gazelle.index')}}">  
+        <img src="/img/gaz_home1.jpg" alt="ГАЗель" class="w-full h-100 object-cover mb-4 rounded">
+        <span class="text-center font-medium">ГАЗель</span>
+    </a>    
   </div>
 
   <!-- Легковое авто -->
   <div class="p-6 bg-white rounded shadow flex flex-col items-center">
-    <img src="/img/sedan_home.jpg" alt="Легковое авто" class="w-full h-100 object-cover mb-4 rounded">
-    <span class="text-center font-medium">Легковое авто</span>
+      <a href="{{route('operator.car.index')}}">
+          <img src="/img/sedan_home.jpg" alt="Легковое авто" class="w-full h-100 object-cover mb-4 rounded">
+          <span class="text-center font-medium">Легковое авто</span>
+      </a>    
   </div>
 </section>
 
