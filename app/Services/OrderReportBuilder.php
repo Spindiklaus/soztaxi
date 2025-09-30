@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class OrderReportBuilder
 {
@@ -26,9 +27,10 @@ class OrderReportBuilder
                 WHERE osh2.order_id = order_status_histories.order_id
             )');
 
-        return DB::table('orders')
+        $rows = DB::table('orders')
             ->select(
                 DB::raw('DATE(visit_data) as visit_date'),
+                'type_order',
                 DB::raw('SUM(CASE WHEN ls.status_order_id = 1 THEN 1 ELSE 0 END) AS status_1_count'),
                 DB::raw('SUM(CASE WHEN ls.status_order_id = 2 THEN 1 ELSE 0 END) AS status_2_count'),
                 DB::raw('SUM(CASE WHEN ls.status_order_id = 3 THEN 1 ELSE 0 END) AS status_3_count'),
@@ -43,7 +45,30 @@ class OrderReportBuilder
             })
             ->whereNotNull('visit_data')
             ->whereNull('orders.deleted_at') // Только неудалённые
-            ->groupBy(DB::raw('DATE(visit_data)'))
-            ->orderBy('visit_date', 'asc');
+            ->groupBy(DB::raw('DATE(visit_data)'), 'type_order')
+            ->orderBy('visit_date', 'asc')
+            ->orderBy('type_order', 'asc')
+            ->get();
+
+        // Группируем результаты по дате
+        $grouped = [];
+        foreach ($rows as $row) {
+            $date = $row->visit_date;
+            if (!isset($grouped[$date])) {
+                $grouped[$date] = [
+                    'visit_date' => $date,
+                    'types' => [],
+                ];
+            }
+
+            $grouped[$date]['types'][$row->type_order] = [
+                'status_1_count' => $row->status_1_count,
+                'status_2_count' => $row->status_2_count,
+                'status_3_count' => $row->status_3_count,
+                'status_4_count' => $row->status_4_count,
+            ];
+        }
+
+        return collect($grouped);
     }
 }

@@ -17,7 +17,7 @@ class OrderReportController extends BaseController
         $endDate = $request->input('end_date', Carbon::now()->toDateString());
 
         $query = new OrderReportBuilder($startDate, $endDate);
-        $report = $query->build()->get();
+        $report = $query->build();
 
         return view('reports.orders_visit', compact('report', 'startDate', 'endDate'));
     }
