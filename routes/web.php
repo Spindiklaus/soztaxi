@@ -13,6 +13,8 @@ use App\Http\Controllers\Admin\FioDtrnController;
 use App\Http\Controllers\Admin\FioRipController;
 use App\Http\Controllers\Admin\SkidkaDopController;
 use App\Http\Controllers\Admin\SocialTaxiOrderController;
+use App\Http\Controllers\Admin\OrderReportController;
+
 
 use App\Http\Controllers\Import\ImportFioDtrnController;
 use App\Http\Controllers\Import\ImportFioRipController;
@@ -79,6 +81,8 @@ Route::middleware(['web', 'auth', IsAdmin::class])->group(function () {
     Route::post('/taxi-orders/set-sent-date', [TaxiOrderController::class, 'setSentDate'])->name('taxi-orders.set-sent-date');    
     Route::patch('/taxi-orders/unset-sent-date', [TaxiOrderController::class, 'unsetSentDate'])->name('taxi-orders.unset-sent-date');
     Route::patch('/taxi-orders/transfer-predictive-data', [TaxiOrderController::class, 'transferPredictiveData'])->name('taxi-orders.transfer.predictive.data');
+    
+    Route::get('/reports/orders_visit', [OrderReportController::class, 'index'])->name('orders.report_visit');
 });
 
 Route::middleware(['auth'])->group(function () {

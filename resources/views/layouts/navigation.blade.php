@@ -24,6 +24,9 @@
                     <x-nav-link :href="route('taxi-orders.index')" :active="request()->routeIs('taxi-orders.index')">
                         {{ __('Сведения в такси') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('orders.report_visit')" :active="request()->routeIs('orders.report_visit')">
+                        {{ __('Отчет по поездкам') }}
+                    </x-nav-link>
                 </div>
             </div>
 
