@@ -3,7 +3,7 @@
 namespace App\Exports;
 
 use App\Services\OrderReportBuilder;
-use Maatwebsite\Excel\Concerns\FromQuery;
+use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithEvents;
@@ -13,8 +13,7 @@ use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Color;
 use Carbon\Carbon;
 
-
-class OrderReportExport implements FromQuery, WithHeadings, WithMapping, WithEvents
+class OrderReportExport implements FromArray, WithHeadings, WithEvents
 {
     protected $startDate;
     protected $endDate;
@@ -25,30 +24,37 @@ class OrderReportExport implements FromQuery, WithHeadings, WithMapping, WithEve
         $this->endDate = $endDate;
     }
 
-    public function query()
+    public function array(): array
     {
-        return (new OrderReportBuilder($this->startDate, $this->endDate))->build();
+        $report = (new OrderReportBuilder($this->startDate, $this->endDate))->build();
+        $rows = [];
+
+        foreach ($report as $date => $data) {
+            $data = (array)$data; // Преобразуем в массив, если объект
+            foreach ($data['types'] as $typeId => $stats) {
+                $rows[] = [
+                    'visit_date' => $date,
+                    'type_order' => getOrderTypeName($typeId),
+                    'status_1_count' => $stats['status_1_count'],
+                    'status_2_count' => $stats['status_2_count'],
+                    'status_3_count' => $stats['status_3_count'],
+                    'status_4_count' => $stats['status_4_count'],
+                ];
+            }
+        }
+
+        return $rows;
     }
 
     public function headings(): array
     {
         return [
             'Дата поездки',
+            'Тип заказа',
             'Принят (id=1)',
             'Передан в такси (id=2)',
             'Отменен (id=3)',
             'Закрыт (id=4)',
-        ];
-    }
-
-    public function map($row): array
-    {
-        return [
-            $row->visit_date ? Carbon::parse($row->visit_date)->format('d.m.Y') : 'Не указана',
-            $row->status_1_count,
-            $row->status_2_count,
-            $row->status_3_count,
-            $row->status_4_count,
         ];
     }
 
@@ -60,35 +66,36 @@ class OrderReportExport implements FromQuery, WithHeadings, WithMapping, WithEve
 
                 // Заголовок
                 $sheet->setCellValue('A1', 'Сводка по статусам заказов');
-                $sheet->mergeCells('A1:E1');
+                $sheet->mergeCells('A1:F1');
                 $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
                 $sheet->getStyle('A1')->getAlignment()->setHorizontal('center');
 
                 // Фильтры
                 $sheet->setCellValue('A2', "Период: с {$this->startDate} по {$this->endDate}");
-                $sheet->mergeCells('A2:E2');
+                $sheet->mergeCells('A2:F2');
                 $sheet->getStyle('A2')->getFont()->setItalic(true);
                 $sheet->getStyle('A2')->getAlignment()->setHorizontal('center');
 
                 // Установка ширины колонок
                 $sheet->getColumnDimension('A')->setWidth(15); // Дата поездки
-                $sheet->getColumnDimension('B')->setWidth(20); // Принят
-                $sheet->getColumnDimension('C')->setWidth(25); // Передан в такси
-                $sheet->getColumnDimension('D')->setWidth(20); // Отменен
-                $sheet->getColumnDimension('E')->setWidth(20); // Закрыт
+                $sheet->getColumnDimension('B')->setWidth(15); // Тип заказа
+                $sheet->getColumnDimension('C')->setWidth(20); // Принят
+                $sheet->getColumnDimension('D')->setWidth(25); // Передан в такси
+                $sheet->getColumnDimension('E')->setWidth(20); // Отменен
+                $sheet->getColumnDimension('F')->setWidth(20); // Закрыт
 
                 // Шапка таблицы (строка 3)
-                $sheet->getStyle('A3:E3')->getFont()->setBold(true);
-                $sheet->getStyle('A3:E3')->getFill()
+                $sheet->getStyle('A3:F3')->getFont()->setBold(true);
+                $sheet->getStyle('A3:F3')->getFill()
                     ->setFillType(Fill::FILL_SOLID)
                     ->getStartColor()->setRGB('D3D3D3'); // Светло-серый фон
 
                 // Рамки для шапки
-                $sheet->getStyle('A3:E3')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+                $sheet->getStyle('A3:F3')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
 
                 // Рамки для данных (начиная с 4 строки)
                 $lastRow = $sheet->getHighestRow();
-                $sheet->getStyle("A4:E{$lastRow}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+                $sheet->getStyle("A4:F{$lastRow}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
             },
         ];
     }
