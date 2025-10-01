@@ -71,4 +71,30 @@ class OrderReportBuilder
 
         return collect($grouped);
     }
+    
+    
+    public function getTotals($report)
+{
+    $totalStatus1 = 0;
+    $totalStatus2 = 0;
+    $totalStatus3 = 0;
+    $totalStatus4 = 0;
+
+    foreach ($report as $data) {
+        foreach ($data['types'] as $stats) {
+            $totalStatus1 += $stats['status_1_count'];
+            $totalStatus2 += $stats['status_2_count'];
+            $totalStatus3 += $stats['status_3_count'];
+            $totalStatus4 += $stats['status_4_count'];
+        }
+    }
+
+    return [
+        'totalStatus1' => $totalStatus1,
+        'totalStatus2' => $totalStatus2,
+        'totalStatus3' => $totalStatus3,
+        'totalStatus4' => $totalStatus4,
+    ];
+}
+    
 }

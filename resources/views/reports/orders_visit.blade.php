@@ -101,10 +101,52 @@
             </td>
         </tr>
     @endforelse
+    
+    <!-- Итоговая строка -->
+    <tr class="bg-gray-100 font-semibold">
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Итого</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"></td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm">
+            @if($totals['totalStatus1'])
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                <i data-feather="check-circle" class="w-4 h-4 mr-1"></i>
+                {{ $totals['totalStatus1'] }}
+            </span>
+            @endif
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm">
+            @if($totals['totalStatus2'])
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                <i data-feather="truck" class="w-4 h-4 mr-1"></i>
+                {{ $totals['totalStatus2'] }}
+            </span>
+            @endif
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm">
+            @if($totals['totalStatus3'])
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                <i data-feather="x-circle" class="w-4 h-4 mr-1"></i>
+                {{ $totals['totalStatus3'] }}
+            </span>
+            @endif
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm">
+            @if($totals['totalStatus4'])
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                <i data-feather="flag" class="w-4 h-4 mr-1"></i>
+                {{ $totals['totalStatus4'] }}
+            </span>
+            @endif
+        </td>
+    </tr>
+    
 </tbody>
                     </table>
                 </div>
             </div>
+            
+            
+            
         </div>
     </div>
 
