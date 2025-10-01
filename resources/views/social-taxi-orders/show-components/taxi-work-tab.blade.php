@@ -62,6 +62,15 @@
                     <div class="mt-1 bg-gray-100 p-2 rounded-md">{{ number_format($order->taxi_vozm ?? 0, 11, ',', ' ') }} руб.</div>
                 @endif   
             </div>
+            <!-- Четвертая строчка -->
+            @if($order->type_order == 1)
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Фактический километраж</label>
+                <div class="mt-1 bg-gray-100 p-2 rounded-md">
+                    {{ $order->taxi_way ? number_format($order->taxi_way, 1, ',', ' ') . ' км' : 'Не указан' }}
+                </div>
+            </div>
+            @endif
             
         </div>
     </div>

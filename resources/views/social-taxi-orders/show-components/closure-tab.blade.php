@@ -24,7 +24,7 @@
         <h2 class="text-lg font-semibold text-gray-800 mb-4">Комментарии</h2>
         
         <div class="bg-white p-4 rounded-md border">
-            <p class="text-sm text-gray-600">{{ $order->komment ?? 'Комментарии отсутствуют' }}</p>
+            <p class="text-sm text-gray-600">{!! nl2br(e($order->komment ?? 'Комментарии отсутствуют')) !!}</p>
         </div>
     </div>
     <div class="bg-gray-50 p-4 rounded-lg">
