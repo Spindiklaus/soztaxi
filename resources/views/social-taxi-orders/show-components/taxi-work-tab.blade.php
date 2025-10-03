@@ -72,7 +72,7 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700">Фактический километраж</label>
                 <div class="mt-1 bg-gray-100 p-2 rounded-md">
-                    {{ $order->taxi_way ? number_format($order->taxi_way, 1, ',', ' ') . ' км' : 'Не указан' }}
+                    {{ $order->taxi_way ? number_format($order->taxi_way, 3, ',', ' ') . ' км' : 'Не указан' }}
                 </div>
             </div>
             @endif

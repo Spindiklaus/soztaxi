@@ -21,6 +21,7 @@ function getOrderTypeColor(typeId) {
 
 // Показать модальное окно с поездками клиента
 function showClientTrips(clientId, monthYear) {
+    console.log('showClientTrips called with:', clientId, monthYear);
     const modal = document.getElementById('client-trips-modal');
     if (modal) {
         modal.classList.remove('hidden');

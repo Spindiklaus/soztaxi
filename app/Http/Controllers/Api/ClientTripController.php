@@ -58,7 +58,6 @@ class ClientTripController extends Controller {
                 ->whereNotNull('visit_data')
                 ->whereNull('deleted_at')
                 ->whereNull('cancelled_at')
-                ->where('otmena_taxi', 0)
                 ->select([
                     'id',
                     'visit_data',

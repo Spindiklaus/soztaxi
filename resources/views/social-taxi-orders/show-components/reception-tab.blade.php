@@ -197,17 +197,6 @@
                                 {{ getClientTripsCountInMonthByVisitDate($order->client_id, $order->visit_data) }}
                             </button>
                         </div>
-
-                        <!-- Число фактических поездок в месяц -->
-                        <div class="flex items-center mt-2">
-                            <span class="text-lg font-semibold text-gray-800">Число фактических поездок в месяц:</span>
-                            <button 
-                                onclick="showClientActualTrips({{ $order->client_id }}, '{{ $order->visit_data ? $order->visit_data->format('Y-m') : date('Y-m') }}')"
-                                class="ml-2 inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-green-100 text-green-800 hover:bg-green-200 transition-colors">
-                                {{ getClientActualTripsCountInMonthByVisitDate($order->client_id, $order->visit_data) }}
-                            </button>
-                        </div>
-
                         <!-- Число поездок переданных в такси -->
                         <div class="flex items-center mt-2">
                             <span class="text-lg font-semibold text-gray-800">Число поездок, переданных оператору такси:</span>
@@ -217,6 +206,16 @@
                                 {{ getClientTaxiSentTripsCountInMonthByVisitDate($order->client_id, $order->visit_data) }}
                             </button>
                         </div>
+                        <!-- Число фактических поездок в месяц -->
+                        <div class="flex items-center mt-2">
+                            <span class="text-lg font-semibold text-gray-800">Число фактических поездок в месяц:</span>
+                            <button 
+                                onclick="showClientActualTrips({{ $order->client_id }}, '{{ $order->visit_data ? $order->visit_data->format('Y-m') : date('Y-m') }}')"
+                                class="ml-2 inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-green-100 text-green-800 hover:bg-green-200 transition-colors">
+                                {{ getClientActualTripsCountInMonthByVisitDate($order->client_id, $order->visit_data) }}
+                            </button>
+                        </div>
+                        
                     </div>
                 </div>
             </div>

@@ -86,8 +86,7 @@ if (!function_exists('getClientActualTripsCountInMonthByVisitDate')) {
             ->whereNotNull('visit_data') // Только с указанной датой поездки
             ->whereNotNull('closed_at') // Только с датой закрытия (фактические поездки)
             ->whereNull('deleted_at') // Только неудаленные заказы
-            ->whereNull('cancelled_at') // Только неотмененные заказы
-            ->where('otmena_taxi', 0); // Только неотмененные такси
+            ->whereNull('cancelled_at'); // Только неотмененные заказы
 
         // Если указан ID заказа для исключения, добавляем условие
         if ($excludeOrderId) {
@@ -135,8 +134,7 @@ if (!function_exists('getClientTaxiSentTripsCountInMonthByVisitDate')) {
             ->whereNotNull('visit_data') // Только с указанной датой поездки
             ->whereNotNull('taxi_sent_at') // Только переданные в такси
             ->whereNull('deleted_at') // Только неудаленные заказы
-            ->whereNull('cancelled_at') // Только неотмененные заказы
-            ->where('otmena_taxi', 0); // Только неотмененные такси
+            ->whereNull('cancelled_at'); // Только неотмененные заказы
 
         // Если указан ID заказа для исключения, добавляем условие
         if ($excludeOrderId) {
