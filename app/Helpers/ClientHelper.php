@@ -133,6 +133,7 @@ if (!function_exists('getClientTaxiSentTripsCountInMonthByVisitDate')) {
             ->whereBetween('visit_data', [$startDate, $endDate])
             ->whereNotNull('visit_data') // Только с указанной датой поездки
             ->whereNotNull('taxi_sent_at') // Только переданные в такси
+            ->whereNull('closed_at') // Только неудаленные заказы
             ->whereNull('deleted_at') // Только неудаленные заказы
             ->whereNull('cancelled_at'); // Только неотмененные заказы
 

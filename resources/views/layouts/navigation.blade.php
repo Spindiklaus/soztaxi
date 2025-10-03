@@ -22,10 +22,13 @@
                         {{ __('Легковой автомобиль') }}
                     </x-nav-link>
                     <x-nav-link :href="route('taxi-orders.index')" :active="request()->routeIs('taxi-orders.index')">
-                        {{ __('Сведения в такси') }}
+                        {{ __('Передача в такси') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('taxi-orders.index')" :active="request()->routeIs('taxi-orders.index')">
+                        {{ __('Закрыть поездки') }}
                     </x-nav-link>
                     <x-nav-link :href="route('orders.report_visit')" :active="request()->routeIs('orders.report_visit')">
-                        {{ __('Отчет по поездкам') }}
+                        {{ __('Сводный отчет') }}
                     </x-nav-link>
                 </div>
             </div>

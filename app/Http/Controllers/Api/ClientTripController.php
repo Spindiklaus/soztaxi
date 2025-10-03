@@ -82,7 +82,8 @@ class ClientTripController extends Controller {
                     break;
                 case 'taxi-sent':
                     // Только переданные в такси (с датой передачи в такси)
-                    $query->whereNotNull('taxi_sent_at');
+                    $query->whereNotNull('taxi_sent_at')
+                        ->whereNull('closed_at');
                     break;
                 case 'all':
                 default:
