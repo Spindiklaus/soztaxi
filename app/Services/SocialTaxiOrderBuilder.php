@@ -91,7 +91,7 @@ class SocialTaxiOrderBuilder {
 
         // Фильтрация по оператору (user_id)
         if ($request->filled('filter_user_id')) {
-            $this->query->where('user_id', $request->input('filter_user_id'));
+            $this->query->where('orders.user_id', $request->input('filter_user_id'));
         }
 
 
