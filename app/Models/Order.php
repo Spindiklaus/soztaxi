@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use DateTimeInterface;
 
 class Order extends Model {
 
@@ -45,7 +46,6 @@ class Order extends Model {
         'user_id',
         'deleted_at',
     ];
-    protected $dates = ['deleted_at']; // Указываем, что deleted_at — это дата
     protected $casts = [
         'pz_data' => 'datetime',
         'visit_data' => 'datetime',
@@ -122,5 +122,9 @@ class Order extends Model {
         return $this->belongsTo(Taxi::class, 'taxi_id');
     }
 
+    protected function serializeDate(DateTimeInterface $date)
+    {
+        return $date->setTimezone(new \DateTimeZone('Europe/Samara'))->format('Y-m-d H:i:s');
+    }
 
 }

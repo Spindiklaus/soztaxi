@@ -113,6 +113,25 @@ function loadClientTrips(clientId, monthYear, type = 'normal') {
         });
 }
 
+
+function parseDateTime(dateTimeStr) {
+    if (!dateTimeStr) return { date: '-', time: '' };
+
+    // Разбиваем по пробелу
+    const [dateStr, timeStr] = dateTimeStr.split(' ');
+
+    if (!dateStr || !timeStr) {
+        return { date: 'Invalid Date', time: '' };
+    }
+
+    // Форматируем дату: YYYY-MM-DD → DD.MM.YYYY
+    const formattedDate = dateStr.split('-').reverse().join('.');
+    // Берём только HH:MM
+    const formattedTime = timeStr.substring(0, 5);
+
+    return { date: formattedDate, time: formattedTime };
+}
+
 // Отобразить поездки клиента
 function displayClientTrips(data, type = 'normal') {
     const content = document.getElementById('client-trips-content');
@@ -196,28 +215,15 @@ function displayClientTrips(data, type = 'normal') {
         // Добавим отладку для каждой поездки
         console.log(`Trip ${index}:`, trip);
         // Форматируем дату поездки
-        let visitDate = '-';
-        let visitTime = '';
-        if (trip.visit_data) {
-            // Извлекаем дату и время напрямую из строки ISO без учета часовых поясов
-            const dateTimeParts = trip.visit_data.split('T');
-            if (dateTimeParts.length > 1) {
-                visitDate = dateTimeParts[0].split('-').reverse().join('.'); // YYYY-MM-DD to DD.MM.YYYY
-                visitTime = dateTimeParts[1].substring(0, 5); // HH:MM:SS to HH:MM
-            }
-        }
+        const { date: visitDate, time: visitTime } = parseDateTime(trip.visit_data);
         
         // Форматируем дату обратной поездки
         let visitObratnoInfo = '';
         console.log(`Trip ${index} visit_obratno:`, trip.visit_obratno);
         
         if (trip.visit_obratno) {
-            const obratnoDateTimeParts = trip.visit_obratno.split('T');
-            if (obratnoDateTimeParts.length > 1) {
-                const obratnoDate = obratnoDateTimeParts[0].split('-').reverse().join('.');
-                const obratnoTime = obratnoDateTimeParts[1].substring(0, 5);
-                visitObratnoInfo = `<br><span class="text-xs text-blue-600">Обратно: ${obratnoTime}</span>`;
-            }
+            const { date, time } = parseDateTime(trip.visit_obratno);
+            visitObratnoInfo = `<span class="text-xs text-blue-600">Обратно: ${time}</span>`;
         }
         
         tripsHtml += `
@@ -232,7 +238,7 @@ function displayClientTrips(data, type = 'normal') {
                 </td>
                 <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
                     ${visitDate}
-                    ${visitTime ? `<br><span class="text-xs text-gray-500">${visitTime}</span>` : ''}
+                    ${visitTime ? `<br><span class="text-xs text-gray-900">${visitTime}</span>` : ''}
                     ${visitObratnoInfo}
                 </td>
                 <td class="px-4 py-2 text-sm text-gray-900 max-w-xs truncate" title="${trip.adres_otkuda || '-'}">${trip.adres_otkuda || '-'}</td>
@@ -258,13 +264,7 @@ function displayClientTrips(data, type = 'normal') {
                 `;
                 break;
             case 'taxi-sent':
-                let sentDate = '-';
-                let sentTime = '';
-                if (trip.taxi_sent_at) {
-                    const sentObj = new Date(trip.taxi_sent_at);
-                    sentDate = sentObj.toLocaleDateString('ru-RU');
-                    sentTime = sentObj.toLocaleTimeString('ru-RU', {hour: '2-digit', minute:'2-digit'});
-                }
+                const { date: sentDate, time: sentTime } = parseDateTime(trip.taxi_sent_at);
                 tripsHtml += `
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
                         ${sentDate}
