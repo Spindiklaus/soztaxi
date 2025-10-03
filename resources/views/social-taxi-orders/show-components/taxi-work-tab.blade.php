@@ -53,13 +53,18 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700">Сумма к оплате</label>
                 @if ($order->taxi_price!=0)
-                    <div class="mt-1 bg-gray-100 p-2 rounded-md">{{ number_format($order->taxi_price - $order->taxi_vozm ?? 0, 11, ',', ' ') }} руб.</div>
+                    @php
+                        $paymentAmount = $order->taxi_price - ($order->taxi_vozm ?? 0);
+                    @endphp
+                    <div class="mt-1 text-blue-600 bg-gray-100 p-2 rounded-md">
+                        {{ $paymentAmount == 0 ? '0' : number_format($paymentAmount, 11, ',', ' ') }} руб.
+                    </div>
                 @endif    
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700">Сумма к возмещению</label>
                 @if ($order->taxi_price!=0)
-                    <div class="mt-1 bg-gray-100 p-2 rounded-md">{{ number_format($order->taxi_vozm ?? 0, 11, ',', ' ') }} руб.</div>
+                    <div class="mt-1  text-orange-600 bg-gray-100 p-2 rounded-md">{{ number_format($order->taxi_vozm ?? 0, 11, ',', ' ') }} руб.</div>
                 @endif   
             </div>
             <!-- Четвертая строчка -->

@@ -268,7 +268,12 @@
 
                     <div class="flex justify-between">
                         <span class="text-sm font-medium text-gray-700">Сумма к оплате, руб.</span>
-                        <span class="text-sm text-blue-600 font-semibold">{{ number_format(calculateClientPaymentAmount($order, 11, $taxi), 11, ',', ' ') }} руб.</span>
+                        @php
+                            $amount = calculateClientPaymentAmount($order, 11, $taxi);
+                        @endphp
+                        <span class="text-sm text-blue-600 font-semibold">
+                            {{ $amount == 0 ? '0' : number_format($amount, 11, ',', ' ') }} руб.
+                        </span>
                     </div>
 
                     <div class="flex justify-between">

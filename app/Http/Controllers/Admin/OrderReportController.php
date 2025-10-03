@@ -12,8 +12,10 @@ class OrderReportController extends BaseController {
 
     public function index(Request $request) {
         $startDate = $request->input('start_date', Carbon::now()->startOfMonth()->toDateString());
-        $endDate = $request->input('end_date', Carbon::now()->toDateString());
-
+//        $endDate = $request->input('end_date', Carbon::now()->toDateString());
+        // конец месяца
+        $endDate = $request->input('end_date', Carbon::now()->endOfMonth()->toDateString());
+        
         $query = new OrderReportBuilder($startDate, $endDate);
         $report = $query->build();
 
