@@ -28,6 +28,21 @@ class TaxiOrderBuilder extends SocialTaxiOrderBuilder
             $q->whereIn('status_order_id', [3, 4]); // Исключаем отмененные и закрытые
         });
         
+        // НОВАЯ ПРОВЕРКА:
+        // Для соцтакси (type_order == 1) предварительная дальность (predv_way) должна быть > 0
+        // Это условие добавляется ко всем запросам, использующим этот билдер,
+        // включая index, export, setSentDate и transferPredictiveData.
+        $this->query->where(function ($query) {
+            // Условие для не-соцтакси (остальные типы) или соцтакси с predv_way > 0
+            $query->where('type_order', '!=', 1) // Не соцтакси -> без ограничений
+                  ->orWhere(function ($socTaksiQuery) {
+                      // Для соцтакси: predv_way > 0
+                      $socTaksiQuery->where('type_order', 1)
+                                    ->where('predv_way', '>', 0);
+                  });
+        });
+
+        
         return $this;
     }
     public function applySorting(Request $request): self

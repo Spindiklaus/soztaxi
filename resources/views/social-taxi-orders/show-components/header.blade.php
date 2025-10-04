@@ -28,12 +28,16 @@
             $backToOperator = request('back_to_operator');
             $operatorType = request('operator_type');
             $fromTaxiPage = request('from_taxi_page', 0); // Проверяем, откуда пришли
+            $fromClosePage = request('from_close_page', 0);
             
             if ($backToOperator && $operatorType) {
                 $backRoute = route($backToOperator, array_merge(['type_order' => $operatorType], $backUrlParams ?? []));
             } elseif ($fromTaxiPage) {
                 // Если пришли со страницы такси, возвращаемся туда
                 $backRoute = route('taxi-orders.index', $backUrlParams ?? []); 
+            } elseif ($fromClosePage) {
+                // Если пришли со страницы закрытия заказов, возвращаемся туда
+                $backRoute = route('social-taxi-orders.close.index', $backUrlParams ?? []); 
             } else {
                 $backRoute = route('social-taxi-orders.index', $backUrlParams ?? []);
             }

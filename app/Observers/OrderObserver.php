@@ -58,6 +58,11 @@ class OrderObserver
         if (is_null($original['closed_at']) && !is_null($order->closed_at)) {
             $this->changeStatus($order, 4); // ID статуса "закрыт"
         }
+        // Статус "передан в такси" - ВОССТАНОВЛЕНИЕ (когда closed_at сбрасывается, восстанавливается - передан в такси)
+        if (!is_null($original['closed_at']) && is_null($order->closed_at)) {
+            \Log::info('Setting status back to taxi-sent for order ' . $order->id);
+            $this->changeStatus($order, 2); // ID статуса "передан в такси"
+        }
     }
 
     /**

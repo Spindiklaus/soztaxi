@@ -10,6 +10,8 @@ use App\Services\TaxiOrderService;
 use App\Services\TaxiOrderBuilder;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\TaxiOrdersExport;
+use Carbon\Carbon;
+
 
 class TaxiOrderController extends BaseController {
 
@@ -36,12 +38,12 @@ class TaxiOrderController extends BaseController {
 //        'direction' => $direction,
 //        'all_params' => $request->all()
 //    ]);
-        // Устанавливаем фильтр по дате поездки по умолчанию - сегодня
+        // Устанавливаем фильтр по дате поездки по умолчанию - начало и конец текущего месяца
         if (!$request->has('visit_date_from')) {
-            $request->merge(['visit_date_from' => date('Y-m-d')]);
+            $request->merge(['visit_date_from' => Carbon::now()->startOfMonth()->toDateString()]);
         }
         if (!$request->has('visit_date_to')) {
-            $request->merge(['visit_date_to' => date('Y-m-d')]);
+            $request->merge(['visit_date_to' => Carbon::now()->endOfMonth()->toDateString()]);
         }
 
         // Собираем параметры для передачи в шаблон
@@ -49,6 +51,14 @@ class TaxiOrderController extends BaseController {
 
         // Получаем список активных такси для фильтра
         $taxis = \App\Models\Taxi::where('life', 1)->orderBy('name')->get();
+        if (!$request->has('taxi_id')) {
+            $firstTaxi = $taxis->first();
+            if ($firstTaxi) {
+                $request->merge(['taxi_id' => $firstTaxi->id]);
+                // Обновляем urlParams, чтобы ссылки пагинации/сортировки тоже вели к выбранному такси
+                $urlParams['taxi_id'] = $firstTaxi->id;
+            }
+        } 
         $taxi_sent_at = now(); // дата передачи сведений в такси
         // Используем упрощенную логику для такси
         $query = $this->queryBuilder->build($request, false);
@@ -104,7 +114,7 @@ class TaxiOrderController extends BaseController {
             $visitDateFrom = \Carbon\Carbon::parse($validated['visit_date_from']);
 
             if ($taxiSentAt >= $visitDateFrom) {
-                return redirect()->back()->with('error', 'Дата передачи в такси '.$taxiSentAt->format('d.m.Y') .' должна быть меньше даты поездки '
+                return redirect()->back()->with('error', 'Дата передачи в такси '.$taxiSentAt->format('d.m.Y') .' должна быть меньше даты фильтра '
                         . $visitDateFrom->format('d.m.Y') . '.');
             }
            
@@ -144,12 +154,11 @@ class TaxiOrderController extends BaseController {
         $validated = $request->validated();
 
         $updatedCount = $this->orderService->transferPredictiveData($validated);
+        $urlParams = $this->orderService->getUrlParams();
 
         if ($updatedCount === 0) {
-            return redirect()->back()->with('info', 'Нет заказов для обновления (нет заказов соцтакси со статусом "Передан в такси" с заполненной предварительной дальностью).');
+            return redirect()->route('taxi-orders.index', $urlParams)->with('info', 'Нет заказов для обновления (нет заказов соцтакси со статусом "Передан в такси" с заполненной предварительной дальностью).');
         }
-
-        $urlParams = $this->orderService->getUrlParams();
 
         return redirect()->route('taxi-orders.index', $urlParams)
             ->with('success', "Предварительные данные перенесены в фактические для {$updatedCount} заказов.");

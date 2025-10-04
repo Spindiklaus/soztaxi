@@ -85,11 +85,6 @@ class UpdateSocialTaxiOrderRequest extends FormRequest {
                 'numeric',
                 'min:0',
                 'max:100',
-                function ($attribute, $value, $fail) {
-                    if ($this->type_order == 1 && (!$value || $value <= 0)) {
-                     $fail('Предварительная дальность обязательна и должна быть больше 0 для соцтакси (type_order = 1).');
-                    }
-                }
             ],
             'zena_type' => 'required|integer|in:1,2',
             'dopus_id' => 'nullable|exists:skidka_dops,id',
@@ -239,6 +234,19 @@ class UpdateSocialTaxiOrderRequest extends FormRequest {
                 $validator->errors()->add('visit_obratno', 'Для соцтакси дата обратной поездки должна быть пустой.');
             }
         }
+        
+        // Проверка predv_way для type_order = 1
+        if (isset($request['type_order']) && $request['type_order'] == 1) {
+            $predvWay = $request['predv_way'] ?? null;
+
+            if (!$predvWay || !is_numeric($predvWay) || $predvWay <= 0) {
+                $validator->errors()->add('predv_way', 'Предварительная дальность обязательна и должна быть больше 0 для соцтакси.');
+            } elseif ($predvWay > 100) {
+                 $validator->errors()->add('predv_way', 'Предварительная дальность не может быть больше 100км.');
+            }
+        }
+        
+        
     });
 }
     

@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\FioRipController;
 use App\Http\Controllers\Admin\SkidkaDopController;
 use App\Http\Controllers\Admin\SocialTaxiOrderController;
 use App\Http\Controllers\Admin\OrderReportController;
+use App\Http\Controllers\Admin\OrderCloseController;
 
 
 use App\Http\Controllers\Import\ImportFioDtrnController;
@@ -84,6 +85,11 @@ Route::middleware(['web', 'auth', IsAdmin::class])->group(function () {
     
     Route::get('/reports/orders_visit', [OrderReportController::class, 'index'])->name('orders.report_visit');
     Route::get('/reports/orders_visit/export', [OrderReportController::class, 'export'])->name('orders.report_visit_export');
+    
+    Route::get('/close', [OrderCloseController::class, 'index'])->name('social-taxi-orders.close.index');
+    Route::post('/close', [OrderCloseController::class, 'bulkClose'])->name('social-taxi-orders.close.bulk-close');
+    Route::patch('/close', [OrderCloseController::class, 'bulkUnset'])->name('social-taxi-orders.close.bulk-unset');
+    
 });
 
 Route::middleware(['auth'])->group(function () {

@@ -75,12 +75,7 @@ class StoreSocialTaxiOrderByTypeRequest extends FormRequest
                 'numeric',
                 'min:0',
                 'max:100',
-                function ($attribute, $value, $fail) {
-                    if ($this->type_order == 1 && (!$value || $value <= 0)) {
-                     $fail('Предварительная дальность обязательна и должна быть больше 0 для соцтакси (type_order = 1).');
-                    }
-                }
-            ],
+            ],        
             'zena_type' => 'required|integer|in:1,2',
             'dopus_id' => 'nullable|exists:skidka_dops,id',
             'skidka_dop_all' => [
@@ -160,9 +155,6 @@ class StoreSocialTaxiOrderByTypeRequest extends FormRequest
             'closed_at.date' => 'Дата закрытия должна быть корректной датой.',
             'komment.string' => 'Комментарий должен быть строкой.',
             'komment.max' => 'Комментарий не может быть длиннее 1000 символов.',
-            'predv_way.numeric' => 'Предварительная дальность должна быть числом.',
-            'predv_way.min' => 'Предварительная дальность поездки не может быть отрицательной.',
-            'predv_way.max' => 'Предварительная дальность поездки не может быть больше 100км.',
             'zena_type.required' => 'Тип поездки обязателен для выбора.',
             'zena_type.integer' => 'Тип поездки должен быть целым числом.',
             'zena_type.in' => 'Недопустимый тип поездки. Выберите 1 (в одну сторону) или 2 (в обе стороны).',
@@ -231,6 +223,19 @@ class StoreSocialTaxiOrderByTypeRequest extends FormRequest
                 $validator->errors()->add('visit_obratno', 'Для соцтакси дата обратной поездки должна быть пустой.');
             }
         }
+        
+        // Проверка predv_way для type_order = 1
+        if (isset($request['type_order']) && $request['type_order'] == 1) {
+            $predvWay = $request['predv_way'] ?? null;
+
+            if (!$predvWay || !is_numeric($predvWay) || $predvWay <= 0) {
+                $validator->errors()->add('predv_way', 'Предварительная дальность обязательна и должна быть больше 0 для соцтакси.');
+            } elseif ($predvWay > 100) {
+                 $validator->errors()->add('predv_way', 'Предварительная дальность не может быть больше 100км.');
+            }
+        }
+        
+        
     });
 }
     

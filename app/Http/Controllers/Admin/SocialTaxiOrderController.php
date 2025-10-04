@@ -128,6 +128,7 @@ class SocialTaxiOrderController extends BaseController {
             'status_order_id', 'date_from', 'date_to', 'filter_user_id', 'client_fio', 'filter_pz_nom'
         ])
     ]);
+        \Log::info('Predv way from request:', ['predv_way' => $request->input('predv_way')]);
         
         try {
             $validated = $request->validated();
@@ -141,6 +142,10 @@ class SocialTaxiOrderController extends BaseController {
             $validated['categoty_id'] = $social_taxi_order->category_id;
             $validated['kol_limit_all'] = $social_taxi_order->kol_limit_all;
             $validated['skidka_dop_all'] = $social_taxi_order->skidka_dop_all;
+            \Log::info('Updating order with predv_way:', [
+            'predv_way' => $request->input('predv_way'),
+            'validated_predv_way' => $request->validated()['predv_way'] ?? 'not_set'
+            ]);
 
             // Передаем в сервис валидированные данные и объект заказа для обновления
             $this->orderService->updateOrder($social_taxi_order, $validated);
@@ -169,6 +174,7 @@ class SocialTaxiOrderController extends BaseController {
         // Проверяем текущий статус заказа
         $currentStatus = $order->currentStatus;
         $statusId = $currentStatus ? $currentStatus->status_order_id : 1; // По умолчанию "Принят"
+        $orderNumber = $order->pz_nom ?? 'Неизвестный номер';
         // Разрешаем удаление только для заказов со статусом "Принят" (ID = 1)
         if ($statusId != 1) {
             return redirect()->back()->with('error', 'Удаление возможно только для заказов со статусом "Принят". Текущий статус: ' . ($currentStatus->statusOrder->name ?? 'Неизвестный статус'));
@@ -185,7 +191,7 @@ class SocialTaxiOrderController extends BaseController {
         $urlParams = $this->orderService->getUrlParams(); // параметры фильтрации
         $backRoute = $this->getBackRoute($urlParams);
 
-        return redirect()->to($backRoute)->with('success', 'Заказ удален.');
+        return redirect()->to($backRoute)->with('success', 'Заказ {$orderNumber} удален.');
     }
 
     public function restore($id) {

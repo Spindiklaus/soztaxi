@@ -31,7 +31,7 @@
                 
                 <form action="{{ route('taxi-orders.set-sent-date') }}" method="POST" class="inline">
                     @csrf
-                    <input type="hidden" name="taxi_sent_at" value="{{ request('taxi_sent_at') }}">
+                    <input type="hidden" name="taxi_sent_at" value="{{ request('taxi_sent_at', now()->format('Y-m-d\TH:i')) }}">
                     <input type="hidden" name="visit_date_from" value="{{ request('visit_date_from', date('Y-m-d')) }}">
                     <input type="hidden" name="visit_date_to" value="{{ request('visit_date_to', date('Y-m-d')) }}">
                     <input type="hidden" name="taxi_id" value="{{ request('taxi_id') }}">
@@ -53,6 +53,7 @@
                     <input type="hidden" name="visit_date_from" value="{{ request('visit_date_from', date('Y-m-d')) }}">
                     <input type="hidden" name="visit_date_to" value="{{ request('visit_date_to', date('Y-m-d')) }}">
                     <input type="hidden" name="taxi_id" value="{{ request('taxi_id') }}">
+                    <input type="hidden" name="taxi_sent_at" value="{{ request('taxi_sent_at') }}">                        
                     <button type="submit"
                         class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition ease-in-out duration-150"
                         onclick="return confirm('Вы уверены, что хотите снять дату передачи в такси для всех заказов в выборке?')"
@@ -61,7 +62,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
-                        Удалить сведения в такси 
+                        Удалить дату передачи 
                     </button>
                 </form>
                 <!-- Кнопка "Перенести предварительные данные в фактические" -->
@@ -71,13 +72,15 @@
                     <input type="hidden" name="visit_date_from" value="{{ request('visit_date_from', date('Y-m-d')) }}">
                     <input type="hidden" name="visit_date_to" value="{{ request('visit_date_to', date('Y-m-d')) }}">
                     <input type="hidden" name="taxi_id" value="{{ request('taxi_id') }}">
+                    <input type="hidden" name="taxi_sent_at" value="{{ request('taxi_sent_at') }}">                        
                     <button type="submit"
+                        title="перенос предварительных данных в фактические (только для соцтакси)"                            
                         class="inline-flex items-center px-4 py-2 bg-purple-600 border border-transparent rounded-md font-semibold text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition ease-in-out duration-150"
-                        onclick="return confirm('Вы уверены, что хотите перенести предварительные данные в фактические для всех заказов соцтакси со статусом \'Передан в такси\' и заполненной предварительной дальностью?')">
+                        onclick="return confirm('Вы уверены, что хотите перенести предварительные данные в фактические для всех заказов соцтакси со статусом \'Передан в такси\' и заполненной предварительной дальностью?')">                        
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                         </svg>
-                        Перенести данные
+                        Фактические данные
                     </button>
                 </form>
                 

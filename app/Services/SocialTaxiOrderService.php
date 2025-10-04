@@ -392,7 +392,7 @@ class SocialTaxiOrderService {
                     'filter_type_order', 'status_order_id', 'date_from', 'date_to', 'filter_user_id', 
                     'client_fio', 'page', 'visit_date_from', 'visit_date_to', 'taxi_id'
         ]);
-        \Log::info('SocialTaxiOrderService result', ['params' => $params]);
+//        \Log::info('SocialTaxiOrderService result', ['params' => $params]);
         return $params;
     }
 

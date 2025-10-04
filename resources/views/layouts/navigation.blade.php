@@ -24,7 +24,7 @@
                     <x-nav-link :href="route('taxi-orders.index')" :active="request()->routeIs('taxi-orders.index')">
                         {{ __('Передача в такси') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('taxi-orders.index')" :active="request()->routeIs('taxi-orders.index')">
+                    <x-nav-link :href="route('social-taxi-orders.close.index')" :active="request()->routeIs('social-taxi-orders.close.index')">
                         {{ __('Закрыть поездки') }}
                     </x-nav-link>
                     <x-nav-link :href="route('orders.report_visit')" :active="request()->routeIs('orders.report_visit')">
