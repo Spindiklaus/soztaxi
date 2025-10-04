@@ -19,6 +19,9 @@
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-blue-800 text-gray-200">
                 <tr>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">
+                        <input type="checkbox" id="select-all" class="rounded">
+                    </th>
                     <th @click="sortBy('pz_data')" scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-blue-700">
                         Заказ и статус
                         <span class="ml-1" x-show="sortField === 'pz_data' && sortDirection === 'asc'">↑</span>
@@ -41,6 +44,9 @@
                         Скидка и лимит по поездке
                     </th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">
+                        Фактические данные
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">
                         Действия оператора
                     </th>
                 </tr>
@@ -48,6 +54,9 @@
             <tbody class="divide-y divide-gray-200">
                 @forelse ($orders as $order)
                 <tr @if($order->deleted_at) class="bg-red-50" @endif>
+                    <td class="px-6 py-4">
+                        <input type="checkbox" name="order_ids[]" value="{{ $order->id }}" class="order-checkbox rounded">
+                    </td>
                     <td class="px-6 py-4">
                         @if($order->deleted_at)
                         <div class="text-sm font-medium text-red-600">
@@ -196,6 +205,29 @@
                         <div class="text-sm text-gray-500 mt-1">Лимит: -</div>
                         @endif
                     </td>
+                    <td class="px-6 py-4">
+                        @if($order->taxi_way)
+                            <div class="text-sm text-gray-900">
+                                <span class="font-medium">Километраж:</span> {{number_format($order->taxi_way, 3, ',', ' ') . ' км' }}
+                            </div>
+                        @endif
+                        @if($order->taxi_price)
+                            <div class="text-sm text-gray-900 mt-1">
+                                <span class="font-medium">Цена:</span> {{ number_format($order->taxi_price, 2, ',', ' ') . ' руб.' }}
+                            </div>
+                        @endif
+                        @if($order->taxi_price - $order->taxi_vozm<>0)
+                            <div class="text-sm text-gray-900 mt-1">
+                                <span class="font-medium">К оплате:</span> 
+                                {{ number_format($order->taxi_price - $order->taxi_vozm, 2, ',', ' ') . ' руб.' }}
+                            </div>
+                        @endif
+                        @if($order->taxi_vozm)
+                            <div class="text-sm text-gray-900 mt-1">
+                                <span class="font-medium">К возмещению:</span> {{ $order->taxi_vozm ? number_format($order->taxi_vozm, 2, ',', ' ') . ' руб.' : '-' }}
+                            </div>
+                        @endif
+                    </td>
 
                     <td class="px-6 py-4">
                         <div class="flex flex-col space-y-1">
@@ -213,7 +245,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                    <td colspan="8" class="px-6 py-4 text-center text-gray-500">
                         Заказы не найдены
                     </td>
                 </tr>
