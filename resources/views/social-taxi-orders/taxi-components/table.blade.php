@@ -19,9 +19,6 @@
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-blue-800 text-gray-200">
                 <tr>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">
-                        <input type="checkbox" id="select-all" class="rounded">
-                    </th>
                     <th @click="sortBy('pz_data')" scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-blue-700">
                         Заказ и статус
                         <span class="ml-1" x-show="sortField === 'pz_data' && sortDirection === 'asc'">↑</span>
@@ -54,9 +51,6 @@
             <tbody class="divide-y divide-gray-200">
                 @forelse ($orders as $order)
                 <tr @if($order->deleted_at) class="bg-red-50" @endif>
-                    <td class="px-6 py-4">
-                        <input type="checkbox" name="order_ids[]" value="{{ $order->id }}" class="order-checkbox rounded">
-                    </td>
                     <td class="px-6 py-4">
                         @if($order->deleted_at)
                         <div class="text-sm font-medium text-red-600">
