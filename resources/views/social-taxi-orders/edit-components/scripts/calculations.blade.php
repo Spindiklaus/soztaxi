@@ -1,6 +1,35 @@
 <!--calculations.blade.php -->
 
 <script>
+    
+ function roundToFiveMinutes(element) {
+    if (!element.value) return;
+    
+    // Разбираем значение
+    const [datePart, timePart] = element.value.split('T');
+    const [hours, minutes] = timePart.split(':').map(Number);
+    
+    // Округляем минуты до ближайших 5
+    const roundedMinutes = Math.round(minutes / 5) * 5;
+    
+    // Корректируем часы, если минуты стали 60
+    let finalHours = hours;
+    let finalMinutes = roundedMinutes;
+    
+    if (roundedMinutes === 60) {
+        finalHours = (hours + 1) % 24;
+        finalMinutes = 0;
+    }
+    
+    // Форматируем минуты с ведущим нулем
+    const formattedMinutes = finalMinutes.toString().padStart(2, '0');
+    const formattedHours = finalHours.toString().padStart(2, '0');
+    
+    // Устанавливаем округленное значение
+    element.value = `${datePart}T${formattedHours}:${formattedMinutes}`;
+}   
+    
+    
 // Функции расчетов и вспомогательные функции
 function calculateValues() {
     const predvWayInput = document.getElementById('predv_way');
@@ -101,32 +130,7 @@ function triggerCalculationIfNeeded() {
     }
 }
 
-function roundToFiveMinutes(element) {
-    if (!element.value) return;
-    
-    // Разбираем значение
-    const [datePart, timePart] = element.value.split('T');
-    const [hours, minutes] = timePart.split(':').map(Number);
-    
-    // Округляем минуты до ближайших 5
-    const roundedMinutes = Math.round(minutes / 5) * 5;
-    
-    // Корректируем часы, если минуты стали 60
-    let finalHours = hours;
-    let finalMinutes = roundedMinutes;
-    
-    if (roundedMinutes === 60) {
-        finalHours = (hours + 1) % 24;
-        finalMinutes = 0;
-    }
-    
-    // Форматируем минуты с ведущим нулем
-    const formattedMinutes = finalMinutes.toString().padStart(2, '0');
-    const formattedHours = finalHours.toString().padStart(2, '0');
-    
-    // Устанавливаем округленное значение
-    element.value = `${datePart}T${formattedHours}:${formattedMinutes}`;
-}
+
 
 // Обновление состояния поля обратного адреса в зависимости от типа поездки
 function updateAdresObratnoState(zenaType) {

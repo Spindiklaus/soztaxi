@@ -73,13 +73,13 @@ document.addEventListener('DOMContentLoaded', function () {
     if (visitDataInput) {
         // Принудительное округление до 5 минут
         visitDataInput.addEventListener('input', function() {
-            roundToFiveMinutes(this);
+            //roundToFiveMinutes(this);
             // Обновляем информацию о поездках при изменении даты
             updateTripsInfoOnDateChange();
         });
         
         visitDataInput.addEventListener('change', function() {
-            roundToFiveMinutes(this);
+            //roundToFiveMinutes(this);
             // Обновляем информацию о поездках при изменении даты
             updateTripsInfoOnDateChange();
         });
