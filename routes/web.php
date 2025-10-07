@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\SkidkaDopController;
 use App\Http\Controllers\Admin\SocialTaxiOrderController;
 use App\Http\Controllers\Admin\OrderReportController;
 use App\Http\Controllers\Admin\OrderCloseController;
+use App\Http\Controllers\Admin\OrderOpenController;
 
 
 use App\Http\Controllers\Import\ImportFioDtrnController;
@@ -88,7 +89,11 @@ Route::middleware(['web', 'auth', IsAdmin::class])->group(function () {
     
     Route::get('/close', [OrderCloseController::class, 'index'])->name('social-taxi-orders.close.index');
     Route::post('/close', [OrderCloseController::class, 'bulkClose'])->name('social-taxi-orders.close.bulk-close');
-    Route::patch('/close', [OrderCloseController::class, 'bulkUnset'])->name('social-taxi-orders.close.bulk-unset');
+
+    Route::get('/open', [OrderOpenController::class, 'index'])->name('social-taxi-orders.open.index');
+    Route::post('/open', [OrderOpenController::class, 'bulkUnset'])->name('social-taxi-orders.open.bulk-unset');
+
+    
     
 });
 

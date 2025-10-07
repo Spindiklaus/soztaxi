@@ -22,11 +22,7 @@ class OrderCloseController extends BaseController {
         // Собираем параметры фильтрации
         $sort = $request->get('sort', 'visit_data');
         $direction = $request->get('direction', 'asc');
-        $urlParams = [
-            'sort' => $sort,
-            'direction' => $direction,
-        ];
-
+        
         // Устанавливаем фильтр по дате поездки по умолчанию - начало и конец текущего месяца
         if (!$request->has('visit_date_from')) {
             $request->merge(['visit_date_from' => Carbon::now()->startOfMonth()->toDateString()]);
@@ -35,6 +31,7 @@ class OrderCloseController extends BaseController {
             $request->merge(['visit_date_to' => Carbon::now()->endOfMonth()->toDateString()]);
         }
 
+        $urlParams = $this->orderService->getUrlParams();        
         // Используем билдер
         $query = $this->queryBuilder->build($request);
         $orders = $query->paginate(15)->appends($request->all());
@@ -61,7 +58,7 @@ class OrderCloseController extends BaseController {
 
     public function bulkClose(Request $request) {
         $validated = $request->validate([
-            'order_ids' => 'array',
+            'order_ids' => 'required|array|min:1', // Обязательно, массив, минимум 1 элемент
             'order_ids.*' => 'integer|exists:orders,id',
             'visit_date_from' => 'required|date_format:Y-m-d',
             'visit_date_to' => 'required|date_format:Y-m-d',
@@ -89,6 +86,7 @@ class OrderCloseController extends BaseController {
         if (!empty($validated['order_ids'])) {
             $query->whereIn('id', $validated['order_ids']);
         }
+//        dd($query);
 
         $orders = $query->get();
         $updatedCount = 0;
@@ -142,55 +140,6 @@ class OrderCloseController extends BaseController {
 
         return redirect()->route('social-taxi-orders.close.index', $urlParams)
                         ->with('success', $message);
-    }
-
-    public function bulkUnset(Request $request) {
-        // отмена закрытия заказа
-        $validated = $request->validate([
-            'order_ids' => 'array',
-            'order_ids.*' => 'integer|exists:orders,id',
-            'visit_date_from' => 'required|date_format:Y-m-d',
-            'visit_date_to' => 'required|date_format:Y-m-d',
-            'taxi_id' => 'nullable|integer|exists:taxis,id',
-        ]);
-
-        $currentUser = auth()->user();
-        $operatorInfo = $currentUser->name . ' (' . $currentUser->litera . ')';
-
-        $query = Order::whereDate('visit_data', '>=', $validated['visit_date_from'])
-                ->whereDate('visit_data', '<=', $validated['visit_date_to'])
-                ->where('taxi_id', $validated['taxi_id'])
-                ->whereNotNull('closed_at') // Только закрытые
-                ->whereHas('currentStatus', function ($q) {
-            $q->where('status_order_id', 4); // Закрыт
-        });
-
-        if (!empty($validated['order_ids'])) {
-            $query->whereIn('id', $validated['order_ids']);
-        }
-
-        $orders = $query->get();
-
-        $updatedCount = 0;
-        foreach ($orders as $order) {
-            $order->closed_at = null;
-
-            // Формируем комментарий об открытии автоматически
-            $comment = 'Отмена закрытия заказа: оператор ' . $operatorInfo . ', ' . now()->format('d.m.Y H:i');
-
-            if ($order->komment) {
-                $order->komment = $order->komment . "\n" . $comment;
-            }
-            else {
-                $order->komment = $comment;
-            }
-
-
-            $order->save();
-            $updatedCount++;
-        }
-        $urlParams = $this->orderService->getUrlParams();
-        return redirect()->route('social-taxi-orders.close.index', $urlParams)->with('success', "Заказы открыты: {$updatedCount} шт.");
     }
 
 }

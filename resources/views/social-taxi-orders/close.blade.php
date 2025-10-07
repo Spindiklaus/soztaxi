@@ -34,36 +34,12 @@
                     </svg>
                     Закрыть отмеченные
                 </button>
-            </form>
-
-            <form action="{{ route('social-taxi-orders.close.bulk-unset') }}" method="POST" class="mb-4">
-                @csrf
-                @method('PATCH')
-                <input type="hidden" name="visit_date_from" value="{{ request('visit_date_from', date('Y-m-d')) }}">
-                <input type="hidden" name="visit_date_to" value="{{ request('visit_date_to', date('Y-m-d')) }}">
-                <input type="hidden" name="taxi_id" value="{{ request('taxi_id') }}">
-
-                <button type="submit"
-                        class="inline-flex items-center px-4 py-2 bg-yellow-600 border border-transparent rounded-md font-semibold text-white hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition ease-in-out duration-150"
-                        onclick="return confirm('Вы уверены, что хотите открыть все отмеченные заказы?')"
-                        title="открыть отмеченные">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                    Открыть отмеченные
-                </button>
+                @include('social-taxi-orders.close-components.table')
             </form>
             </div>
 
             <!-- Пагинация -->
             <div class="mt-4 mb-2">
-                {{ $orders->links() }}
-            </div>
-
-            @include('social-taxi-orders.close-components.table')
-
-            <!-- Пагинация -->
-            <div class="mt-6">
                 {{ $orders->links() }}
             </div>
         </div>

@@ -12,21 +12,67 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('operator.social-taxi.index')" :active="request()->routeIs('operator.social-taxi.*')">
-                        {{ __('Соцтакси') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('operator.gazelle.index')" :active="request()->routeIs('operator.gazelle.*')">
-                        {{ __('ГАЗель') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('operator.car.index')" :active="request()->routeIs('operator.car.*')">
-                        {{ __('Легковой автомобиль') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('taxi-orders.index')" :active="request()->routeIs('taxi-orders.index')">
-                        {{ __('Передача в такси') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('social-taxi-orders.close.index')" :active="request()->routeIs('social-taxi-orders.close.index')">
-                        {{ __('Закрыть поездки') }}
-                    </x-nav-link>
+
+                    <!-- Оборачиваем dropdown "Ввод данных" в div с теми же классами, что и у x-nav-link -->
+                    <div class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium leading-5 text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out">
+                        <x-dropdown align="bottom" width="48">
+                            <x-slot name="trigger">
+                                <!-- Кнопка внутри триггера получает минимальные стили для выравнивания содержимого -->
+                                <button class="flex items-center text-sm font-medium leading-5 text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out">
+                                    <div>{{ __('Ввод данных') }}</div> <!-- Название подменю -->
+                                    <div class="ms-1">
+                                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                </button>
+                            </x-slot>
+
+                            <x-slot name="content">
+                                <x-dropdown-link :href="route('operator.social-taxi.index')" :active="request()->routeIs('operator.social-taxi.*')">
+                                    {{ __('Соцтакси') }}
+                                </x-dropdown-link>
+                                <x-dropdown-link :href="route('operator.gazelle.index')" :active="request()->routeIs('operator.gazelle.*')">
+                                    {{ __('ГАЗель') }}
+                                </x-dropdown-link>
+                                <x-dropdown-link :href="route('operator.car.index')" :active="request()->routeIs('operator.car.*')">
+                                    {{ __('Легковой автомобиль') }}
+                                </x-dropdown-link>
+                            </x-slot>
+                        </x-dropdown>
+                    </div>
+                    <!-- Конец подменю "Ввод данных" -->
+
+                    <!-- Новое подменю "Управление поездками" -->
+                    <div class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium leading-5 text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out">
+                        <x-dropdown align="bottom" width="48">
+                            <x-slot name="trigger">
+                                <!-- Кнопка внутри триггера получает минимальные стили для выравнивания содержимого -->
+                                <button class="flex items-center text-sm font-medium leading-5 text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out">
+                                    <div>{{ __('Управление поездками') }}</div> <!-- Название подменю -->
+                                    <div class="ms-1">
+                                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                </button>
+                            </x-slot>
+
+                            <x-slot name="content">
+                                <x-dropdown-link :href="route('taxi-orders.index')" :active="request()->routeIs('taxi-orders.index')">
+                                    {{ __('Передача в такси') }}
+                                </x-dropdown-link>
+                                <x-dropdown-link :href="route('social-taxi-orders.close.index')" :active="request()->routeIs('social-taxi-orders.close.index')">
+                                    {{ __('Закрыть поездки') }}
+                                </x-dropdown-link>
+                                <x-dropdown-link :href="route('social-taxi-orders.open.index')" :active="request()->routeIs('social-taxi-orders.open.index')">
+                                    {{ __('Открыть поездки') }}
+                                </x-dropdown-link>
+                            </x-slot>
+                        </x-dropdown>
+                    </div>
+                    <!-- Конец подменю "Управление поездками" -->
+
                     <x-nav-link :href="route('orders.report_visit')" :active="request()->routeIs('orders.report_visit')">
                         {{ __('Сводный отчет') }}
                     </x-nav-link>
@@ -113,6 +159,3 @@
         </div>
     </div>
 </nav>
-
-
-

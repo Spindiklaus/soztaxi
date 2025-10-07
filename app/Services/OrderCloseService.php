@@ -3,8 +3,6 @@
 
 
 namespace App\Services;
-use App\Models\Order;
-
 
 class OrderCloseService extends SocialTaxiOrderService
 {
