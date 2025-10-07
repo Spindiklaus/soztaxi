@@ -27,12 +27,56 @@ class OrderReportExport implements FromArray, WithHeadings, WithEvents
     {
         $report = (new OrderReportBuilder($this->startDate, $this->endDate))->build();
         
-        // --- ВРЕМЕННАЯ ОТЛАДКА ---
-        \Log::info('Отчет для экспорта:', $report->toArray());
-        // -------------------------
+         // --- ВРЕМЕННАЯ ОТЛАДКА ---
+        \Log::info('Отчет для экспорта (до формирования rows):', $report->toArray());
+        // -----------------
         
         
         $rows = [];
+        // --- ДОБАВЛЯЕМ ПУСТУЮ СТРОКУ ---
+        $rows[] = [
+            'visit_date' => '',
+            'type_order' => '',
+            'status_1_count' => '',
+            'status_2_count' => '',
+            'status_3_count' => '',
+            'status_4_count' => '',
+        ];
+
+        // --- ДОБАВЛЯЕМ ЗАГЛАВИЕ И ФИЛЬТРЫ КАК ПЕРВЫЕ СТРОКИ ДАННЫХ ---
+        // Строка 2: Заголовок отчета
+        $rows[] = [
+            'visit_date' => 'Сводка по статусам заказов',
+            'type_order' => '',
+            'status_1_count' => '',
+            'status_2_count' => '',
+            'status_3_count' => '',
+            'status_4_count' => '',
+        ];
+        
+        // Строка 3: Период фильтрации
+        $start = Carbon::createFromFormat('Y-m-d', $this->startDate)->format('d.m.Y');
+        $end = Carbon::createFromFormat('Y-m-d', $this->endDate)->format('d.m.Y');
+        $rows[] = [
+            'visit_date' => "Период: с {$start} по {$end}",
+            'type_order' => '',
+            'status_1_count' => '',
+            'status_2_count' => '',
+            'status_3_count' => '',
+            'status_4_count' => '',
+        ];
+            
+        // Строка 4: Заголовки столбцов
+        $rows[] = [
+            'visit_date' => $this->headings()[0], // "Дата поездки"
+            'type_order' => $this->headings()[1], // "Тип заказа"
+            'status_1_count' => $this->headings()[2], // "Принят (id=1)"
+            'status_2_count' => $this->headings()[3], // "Передан в такси (id=2)"
+            'status_3_count' => $this->headings()[4], // "Отменен (id=3)"
+            'status_4_count' => $this->headings()[5], // "Закрыт (id=4)"
+        ];
+
+        
 
         foreach ($report as $date => $data) {
             $data = (array)$data; // Преобразуем в массив, если объект
@@ -48,6 +92,10 @@ class OrderReportExport implements FromArray, WithHeadings, WithEvents
                 ];
             }
         }
+        
+        // --- ВРЕМЕННАЯ ОТЛАДКА ---
+        \Log::info('Сформированные строки для Excel (rows):', $rows);
+        // -------------------------
 
         return $rows;
     }
@@ -57,10 +105,10 @@ class OrderReportExport implements FromArray, WithHeadings, WithEvents
         return [
             'Дата поездки',
             'Тип заказа',
-            'Принят (id=1)',
-            'Передан в такси (id=2)',
-            'Отменен (id=3)',
-            'Закрыт (id=4)',
+            'Статус: принят',
+            'Передан в такси',
+            'Отменен',
+            'Закрыт',
         ];
     }
 
@@ -69,49 +117,6 @@ class OrderReportExport implements FromArray, WithHeadings, WithEvents
         return [
             AfterSheet::class => function(AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
-
-                // Заголовок
-                $sheet->setCellValue('A1', 'Сводка по статусам заказов');
-                $sheet->mergeCells('A1:F1');
-                $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
-                $sheet->getStyle('A1')->getAlignment()->setHorizontal('center');
-
-                // Фильтры
-                $start = Carbon::createFromFormat('Y-m-d', $this->startDate)->format('d.m.Y');
-                $end = Carbon::createFromFormat('Y-m-d', $this->endDate)->format('d.m.Y');
-                $sheet->setCellValue('A2', "Период: с {$start} по {$end}");
-                $sheet->mergeCells('A2:F2');
-                $sheet->getStyle('A2')->getFont()->setItalic(true);
-                $sheet->getStyle('A2')->getAlignment()->setHorizontal('center');
-                
-                 // Вставляем заголовки таблицы в строку 3
-                $sheet->setCellValue('A3', $this->headings()[0]);
-                $sheet->setCellValue('B3', $this->headings()[1]);
-                $sheet->setCellValue('C3', $this->headings()[2]);
-                $sheet->setCellValue('D3', $this->headings()[3]);
-                $sheet->setCellValue('E3', $this->headings()[4]);
-                $sheet->setCellValue('F3', $this->headings()[5]);
-                
-                //                // Шапка таблицы (строка 3)
-//                $sheet->getStyle('A3:F3')->getFont()->setBold(true);
-//                $sheet->getStyle('A3:F3')->getFill()
-//                    ->setFillType(Fill::FILL_SOLID)
-//                    ->getStartColor()->setRGB('D3D3D3'); // Светло-серый фон
-//
-//                // Рамки для шапки
-//                $sheet->getStyle('A3:F3')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
-
-                
-
-                // Стили для строки заголовков (строка 3)
-                $sheet->getStyle('A3:F3')->getFont()->setBold(true);
-                $sheet->getStyle('A3:F3')->getFill()
-                    ->setFillType(Fill::FILL_SOLID)
-                    ->getStartColor()->setRGB('D3D3D3'); // Светло-серый фон
-
-                // Рамки для шапки
-                $sheet->getStyle('A3:F3')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
-
                 // Установка ширины колонок
                 $sheet->getColumnDimension('A')->setWidth(15); // Дата поездки
                 $sheet->getColumnDimension('B')->setWidth(15); // Тип заказа
@@ -120,10 +125,32 @@ class OrderReportExport implements FromArray, WithHeadings, WithEvents
                 $sheet->getColumnDimension('E')->setWidth(20); // Отменен
                 $sheet->getColumnDimension('F')->setWidth(20); // Закрыт
 
-
                 // Рамки для данных (начиная с 4 строки)
                 $lastRow = $sheet->getHighestRow();
-                $sheet->getStyle("A5:F{$lastRow}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+                $sheet->getStyle("A4:F{$lastRow}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+
+                // --- ЯВНОЕ УКАЗАНИЕ ФОРМАТА КОЛОНКИ A КАК ТЕКСТ ---
+                // Применяем к диапазону данных, начиная с 4 строки
+                $sheet->getStyle("A4:A{$lastRow}")->getNumberFormat()->setFormatCode('@');
+                // --- Конец кода форматирования ---
+
+                // --- СТИЛИ ДЛЯ ЗАГОЛОВКОВ (строки 1, 2, 3) ---
+                // Строка 1: Заголовок отчета
+                $sheet->getStyle('A1:F1')->getFont()->setBold(true)->setSize(14);
+                $sheet->getStyle('A1:F1')->getAlignment()->setHorizontal('center');
+
+                // Строка 2: Период фильтрации
+                $sheet->getStyle('A2:F2')->getFont()->setItalic(true);
+                $sheet->getStyle('A2:F2')->getAlignment()->setHorizontal('center');
+
+                // Строка 3: Заголовки столбцов
+                $sheet->getStyle('A3:F3')->getFont()->setBold(true);
+                $sheet->getStyle('A3:F3')->getFill()
+                    ->setFillType(Fill::FILL_SOLID)
+                    ->getStartColor()->setRGB('D3D3D3'); // Светло-серый фон
+                $sheet->getStyle('A3:F3')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+
+                // --- Конец стилей заголовков ---
             },
         ];
     }
