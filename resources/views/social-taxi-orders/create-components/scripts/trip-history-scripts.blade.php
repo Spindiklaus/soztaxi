@@ -55,7 +55,7 @@ function loadClientLastTrips(clientId) {
         </div>
     `;
     
-    fetch(`/api/client-last-trips/${clientId}`)
+    fetch(`/api/helpers/client-last-trips/${clientId}`)
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);

@@ -32,7 +32,7 @@ class OrderReportController extends BaseController {
 
     public function export(Request $request) {
         $startDate = $request->input('start_date', Carbon::now()->startOfMonth()->toDateString());
-        $endDate = $request->input('end_date', Carbon::now()->toDateString());
+        $endDate = $request->input('end_date', Carbon::now()->endOfMonth()->toDateString());
 
         return Excel::download(new OrderReportExport($startDate, $endDate), 'сводка_по_статусам_' . now()->format('Y-m-d_H-i-s') . '.xlsx');
     }

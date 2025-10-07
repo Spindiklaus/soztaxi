@@ -1,7 +1,7 @@
 <script>
 // Функции работы с дополнительными условиями
 function fetchDopusData(dopusId) {
-    return fetch(`/api/skidka-dops/${dopusId}`)
+    return fetch(`/api/helpers/skidka-dops/${dopusId}`)
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);

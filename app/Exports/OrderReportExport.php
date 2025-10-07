@@ -26,6 +26,12 @@ class OrderReportExport implements FromArray, WithHeadings, WithEvents
     public function array(): array
     {
         $report = (new OrderReportBuilder($this->startDate, $this->endDate))->build();
+        
+        // --- ВРЕМЕННАЯ ОТЛАДКА ---
+        \Log::info('Отчет для экспорта:', $report->toArray());
+        // -------------------------
+        
+        
         $rows = [];
 
         foreach ($report as $date => $data) {
@@ -34,10 +40,11 @@ class OrderReportExport implements FromArray, WithHeadings, WithEvents
                 $rows[] = [
                     'visit_date' => Carbon::createFromFormat('Y-m-d', $date)->format('d.m.Y'), 
                     'type_order' => getOrderTypeName($typeId),
-                    'status_1_count' => $stats['status_1_count'] ?: '', // ✅ Если 0 — пустая строка
-                    'status_2_count' => $stats['status_2_count'] ?: '', // ✅
-                    'status_3_count' => $stats['status_3_count'] ?: '', // ✅
-                    'status_4_count' => $stats['status_4_count'] ?: '', // ✅
+                    // Проверяем на null или 0 (число), а не на "ложность"
+                    'status_1_count' => ($stats['status_1_count'] === null || $stats['status_1_count'] === 0) ? '' : $stats['status_1_count'],
+                    'status_2_count' => ($stats['status_2_count'] === null || $stats['status_2_count'] === 0) ? '' : $stats['status_2_count'],
+                    'status_3_count' => ($stats['status_3_count'] === null || $stats['status_3_count'] === 0) ? '' : $stats['status_3_count'],
+                    'status_4_count' => ($stats['status_4_count'] === null || $stats['status_4_count'] === 0) ? '' : $stats['status_4_count'],
                 ];
             }
         }
@@ -116,7 +123,7 @@ class OrderReportExport implements FromArray, WithHeadings, WithEvents
 
                 // Рамки для данных (начиная с 4 строки)
                 $lastRow = $sheet->getHighestRow();
-                $sheet->getStyle("A4:F{$lastRow}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+                $sheet->getStyle("A5:F{$lastRow}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
             },
         ];
     }

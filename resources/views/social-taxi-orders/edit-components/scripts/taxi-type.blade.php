@@ -24,7 +24,7 @@ function updateTaxiPriceAndCompensation() {
     }
     
     // Получаем данные такси через AJAX
-    fetch(`/api/taxis/${taxiId}`)
+    fetch(`/api/helpers/taxis/${taxiId}`)
         .then(response => response.json())
         .then(data => {
             if (data.error) {

@@ -1,7 +1,7 @@
 <script>
 // Функции работы с данными категории
 function fetchCategoryData(categoryId) {
-    return fetch(`/api/categories/${categoryId}`)
+    return fetch(`/api/helpers/categories/${categoryId}`)
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
