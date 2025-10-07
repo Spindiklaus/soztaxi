@@ -12,7 +12,7 @@ use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Color;
 use Carbon\Carbon;
 
-class OrderReportExport implements FromArray, WithHeadings, WithEvents
+class OrderReportExport implements FromArray, WithEvents
 {
     protected $startDate;
     protected $endDate;
@@ -33,18 +33,8 @@ class OrderReportExport implements FromArray, WithHeadings, WithEvents
         
         
         $rows = [];
-        // --- ДОБАВЛЯЕМ ПУСТУЮ СТРОКУ ---
-        $rows[] = [
-            'visit_date' => '',
-            'type_order' => '',
-            'status_1_count' => '',
-            'status_2_count' => '',
-            'status_3_count' => '',
-            'status_4_count' => '',
-        ];
-
         // --- ДОБАВЛЯЕМ ЗАГЛАВИЕ И ФИЛЬТРЫ КАК ПЕРВЫЕ СТРОКИ ДАННЫХ ---
-        // Строка 2: Заголовок отчета
+        // Строка 1: Заголовок отчета
         $rows[] = [
             'visit_date' => 'Сводка по статусам заказов',
             'type_order' => '',
@@ -53,8 +43,8 @@ class OrderReportExport implements FromArray, WithHeadings, WithEvents
             'status_3_count' => '',
             'status_4_count' => '',
         ];
-        
-        // Строка 3: Период фильтрации
+
+        // Строка 2: Период фильтрации
         $start = Carbon::createFromFormat('Y-m-d', $this->startDate)->format('d.m.Y');
         $end = Carbon::createFromFormat('Y-m-d', $this->endDate)->format('d.m.Y');
         $rows[] = [
@@ -65,19 +55,18 @@ class OrderReportExport implements FromArray, WithHeadings, WithEvents
             'status_3_count' => '',
             'status_4_count' => '',
         ];
-            
-        // Строка 4: Заголовки столбцов
+
+        // Строка 3: Заголовки столбцов
         $rows[] = [
-            'visit_date' => $this->headings()[0], // "Дата поездки"
-            'type_order' => $this->headings()[1], // "Тип заказа"
-            'status_1_count' => $this->headings()[2], // "Принят (id=1)"
-            'status_2_count' => $this->headings()[3], // "Передан в такси (id=2)"
-            'status_3_count' => $this->headings()[4], // "Отменен (id=3)"
-            'status_4_count' => $this->headings()[5], // "Закрыт (id=4)"
+            'visit_date' => 'Дата поездки', // Явно указываем, без использования headings()
+            'type_order' => 'Тип заказа',
+            'status_1_count' => 'Принят ',
+            'status_2_count' => 'Передан в такси ',
+            'status_3_count' => 'Отменен',
+            'status_4_count' => 'Закрыт',
         ];
 
-        
-
+  
         foreach ($report as $date => $data) {
             $data = (array)$data; // Преобразуем в массив, если объект
             foreach ($data['types'] as $typeId => $stats) {
@@ -98,18 +87,6 @@ class OrderReportExport implements FromArray, WithHeadings, WithEvents
         // -------------------------
 
         return $rows;
-    }
-
-    public function headings(): array
-    {
-        return [
-            'Дата поездки',
-            'Тип заказа',
-            'Статус: принят',
-            'Передан в такси',
-            'Отменен',
-            'Закрыт',
-        ];
     }
 
     public function registerEvents(): array
@@ -137,11 +114,11 @@ class OrderReportExport implements FromArray, WithHeadings, WithEvents
                 // --- СТИЛИ ДЛЯ ЗАГОЛОВКОВ (строки 1, 2, 3) ---
                 // Строка 1: Заголовок отчета
                 $sheet->getStyle('A1:F1')->getFont()->setBold(true)->setSize(14);
-                $sheet->getStyle('A1:F1')->getAlignment()->setHorizontal('center');
+                $sheet->getStyle('A1:F1')->getAlignment()->setHorizontal('left');
 
                 // Строка 2: Период фильтрации
                 $sheet->getStyle('A2:F2')->getFont()->setItalic(true);
-                $sheet->getStyle('A2:F2')->getAlignment()->setHorizontal('center');
+                $sheet->getStyle('A2:F2')->getAlignment()->setHorizontal('left');
 
                 // Строка 3: Заголовки столбцов
                 $sheet->getStyle('A3:F3')->getFont()->setBold(true);
