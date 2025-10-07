@@ -47,112 +47,118 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
-    @forelse($report as $date => $data)
-        @php $first = true; @endphp
-        @foreach($data['types'] as $typeId => $stats)
-            <tr>
-                @if($first)
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" rowspan="{{ count($data['types']) }}">
-                        {{ $date ? \Carbon\Carbon::parse($date)->format('d.m.Y') : 'Не указана' }}
-                    </td>
-                    @php $first = false; @endphp
-                @endif
-                <td class="px-6 py-4 whitespace-nowrap text-sm {{ getOrderTypeColor($typeId) }}">
-                    {{ getOrderTypeName($typeId) }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm">
-                    @if($stats['status_1_count'])
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        <i data-feather="check-circle" class="w-4 h-4 mr-1"></i>
-                        {{ $stats['status_1_count'] }}
-                    </span>
-                    @endif
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm">
-                    @if($stats['status_2_count'])
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                        <i data-feather="truck" class="w-4 h-4 mr-1"></i>
-                        {{ $stats['status_2_count'] }}
-                    </span>
-                    @endif
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm">
-                    @if($stats['status_3_count'])
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                        <i data-feather="x-circle" class="w-4 h-4 mr-1"></i>
-                        {{ $stats['status_3_count'] }}
-                    </span>
-                    @endif
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm">
-                    @if($stats['status_4_count'])
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        <i data-feather="flag" class="w-4 h-4 mr-1"></i>
-                        {{ $stats['status_4_count'] }}
-                    </span>
-                    @endif
-                </td>
-            </tr>
-        @endforeach
-    @empty
-        <tr>
-            <td colspan="6" class="px-6 py-4 text-center text-gray-500">
-                Нет данных
-            </td>
-        </tr>
-    @endforelse
-    
-    <!-- Итоговая строка -->
-    <tr class="bg-gray-100 font-semibold">
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Итого</td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"></td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm">
-            @if($totals['totalStatus1'])
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                <i data-feather="check-circle" class="w-4 h-4 mr-1"></i>
-                {{ $totals['totalStatus1'] }}
-            </span>
-            @endif
-        </td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm">
-            @if($totals['totalStatus2'])
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                <i data-feather="truck" class="w-4 h-4 mr-1"></i>
-                {{ $totals['totalStatus2'] }}
-            </span>
-            @endif
-        </td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm">
-            @if($totals['totalStatus3'])
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                <i data-feather="x-circle" class="w-4 h-4 mr-1"></i>
-                {{ $totals['totalStatus3'] }}
-            </span>
-            @endif
-        </td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm">
-            @if($totals['totalStatus4'])
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                <i data-feather="flag" class="w-4 h-4 mr-1"></i>
-                {{ $totals['totalStatus4'] }}
-            </span>
-            @endif
-        </td>
-    </tr>
-    
-</tbody>
+                            @forelse($report as $date => $data)
+                            @php $first = true; @endphp
+                            @foreach($data['types'] as $typeId => $stats)
+                            <tr>
+                                @if($first)
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" rowspan="{{ count($data['types']) }}">
+                                    {{ $date ? \Carbon\Carbon::parse($date)->format('d.m.Y') : 'Не указана' }}
+                                </td>
+                                @php $first = false; @endphp
+                                @endif
+                                <td class="px-6 py-4 whitespace-nowrap text-sm {{ getOrderTypeColor($typeId) }}">
+                                    {{ getOrderTypeName($typeId) }}
+                                </td>
+                                <!-- Статус 1 (Принят) -->
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    @if($stats['status_1_count'])
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 cursor-pointer hover:bg-blue-200" onclick="showOrdersByStatus('{{ $date }}', {{ $typeId }}, 1)">
+                                        <i data-feather="check-circle" class="w-4 h-4 mr-1"></i>
+                                        {{ $stats['status_1_count'] }}
+                                    </span>
+                                    @endif
+                                </td>
+                                <!-- Статус 2 (Передан в такси) -->
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    @if($stats['status_2_count'])
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 cursor-pointer hover:bg-yellow-200" onclick="showOrdersByStatus('{{ $date }}', {{ $typeId }}, 2)">
+                                        <i data-feather="truck" class="w-4 h-4 mr-1"></i>
+                                        {{ $stats['status_2_count'] }}
+                                    </span>
+                                    @endif
+                                </td>
+                                <!-- Статус 3 (Отменен) -->
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    @if($stats['status_3_count'])
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 cursor-pointer hover:bg-red-200" onclick="showOrdersByStatus('{{ $date }}', {{ $typeId }}, 3)">
+                                        <i data-feather="x-circle" class="w-4 h-4 mr-1"></i>
+                                        {{ $stats['status_3_count'] }}
+                                    </span>
+                                    @endif
+                                </td>
+                                <!-- Статус 4 (Закрыт) -->
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    @if($stats['status_4_count'])
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 cursor-pointer hover:bg-green-200" onclick="showOrdersByStatus('{{ $date }}', {{ $typeId }}, 4)">
+                                        <i data-feather="flag" class="w-4 h-4 mr-1"></i>
+                                        {{ $stats['status_4_count'] }}
+                                    </span>
+                                    @endif
+                                </td>
+                            </tr>
+                            @endforeach
+                            @empty
+                            <tr>
+                                <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                                    Нет данных
+                                </td>
+                            </tr>
+                            @endforelse
+
+                            <!-- Итоговая строка -->
+                            <tr class="bg-gray-100 font-semibold">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Итого</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    @if($totals['totalStatus1'])
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        <i data-feather="check-circle" class="w-4 h-4 mr-1"></i>
+                                        {{ $totals['totalStatus1'] }}
+                                    </span>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    @if($totals['totalStatus2'])
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                        <i data-feather="truck" class="w-4 h-4 mr-1"></i>
+                                        {{ $totals['totalStatus2'] }}
+                                    </span>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    @if($totals['totalStatus3'])
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                        <i data-feather="x-circle" class="w-4 h-4 mr-1"></i>
+                                        {{ $totals['totalStatus3'] }}
+                                    </span>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    @if($totals['totalStatus4'])
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        <i data-feather="flag" class="w-4 h-4 mr-1"></i>
+                                        {{ $totals['totalStatus4'] }}
+                                    </span>
+                                    @endif
+                                </td>
+                            </tr>
+
+                        </tbody>
                     </table>
                 </div>
             </div>
-            
-            
-            
+
+
+
         </div>
     </div>
+    @include('reports.client-trips-modal')
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             feather.replace();
         });
     </script>
+     @include('reports.scripts.main')
 </x-app-layout>

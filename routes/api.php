@@ -2,6 +2,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ClientTripController;
 use App\Http\Controllers\Admin\SocialTaxiOrderController;
+use App\Http\Controllers\Api\OrderReportController; 
 
 Route::get('/client-trips/{clientId}/{monthYear}', [ClientTripController::class, 'getClientTrips']);
 Route::get('/client-actual-trips/{clientId}/{monthYear}', [ClientTripController::class, 'getClientActualTrips']);
@@ -107,6 +108,9 @@ Route::get('/client-last-trips/{clientId}', function($clientId) {
         return response()->json(['error' => 'Ошибка получения данных поездок'], 500);
     }
 })->name('api.client-last-trips');
+
+// Маршрут для получения заказов по фильтрам статуса из сводного отчета
+Route::get('/orders-by-status-filter', [OrderReportController::class, 'getOrdersByStatusFilter']);
 
 
 

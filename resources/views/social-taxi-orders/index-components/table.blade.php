@@ -44,7 +44,10 @@
                     </th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">
                         Скидка и лимит по поездке
+                    </th><th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">
+                        Фактические данные
                     </th>
+                    
                     <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">
                         Действия оператора
                     </th>
@@ -199,6 +202,30 @@
                         </div>
                         @else
                         <div class="text-sm text-gray-500 mt-1">Лимит: -</div>
+                        @endif
+                    </td>
+                    
+                    <td class="px-6 py-4">
+                        @if($order->taxi_way)
+                            <div class="text-sm text-gray-900">
+                                <span class="font-medium">Километраж:</span> {{number_format($order->taxi_way, 3, ',', ' ') . ' км' }}
+                            </div>
+                        @endif
+                        @if($order->taxi_price)
+                            <div class="text-sm text-gray-900 mt-1">
+                                <span class="font-medium">Цена:</span> {{ number_format($order->taxi_price, 2, ',', ' ') . ' руб.' }}
+                            </div>
+                        @endif
+                        @if($order->taxi_price - $order->taxi_vozm<>0)
+                            <div class="text-sm text-gray-900 mt-1">
+                                <span class="font-medium">К оплате:</span> 
+                                {{ number_format($order->taxi_price - $order->taxi_vozm, 2, ',', ' ') . ' руб.' }}
+                            </div>
+                        @endif
+                        @if($order->taxi_vozm)
+                            <div class="text-sm text-gray-900 mt-1">
+                                <span class="font-medium">К возмещению:</span> {{ $order->taxi_vozm ? number_format($order->taxi_vozm, 2, ',', ' ') . ' руб.' : '-' }}
+                            </div>
                         @endif
                     </td>
 

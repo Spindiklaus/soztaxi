@@ -17,12 +17,12 @@
         <!-- Кнопка "Назад к списку" с сохранением параметров -->
         @php
         
-        \Log::info('Debug backUrlParams', [
-        'backUrlParams' => $backUrlParams ?? [],
-        'request_all' => request()->all(),
-        'session_taxi_params' => session('taxi_filter_params', []),
-        'referer' => request()->headers->get('referer')
-    ]);
+//        \Log::info('Debug backUrlParams', [
+//        'backUrlParams' => $backUrlParams ?? [],
+//        'request_all' => request()->all(),
+//        'session_taxi_params' => session('taxi_filter_params', []),
+//        'referer' => request()->headers->get('referer')
+//    ]);
         
         
             $backToOperator = request('back_to_operator');
