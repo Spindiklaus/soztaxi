@@ -50,6 +50,47 @@
                 </div>    
             </div>
 
+            <!-- Раскрывающийся список дубликатов -->
+            @if($duplicateCounts->isNotEmpty())
+            <div x-data="{ open: false }" class="mb-4">
+                <button @click="open = !open"
+                         class="w-full text-left flex justify-between items-center bg-yellow-50 border border-yellow-200 rounded-lg p-4 hover:bg-yellow-100 focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                    <span class="font-bold text-yellow-700">
+                        Найдены дубликаты по ФИО (не RIP): {{ $duplicateCounts->count() }} совп.
+                    </span>
+                    <svg :class="{ 'rotate-180': open }"
+                         class="w-5 h-5 text-yellow-700 transition-transform duration-200"
+                         xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+                <div x-show="open" x-collapse class="mt-2 border border-yellow-200 rounded-b-lg bg-white">
+                    <ul class="divide-y divide-gray-200">
+                        @foreach($duplicateCounts as $fio => $count)
+                        <li class="p-3 text-sm text-gray-700 hover:bg-gray-50">
+                            <span class="font-medium">{{ $fio }}</span> ({{ $count }} чел.)
+                        </li>
+                        @endforeach
+                    </ul>
+                    <!-- Кнопка "Совместить дубликаты" -->
+                    <div class="p-3 border-t border-gray-200">
+                        <a href="{{ route('fiodtrns.merge.form') }}"
+                           class="inline-flex items-center px-4 py-2 bg-purple-600 border border-transparent rounded-md font-semibold text-white hover:bg-purple-700"
+                           title="Открыть форму совмещения">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                            </svg>
+                            Совместить дубликаты
+                        </a>
+                    </div>
+                </div>
+            </div>
+            @else
+                <!-- Опционально: сообщение, если дубликатов нет -->
+                <div class="mb-4 text-sm text-gray-600">
+                    Дубликатов по ФИО (без даты RIP) не найдено.
+                </div>
+            @endif
 
 
             <!-- Форма фильтрации -->

@@ -107,7 +107,25 @@ class ImportFioDtrnController extends BaseController {
                     'data_r' => 'nullable|date_format:d.m.Y',
                     'sex' => 'nullable|in:М,Ж',
                     'rip_at' => 'nullable|date_format:d.m.Y',
-                    'created_rip' => 'nullable|date_format:d.m.Y H:i',
+                    'created_rip' => [
+                        'nullable',
+                        function ($attribute, $value, $fail) {
+                            if (empty($value)) {
+                                return; // Пропускаем, если null
+                            }
+
+                            $formats = ['d.m.Y H:i', 'd.m.Y G:i'];
+
+                            foreach ($formats as $format) {
+                                $date = \DateTime::createFromFormat($format, $value);
+                                if ($date && $date->format($format) === $value) {
+                                    return; // Успешно прошло валидацию
+                                }
+                            }
+
+                            $fail("Поле {$attribute} должно быть в формате d.m.Y H:i или d.m.Y G:i.");
+                        },
+                    ],
                     'komment' => 'nullable|string',
                 ])->validate();
 

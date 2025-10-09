@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 use Illuminate\Http\Request;
 use App\Models\FioDtrn;
+use Illuminate\Support\Facades\DB;
 
 class FioDtrnController extends BaseController {
 
@@ -25,6 +26,16 @@ class FioDtrnController extends BaseController {
         if ($request->filled('rip')) {
             $query->whereNotNull('rip_at');
         }
+        
+         // Подсчет дубликатов ФИО
+        $duplicateCounts = $query->clone()
+            ->select('fio', DB::raw('COUNT(*) as count'))
+            ->whereNull('rip_at')    
+            ->groupBy('fio')
+            ->having('count', '>', 1)
+            ->orderBy('fio')    
+            ->pluck('count', 'fio'); // ['Иванов Иван Иванович' => 3, ...]
+
 
         // Сортировка
         $sort = $request->input('sort', 'id');
@@ -53,7 +64,7 @@ class FioDtrnController extends BaseController {
         }
 
 
-        return view('fiodtrns.index', compact('fiodtrns', 'sort', 'direction', 'fiodtrnsJs'));
+        return view('fiodtrns.index', compact('fiodtrns', 'sort', 'direction', 'fiodtrnsJs', 'duplicateCounts'));
     }
 
     public function create(Request $request) {

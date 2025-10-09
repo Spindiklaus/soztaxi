@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\TaxiController;
 use App\Http\Controllers\Admin\TaxiOrderController;
 use App\Http\Controllers\Admin\FioDtrnController;
+use App\Http\Controllers\Admin\FioDtrnMergeController;
 use App\Http\Controllers\Admin\FioRipController;
 use App\Http\Controllers\Admin\SkidkaDopController;
 use App\Http\Controllers\Admin\SocialTaxiOrderController;
@@ -53,6 +54,10 @@ Route::middleware(['web', 'auth', IsAdmin::class])->group(function () {
     Route::get('/admin/users', function () {
         return view('admin.users');
     })->name('admin.users');
+
+    // маршрут fiodtrns/merge не будет перехватываться, если поставить вначалк Route::resource('fiodtrns', ...)
+    Route::get('/fiodtrns/merge', [FioDtrnMergeController::class, 'showForm'])->name('fiodtrns.merge.form');
+    Route::post('/fiodtrns/merge', [FioDtrnMergeController::class, 'merge'])->name('fiodtrns.merge');
     
     Route::resource('categories', CategoryController::class);
     Route::resource('users', UserController::class);
@@ -93,7 +98,7 @@ Route::middleware(['web', 'auth', IsAdmin::class])->group(function () {
     Route::get('/open', [OrderOpenController::class, 'index'])->name('social-taxi-orders.open.index');
     Route::post('/open', [OrderOpenController::class, 'bulkUnset'])->name('social-taxi-orders.open.bulk-unset');
 
-    
+
     
 });
 
