@@ -9,7 +9,7 @@ class FioDtrnController extends BaseController {
 
     public function index(Request $request) {
         // Фильтрация
-        $query = FioDtrn::query();
+        $query = FioDtrn::withCount('orders');
 
         if ($request->filled('fio')) {
             $query->where('fio', 'like', "%{$request->input('fio')}%");
@@ -41,7 +41,7 @@ class FioDtrnController extends BaseController {
         $sort = $request->input('sort', 'id');
         $direction = $request->input('direction', 'asc');
 
-        $allowedSorts = ['id', 'fio', 'kl_id', 'data_r', 'sex'];
+        $allowedSorts = ['id', 'fio', 'kl_id', 'data_r', 'sex', 'orders_count'];
         if (!in_array($sort, $allowedSorts)) {
             $sort = 'id';
         }
@@ -60,6 +60,7 @@ class FioDtrnController extends BaseController {
                 'rip_at' => optional($fiodtrn->rip_at)->format('d.m.Y'),
                 'operator' => optional($fiodtrn->user)->name ?? '-',
                 'komment' => $fiodtrn->komment,
+                 'orders_count' => $fiodtrn->orders_count, // <-- количество заказов
             ];
         }
 

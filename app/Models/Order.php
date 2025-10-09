@@ -35,6 +35,7 @@ class Order extends Model {
         'visit_data',
         'predv_way',
         'taxi_id',
+        'order_group_id',
         'taxi_sent_at',
         'taxi_price',
         'taxi_way',
@@ -51,7 +52,6 @@ class Order extends Model {
         'visit_data' => 'datetime',
         'visit_obratno' => 'datetime',
         'taxi_sent_at' => 'datetime',
-        'taxi_data' => 'datetime',
         'cancelled_at' => 'datetime',
         'closed_at' => 'datetime',
         'otmena_taxi' => 'boolean',
@@ -61,6 +61,15 @@ class Order extends Model {
         'taxi_price' => 'decimal:11',
         'taxi_vozm' => 'decimal:11',
     ];
+    
+    /**
+     * Группа заказа
+     */
+    public function orderGroup() // Имя метода обычно в стиле camelCase
+    {
+        return $this->belongsTo(OrderGroup::class, 'order_group_id'); // Указываем внешний ключ
+    }
+
 
     /**
      * История статусов заказа

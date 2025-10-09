@@ -210,6 +210,12 @@
                                 <span class="ml-1" x-show="sortField === 'rip_at' && sortDirection === 'asc'">↑</span>
                                 <span class="ml-1" x-show="sortField === 'rip_at' && sortDirection === 'desc'">↓</span>
                             </th>
+                            <th @click="sortBy('orders_count')" scope="col"
+                                 class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-blue-700">
+                                Кол-во поездок
+                                <span class="ml-1" x-show="sortField === 'orders_count' && sortDirection === 'asc'">↑</span>
+                                <span class="ml-1" x-show="sortField === 'orders_count' && sortDirection === 'desc'">↓</span>
+                            </th>
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">
                                 Оператор
@@ -239,6 +245,7 @@
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" x-text="fiodtrn.rip_at"></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" x-text="fiodtrn.orders_count"></td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" x-text="fiodtrn.operator"></td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm space-x-2 flex justify-end">
                                     <a :href="`/fiodtrns/${fiodtrn.id}?sort=${sortField}&direction=${sortDirection}`"
