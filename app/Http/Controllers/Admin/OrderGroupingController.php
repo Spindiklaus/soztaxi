@@ -35,14 +35,27 @@ class OrderGroupingController extends BaseController
 
         // Получаем заказы типа 1 (соцтакси) на выбранную дату, не закрытые и не отмененные
         $orders = Order::where('type_order', 1)
+            ->whereBetween('visit_data', [$selectedDate, $endDate])                
             ->whereNull('closed_at')
             ->whereNull('cancelled_at')
-            ->whereBetween('visit_data', [$selectedDate, $endDate])
+            ->whereNull('order_group_id')  // не сгруппированные 
             ->with(['client']) // Загружаем связь client (метод в модели Order)   
             ->orderBy('visit_data')
             ->orderBy('adres_otkuda')
             ->orderBy('adres_kuda')
             ->get();
+        
+            \Log::info('Orders for grouping:', $orders->pluck('id', 'pz_nom')->toArray()); // Логируем номера и ID
+$orderIds = $orders->pluck('id')->toArray();
+$uniqueOrderIds = array_unique($orderIds);
+if (count($orderIds) !== count($uniqueOrderIds)) {
+    \Log::warning('Duplicate Order IDs found in initial collection!', [
+        'original_count' => count($orderIds),
+        'unique_count' => count($uniqueOrderIds),
+        'duplicates' => array_diff_assoc($orderIds, $uniqueOrderIds)
+    ]);
+}
+        
         
         // Получаем толерантность времени из сервиса
         $timeTolerance = $this->groupingService->getTimeToleranceMinutes(); // Убедитесь, что в сервисе есть геттер

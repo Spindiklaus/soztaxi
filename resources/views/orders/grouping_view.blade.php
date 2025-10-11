@@ -1,5 +1,5 @@
 {{-- resources/views/orders/grouping_view.blade.php --}}
-<x-app-layout>
+ <x-app-layout>
         <div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
             <div class="bg-white shadow-md rounded-lg p-6">
                 <h2 class="text-2xl font-bold text-gray-800 mb-6">Группировка заказов на {{ $selectedDate->format('d.m.Y') }}</h2>
@@ -16,18 +16,25 @@
                             <div class="card mb-3 potential-group-card bg-gray-50 border border-gray-200 rounded-lg p-4" data-group-id="{{ $group['id'] }}">
                                 <div class="card-header bg-gray-100 border-b border-gray-200 rounded-t-lg p-3">
                                     <input type="checkbox" name="selected_groups[{{ $index }}][selected]" value="1" class="group-selector h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                                    <strong class="ml-2">Предложенная группа (ID: {{ $group['id'] }})</strong>
-                                    <span class="badge bg-info text-white text-xs px-2 py-1 ml-2">Время: {{ $group['base_time']->format('H:i') }} +/- {{ $timeTolerance }} мин</span>
+                                    <strong class="ml-2">{{ $group['name'] }}</strong>
+                                    <span class="badge bg-blue-100 text-blue-800 text-xs px-2 py-1 ml-2 rounded">Время: {{ $group['base_time']->format('H:i') }} +/- {{ $timeTolerance }} мин</span>
                                 </div>
                                 <div class="card-body p-3">
                                     <ul class="list-group">
                                         @foreach($group['orders'] as $order)
-                                            <li class="list-group-item bg-white p-2 border-b border-gray-100">
+                                            <li class="list-group-item p-2 border-b border-gray-100 bg-white">
                                                 <input type="checkbox" name="selected_groups[{{ $index }}][order_ids][]" value="{{ $order->id }}" class="order-checkbox h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" disabled>
                                                 <div class="ml-2">
-                                                    <strong>{{ $order->pz_nom }}</strong> - {{ $order->visit_data->format('H:i') }}
+                                                    <strong>{{ $order->pz_nom }}</strong> - 
+                                                    <span 
+                                                        @if($order->has_duplicate_time)
+                                                            class="bg-red-500 text-white px-1 rounded font-bold"
+                                                        @endif
+                                                    >
+                                                        {{ $order->visit_data->format('H:i') }}
+                                                    </span>
                                                     <br>
-                                                    <span class="text-sm text-gray-600">Клиент: {{ $order->client ? $order->client->fio : 'N/A' }}</span> <!-- Предполагается, что столбец fio в FioDtrn -->
+                                                    <span class="text-sm text-gray-600">Клиент: {{ $order->client ? $order->client->fio : 'N/A' }}</span>
                                                     <br>
                                                     <span class="text-sm">От: {{ $order->adres_otkuda }}</span>
                                                     <br>
