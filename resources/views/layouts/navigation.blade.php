@@ -73,6 +73,9 @@
                     </div>
                     <!-- Конец подменю "Управление поездками" -->
 
+                    <x-nav-link :href="route('orders.grouping.form')" :active="request()->routeIs('orders.grouping.form')">
+                        {{ __('Группировка заказов') }}
+                    </x-nav-link>
                     <x-nav-link :href="route('orders.report_visit')" :active="request()->routeIs('orders.report_visit')">
                         {{ __('Сводный отчет') }}
                     </x-nav-link>

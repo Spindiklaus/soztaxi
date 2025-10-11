@@ -1,0 +1,85 @@
+{{-- resources/views/orders/grouping_view.blade.php --}}
+<x-app-layout>
+        <div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
+            <div class="bg-white shadow-md rounded-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Группировка заказов на {{ $selectedDate->format('d.m.Y') }}</h2>
+
+                <form id="grouping-form" action="{{ route('orders.grouping.process') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="selected_date" value="{{ $selectedDate->format('Y-m-d') }}">
+
+                    @if(empty($potentialGroups))
+                        <p class="text-gray-700 mb-4">На выбранную дату нет подходящих заказов для автоматической группировки.</p>
+                    @else
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Предлагаемые группы (отметьте нужные):</h3>
+                        @foreach($potentialGroups as $index => $group)
+                            <div class="card mb-3 potential-group-card bg-gray-50 border border-gray-200 rounded-lg p-4" data-group-id="{{ $group['id'] }}">
+                                <div class="card-header bg-gray-100 border-b border-gray-200 rounded-t-lg p-3">
+                                    <input type="checkbox" name="selected_groups[{{ $index }}][selected]" value="1" class="group-selector h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                    <strong class="ml-2">Предложенная группа (ID: {{ $group['id'] }})</strong>
+                                    <span class="badge bg-info text-white text-xs px-2 py-1 ml-2">Время: {{ $group['base_time']->format('H:i') }} +/- {{ $timeTolerance }} мин</span>
+                                </div>
+                                <div class="card-body p-3">
+                                    <ul class="list-group">
+                                        @foreach($group['orders'] as $order)
+                                            <li class="list-group-item bg-white p-2 border-b border-gray-100">
+                                                <input type="checkbox" name="selected_groups[{{ $index }}][order_ids][]" value="{{ $order->id }}" class="order-checkbox h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" disabled>
+                                                <div class="ml-2">
+                                                    <strong>{{ $order->pz_nom }}</strong> - {{ $order->visit_data->format('H:i') }}
+                                                    <br>
+                                                    <span class="text-sm text-gray-600">Клиент: {{ $order->client ? $order->client->fio : 'N/A' }}</span> <!-- Предполагается, что столбец fio в FioDtrn -->
+                                                    <br>
+                                                    <span class="text-sm">От: {{ $order->adres_otkuda }}</span>
+                                                    <br>
+                                                    <span class="text-sm">До: {{ $order->adres_kuda }}</span>
+                                                </div>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            </div>
+                        @endforeach
+                    @endif
+
+                    <button type="submit" class="btn btn-success mt-3 inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition ease-in-out duration-150" id="save-groups-btn" disabled>Сохранить выбранные группы</button>
+                </form>
+
+                <a href="{{ route('orders.grouping.form') }}" class="btn btn-secondary mt-3 inline-flex items-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-semibold text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition ease-in-out duration-150 ml-2">Назад</a>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const groupSelectors = document.querySelectorAll('.group-selector');
+                const saveButton = document.getElementById('save-groups-btn');
+
+                groupSelectors.forEach(selector => {
+                    selector.addEventListener('change', function() {
+                        const card = this.closest('.potential-group-card');
+                        const orderCheckboxes = card.querySelectorAll('.order-checkbox');
+
+                        orderCheckboxes.forEach(cb => {
+                            cb.disabled = !this.checked;
+                            if (!this.checked) {
+                                cb.checked = false;
+                            }
+                        });
+
+                        updateSaveButton();
+                    });
+                });
+
+                function updateSaveButton() {
+                    let anyGroupSelected = false;
+                    groupSelectors.forEach(selector => {
+                        if (selector.checked) {
+                            anyGroupSelected = true;
+                        }
+                    });
+                    saveButton.disabled = !anyGroupSelected;
+                }
+
+                updateSaveButton();
+            });
+        </script>
+    </x-app-layout>

@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\SocialTaxiOrderController;
 use App\Http\Controllers\Admin\OrderReportController;
 use App\Http\Controllers\Admin\OrderCloseController;
 use App\Http\Controllers\Admin\OrderOpenController;
+use App\Http\Controllers\Admin\OrderGroupingController;
 
 
 use App\Http\Controllers\Import\ImportFioDtrnController;
@@ -28,6 +29,8 @@ use App\Http\Controllers\Import\ImportTaxiController;
 use App\Http\Controllers\Operator\SocialTaxiController;
 use App\Http\Controllers\Operator\CarController;
 use App\Http\Controllers\Operator\GazelleController;
+
+
 
 
 
@@ -98,6 +101,9 @@ Route::middleware(['web', 'auth', IsAdmin::class])->group(function () {
     Route::get('/open', [OrderOpenController::class, 'index'])->name('social-taxi-orders.open.index');
     Route::post('/open', [OrderOpenController::class, 'bulkUnset'])->name('social-taxi-orders.open.bulk-unset');
 
+    Route::get('/orders/grouping', [OrderGroupingController::class, 'showGroupingForm'])->name('orders.grouping.form');
+    Route::post('/orders/grouping/show', [OrderGroupingController::class, 'showOrdersForGrouping'])->name('orders.grouping.show');
+    Route::post('/orders/grouping/process', [OrderGroupingController::class, 'processGrouping'])->name('orders.grouping.process');
 
     
 });
