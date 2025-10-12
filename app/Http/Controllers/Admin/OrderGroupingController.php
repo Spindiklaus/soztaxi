@@ -77,20 +77,29 @@ class OrderGroupingController extends BaseController {
                 if (empty($groupData['order_ids'])) {
                     continue; // Пропускаем пустые группы
                 }
-
-                // Создаем новую группу в БД
-                $orderGroup = OrderGroup::create([
-                            'name' => 'Группировка ' . now()->format('Y-m-d H:i:s'), // Или генерируйте имя по-другому
-                ]);
-
                 $groupIds = $groupData['order_ids'];
-
-                // Обновляем заказы, присваивая им ID новой группы. Так не вызывается observer
-                // Order::whereIn('id', $groupIds)->update(['order_group_id' => $orderGroup->id]);
-                
+                // --- Получаем модели и формируем имя ---
                 // Получаем модели Order
                 $ordersToUpdate = Order::whereIn('id', $groupIds)->get();
 
+                if ($ordersToUpdate->isNotEmpty()) {
+                    // Находим заказ с самым ранним visit_data
+                    $earliestVisitTime = $ordersToUpdate->min('visit_data'); // Это Carbon\Carbon или DateTime
+                    $countOrders = $ordersToUpdate->count();
+
+                    // Формируем имя группы
+                    $groupName = "Группа " . $earliestVisitTime->format('H:i') . " ({$countOrders} чел.)";
+                } else {
+                    // На всякий случай, если заказы не найдены (хотя валидация должна это исключить)
+                    $groupName = 'Группа (ошибка)';
+                }
+                // --- КОНЕЦ ИЗМЕНЕНИЯ ---
+                
+                // Создаем новую группу в БД с сформированным именем
+                $orderGroup = OrderGroup::create([
+                    'name' => $groupName,
+                ]);
+                
                 foreach ($ordersToUpdate as $order) {
                     // Вызываем update() на экземпляре модели Order
                     // Это запустит событие 'updating' и, соответственно, OrderObserver::updating()
