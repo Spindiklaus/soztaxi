@@ -34,7 +34,8 @@ class SocialTaxiOrderBuilder {
                     'currentStatus.statusOrder', // Текущий статус заказа
                     'client', // Клиент (заказчик)
                     'category', // Категория инвалидности
-                    'dopus'                       // Дополнительные условия
+                    'dopus',    // Дополнительные условия
+                    'orderGroup' // группировка заказа
         ]);
     }
 

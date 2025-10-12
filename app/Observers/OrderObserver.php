@@ -3,6 +3,8 @@
 namespace App\Observers;
 
 use App\Models\Order;
+use App\Models\OrderGroup; // Импортируем OrderGroup, если нужно получить имя/описание группы
+
 use App\Models\OrderStatusHistory;
 use Illuminate\Support\Facades\Auth;
 
@@ -88,6 +90,55 @@ class OrderObserver
     {
         //
     }
+    
+    /**
+     * Handle the Order "updating" event.
+     * Вызывается перед обновлением модели Order.
+     */
+    public function updating(Order $order): void
+    {
+        // Проверяем, изменилось ли поле order_group_id
+        if ($order->isDirty('order_group_id')) {
+            $originalGroupId = $order->getOriginal('order_group_id'); // Старое значение
+            $newGroupId = $order->order_group_id; // Новое значение
+
+            if (is_null($originalGroupId) && !is_null($newGroupId)) {
+                // Заказ добавляется в группу (был NULL, стал ID)
+                $group = OrderGroup::find($newGroupId); // Получаем группу, если нужно включить её имя
+                $groupName = $group ? $group->name : "ID {$newGroupId}";
+                $commentToAdd = "Добавлен в группу: {$groupName} (" . now() . ").";
+                $order->komment = $this->appendComment($order->getOriginal('komment'), $commentToAdd);
+            } elseif (!is_null($originalGroupId) && is_null($newGroupId)) {
+                // Заказ удаляется из группы (был ID, стал NULL) - это обрабатывается в OrderGroupObserver
+                // Можно добавить комментарий здесь, если нужно, но логика уже в OrderGroupObserver
+                // $commentToAdd = "Удален из группы ID {$originalGroupId} (" . now() . ").";
+                // $order->komment = $this->appendComment($order->getOriginal('komment'), $commentToAdd);
+                // В данном случае, комментарий добавляется в OrderGroupObserver, так что оставим это пустым или добавим другую логику при необходимости.
+            } elseif (!is_null($originalGroupId) && !is_null($newGroupId) && $originalGroupId != $newGroupId) {
+                // Заказ перемещается из одной группы в другую
+                $oldGroup = OrderGroup::find($originalGroupId);
+                $newGroup = OrderGroup::find($newGroupId);
+                $oldGroupName = $oldGroup ? $oldGroup->name : "ID {$originalGroupId}";
+                $newGroupName = $newGroup ? $newGroup->name : "ID {$newGroupId}";
+                $commentToAdd = "Перемещен из группы {$oldGroupName} в группу {$newGroupName} (" . now() . ").";
+                $order->komment = $this->appendComment($order->getOriginal('komment'), $commentToAdd);
+            }
+            // elseif (is_null($originalGroupId) && is_null($newGroupId)) { // Оба NULL - нет изменений для комментария }
+        }
+    }
+    
+    /**
+     * Вспомогательный метод для объединения комментариев.
+     * @param string|null $existingComment
+     * @param string $newComment
+     * @return string
+     */
+    private function appendComment(?string $existingComment, string $newComment): string
+    {
+        $existingComment = $existingComment ?? '';
+        return trim($existingComment . "\n" . $newComment);
+    }
+    
     
     protected function changeStatus(Order $order, int $statusOrderId)
     {

@@ -95,20 +95,29 @@
                     </td>
                     <td class="px-6 py-4">
                         @if($order->visit_data)
-                        <div class="text-sm font-medium text-gray-900">
-                            {{ $order->visit_data->format('d.m.Y') }}
-                        </div>
-                        <div class="text-lg text-gray-900">
-                            {{ $order->visit_data->format('H:i') }}
-                        </div>
-                        @if($order->visit_obratno)
-                        <div class="text-sm font-medium text-gray-600 mt-1">
-                            Обратно: 
-                            <span class="text-lg">{{ $order->visit_obratno->format('H:i') }}</span>
-                        </div>
-                        @endif
+                            <div class="text-sm font-medium text-gray-900">
+                                {{ $order->visit_data->format('d.m.Y') }}
+                            </div>
+                            <div class="text-lg text-gray-900">
+                                {{ $order->visit_data->format('H:i') }}
+                            </div>
+                            @if($order->visit_obratno)
+                                <div class="text-sm font-medium text-gray-600 mt-1">
+                                    Обратно: 
+                                    <span class="text-lg">{{ $order->visit_obratno->format('H:i') }}</span>
+                                </div>
+                            @endif
+                            {{-- --- Добавляем отображение имени группы --- --}}
+                            @if($order->orderGroup) {{-- Проверяем, есть ли связанная группа --}}
+                                <div class="mt-1">
+                                    <span class="inline-block px-2 py-1 text-xs font-semibold bg-blue-100 text-blue-800 rounded-full">
+                                        {{ $order->orderGroup->name }}
+                                    </span>
+                                </div>
+                            @endif
+                            {{-- --- Конец добавления группы--- --}}
                         @else
-                        <div class="text-sm text-gray-500">-</div>
+                            <div class="text-sm text-gray-500">-</div>
                         @endif
                     </td>
                     <td class="px-6 py-4">

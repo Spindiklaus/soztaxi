@@ -18,7 +18,7 @@ class OrderGroupingController extends BaseController {
 
     // Показать форму выбора даты
     public function showGroupingForm() {
-        return view('orders-groping.grouping_form'); // Blade шаблон для выбора даты
+        return view('orders-grouping.grouping_form'); // Blade шаблон для выбора даты
     }
 
     // Обработать выбор даты и показать заказы для группировки
@@ -42,16 +42,16 @@ class OrderGroupingController extends BaseController {
                 ->orderBy('adres_kuda')
                 ->get();
 
-        \Log::info('Orders for grouping:', $orders->pluck('id', 'pz_nom')->toArray()); // Логируем номера и ID
-        $orderIds = $orders->pluck('id')->toArray();
-        $uniqueOrderIds = array_unique($orderIds);
-        if (count($orderIds) !== count($uniqueOrderIds)) {
-            \Log::warning('Duplicate Order IDs found in initial collection!', [
-                'original_count' => count($orderIds),
-                'unique_count' => count($uniqueOrderIds),
-                'duplicates' => array_diff_assoc($orderIds, $uniqueOrderIds)
-            ]);
-        }
+//        \Log::info('Orders for grouping:', $orders->pluck('id', 'pz_nom')->toArray()); // Логируем номера и ID
+//        $orderIds = $orders->pluck('id')->toArray();
+//        $uniqueOrderIds = array_unique($orderIds);
+//        if (count($orderIds) !== count($uniqueOrderIds)) {
+//            \Log::warning('Duplicate Order IDs found in initial collection!', [
+//                'original_count' => count($orderIds),
+//                'unique_count' => count($uniqueOrderIds),
+//                'duplicates' => array_diff_assoc($orderIds, $uniqueOrderIds)
+//            ]);
+//        }
 
 
         // Получаем толерантность времени из сервиса
@@ -59,7 +59,7 @@ class OrderGroupingController extends BaseController {
         // Генерируем потенциальные группы
         $potentialGroups = $this->groupingService->findPotentialGroupsForDate($orders);
 
-        return view('orders-groping.grouping_view', compact('orders', 'potentialGroups', 'selectedDate', 'timeTolerance'));
+        return view('orders-grouping.grouping_view', compact('orders', 'potentialGroups', 'selectedDate', 'timeTolerance'));
     }
 
     // Обработать выбор группировки пользователем и сохранить
@@ -85,12 +85,24 @@ class OrderGroupingController extends BaseController {
 
                 $groupIds = $groupData['order_ids'];
 
-                // Обновляем заказы, присваивая им ID новой группы
-                Order::whereIn('id', $groupIds)->update(['order_group_id' => $orderGroup->id]);
+                // Обновляем заказы, присваивая им ID новой группы. Так не вызывается observer
+                // Order::whereIn('id', $groupIds)->update(['order_group_id' => $orderGroup->id]);
+                
+                // Получаем модели Order
+                $ordersToUpdate = Order::whereIn('id', $groupIds)->get();
+
+                foreach ($ordersToUpdate as $order) {
+                    // Вызываем update() на экземпляре модели Order
+                    // Это запустит событие 'updating' и, соответственно, OrderObserver::updating()
+                    $order->update(['order_group_id' => $orderGroup->id]);
+                }
+                
+                
             }
         });
 
-        return redirect()->back()->with('success', 'Группировка успешно сохранена!');
+        // Редирект на форму выбора даты
+        return redirect()->route('orders.grouping.form')->with('success', 'Группировка успешно сохранена!');
     }
 
 }
