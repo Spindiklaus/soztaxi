@@ -68,6 +68,9 @@
                                 <x-dropdown-link :href="route('social-taxi-orders.open.index')" :active="request()->routeIs('social-taxi-orders.open.index')">
                                     {{ __('Открыть поездки') }}
                                 </x-dropdown-link>
+                                <x-dropdown-link :href="route('order-groups.index')" :active="request()->routeIs('order-groups.index')">
+                                    {{ __('Группы заказов') }}
+                                </x-dropdown-link>
                             </x-slot>
                         </x-dropdown>
                     </div>

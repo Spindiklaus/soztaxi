@@ -46,9 +46,12 @@
                                 </div>
                             </div>
                         @endforeach
+                        <button type="submit" class="btn btn-success mt-3 inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition ease-in-out duration-150" id="save-groups-btn" disabled>
+                            Сохранить выбранные группы
+                        </button>
                     @endif
 
-                    <button type="submit" class="btn btn-success mt-3 inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition ease-in-out duration-150" id="save-groups-btn" disabled>Сохранить выбранные группы</button>
+
                 </form>
 
                 <a href="{{ route('orders.grouping.form') }}" class="btn btn-secondary mt-3 inline-flex items-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-semibold text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition ease-in-out duration-150 ml-2">Назад</a>

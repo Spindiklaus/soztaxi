@@ -18,7 +18,7 @@ use App\Http\Controllers\Admin\OrderReportController;
 use App\Http\Controllers\Admin\OrderCloseController;
 use App\Http\Controllers\Admin\OrderOpenController;
 use App\Http\Controllers\Admin\OrderGroupingController;
-
+use App\Http\Controllers\Admin\OrderGroupController;
 
 use App\Http\Controllers\Import\ImportFioDtrnController;
 use App\Http\Controllers\Import\ImportFioRipController;
@@ -104,6 +104,8 @@ Route::middleware(['web', 'auth', IsAdmin::class])->group(function () {
     Route::get('/orders/grouping', [OrderGroupingController::class, 'showGroupingForm'])->name('orders.grouping.form');
     Route::post('/orders/grouping/show', [OrderGroupingController::class, 'showOrdersForGrouping'])->name('orders.grouping.show');
     Route::post('/orders/grouping/process', [OrderGroupingController::class, 'processGrouping'])->name('orders.grouping.process');
+
+    Route::resource('order-groups', OrderGroupController::class)->names('order-groups'); 
 
     
 });
