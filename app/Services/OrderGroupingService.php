@@ -8,16 +8,16 @@ use Carbon\Carbon;
 
 class OrderGroupingService
 {
-    private $timeToleranceMinutes = 30; // 30 минут
-    private $addressTolerancePercent = 80; // 80% схожести адреса "куда"
-    
-    // Геттер для времени толерантности
-    public function getTimeToleranceMinutes(): int
-    {
-        return $this->timeToleranceMinutes;
-    }
+//    private $timeToleranceMinutes = 30; // 30 минут
+//    private $addressTolerancePercent = 80; // 80% схожести адреса "куда"
+//    
+//    // Геттер для времени толерантности
+//    public function getTimeToleranceMinutes(): int
+//    {
+//        return $this->timeToleranceMinutes;
+//    }
 
-    public function findPotentialGroupsForDate($orders)
+    public function findPotentialGroupsForDate($orders, $timeToleranceMinutes = 30, $addressTolerancePercent = 80, $maxGroupSize = 10)
     {
         $potentialGroups = [];
         $processedOrderIds = collect(); // Коллекция ID уже обработанных заказов
@@ -30,7 +30,7 @@ class OrderGroupingService
             // Проверяем, можно ли добавить этот заказ в существующую группу
             $foundGroup = false;
             foreach ($potentialGroups as &$group) {
-                if (count($group['orders']) < 4 && $this->isOrderCompatible($order, $group)) {
+                if (count($group['orders']) < $maxGroupSize && $this->isOrderCompatible($order, $group, $timeToleranceMinutes, $addressTolerancePercent)) {
                     // Проверка на уникальность клиента в группе
                     $existingClientIds = collect($group['orders'])->pluck('client_id')->toArray();
                     if (!in_array($order->client_id, $existingClientIds)) {
@@ -143,16 +143,16 @@ class OrderGroupingService
     
     
 
-    private function isOrderCompatible(Order $order, array $group): bool
+    private function isOrderCompatible(Order $order, array $group, $timeToleranceMinutes, $addressTolerancePercent): bool // Принимаем параметры
     {
         // Проверка времени
         $timeDiff = abs($order->visit_data->diffInMinutes($group['base_time']));
-        if ($timeDiff > $this->timeToleranceMinutes) {
+        if ($timeDiff > $timeToleranceMinutes) {
             return false;
         }
 
         // Проверка адреса "куда"
-        $addressToMatch = $this->addressesAreSimilar($order->adres_kuda, $group['base_to']);
+        $addressToMatch = $this->addressesAreSimilar($order->adres_kuda, $group['base_to'], $addressTolerancePercent);
         if (!$addressToMatch) {
             return false;
         }
@@ -160,8 +160,10 @@ class OrderGroupingService
         return true;
     }
 
-    private function addressesAreSimilar(string $addr1, string $addr2): bool
+    // Простая проверка схожести адресов (можно улучшить)
+    private function addressesAreSimilar(string $addr1, string $addr2, float $minPercent): bool
     {
+        // Приведение к нижнему регистру и удаление лишних пробелов
         $addr1 = trim(strtolower($addr1));
         $addr2 = trim(strtolower($addr2));
 
@@ -177,6 +179,18 @@ class OrderGroupingService
 
         // Проверка схожести с использованием similar_text
         similar_text($addr1, $addr2, $percent);
-        return $percent >= $this->addressTolerancePercent;
+        return $percent >= $minPercent; // Сравниваем с переданным порогом
     }
+    
+    // Метод для получения значений по умолчанию (опционально)
+    public function getDefaultTimeToleranceMinutes(): int
+    {
+        return 30;
+    }
+
+    public function getDefaultAddressTolerancePercent(): float
+    {
+        return 80.0;
+    }
+    
 }

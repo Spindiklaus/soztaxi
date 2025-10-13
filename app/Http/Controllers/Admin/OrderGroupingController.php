@@ -25,10 +25,19 @@ class OrderGroupingController extends BaseController {
     public function showOrdersForGrouping(Request $request) {
         $request->validate([
             'grouping_date' => 'required|date',
+            // Валидация новых параметров
+            'time_tolerance' => 'required|integer|min:20|max:60', // Пример: от 20 до 60 минут
+            'address_tolerance' => 'required|numeric|min:20|max:100', // Пример: от 20 до 100%
+            'max_potential_group_size' => 'required|integer|min:1|max:20', // Установите логичный максимум            
         ]);
 
         $selectedDate = Carbon::parse($request->input('grouping_date'))->startOfDay();
         $endDate = $selectedDate->copy()->endOfDay();
+        // Получаем параметры из запроса
+        $timeTolerance = (int) $request->input('time_tolerance');
+        $addressTolerance = (float) $request->input('address_tolerance');
+        $maxPotentialGroupSize = (int) $request->input('max_potential_group_size'); // Получаем новое значение
+
 
         // Получаем заказы типа 1 (соцтакси) на выбранную дату, не закрытые и не отмененные
         $orders = Order::where('type_order', 1)
@@ -52,21 +61,19 @@ class OrderGroupingController extends BaseController {
 //                'duplicates' => array_diff_assoc($orderIds, $uniqueOrderIds)
 //            ]);
 //        }
-
-
         // Получаем толерантность времени из сервиса
-        $timeTolerance = $this->groupingService->getTimeToleranceMinutes(); // 
+        // $timeTolerance = $this->groupingService->getTimeToleranceMinutes(); // 
         // Генерируем потенциальные группы
-        $potentialGroups = $this->groupingService->findPotentialGroupsForDate($orders);
+        $potentialGroups = $this->groupingService->findPotentialGroupsForDate($orders, $timeTolerance, $addressTolerance, $maxPotentialGroupSize);
 
-        return view('orders-grouping.grouping_view', compact('orders', 'potentialGroups', 'selectedDate', 'timeTolerance'));
+        return view('orders-grouping.grouping_view', compact('orders', 'potentialGroups', 'selectedDate', 'timeTolerance', 'addressTolerance', 'maxPotentialGroupSize'));
     }
 
     // Обработать выбор группировки пользователем и сохранить
     public function processGrouping(Request $request) {
         $request->validate([
             'selected_groups' => 'required|array',
-            'selected_groups.*.order_ids' => 'required|array|max:4',
+            'selected_groups.*.order_ids' => 'required|array|max:3',
             'selected_groups.*.order_ids.*' => 'required|exists:orders,id',
         ]);
 
@@ -83,30 +90,38 @@ class OrderGroupingController extends BaseController {
                 $ordersToUpdate = Order::whereIn('id', $groupIds)->get();
 
                 if ($ordersToUpdate->isNotEmpty()) {
-                    // Находим заказ с самым ранним visit_data
-                    $earliestVisitTime = $ordersToUpdate->min('visit_data'); // Это Carbon\Carbon или DateTime
+                    // Находим заказ с самым ранним visit_data (первый в группе)
+                    $earliestOrder = $ordersToUpdate->sortBy('visit_data')->first();
+                    $earliestVisitTime = $earliestOrder->visit_data;
+
+                    // Находим заказ с самым поздним visit_data (последний в группе)
+                    $latestOrder = $ordersToUpdate->sortByDesc('visit_data')->first();
+                    $latestVisitTime = $latestOrder->visit_data;
+
+                    // Берем адрес "куда" из первого заказа
+                    $destinationAddress = $earliestOrder->adres_kuda;
+
+                    // Количество заказов в группе (человек)
                     $countOrders = $ordersToUpdate->count();
 
-                    // Формируем имя группы
-                    $groupName = "Группа " . $earliestVisitTime->format('H:i') . " ({$countOrders} чел.)";
-                } else {
+                    // Формируем имя группы по новому шаблону
+                    $groupName = "До: {$destinationAddress} | Время {$earliestVisitTime->format('H:i')} - {$latestVisitTime->format('H:i')} ({$countOrders} чел.)";
+                }
+                else {
                     // На всякий случай, если заказы не найдены (хотя валидация должна это исключить)
                     $groupName = 'Группа (ошибка)';
                 }
                 // --- КОНЕЦ ИЗМЕНЕНИЯ ---
-                
                 // Создаем новую группу в БД с сформированным именем
                 $orderGroup = OrderGroup::create([
-                    'name' => $groupName,
+                            'name' => $groupName,
                 ]);
-                
+
                 foreach ($ordersToUpdate as $order) {
                     // Вызываем update() на экземпляре модели Order
                     // Это запустит событие 'updating' и, соответственно, OrderObserver::updating()
                     $order->update(['order_group_id' => $orderGroup->id]);
                 }
-                
-                
             }
         });
 

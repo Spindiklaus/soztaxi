@@ -2,7 +2,15 @@
  <x-app-layout>
         <div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
             <div class="bg-white shadow-md rounded-lg p-6">
-                <h2 class="text-2xl font-bold text-gray-800 mb-6">Группировка заказов на {{ $selectedDate->format('d.m.Y') }}</h2>
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Группировка заказов в поездки на {{ $selectedDate->format('d.m.Y') }}</h2>
+                <!-- Отображение использованных параметров -->
+            <div class="mb-4 p-3 bg-blue-50 rounded-md">
+                <p class="text-sm text-blue-800"><strong>Параметры группировки:</strong></p>
+                <p class="text-sm text-blue-800">- Допустимая разница во времени заказов: {{ $timeTolerance }} минут</p>
+                <p class="text-sm text-blue-800">- Минимальное сходство адреса КУДА: {{ $addressTolerance }}%</p>
+                <p class="text-sm text-blue-800">- Максимальный размер потенциальной группы: {{ $maxPotentialGroupSize }} чел.</p>
+                <p class="text-sm text-blue-800">- Максимальное число пассажиров в авто: 3 чел.</p>
+            </div>
 
                 <form id="grouping-form" action="{{ route('orders.grouping.process') }}" method="POST">
                     @csrf
@@ -36,9 +44,12 @@
                                                     <br>
                                                     <span class="text-sm text-gray-600">Клиент: {{ $order->client ? $order->client->fio : 'N/A' }}</span>
                                                     <br>
-                                                    <span class="text-sm">От: {{ $order->adres_otkuda }}</span>
-                                                    <br>
-                                                    <span class="text-sm">До: {{ $order->adres_kuda }}</span>
+                                                    <span class="text-sm text-gray-600">От: <b>{{ $order->adres_otkuda }}</b></span>
+                                                    <span class="text-sm text-gray-600">До: <b>{{ $order->adres_kuda }}</b></span>
+                                                     @if($order->predv_way !== null && $order->predv_way !== '')
+                                                        <br>
+                                                        Предв. дальность, км: <span class="text-sm text-gray-600"><b>{{ number_format($order->predv_way, 3, ',', ' ') }}</b></span>
+                                                    @endif
                                                 </div>
                                             </li>
                                         @endforeach

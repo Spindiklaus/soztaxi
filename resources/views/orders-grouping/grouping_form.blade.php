@@ -1,3 +1,4 @@
+{{-- resources/views/orders-grouping/grouping_form.blade.php --}}
 <x-app-layout>
     <!-- Заголовок и навигация (опционально, можно убрать, если не нужна) -->
     <!--
@@ -21,6 +22,48 @@
                         name="grouping_date" 
                         id="grouping_date" 
                         value="{{ old('grouping_date', now()->format('Y-m-d')) }}" 
+                        required 
+                        class="mt-1 block w-full max-w-xs px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    >
+                </div>
+                <!-- Новые поля для параметров -->
+                <div class="space-y-2">
+                    <label for="time_tolerance" class="block text-sm font-medium text-gray-700">Допустимая разница во времени (20-60 минут):</label>
+                    <input 
+                        type="number" 
+                        name="time_tolerance" 
+                        id="time_tolerance" 
+                        value="{{ old('time_tolerance', 30) }}" 
+                        min="1" 
+                        max="120" 
+                        required 
+                        class="mt-1 block w-full max-w-xs px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    >
+                </div>
+
+                <div class="space-y-2">
+                    <label for="address_tolerance" class="block text-sm font-medium text-gray-700">Минимальное сходство адреса (%)(20-100):</label>
+                    <input 
+                        type="number" 
+                        name="address_tolerance" 
+                        id="address_tolerance" 
+                        value="{{ old('address_tolerance', 80.0) }}" 
+                        min="0" 
+                        max="100" 
+                        step="0.1"
+                        required 
+                        class="mt-1 block w-full max-w-xs px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    >
+                </div>
+                <div class="space-y-2">
+                    <label for="max_potential_group_size" class="block text-sm font-medium text-gray-700">Максимальный размер потенциальной группы:</label>
+                    <input 
+                        type="number" 
+                        name="max_potential_group_size" 
+                        id="max_potential_group_size" 
+                        value="{{ old('max_potential_group_size', 10) }}" 
+                        min="1" 
+                        max="20" 
                         required 
                         class="mt-1 block w-full max-w-xs px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     >
