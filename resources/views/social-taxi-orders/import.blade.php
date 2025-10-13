@@ -7,13 +7,16 @@
             <div class="bg-white shadow rounded-lg p-4 mb-4">
                 <h2 class="text-lg font-semibold text-gray-800 mb-2">Формат CSV файла:</h2>
                 <p class="text-sm text-gray-600 mb-2">
-                    Формат: <code class="break-all">id;type_order;kl_id;client_tel;client_invalid;client_sopr;nmv;category_skidka;category_limit;dopus_id;skidka_dop_all;kol_p_limit;pz_nom;pz_data;adres_otkuda;adres_kuda;adres_obratno;zena_type;visit_data;predv_way;taxi_id;taxi_data;adres_trips_id;taxi_sent_at;taxi_price;taxi_way;otmena_data;otmena_taxi;closed_at;komment;user_id;created_at;updated_at;deleted_at</code>
+                    Формат: <code class="break-all">id;type_order;kl_id;client_tel;client_invalid(ud_inval);client_sopr(fio_sopr);nmv;category_skidka;category_limit;dopus_id;skidka_dop_all;kol_p_limit;
+                        pz_nom;pz_data;adres_otkuda;adres_kuda;adres_obratno;zena_type;visit_data;predv_way;taxi_id;taxi_sent_at;taxi_price;
+                        taxi_way;taxi_vozm;otmena_data;otmena_taxi;closed_at;komment;user_id;created_at;updated_at;deleted_at;visit_obratno</code>
                 </p>
                 <p class="text-sm text-gray-600 mb-3">
                     <strong>Важно:</strong> 
                     <ul class="list-disc pl-5 mt-1 text-sm">
                         <li>Поле <code>kl_id</code> будет использовано для поиска <code>client_id</code> в таблице клиентов</li>
                         <li>Поле <code>nmv</code> будет использовано для поиска <code>category_id</code> в таблице категорий (по NMV категории)</li>
+                        <li>Поле <code>deleted_at=1</code> удаленный заказ!</li>
                     </ul>
                 </p>
                 

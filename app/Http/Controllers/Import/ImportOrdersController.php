@@ -29,9 +29,18 @@ class ImportOrdersController extends BaseController {
 
         // Чтение заголовка
         $header = fgetcsv($handle, 0, ';'); // Указываем разделитель ;
-        $header = array_map('trim', $header);
+        $header = array_map('trim', $header); // Убираем пробелы
 
-        // Разрешённые заголовки (исправлено: nmv вместо category_id)
+        // Удаляем BOM из первого элемента, если он есть
+        if (!empty($header) && isset($header[0])) {
+            $header[0] = preg_replace('/^\xEF\xBB\xBF/', '', $header[0]); // Удаляем BOM (UTF-8)
+            // Альтернатива: $header[0] = ltrim($header[0], "\xEF\xBB\xBF"); // Удалить только в начале строки
+        }
+         $header = array_filter($header, function($value) { // Убираем пустые элементы
+            return $value !== '';
+        });
+
+        // Разрешённые заголовки
         $allowedHeaders = [
             'id', 'type_order', 'kl_id', 'client_tel', 'client_invalid', 'client_sopr',
             'nmv', 'category_skidka', 'category_limit', 'dopus_id', 'skidka_dop_all',
@@ -42,7 +51,11 @@ class ImportOrdersController extends BaseController {
         ];
 
         if ($header !== $allowedHeaders) {
-            Log::error("Неверный заголовок CSV", ['expected' => $allowedHeaders, 'got' => $header]);
+            Log::error("Неверный заголовок CSV после обработки", [
+                'expected' => $allowedHeaders,
+                'got' => $header,
+                'original_raw_header' => fgetcsv(fopen($path, 'r'), 0, ';') // Для отладки, если нужно
+            ]);
             return back()->with('import_errors', ['Неверный заголовок CSV.']);
         }
 
