@@ -112,7 +112,7 @@ class OrderGroupingService
         return $potentialGroups;
     }
     
-    // --- НОВЫЙ МЕТОД: Генерация понятного имени для группы ---
+    // Генерация понятного имени для группы ---
     // на основе характеристик заказов в группе: количество человек, диапазон времени поездок, общий адрес "куда".
     private function generateGroupName(array $orders, string $commonDestination = null): string
     {
@@ -134,6 +134,17 @@ class OrderGroupingService
 
         // Обрезаем адрес "куда" до первых 20 символов для краткости
         $shortDestination = strlen($destination) > 20 ? mb_substr($destination, 0, 20) . '...' : $destination;
+
+        // --- ИЗМЕНЕНИЕ: Формируем имя для потенциальной группы ---
+        // Если в группе только 1 заказ (например, при создании), используем формат "Предварительная группа"
+        if ($count === 1) {
+            $singleOrderTime = $orders[0]->visit_data->format('H:i');
+            return "Предварительная группа | {$singleOrderTime} | До: {$shortDestination}";
+        } else {
+            // Если в группе уже несколько заказов (например, после добавления), используем формат с количеством и диапазоном
+            return "Предварительная группа {$count} чел. | {$timeRange} | До: {$shortDestination}";
+        }
+        // --- КОНЕЦ ИЗМЕНЕНИЯ ---
 
         // Формируем имя
         return "Группа {$count} чел. | {$timeRange} | До: {$shortDestination}";

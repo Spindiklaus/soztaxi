@@ -7,9 +7,10 @@
             <div class="bg-white shadow rounded-lg p-4 mb-4">
                 <h2 class="text-lg font-semibold text-gray-800 mb-2">Формат CSV файла:</h2>
                 <p class="text-sm text-gray-600 mb-2">
-                    Формат: <code class="break-all">id;type_order;kl_id;client_tel;client_invalid(ud_inval);client_sopr(fio_sopr);nmv;category_skidka;category_limit;dopus_id;skidka_dop_all;kol_p_limit;
-                        pz_nom;pz_data;adres_otkuda;adres_kuda;adres_obratno;zena_type;visit_data;predv_way;taxi_id;taxi_sent_at;taxi_price;
-                        taxi_way;taxi_vozm;otmena_data;otmena_taxi;closed_at;komment;user_id;created_at;updated_at;deleted_at;visit_obratno</code>
+                    Формат: <code class="break-all">id;type_order;kl_id;client_tel(kl_tel);client_invalid(ud_inval);client_sopr(fio_sopr);nmv(kategoria_id);
+                        category_skidka(skidka_kl);category_limit(kol_p_kl);dopus_id;skidka_dop_all(skidka_dop);kol_p_limit(kol_p);
+                        pz_nom;pz_data;adres_otkuda;adres_kuda;adres_obratno;zena_type;visit_data;predv_way;taxi_id;taxi_sent_at(taxi_data);adres_trips_id;taxi_price;
+                        taxi_way;taxi_vozm;otmena_data;otmena_taxi;closed_at(zakr_data);komment;user_id;created_at;updated_at;deleted_at;visit_obratno</code>
                 </p>
                 <p class="text-sm text-gray-600 mb-3">
                     <strong>Важно:</strong> 
