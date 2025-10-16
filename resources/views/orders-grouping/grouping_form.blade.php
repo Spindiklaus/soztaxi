@@ -11,7 +11,7 @@
     <!-- Основной контент -->
     <div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
         <div class="bg-white shadow-md rounded-lg p-6">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6">Группировка заказов на день</h2>
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Группировка заказов на день (КУДА)</h2>
 
             <form action="{{ route('orders.grouping.show') }}" method="POST" class="space-y-6">
                 @csrf

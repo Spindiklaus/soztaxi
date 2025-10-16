@@ -91,7 +91,7 @@
                                     {{ __('Поездки') }}
                                 </x-dropdown-link>
                                 <x-dropdown-link :href="route('orders.grouping.form')" :active="request()->routeIs('orders.grouping.form')">
-                                    {{ __('Группировка заказов в поездки') }}
+                                    {{ __('Группировка заказов в поездки (КУДА)') }}
                                 </x-dropdown-link>
                             </x-slot>
                         </x-dropdown>
