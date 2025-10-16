@@ -46,7 +46,7 @@ class FioDtrnMergeController extends BaseController
             $targetClient = FioDtrn::findOrFail($targetId);
 
             // Обновляем client_id в таблице orders
-            $sourceClient->orders()->update(['client_id' => $targetId]);
+            $sourceClient->orders()->withTrashed()->update(['client_id' => $targetId]);
 
             // Удаляем старого клиента
             $sourceClient->delete();

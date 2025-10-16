@@ -27,9 +27,9 @@
                     <a href="{{ url('/dashboard') }}" class="inline-block px-5 py-1.5 dark:text-[#EDEDEC] border-[#19140035] hover:border-[#1915014a] border text-[#1b1b18] dark:border-[#3E3E3A] dark:hover:border-[#62605b] rounded-sm text-sm leading-normal">Главная</a>
                 @else
                     <a href="{{ route('login') }}" class="inline-block px-5 py-1.5 dark:text-[#EDEDEC] text-[#1b1b18] border border-transparent hover:border-[#19140035] dark:hover:border-[#3E3E3A] rounded-sm text-sm leading-normal">Вход</a>
-                    @if (Route::has('register'))
+<!--                    @if (Route::has('register'))
                         <a href="{{ route('register') }}" class="inline-block px-5 py-1.5 dark:text-[#EDEDEC] border-[#19140035] hover:border-[#1915014a] border text-[#1b1b18] dark:border-[#3E3E3A] dark:hover:border-[#62605b] rounded-sm text-sm leading-normal">Регистрация</a>
-                    @endif
+                    @endif-->
                 @endauth
             </nav>
         @endif
@@ -38,15 +38,13 @@
 
     <div class="flex items-center justify-center w-full transition-opacity opacity-100 duration-750 lg:grow starting:opacity-0">
         <main class="flex max-w-[335px] w-full flex-col-reverse lg:max-w-4xl lg:flex-row">
+             <img src="{{ asset('img/soztaxi.jpg') }}" alt="Панель оператора" class="rounded-lg shadow-lg w-full max-w-xs lg:max-w-md">
 
-            <!-- Левая часть - текст -->
+<!--             Левая часть - текст 
             <div class="flex flex-col justify-center lg:pr-8 lg:w-1/2">
                 <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-6 text-center lg:text-left tracking-tight leading-tight text-[#1e3a8a] dark:text-[#3b82f6]">
                     Панель оператора «Социальное такси»
                 </h1>
-<!--                <h1 class="text-2xl font-bold leading-tight lg:text-4xl lg:leading-normal">
-                    Панель оператора<br><span class="text-[#f53003]">«Социальное такси»</span>
-                </h1>-->
                 <p class="mt-6 mb-6 text-sm lg:text-base text-[#706f6c] dark:text-[#A1A09A]">
                     Управление заявками на социальные поездки по городу САМАРА.  
                 </p>
@@ -55,10 +53,10 @@
                 </p>
             </div>
 
-            <!-- Правая часть - изображение -->
+             Правая часть - изображение 
             <div class="flex justify-center mt-6 lg:mt-0 lg:w-1/2">
                 <img src="{{ asset('img/taxi.jpg') }}" alt="Панель оператора" class="rounded-lg shadow-lg w-full max-w-xs lg:max-w-md">
-            </div>
+            </div>-->
 
         </main>
     </div>
