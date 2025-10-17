@@ -1,3 +1,4 @@
+<!-- resources/views/sozial-taxi-orders/show-components/taxi-work-tab.blade.php -->
 <div id="taxi-work" class="tab-content hidden">
     <div class="bg-gray-50 p-4 rounded-lg mb-6">
         <h2 class="text-lg font-semibold text-gray-800 mb-4">Работа с такси</h2>
@@ -33,11 +34,23 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700">Откуда ехать</label>
                 <div class="mt-1 bg-gray-100 p-2 rounded-md">{{ $order->adres_otkuda ?? 'Не указано' }}</div>
+                <!-- Дополнительная информация об адресе "откуда" -->
+                @if($order->adres_otkuda_info)
+                    <div class="mt-1 text-xs text-gray-500">
+                        {{ $order->adres_otkuda_info }}
+                    </div>
+                @endif
             </div>
 
             <div>
                 <label class="block text-sm font-medium text-gray-700">Куда ехать</label>
                 <div class="mt-1 bg-gray-100 p-2 rounded-md">{{ $order->adres_kuda ?? 'Не указано' }}</div>
+                 <!-- Дополнительная информация об адресе "куда" -->
+                @if($order->adres_kuda_info)
+                    <div class="mt-1 text-xs text-gray-500">
+                        {{ $order->adres_kuda_info }}
+                    </div>
+                @endif
             </div>
 
             <div>

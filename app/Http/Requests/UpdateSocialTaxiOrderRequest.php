@@ -52,7 +52,9 @@ class UpdateSocialTaxiOrderRequest extends FormRequest {
             ],
             'visit_obratno' => 'nullable|date|after:visit_data',
             'adres_otkuda' => 'required|string|max:255',
+            'adres_otkuda_info' => 'nullable|string|max:255',
             'adres_kuda' => 'required|string|max:255',
+            'adres_kuda_info' => 'nullable|string|max:255',
             'adres_obratno' => [
                 'nullable',
                 'max:255',
@@ -126,7 +128,7 @@ class UpdateSocialTaxiOrderRequest extends FormRequest {
             'visit_data.after' => 'Дата поездки должна быть не раньше завтрашней даты (' . $minVisitDate->format('d.m.Y') . ').',
             'visit_data.before' => 'Дата поездки должна быть не позже чем через полгода (' . $maxVisitDate->format('d.m.Y') . ').',
             'visit_obratno.date' => 'Дата обратной поездки должна быть корректной датой.',
-            'visit_obratno.after' => 'Дата обратной поездки должна быть позже даты основной поездки.',
+            'visit_obratno.after' => 'Время обратной поездки должно быть больше времени основной поездки.',
             'adres_otkuda.required' => 'Адрес отправки обязателен для заполнения.',
             'adres_otkuda.string' => 'Адрес отправки должен быть строкой.',
             'adres_otkuda.max' => 'Адрес отправки не может быть длиннее 255 символов.',
@@ -200,7 +202,7 @@ class UpdateSocialTaxiOrderRequest extends FormRequest {
                 $visitData = strtotime($request->visit_data);
                 $visitObratno = strtotime($request->visit_obratno);
                 if ($visitObratno <= $visitData) {
-                    $validator->errors()->add('visit_obratno', 'Дата обратной поездки должна быть позже даты основной поездки.');
+                    $validator->errors()->add('visit_obratno', 'Время обратной поездки должна быть больше времени начала поездки.');
                     return;
                 }
             }
@@ -210,7 +212,7 @@ class UpdateSocialTaxiOrderRequest extends FormRequest {
                 $visitObratnoDate = date('Y-m-d', $visitObratno);
                 
                 if ($visitDataDate !== $visitObratnoDate) {
-                    $validator->errors()->add('visit_obratno', 'Дата обратной поездки должна быть в тот же день, что и основная поездка.');
+                    $validator->errors()->add('visit_obratno', 'Дата обратной поездки должна быть той же, что и основная поездка.');
                     return;
                 }
             

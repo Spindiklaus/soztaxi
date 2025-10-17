@@ -124,13 +124,26 @@
                         <div class="text-sm text-gray-900">
                             <span class="font-medium">Откуда:</span> {{ $order->adres_otkuda }}
                         </div>
+                        <!-- Дополнительная информация об адресе "откуда" -->
+                        @if($order->adres_otkuda_info)
+                            <div class="text-xs text-gray-500 mt-1 ml-4">
+                                {{ $order->adres_otkuda_info }}
+                            </div>
+                        @endif
                         <div class="text-sm text-gray-900 mt-1">
                             <span class="font-medium">Куда:</span> {{ $order->adres_kuda }}
                         </div>
+                        <!-- Дополнительная информация об адресе "куда" -->
+                        @if($order->adres_kuda_info)
+                            <div class="text-xs text-gray-500 mt-1 ml-4">
+                                {{ $order->adres_kuda_info }}
+                            </div>
+                        @endif
+                        
                         @if($order->adres_obratno)
-                        <div class="text-sm text-gray-900 mt-1">
-                            <span class="font-medium">Обратно:</span> {{ $order->adres_obratno }}
-                        </div>
+                            <div class="text-sm text-gray-900 mt-1">
+                                <span class="font-medium">Обратно:</span> {{ $order->adres_obratno }}
+                            </div>
                         @endif
                     </td>
                     <td class="px-6 py-4">

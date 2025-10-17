@@ -70,7 +70,7 @@
             <div class="flex-1">
                 <label for="adres_otkuda" class="block text-sm font-medium text-gray-700">Откуда ехать *</label>
                 <textarea name="adres_otkuda" id="adres_otkuda" 
-                          rows="3" 
+                          rows="2" 
                           required
                           placeholder="Введите адрес отправки"
                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('adres_kuda', $order->adres_otkuda) }}
@@ -89,17 +89,43 @@
                 История
             </button>
         </div>
+        <!-- Дополнительная информация об адресе "откуда" -->    
+        <div class="mt-2">
+            <label for="adres_otkuda_info" class="block text-sm font-medium text-gray-700">Дополнительная информация</label>
+            <textarea name="adres_otkuda_info" id="adres_otkuda_info" 
+              rows="1" 
+              placeholder="Телефон, особенности заезда и т.д."
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('adres_otkuda_info', $order->adres_otkuda_info) }}
+            </textarea>
+            @error('adres_otkuda_info')
+                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+            @enderror
+            <p class="mt-1 text-xs text-gray-500">Укажите дополнительную информацию: телефон, особенности заезда и т.д.</p>
+        </div>    
 
         <div>
             <label for="adres_kuda" class="block text-sm font-medium text-gray-700">Куда ехать *</label>
             <textarea name="adres_kuda" id="adres_kuda" 
-                      rows="3" 
+                      rows="2" 
                       required
                       placeholder="Введите адрес назначения"
                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{old('adres_kuda', $order->adres_kuda) }}</textarea>
             @error('adres_kuda')
             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
             @enderror
+        </div>
+        <!-- Дополнительная информация об адресе "куда" -->
+        <div class="mt-2">
+            <label for="adres_kuda_info" class="block text-sm font-medium text-gray-700">Дополнительная информация</label>
+            <textarea name="adres_kuda_info" id="adres_kuda_info" 
+                  rows="1" 
+                  placeholder="Телефон, особенности заезда и т.д."
+                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('adres_kuda_info', $order->adres_kuda_info) }}
+            </textarea>
+            @error('adres_kuda_info')
+                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+            @enderror
+            <p class="mt-1 text-xs text-gray-500">Укажите дополнительную информацию: телефон, особенности заезда и т.д.</p>
         </div>
 
         <!-- Обратный адрес (показываем только для типов 2 и 3 - легковое авто и ГАЗель) -->
