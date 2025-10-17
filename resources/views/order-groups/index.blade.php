@@ -2,7 +2,7 @@
     <div class="container mx-auto py-8">
         <div class="bg-white shadow-md rounded-lg overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-200">
-                <h2 class="text-2xl font-semibold text-gray-800 leading-tight">Управление группами заказов</h2>
+                <h2 class="text-2xl font-semibold text-gray-800 leading-tight">Управление поездками</h2>
                 <!-- Если разрешено создание вручную -->
                 <!-- <a href="{{-- route('order-groups.create') --}}" class="ml-4 inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                     Создать новую группу
