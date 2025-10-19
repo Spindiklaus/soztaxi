@@ -108,7 +108,7 @@
 
                 <!-- Кнопки -->
                 <div class="flex justify-end space-x-2 pt-2">
-                    <a href="{{ route('fiodtrns.index', ['sort' => request('sort', 'id'), 'direction' => request('direction', 'asc') ]) }}" 
+                    <a href="{{ route('fiodtrns.index', $urlParams) }}" 
                        class="inline-flex items-center px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400">
                         Отменить
                     </a>

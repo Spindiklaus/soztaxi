@@ -42,13 +42,9 @@
 
                 <!-- Кнопка редактирования -->
                 <div class="flex justify-end">
-                    <a href="{{ route('fiodtrns.index', ['sort' => request('sort', 'id'), 'direction' => request('direction', 'asc') ]) }}" 
+                     <a href="{{ route('fiodtrns.index', $urlParams) }}" 
                        class="inline-flex items-center px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400">
                         К списку
-                    </a>
-                    <a href="{{ route('fiodtrns.edit', ['fiodtrn' => $fiodtrn, 'sort' => request('sort'), 'direction' => request('direction')]) }}"
-                       class="inline-flex items-center px-4 py-2 bg-yellow-100 text-yellow-800 rounded-md hover:bg-yellow-200">
-                        Редактировать
                     </a>
                 </div>
             </div>

@@ -1,3 +1,5 @@
+{{-- resources/views/fiodtrns/index.blade.php --}}
+
 <x-app-layout>
     <div class="bg-gray-100 py-6">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -96,9 +98,28 @@
             <!-- Форма фильтрации -->
             <div class="bg-white shadow rounded-lg p-4 mb-2">
                 <form action="{{ route('fiodtrns.index') }}" method="GET" class="flex flex-wrap items-end gap-3">
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                     <!-- Скрытое поле для сохранения сортировки и других параметров -->
+                    @if(request('sort'))
+                        <input type="hidden" name="sort" value="{{ request('sort') }}">
+                    @endif
+                    @if(request('direction'))
+                        <input type="hidden" name="direction" value="{{ request('direction') }}">
+                    @endif
+                    @if(request('fio'))
+                        <input type="hidden" name="fio" value="{{ request('fio') }}">
+                    @endif
+                    @if(request('kl_id'))
+                        <input type="hidden" name="kl_id" value="{{ request('kl_id') }}">
+                    @endif
+                    @if(request('sex'))
+                        <input type="hidden" name="sex" value="{{ request('sex') }}">
+                    @endif
+                    <!-- Конец скрытых полей -->
+                    
+                    <!-- Изменяем grid-cols с 4 на 6, чтобы освободить место для кнопок -->
+                    <div class="grid grid-cols-1 md:grid-cols-6 gap-4 w-full">
                         <!-- Поиск по ФИО -->
-                        <div class="flex-1 min-w-[200px]">
+                        <div class="flex-1 min-w-[200px] md:col-span-2">
                             <label for="filter_fio" class="block text-sm font-medium text-gray-700">ФИО</label>
                             <input type="text" name="fio" id="filter_fio"
                                    value="{{ request('fio') }}"
@@ -124,59 +145,71 @@
                             </select>
                         </div>
                         <!-- Фильтр RIP -->
-                        <div class="flex space-x-2 pb-1">
-                            <label for="filter_rip" class="block text-sm font-medium text-gray-700">Только с RIP</label>
-                            <input type="checkbox" name="rip" id="filter_rip"
-                                   {{ request('rip') ? 'checked' : '' }}
+                        <div class="flex items-end pb-1 md:col-span-2">
+                            <label for="filter_rip" class="block text-sm font-medium text-gray-700 mr-2">Только с RIP</label>
+                            <input type="checkbox" name="rip" id="filter_rip" value="1"
+                                   {{ $ripFilter == 1 ? 'checked' : '' }}
+                                   class="rounded border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        </div>
+                        <div class="flex-1 min-w-[200px]">
+                            <label for="visit_date_from" class="block text-sm font-medium text-gray-700">Дата поездки с</label>
+                            <input type="date" name="visit_date_from" id="visit_date_from"
+                                   value="{{ request('visit_date_from') }}"
                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                         </div>
-                    </div>
-                    <!-- Кнопки -->
-                    <div class="flex justify-end space-x-2 pt-2">
-                        <button type="submit"
+                        <div class="flex-1 min-w-[200px]">
+                            <label for="visit_date_to" class="block text-sm font-medium text-gray-700">Дата поездки по</label>
+                            <input type="date" name="visit_date_to" id="visit_date_to"
+                                   value="{{ request('visit_date_to') }}"
+                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        </div>
+                        <!-- Кнопки перемещены сюда -->
+                        <div class="flex justify-end space-x-2 pt-4 md:col-start-5 md:col-end-7">
+                             <button type="submit"
                                 class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                            Применить фильтр
-                        </button>
-                        <a href="{{ route('fiodtrns.index') }}"
-                           class="inline-flex items-center px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400">
-                            Очистить фильтр
-                        </a>
+                                Применить фильтр
+                            </button>
+                            <a href="{{ route('fiodtrns.index') }}"
+                               class="inline-flex items-center px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400">
+                                Очистить фильтр
+                            </a>
+                        </div>
+                        <!-- Конец кнопок -->
                     </div>
+                    <!-- Конец сетки -->
                 </form>
+            </div>
+            
+            <div class="mt-4 mb-4">
+                {{ $fiodtrns->appends(request()->all())->links() }}
             </div>
 
             <!-- Таблица клиентов -->
-            <div x-data='{
-                 sortField: "{{ $sort ?? "id" }}",
-                 sortDirection: "{{ $direction ?? "asc" }}",
-                 searchFio: "{{ request("fio") ?? "" }}",
-                 searchKlId: "{{ request("kl_id") ?? "" }}",
-                 sexFilter: "{{ request("sex") ?? "" }}",
-                 ripFilter: "{{ request('rip') ? '1' : '' }}", // фильтр RIP
-                 fiodtrns: @json($fiodtrnsJs),
-                 get filteredFioDtrns() {
-                 return this.fiodtrns.filter(c => {
-                 const matchesFio = !this.searchFio || c.fio.toLowerCase().includes(this.searchFio.toLowerCase());
-                 const matchesKlId = !this.searchKlId || c.kl_id.includes(this.searchKlId);
-                 const matchesSex = !this.sexFilter || c.sex === this.sexFilter;
-                 const matchesRip = !this.ripFilter || c.rip_at;
-                 return matchesFio && matchesKlId && matchesSex && matchesRip;
-                 });
-                 },
+             <div x-data="{
+                 sortField: '{{ $sort ?? 'id' }}',
+                 sortDirection: '{{ $direction ?? 'asc' }}',
                  sortBy(field) {
                  if (this.sortField === field) {
-                 this.sortDirection = this.sortDirection === "asc" ? "desc" : "asc";
+                 this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
                  } else {
                  this.sortField = field;
-                 this.sortDirection = "asc";
+                 this.sortDirection = 'asc';
                  }
-                 let url = "?sort=" + field + "&direction=" + this.sortDirection +
-                 (this.searchFio ? "&fio=" + encodeURIComponent(this.searchFio) : "") +
-                 (this.searchKlId ? "&kl_id=" + encodeURIComponent(this.searchKlId) : "") +
-                 (this.sexFilter ? "&sex=" + encodeURIComponent(this.sexFilter) : "");
-                 window.location.href = url;
+
+                 // Получаем текущие параметры URL
+                 let url = new URL(window.location.href);
+                 let params = new URLSearchParams(url.search);
+
+                 // Устанавливаем параметры сортировки
+                 params.set('sort', field);
+                 params.set('direction', this.sortDirection);
+
+                 // Формируем новый URL с сохранением всех параметров
+                 url.search = params.toString();
+
+                 window.location.href = url.toString();
                  }
-                 }' x-cloak class="bg-white rounded-lg overflow-auto max-h-[70vh] border border-gray-300">
+                 }" x-cloak class="bg-white rounded-lg overflow-auto max-h-[70vh] border border-gray-300">
                 <table class="min-w-full divide-y divide-gray-200 bg-white">
                     <thead class="bg-blue-800 text-gray-200 sticky top-0 z-10 shadow-lg">
                         <tr>
@@ -227,75 +260,76 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
-                        <template x-for="fiodtrn in filteredFioDtrns" :key="fiodtrn.id">
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" 
-                                    :class="fiodtrn.rip_at ? 'bg-gray-500' : ''">
-                                    <div x-text="fiodtrn.fio"></div>
-                                    <div x-show="fiodtrn.komment" 
-                                         class="text-xs text-gray-600 mt-1" 
-                                         x-text="fiodtrn.komment">
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" x-text="fiodtrn.kl_id"></td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" x-text="fiodtrn.data_r"></td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    <span x-text="fiodtrn.sex === 'М' ? 'Мужской' : fiodtrn.sex === 'Ж' ? 'Женский' : '-'"
-                                          :class="fiodtrn.sex === 'М' ? 'text-blue-700' : fiodtrn.sex === 'Ж' ? 'text-pink-700' : 'text-gray-500'">
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" x-text="fiodtrn.rip_at"></td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" x-text="fiodtrn.orders_count"></td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" x-text="fiodtrn.operator"></td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm space-x-2 flex justify-end">
-                                    <a :href="`/fiodtrns/${fiodtrn.id}?sort=${sortField}&direction=${sortDirection}`"
-                                       class="inline-flex items-center px-2 py-1 rounded-md text-sm font-medium bg-blue-100 text-blue-800 hover:bg-blue-200"
-                                       title="Просмотр">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                             stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                            <circle cx="12" cy="12" r="3"></circle>
+                        {{-- Используем @forelse для отображения данных от Laravel --}}
+                        @forelse ($fiodtrns as $fiodtrn)
+                        <tr>
+                            <td class="{{ $fiodtrn->rip_at ? 'px-6 py-4 whitespace-nowrap text-sm bg-gray-500' : 'px-6 py-4 whitespace-nowrap text-sm text-gray-900' }}">
+                                <div>{{ $fiodtrn->fio }}</div>
+                                @if($fiodtrn->komment)
+                                    <div class="text-xs text-gray-600 mt-1">{{ $fiodtrn->komment }}</div>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $fiodtrn->kl_id }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ optional($fiodtrn->data_r)->format('d.m.Y') }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                <span class="{{ $fiodtrn->sex === 'М' ? 'text-blue-700' : ($fiodtrn->sex === 'Ж' ? 'text-pink-700' : 'text-gray-500') }}">
+                                    {{ $fiodtrn->sex === 'М' ? 'Мужской' : ($fiodtrn->sex === 'Ж' ? 'Женский' : '-') }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ optional($fiodtrn->rip_at)->format('d.m.Y') }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $fiodtrn->orders_count > 0 ? $fiodtrn->orders_count : '' }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ optional($fiodtrn->user)->name ?? '-' }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm space-x-2 flex justify-end">
+                                <a href="{{ route('fiodtrns.show', $fiodtrn) }}?{{ http_build_query($urlParams) }}"
+                                   class="inline-flex items-center px-2 py-1 rounded-md text-sm font-medium bg-blue-100 text-blue-800 hover:bg-blue-200"
+                                   title="Просмотр">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                         stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                </a>
+                                <a href="{{ route('fiodtrns.edit', $fiodtrn) }}?{{ http_build_query($urlParams) }}"
+                                   class="inline-flex items-center px-2 py-1 rounded-md text-sm font-medium bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
+                                   title="Редактировать">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                         stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                    </svg>
+                                </a>
+
+                                <!-- Удаление -->
+                                <form action="{{ route('fiodtrns.destroy', $fiodtrn) }}?{{ http_build_query($urlParams) }}"
+                                      method="POST"
+                                      class="inline"
+                                      onsubmit="return confirm('Вы уверены, что хотите удалить этого клиента?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit"
+                                            class="inline-flex items-center px-2 py-1 rounded-md text-sm font-medium bg-red-100 text-red-800 hover:bg-red-200"
+                                            title="Удалить">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                             class="feather feather-trash-2">
+                                            <polyline points="3 6 5 6 21 6"></polyline>
+                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                            <line x1="9" y1="12" x2="9" y2="18"></line>
+                                            <line x1="15" y1="12" x2="15" y2="18"></line>
                                         </svg>
-                                    </a>
-                                    <a :href="`/fiodtrns/${fiodtrn.id}/edit?sort=${sortField}&direction=${sortDirection}`"
-                                       class="inline-flex items-center px-2 py-1 rounded-md text-sm font-medium bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
-                                       title="Редактировать">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                             stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                                        </svg>
-                                    </a>
-
-                                    <!-- Удаление -->
-                                    <form :action="`{{ route('fiodtrns.destroy', ['fiodtrn' => '__ID__', 'sort' => '__SORT__', 'direction' => '__DIRECTION__']) }}`.replace('__ID__', fiodtrn.id).replace('__SORT__', sortField).replace('__DIRECTION__', sortDirection)"
-                                          method="POST"
-                                          class="inline"
-                                          @submit="confirm('Вы уверены, что хотите удалить этого клиента?') || event.preventDefault()">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit"
-                                                class="inline-flex items-center px-2 py-1 rounded-md text-sm font-medium bg-red-100 text-red-800 hover:bg-red-200"
-                                                title="Удалить">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                 class="feather feather-trash-2">
-                                                <polyline points="3 6 5 6 21 6"></polyline>
-                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                                <line x1="9" y1="12" x2="9" y2="18"></line>
-                                                <line x1="15" y1="12" x2="15" y2="18"></line>
-                                            </svg>
-                                        </button>
-                                    </form>
-
-
-
-
-                                </td>
-                            </tr>
-                        </template>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="8" class="px-6 py-4 text-center text-gray-500">
+                                Клиенты не найдены
+                            </td>
+                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
@@ -307,35 +341,9 @@
                         </div>-->
 
             <!-- Пагинация -->
-            <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-                {{ $fiodtrns->appends([
-                    'sort' => request('sort'),
-                    'direction' => request('direction'),
-                    'fio' => request('fio'),
-                    'kl_id' => request('kl_id'),
-                    'sex' => request('sex')
-                ])->links() }}
+            <div class="mt-4">
+                {{ $fiodtrns->appends(request()->all())->links() }}
             </div>
         </div>
     </div>
-
-    <!-- Alpine.js Scripts -->
-    <script>
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('fiodtrnData', () => ({
-                    searchFio: '',
-                    searchKlId: '',
-                    sexFilter: '',
-                    fiodtrns: [],
-                    get filteredFioDtrns() {
-                        return this.fiodtrns.filter(c => {
-                            const matchesFio = !this.searchFio || c.fio?.toLowerCase().includes(this.searchFio.toLowerCase());
-                            const matchesKlId = !this.searchKlId || c.kl_id.includes(this.searchKlId);
-                            const matchesSex = !this.sexFilter || c.sex === this.sexFilter;
-                            return matchesFio && matchesKlId && matchesSex;
-                        });
-                    },
-                }));
-        });
-    </script>
 </x-app-layout>
