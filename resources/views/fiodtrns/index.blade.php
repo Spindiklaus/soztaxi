@@ -105,15 +105,6 @@
                     @if(request('direction'))
                         <input type="hidden" name="direction" value="{{ request('direction') }}">
                     @endif
-                    @if(request('fio'))
-                        <input type="hidden" name="fio" value="{{ request('fio') }}">
-                    @endif
-                    @if(request('kl_id'))
-                        <input type="hidden" name="kl_id" value="{{ request('kl_id') }}">
-                    @endif
-                    @if(request('sex'))
-                        <input type="hidden" name="sex" value="{{ request('sex') }}">
-                    @endif
                     <!-- Конец скрытых полей -->
                     
                     <!-- Изменяем grid-cols с 4 на 6, чтобы освободить место для кнопок -->
@@ -121,23 +112,23 @@
                         <!-- Поиск по ФИО -->
                         <div class="flex-1 min-w-[200px] md:col-span-2">
                             <label for="filter_fio" class="block text-sm font-medium text-gray-700">ФИО</label>
-                            <input type="text" name="fio" id="filter_fio"
-                                   value="{{ request('fio') }}"
+                            <input type="text" name="filter_fio" id="filter_fio"
+                                   value="{{ $filterFio }}"
                                    placeholder="%Поиск по ФИО%"
                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                         </div>
                         <!-- Поиск по ID клиента -->
                         <div class="flex-1 min-w-[150px]">
                             <label for="filter_kl_id" class="block text-sm font-medium text-gray-700">ID клиента</label>
-                            <input type="text" name="kl_id" id="filter_kl_id"
-                                   value="{{ request('kl_id') }}"
+                            <input type="text" name="filter_kl_id" id="filter_kl_id"
+                                   value="{{ $filterKlId }}"
                                    placeholder="Серия^номер паспорта"
                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                         </div>
                         <!-- Фильтр по полу -->
                         <div class="flex-1 min-w-[120px]">
                             <label for="filter_sex" class="block text-sm font-medium text-gray-700">Пол</label>
-                            <select name="sex" id="filter_sex"
+                            <select name="filter_sex" id="filter_sex"
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                                 <option value="">Все</option>
                                 <option value="М" {{ request('sex') == 'М' ? 'selected' : '' }}>Мужской</option>
@@ -290,7 +281,7 @@
                                         <circle cx="12" cy="12" r="3"></circle>
                                     </svg>
                                 </a>
-                                <a href="{{ route('fiodtrns.edit', $fiodtrn) }}?{{ http_build_query($urlParams) }}"
+                                <a href="{{ route('fiodtrns.edit', array_merge(['fiodtrn' => $fiodtrn], $urlParams)) }}" 
                                    class="inline-flex items-center px-2 py-1 rounded-md text-sm font-medium bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
                                    title="Редактировать">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"

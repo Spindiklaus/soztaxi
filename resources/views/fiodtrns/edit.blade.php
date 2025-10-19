@@ -1,3 +1,5 @@
+{{-- resources/views/fiodtrns/edit.blade.php --}}
+
 <x-app-layout>
     <div class="bg-gray-100 py-6">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -6,13 +8,14 @@
             <form action="{{ route('fiodtrns.update', $fiodtrn) }}" method="POST" class="bg-white shadow rounded-lg p-6 space-y-6">
                 @csrf
                 @method('PUT')
-
-                <!-- Скрытые поля для передачи текущей сортировки -->
-                <input type="hidden" name="sort" value="{{ request('sort', 'id') }}">
-                <input type="hidden" name="direction" value="{{ request('direction', 'asc') }}">
-
+                @foreach ($urlParams as $key => $value)
+                    @if ($value !== null && $value !== '')
+                        <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                    @endif
+                @endforeach
+                
                 <!-- ID клиента -->
-                <div>
+                                <div>
                     <label for="kl_id" class="block text-sm font-medium text-gray-700">ID клиента (серия^номер)</label>
                     <input type="text" name="kl_id" id="kl_id" value="{{ old('kl_id', $fiodtrn->kl_id) }}" required
                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500">

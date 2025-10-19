@@ -6,27 +6,37 @@ use App\Models\FioDtrn;
 use Illuminate\Support\Facades\DB;
 
 use App\Models\Order;
+use App\Services\FioDtrnService; 
 use Illuminate\Database\Eloquent\Builder; // Импортируем Builder, если нужно для whereHas
 
 
 class FioDtrnController extends BaseController {
+    
+    protected $fioDtrnService; // бизнес-логика (создание заказов, работа с данными)
+
+    public function __construct(FioDtrnService $fioDtrnService) {
+        $this->fioDtrnService = $fioDtrnService;
+    }
 
     public function index(Request $request) {
         
+        $filterFio = $request->input('filter_fio'); 
+        $filterKlId = $request->input('filter_kl_id'); 
+        $filterSex = $request->input('filter_sex'); 
         $ripFilter = $request->input('rip', 0);
         
         $query = FioDtrn::query();
 
-        if ($request->filled('fio')) {
-            $query->where('fio', 'like', "%{$request->input('fio')}%");
+         if ($filterFio) { // <-- Используем $filterFio
+            $query->where('fio', 'like', "%{$filterFio}%");
         }
 
-        if ($request->filled('kl_id')) {
-            $query->where('kl_id', 'like', "%{$request->input('kl_id')}%");
+        if ($filterKlId) { // <-- Используем $filterKlId
+            $query->where('kl_id', 'like', "%{$filterKlId}%");
         }
 
-        if ($request->filled('sex')) {
-            $query->where('sex', $request->input('sex'));
+        if ($filterSex) { // <-- Используем $filterSex
+            $query->where('sex', $filterSex);
         }
 
         if ($ripFilter == 1) {
@@ -94,8 +104,8 @@ class FioDtrnController extends BaseController {
 
         $fiodtrns = $query->orderBy($sort, $direction)->paginate(50);
          // --- ДИАГНОСТИКА ---
-        \Log::info('FioDtrn Index Paginated Results Count (items):', [$fiodtrns->count()]);
-        \Log::info('FioDtrn Index Paginated Results Items:', $fiodtrns->items());
+//        \Log::info('FioDtrn Index Paginated Results Count (items):', [$fiodtrns->count()]);
+//        \Log::info('FioDtrn Index Paginated Results Items:', $fiodtrns->items());
         // --- КОНЕЦ ДИАГНОСТИКИ ---
         
         // Подсчет дубликатов ФИО
@@ -125,37 +135,20 @@ class FioDtrnController extends BaseController {
         }
         
         // Передаем параметры фильтра и сортировки в шаблон
-        $urlParams = [
-            'sort' => $sort,
-            'direction' => $direction,
-            'fio' => $request->input('fio'),
-            'kl_id' => $request->input('kl_id'),
-            'sex' => $request->input('sex'),
-            'rip' => $ripFilter,
-            'visit_date_from' => $visitDateFrom,
-            'visit_date_to' => $visitDateTo,
-        ];
+        $urlParams = $this->fioDtrnService->getUrlParams();
 
 
-        return view('fiodtrns.index', compact('fiodtrns', 'sort', 'direction', 'fiodtrnsJs', 'duplicateCounts', 'urlParams', 'ripFilter'));
+        return view('fiodtrns.index', compact('fiodtrns', 'sort', 'direction', 
+                'fiodtrnsJs', 'duplicateCounts', 'urlParams', 'ripFilter',
+                'filterFio', 'filterKlId', 'filterSex'));
     }
 
     public function create(Request $request) {
         $fiodtrn = new FioDtrn();
-        $sort = $request->input('sort', 'id');
-        $direction = $request->input('direction', 'asc');
         // Получаем текущие параметры сортировки и фильтрации
-        $urlParams = [
-            'sort' => $request->input('sort', 'id'),
-            'direction' => $request->input('direction', 'asc'),
-            'fio' => $request->input('fio'),
-            'kl_id' => $request->input('kl_id'),
-            'sex' => $request->input('sex'),
-            'rip' => $request->input('rip'),
-            'visit_date_from' => $request->input('visit_date_from'),
-            'visit_date_to' => $request->input('visit_date_to'),
-        ];
-        return view('fiodtrns.create', compact('fiodtrn', 'sort', 'direction', 'urlParams'));
+        $urlParams = $this->fioDtrnService->getUrlParams();
+
+        return view('fiodtrns.create', compact('fiodtrn', 'urlParams'));
     }
 
     public function store(Request $request) {
@@ -172,38 +165,15 @@ class FioDtrnController extends BaseController {
         FioDtrn::create($request->all());
         
         // Передаем все параметры сортировки и фильтрации
-        $urlParams = [
-            'sort' => $request->input('sort', 'id'),
-            'direction' => $request->input('direction', 'asc'),
-            'fio' => $request->input('fio'),
-            'kl_id' => $request->input('kl_id'),
-            'sex' => $request->input('sex'),
-            'rip' => $request->input('rip'),
-            'visit_date_from' => $request->input('visit_date_from'),
-            'visit_date_to' => $request->input('visit_date_to'),
-        ];
+        $urlParams = $this->fioDtrnService->getUrlParams();
 
-        return redirect()->route('fiodtrns.index', [
-                    'sort' => $request->input('sort', 'id'),
-                    'direction' => $request->input('direction', 'asc'),
-                    $urlParams
-                ])->with('success', 'Клиент успешно создан');
+        return redirect()->route('fiodtrns.index', $urlParams)->with('success', 'Клиент успешно создан');
     }
 
     public function show(Request $request, FioDtrn $fiodtrn) {
-        $sort = $request->input('sort', 'id');
-        $direction = $request->input('direction', 'asc');
-        $urlParams = [
-            'sort' => $request->input('sort', 'id'),
-            'direction' => $request->input('direction', 'asc'),
-            'fio' => $request->input('fio'),
-            'kl_id' => $request->input('kl_id'),
-            'sex' => $request->input('sex'),
-            'rip' => $request->input('rip'),
-            'visit_date_from' => $request->input('visit_date_from'),
-            'visit_date_to' => $request->input('visit_date_to'),
-        ];
-        return view('fiodtrns.show', compact('fiodtrn', 'sort', 'direction', 'urlParams'));
+        
+        $urlParams = $this->fioDtrnService->getUrlParams();
+        return view('fiodtrns.show', compact('fiodtrn', 'urlParams'));
     }
 
     public function edit(Request $request, FioDtrn $fiodtrn) {
@@ -212,22 +182,11 @@ class FioDtrnController extends BaseController {
                     $query->whereIn('name', ['admin', 'operator']);
                 })->get();
 
-        $sort = $request->input('sort', 'id');
-        $direction = $request->input('direction', 'asc');
          // Получаем текущие параметры сортировки и фильтрации
-        $urlParams = [
-            'sort' => $request->input('sort', 'id'),
-            'direction' => $request->input('direction', 'asc'),
-            'fio' => $request->input('fio'),
-            'kl_id' => $request->input('kl_id'),
-            'sex' => $request->input('sex'),
-            'rip' => $request->input('rip'),
-            'visit_date_from' => $request->input('visit_date_from'),
-            'visit_date_to' => $request->input('visit_date_to'),
-        ];
+        $urlParams = $this->fioDtrnService->getUrlParams();
         
         
-        return view('fiodtrns.edit', compact('fiodtrn', 'sort', 'direction', 'users', 'urlParams'));
+        return view('fiodtrns.edit', compact('fiodtrn', 'users', 'urlParams'));
     }
 
     public function update(Request $request, FioDtrn $fiodtrn) {
@@ -255,16 +214,7 @@ class FioDtrnController extends BaseController {
         $fiodtrn->update($request->all());
         
         // Передаем все параметры сортировки и фильтрации
-        $urlParams = [
-            'sort' => $request->input('sort', 'id'),
-            'direction' => $request->input('direction', 'asc'),
-            'fio' => $request->input('fio'),
-            'kl_id' => $request->input('kl_id'),
-            'sex' => $request->input('sex'),
-            'rip' => $request->input('rip'),
-            'visit_date_from' => $request->input('visit_date_from'),
-            'visit_date_to' => $request->input('visit_date_to'),
-        ];
+        $urlParams = $this->fioDtrnService->getUrlParams();
 
         return redirect()->route('fiodtrns.index', $urlParams) // <-- Передаем $urlParams как есть
                         ->with('success', "Клиент {$fiodtrn->fio} обновлён");
@@ -274,17 +224,7 @@ class FioDtrnController extends BaseController {
         $fiodtrn->delete();
         
         // Передаем все параметры сортировки и фильтрации
-        $urlParams = [
-            'sort' => $request->input('sort', 'id'),
-            'direction' => $request->input('direction', 'asc'),
-            'fio' => $request->input('fio'),
-            'kl_id' => $request->input('kl_id'),
-            'sex' => $request->input('sex'),
-            'rip' => $request->input('rip'),
-            'visit_date_from' => $request->input('visit_date_from'),
-            'visit_date_to' => $request->input('visit_date_to'),
-        ];
-
+       $urlParams = $this->fioDtrnService->getUrlParams();
         return redirect()->route('fiodtrns.index', $urlParams)->with('success', 'Клиент удалён');
     }
 
