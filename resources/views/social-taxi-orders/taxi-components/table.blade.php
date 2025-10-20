@@ -114,9 +114,14 @@
                             <span class="font-medium">Куда:</span> {{ $order->adres_kuda }}
                         </div>
                         @if($order->adres_obratno)
-                        <div class="text-sm text-gray-900 mt-1">
-                            <span class="font-medium">Обратно:</span> {{ $order->adres_obratno }}
-                        </div>
+                            <div class="text-sm text-gray-900 mt-1">
+                                <span class="font-medium">Обратно:</span> {{ $order->adres_obratno }}
+                            </div>
+                        @endif
+                        @if($order->type_order == 1)
+                            <div class="text-sm text-gray-900 mt-1">
+                                <span class="font-medium">Предв. дальность:</span> {{ $order->predv_way }}км.
+                            </div>
                         @endif
                     </td>
                     <td class="px-6 py-4">

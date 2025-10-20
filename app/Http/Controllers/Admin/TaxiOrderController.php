@@ -25,10 +25,10 @@ class TaxiOrderController extends BaseController {
 
     // Показать список заказов для передачи в такси
     public function index(Request $request) {
-        \Log::info('Taxi orders index called', [
-            'all_params' => $request->all(),
-            'method' => $request->method()
-        ]);
+//        \Log::info('Taxi orders index called', [
+//            'all_params' => $request->all(),
+//            'method' => $request->method()
+//        ]);
 
         $sort = $request->get('sort', 'visit_data');
         $direction = $request->get('direction', 'asc');

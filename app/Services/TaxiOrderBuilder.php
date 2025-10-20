@@ -59,7 +59,8 @@ class TaxiOrderBuilder extends SocialTaxiOrderBuilder
             $this->query->orderBy('pz_data', $direction);
             break;
         case 'client_fio':
-            $this->query->orderBy('client_fio', $direction);
+            // Специальная сортировка по ФИО клиента через JOIN
+            $this->applyClientFioSorting($direction);
             break;
         default:
             $this->query->orderBy($sort, $direction);
