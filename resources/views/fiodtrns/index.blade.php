@@ -268,10 +268,17 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ optional($fiodtrn->rip_at)->format('d.m.Y') }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $fiodtrn->orders_count > 0 ? $fiodtrn->orders_count : '' }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                @if($fiodtrn->orders_count > 0)
+                                    <a href="{{ route('fiodtrns.orders', array_merge(['fiodtrn' => $fiodtrn], $urlParams)) }}" target ="_blank"
+                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 hover:bg-blue-200">
+                                            {{ $fiodtrn->orders_count }}
+                                    </a>
+                                @endif
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ optional($fiodtrn->user)->name ?? '-' }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm space-x-2 flex justify-end">
-                                <a href="{{ route('fiodtrns.show', $fiodtrn) }}?{{ http_build_query($urlParams) }}"
+                                <a href="{{ route('fiodtrns.show', array_merge(['fiodtrn' => $fiodtrn], $urlParams)) }}"
                                    class="inline-flex items-center px-2 py-1 rounded-md text-sm font-medium bg-blue-100 text-blue-800 hover:bg-blue-200"
                                    title="Просмотр">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"

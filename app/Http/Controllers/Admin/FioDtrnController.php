@@ -1,17 +1,16 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
+
 use Illuminate\Http\Request;
 use App\Models\FioDtrn;
 use Illuminate\Support\Facades\DB;
-
 use App\Models\Order;
-use App\Services\FioDtrnService; 
+use App\Services\FioDtrnService;
 use Illuminate\Database\Eloquent\Builder; // Импортируем Builder, если нужно для whereHas
 
-
 class FioDtrnController extends BaseController {
-    
+
     protected $fioDtrnService; // бизнес-логика (создание заказов, работа с данными)
 
     public function __construct(FioDtrnService $fioDtrnService) {
@@ -19,15 +18,15 @@ class FioDtrnController extends BaseController {
     }
 
     public function index(Request $request) {
-        
-        $filterFio = $request->input('filter_fio'); 
-        $filterKlId = $request->input('filter_kl_id'); 
-        $filterSex = $request->input('filter_sex'); 
+
+        $filterFio = $request->input('filter_fio');
+        $filterKlId = $request->input('filter_kl_id');
+        $filterSex = $request->input('filter_sex');
         $ripFilter = $request->input('rip', 0);
-        
+
         $query = FioDtrn::query();
 
-         if ($filterFio) { // <-- Используем $filterFio
+        if ($filterFio) { // <-- Используем $filterFio
             $query->where('fio', 'like', "%{$filterFio}%");
         }
 
@@ -42,11 +41,11 @@ class FioDtrnController extends BaseController {
         if ($ripFilter == 1) {
             $query->whereNotNull('rip_at');
         }
-        
+
         // --- Фильтр по дате поездок ---
         $visitDateFrom = $request->input('visit_date_from');
         $visitDateTo = $request->input('visit_date_to');
-        
+
         // Коллекция для хранения ID клиентов, у которых есть заказы в диапазоне
         $filteredClientIds = null;
         if ($visitDateFrom || $visitDateTo) {
@@ -65,7 +64,7 @@ class FioDtrnController extends BaseController {
             // Если есть фильтр по дате, ограничиваем выборку клиентов
             $query->whereIn('id', $filteredClientIds);
         }
-         // --- Подсчет заказов с учетом фильтра по дате ---
+        // --- Подсчет заказов с учетом фильтра по дате ---
         // Если фильтр по дате применяется, нужно изменить, как считается orders_count
         // Лучше всего сделать это через отношения и скоупы, но для простоты, добавим условие в withCount
         $ordersCountQuery = Order::query();
@@ -75,20 +74,24 @@ class FioDtrnController extends BaseController {
         if ($visitDateTo) {
             $ordersCountQuery->whereDate('visit_data', '<=', $visitDateTo);
         }
-        
-        $query->withCount(['orders' => function ($q) use ($ordersCountQuery) {
-            // Применяем те же условия к подсчету (без type_order)
-            if ($ordersCountQuery->getQuery()->wheres) {
-                $q->where(function ($subQ) use ($ordersCountQuery) {
-                    foreach ($ordersCountQuery->getQuery()->wheres as $where) {
-                        if ($where['type'] === 'Basic' && $where['column'] === 'visit_data') {
-                            $subQ->{strtoupper($where['operator'])}('visit_data', $where['value']);
-                        }
+
+        if ($filteredClientIds !== null) {
+            // Если фильтр по дате был, и $filteredClientIds содержит ID клиентов с заказами в диапазоне
+            // Мы уже отфильтровали $query по этим ID
+            // Теперь подсчитываем заказы только в этом диапазоне для каждого клиента в результирующем наборе
+            $query->withCount(['orders' => function ($q) use ($visitDateFrom, $visitDateTo) {
+                    if ($visitDateFrom) {
+                        $q->whereDate('visit_data', '>=', $visitDateFrom);
                     }
-                });
-            }
-        }]);
- 
+                    if ($visitDateTo) {
+                        $q->whereDate('visit_data', '<=', $visitDateTo);
+                    }
+                }]);
+        } else {
+            // Если фильтр по дате не применялся, подсчитываем все заказы
+            $query->withCount('orders');
+        }
+
         // Сортировка
         $sort = $request->input('sort', 'id');
         $direction = $request->input('direction', 'asc');
@@ -100,24 +103,22 @@ class FioDtrnController extends BaseController {
         if (!in_array(strtolower($direction), ['asc', 'desc'])) {
             $direction = 'asc';
         }
-        
+
 
         $fiodtrns = $query->orderBy($sort, $direction)->paginate(50);
-         // --- ДИАГНОСТИКА ---
+        // --- ДИАГНОСТИКА ---
 //        \Log::info('FioDtrn Index Paginated Results Count (items):', [$fiodtrns->count()]);
 //        \Log::info('FioDtrn Index Paginated Results Items:', $fiodtrns->items());
         // --- КОНЕЦ ДИАГНОСТИКИ ---
-        
         // Подсчет дубликатов ФИО
         // ВАЖНО: Этот подсчет НЕ УЧИТЫВАЕТ фильтр по дате поездок!
         $duplicateCounts = FioDtrn::query()
-            ->select('fio', DB::raw('COUNT(*) as count'))
-            ->whereNull('rip_at')    
-            ->groupBy('fio')
-            ->having('count', '>', 1)
-            ->orderBy('fio')    
-            ->pluck('count', 'fio'); // ['Иванов Иван Иванович' => 3, ...]
-
+                ->select('fio', DB::raw('COUNT(*) as count'))
+                ->whereNull('rip_at')
+                ->groupBy('fio')
+                ->having('count', '>', 1)
+                ->orderBy('fio')
+                ->pluck('count', 'fio'); // ['Иванов Иван Иванович' => 3, ...]
         // Подготовим данные для Alpine.js
         $fiodtrnsJs = [];
         foreach ($fiodtrns as $fiodtrn) {
@@ -130,17 +131,16 @@ class FioDtrnController extends BaseController {
                 'rip_at' => optional($fiodtrn->rip_at)->format('d.m.Y'),
                 'operator' => optional($fiodtrn->user)->name ?? '-',
                 'komment' => $fiodtrn->komment,
-                 'orders_count' => $fiodtrn->orders_count, // <-- количество заказов
+                'orders_count' => $fiodtrn->orders_count, // <-- количество заказов
             ];
         }
-        
+
         // Передаем параметры фильтра и сортировки в шаблон
         $urlParams = $this->fioDtrnService->getUrlParams();
 
-
-        return view('fiodtrns.index', compact('fiodtrns', 'sort', 'direction', 
-                'fiodtrnsJs', 'duplicateCounts', 'urlParams', 'ripFilter',
-                'filterFio', 'filterKlId', 'filterSex'));
+        return view('fiodtrns.index', compact('fiodtrns', 'sort', 'direction',
+                        'fiodtrnsJs', 'duplicateCounts', 'urlParams', 'ripFilter',
+                        'filterFio', 'filterKlId', 'filterSex'));
     }
 
     public function create(Request $request) {
@@ -163,7 +163,7 @@ class FioDtrnController extends BaseController {
         $request->merge(['user_id' => auth()->id()]);
 
         FioDtrn::create($request->all());
-        
+
         // Передаем все параметры сортировки и фильтрации
         $urlParams = $this->fioDtrnService->getUrlParams();
 
@@ -171,7 +171,7 @@ class FioDtrnController extends BaseController {
     }
 
     public function show(Request $request, FioDtrn $fiodtrn) {
-        
+
         $urlParams = $this->fioDtrnService->getUrlParams();
         return view('fiodtrns.show', compact('fiodtrn', 'urlParams'));
     }
@@ -182,10 +182,9 @@ class FioDtrnController extends BaseController {
                     $query->whereIn('name', ['admin', 'operator']);
                 })->get();
 
-         // Получаем текущие параметры сортировки и фильтрации
+        // Получаем текущие параметры сортировки и фильтрации
         $urlParams = $this->fioDtrnService->getUrlParams();
-        
-        
+
         return view('fiodtrns.edit', compact('fiodtrn', 'users', 'urlParams'));
     }
 
@@ -199,7 +198,7 @@ class FioDtrnController extends BaseController {
 //        }
 ////        dd($data['created_rip']);
 //        $request->replace($data);
-        
+
         $request->validate([
             'kl_id' => 'required|string|max:255|unique:fio_dtrns,kl_id,' . $fiodtrn->id,
             'fio' => 'required|string|max:255',
@@ -212,7 +211,7 @@ class FioDtrnController extends BaseController {
         ]);
 
         $fiodtrn->update($request->all());
-        
+
         // Передаем все параметры сортировки и фильтрации
         $urlParams = $this->fioDtrnService->getUrlParams();
 
@@ -222,10 +221,38 @@ class FioDtrnController extends BaseController {
 
     public function destroy(Request $request, FioDtrn $fiodtrn) {
         $fiodtrn->delete();
-        
+
         // Передаем все параметры сортировки и фильтрации
-       $urlParams = $this->fioDtrnService->getUrlParams();
+        $urlParams = $this->fioDtrnService->getUrlParams();
         return redirect()->route('fiodtrns.index', $urlParams)->with('success', 'Клиент удалён');
+    }
+
+    public function showOrders(FioDtrn $fiodtrn, Request $request) {
+        
+        // Получаем фильтры даты из запроса
+        $visitDateFrom = $request->input('visit_date_from');
+        $visitDateTo = $request->input('visit_date_to');
+      
+        $orderQuery = Order::where('client_id', $fiodtrn->id)
+            ->whereNull('deleted_at');
+
+        // Применяем фильтры даты, если они указаны
+        if ($visitDateFrom) {
+            $orderQuery->whereDate('visit_data', '>=', $visitDateFrom);
+        }
+        if ($visitDateTo) {
+            $orderQuery->whereDate('visit_data', '<=', $visitDateTo);
+        }
+
+        // Сортируем и пагинируем
+        $orders = $orderQuery->orderBy('visit_data', 'desc')
+            ->paginate(15);
+
+        // Для корректной работы пагинации с параметрами, добавляем их к пагинатору
+        $orders->appends($request->only(['visit_date_from', 'visit_date_to']));
+        $urlParams = $this->fioDtrnService->getUrlParams();
+
+        return view('fiodtrns.orders', compact('fiodtrn', 'orders', 'urlParams'));
     }
 
 }

@@ -68,6 +68,7 @@ Route::middleware(['web', 'auth', IsAdmin::class])->group(function () {
     Route::resource('roles', RoleController::class);
     Route::resource('taxis', TaxiController::class);
     Route::resource('fiodtrns', FioDtrnController::class);
+    Route::get('/fiodtrns/{fiodtrn}/orders', [FiodtrnController::class, 'showOrders'])->name('fiodtrns.orders');
     Route::group(['namespace' => '', 'prefix' => 'import'], function() {
         Route::get('/fiodtrns', [ImportFioDtrnController::class, 'showClientsImportForm'])->name('import.fiodtrns.form');
         Route::post('/fiodtrns', [ImportFioDtrnController::class, 'importClients'])->name('import.fiodtrns.process');
