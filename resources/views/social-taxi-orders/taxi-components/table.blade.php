@@ -90,29 +90,41 @@
                     </td>
                     <td class="px-6 py-4">
                         @if($order->visit_data)
-                        <div class="text-sm font-medium text-gray-900">
-                            {{ $order->visit_data->format('d.m.Y') }}
-                        </div>
-                        <div class="text-lg text-gray-900">
-                            {{ $order->visit_data->format('H:i') }}
-                        </div>
-                        @if($order->visit_obratno)
-                        <div class="text-sm font-medium text-gray-600 mt-1">
-                            Обратно: 
-                            <span class="text-lg">{{ $order->visit_obratno->format('H:i') }}</span>
-                        </div>
-                        @endif
+                            <div class="text-sm font-medium text-gray-900">
+                                {{ $order->visit_data->format('d.m.Y') }}
+                            </div>
+                            <div class="text-lg text-gray-900">
+                                {{ $order->visit_data->format('H:i') }}
+                            </div>
+                            @if($order->visit_obratno)
+                                <div class="text-sm font-medium text-gray-600 mt-1">
+                                    Обратно: 
+                                    <span class="text-lg">{{ $order->visit_obratno->format('H:i') }}</span>
+                                </div>
+                            @endif
                         @else
-                        <div class="text-sm text-gray-500">-</div>
+                            <div class="text-sm text-gray-500">-</div>
                         @endif
                     </td>
                     <td class="px-6 py-4">
                         <div class="text-sm text-gray-900">
                             <span class="font-medium">Откуда:</span> {{ $order->adres_otkuda }}
                         </div>
+                        <!-- Дополнительная информация об адресе "откуда" -->
+                        @if($order->adres_otkuda_info)
+                            <div class="text-xs text-gray-500 mt-1 ml-4">
+                                {{ $order->adres_otkuda_info }}
+                            </div>
+                        @endif
                         <div class="text-sm text-gray-900 mt-1">
                             <span class="font-medium">Куда:</span> {{ $order->adres_kuda }}
                         </div>
+                        <!-- Дополнительная информация об адресе "куда" -->
+                        @if($order->adres_kuda_info)
+                            <div class="text-xs text-gray-500 mt-1 ml-4">
+                                {{ $order->adres_kuda_info }}
+                            </div>
+                        @endif
                         @if($order->adres_obratno)
                             <div class="text-sm text-gray-900 mt-1">
                                 <span class="font-medium">Обратно:</span> {{ $order->adres_obratno }}

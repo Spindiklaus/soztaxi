@@ -106,7 +106,7 @@
                                     Обратно: 
                                     <span class="text-lg">{{ $order->visit_obratno->format('H:i') }}</span>
                                 </div>
-                            @endif
+                            @endif                            
                             {{-- --- Добавляем отображение имени группы --- --}}
                             @if($order->orderGroup) {{-- Проверяем, есть ли связанная группа --}}
                                 <div class="mt-1">
@@ -144,6 +144,11 @@
                                 <span class="font-medium">Обратно:</span> {{ $order->adres_obratno }}
                             </div>
                         @endif
+                        @if($order->type_order == 1)
+                                <div class="text-sm text-gray-900 mt-1">
+                                    <span class="font-medium">Предв. дальность:</span> {{ $order->predv_way }}км.
+                                </div>
+                            @endif
                     </td>
                     <td class="px-6 py-4">
                         @if($order->client)
