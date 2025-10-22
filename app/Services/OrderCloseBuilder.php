@@ -52,7 +52,27 @@ class OrderCloseBuilder
         // Сортировка
         $sort = $request->get('sort', 'visit_data');
         $direction = $request->get('direction', 'asc');
-        $query->orderBy($sort, $direction);
+        switch ($sort) {
+            case 'client_fio':
+                // Сортировка по ФИО клиента из связанной таблицы
+            
+                $query->join('fio_dtrns', 'orders.client_id', '=', 'fio_dtrns.id') // Присоединяем таблицу fio_dtrns
+                    ->select('orders.*', 'fio_dtrns.fio as client_fio')
+                    ->orderBy('client_fio', $direction);           
+                break;
+            case 'pz_data':
+                $query->orderBy('pz_data', $direction);
+                break;
+            case 'visit_data':
+                $query->orderBy('visit_data', $direction);
+                break;
+            // Можно добавить другие поля, если они используются для сортировки
+            default:
+                // Если поле сортировки неизвестно, можно использовать сортировку по умолчанию или просто игнорировать
+                // В данном случае, если поле неизвестно, будет сортировка по visit_data
+                $query->orderBy('visit_data', $direction);
+                break;
+        }
 
         return $query;
     }
