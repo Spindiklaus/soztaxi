@@ -9,10 +9,11 @@
                 </a> -->
             </div>
             <div class="p-6">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
+                <!-- Обертка для прокрутки таблицы -->
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 bg-white">
+                        <thead class="bg-gray-50 text-gray-200 sticky top-0 z-10 shadow-lg">
                         <tr>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Дата поездки</th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Название</th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Кол-во заказов в поездке</th>
@@ -24,8 +25,7 @@
                     <tbody class="bg-white divide-y divide-gray-200">
                         @forelse($orderGroups as $group)
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $group->id }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $group->visit_date->format('d.m.Y H:i') }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $group->visit_date->format('d.m.Y H:i') }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $group->name }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $group->orders->count() }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $group->komment }}</td>
@@ -64,6 +64,7 @@
                         @endforelse
                     </tbody>
                 </table>
+                </div> <!-- Конец обертки прокрутки -->    
 
                 <div class="mt-4">
                     {{ $orderGroups->links() }} <!-- Пагинация -->
