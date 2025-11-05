@@ -14,10 +14,13 @@ class OrderGroup extends Model
     // Уточните fillable поля, если планируете массовое заполнение
     protected $fillable = [
         'name',
+        'visit_date',
+        'komment',
     ];
 
     // Уточните casts, если необходимо
     protected $casts = [
+        'visit_date' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];

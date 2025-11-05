@@ -15,7 +15,7 @@ class OrderGroupController extends BaseController //
      */
     public function index()
     {
-        $orderGroups = OrderGroup::orderBy('created_at', 'desc')->paginate(15); // Пагинация
+        $orderGroups = OrderGroup::orderBy('visit_date', 'desc')->paginate(25); // Пагинация
         return view('order-groups.index', compact('orderGroups'));
     }
 
@@ -41,6 +41,10 @@ class OrderGroupController extends BaseController //
         // Или реализуйте логику, если нужно создавать группы вручную.
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
+            'visit_data' => [
+                'required',
+                'date',
+            ],            
             // Добавьте другие поля, если есть
         ]);
 
@@ -78,6 +82,10 @@ class OrderGroupController extends BaseController //
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
+            'visit_data' => [
+                'required',
+                'date',
+            ],
             // Добавьте другие поля, если есть
         ]);
 
@@ -96,7 +104,7 @@ class OrderGroupController extends BaseController //
     public function destroy(OrderGroup $orderGroup)
     {
         // Важно: Удаление группы может повлиять на связанные заказы.
-        // Рассмотрите, нужно ли устанавливать order_group_id в NULL у заказов перед удалением группы.
+        // Перед удалением вызывается deleting(OrderGroup $orderGroup)
         // $orderGroup->orders()->update(['order_group_id' => null]); // Пример
 
         $orderGroup->delete();

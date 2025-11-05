@@ -122,15 +122,29 @@ class OrderGroupingController extends BaseController {
 
                     // Формируем имя группы по новому шаблону
                     $groupName = "До: {$destinationAddress} | Время {$earliestVisitTime->format('H:i')} - {$latestVisitTime->format('H:i')} ({$countOrders} чел.)";
+                    
+                    // Берем дату поездки из первого заказа 
+                    $visitDate = $earliestOrder->visit_data; 
+
+                    // Получаем имя текущего оператора 
+                    $currentOperatorName = auth()->user()->name ?? 'Неизвестный'; // 
+
+                    // Формируем комментарий
+                    $comment = "Сформирована оператором {$currentOperatorName} по методу адреса доставки";
                 }
                 else {
                     // На всякий случай, если заказы не найдены (хотя валидация должна это исключить)
                     $groupName = 'Группа (ошибка)';
+                    $visitDate = now(); // Резервная дата/время
+                    $comment = 'Ошибка при формировании группы'; // Резервный комментарий
                 }
                 // --- КОНЕЦ ИЗМЕНЕНИЯ ---
                 // Создаем новую группу в БД с сформированным именем
                 $orderGroup = OrderGroup::create([
                             'name' => $groupName,
+                            'visit_date' => $visitDate, // Добавляем дату поездки
+                            'komment' => $comment      // Добавляем комментарий
+                    
                 ]);
 
                 foreach ($ordersToUpdate as $order) {

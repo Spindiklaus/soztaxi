@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('order_groups', function (Blueprint $table) {
-            $table->date('visit_date')->after('id'); 
+            $table->dateTime('visit_date')->after('id'); 
             $table->text('komment')->after('name'); 
         });
         
