@@ -18,7 +18,23 @@ class OrderGroupingController extends BaseController {
 
     // Показать форму выбора даты
     public function showGroupingForm() {
-        return view('orders-grouping.grouping_form'); // Blade шаблон для выбора даты
+        
+        // Определяем дату начала периода (2 месяца назад от сегодня)
+        $twoMonthsAgo = \Carbon\Carbon::now()->subMonths(6)->startOfDay();
+        
+         // Получаем даты и количество несгруппированных, незакрытых, неотмененных заказов типа 1
+        $groupingDates = Order::selectRaw('DATE(visit_data) as grouping_date, COUNT(*) as count')
+            ->where('visit_data', '>=', $twoMonthsAgo) // Ограничение на дату                
+            ->whereNull('closed_at')
+            ->whereNull('cancelled_at')
+            ->whereNull('order_group_id')                
+            ->where('type_order', 1)
+            ->groupBy('grouping_date')
+            ->orderBy('grouping_date', 'desc')
+            ->pluck('count', 'grouping_date'); // Возвращает коллекцию, где ключ - дата, значение - количество
+        
+        
+        return view('orders-grouping.grouping_form', compact('groupingDates')); // Blade шаблон для выбора даты
     }
 
     // Обработать выбор даты и показать заказы для группировки
