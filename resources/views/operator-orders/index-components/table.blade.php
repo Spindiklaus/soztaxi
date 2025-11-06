@@ -22,14 +22,14 @@
     </div>  -->
     <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-blue-800 text-gray-200">
+            <thead class="{{ $theadColor }} text-gray-200">
                 <tr>
-                    <th @click="sortBy('pz_data')" scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-blue-700">
+                    <th @click="sortBy('pz_data')" scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:{{ $hoverColor }} ">
                         Заказ и статус
                         <span class="ml-1" x-show="sortField === 'pz_data' && sortDirection === 'asc'">↑</span>
                         <span class="ml-1" x-show="sortField === 'pz_data' && sortDirection === 'desc'">↓</span>
                     </th>
-                    <th @click="sortBy('visit_data')" scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-blue-700">
+                    <th @click="sortBy('visit_data')" scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:{{ $hoverColor }} ">
                         Дата и время поездки
                         <span class="ml-1" x-show="sortField === 'visit_data' && sortDirection === 'asc'">↑</span>
                         <span class="ml-1" x-show="sortField === 'visit_data' && sortDirection === 'desc'">↓</span>
@@ -37,7 +37,7 @@
                     <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">
                         Маршрут поездки
                     </th>
-                    <th @click="sortBy('client_fio')" scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-blue-700">
+                    <th @click="sortBy('client_fio')" scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:{{ $hoverColor }}">
                         Клиент
                         <span class="ml-1" x-show="sortField === 'client_fio' && sortDirection === 'asc'">↑</span>
                         <span class="ml-1" x-show="sortField === 'client_fio' && sortDirection === 'desc'">↓</span>

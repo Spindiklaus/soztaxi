@@ -11,14 +11,20 @@
                         case 1: 
                             $typeName = 'Соцтакси';
                             $typeColor = 'text-blue-600';
+                            $theadColor = 'bg-blue-800';
+                            $hoverColor = 'bg-blue-700';
                             break;
                         case 2: 
                             $typeName = 'Легковое авто';
                             $typeColor = 'text-green-600';
+                            $theadColor = 'bg-green-600';
+                            $hoverColor = 'bg-green-500';
                             break;
                         case 3: 
                             $typeName = 'ГАЗель';
                             $typeColor = 'text-yellow-600';
+                            $theadColor = 'bg-yellow-600';
+                            $hoverColor = 'bg-yellow-500';
                             break;
                     }
                 @endphp
