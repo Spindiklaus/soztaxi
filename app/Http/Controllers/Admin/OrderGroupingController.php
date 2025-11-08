@@ -7,6 +7,10 @@ use App\Models\OrderGroup;
 use App\Services\OrderGroupingService;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
+
+
 
 class OrderGroupingController extends BaseController {
 
@@ -18,22 +22,22 @@ class OrderGroupingController extends BaseController {
 
     // Показать форму выбора даты
     public function showGroupingForm() {
-        
+
         // Определяем дату начала периода (2 месяца назад от сегодня)
         $twoMonthsAgo = \Carbon\Carbon::now()->subMonths(6)->startOfDay();
-        
-         // Получаем даты и количество несгруппированных, незакрытых, неотмененных заказов типа 1
+
+        // Получаем даты и количество несгруппированных, незакрытых, неотмененных заказов типа 1
         $groupingDates = Order::selectRaw('DATE(visit_data) as grouping_date, COUNT(*) as count')
-            ->where('visit_data', '>=', $twoMonthsAgo) // Ограничение на дату                
-            ->whereNull('closed_at')
-            ->whereNull('cancelled_at')
-            ->whereNull('order_group_id')                
-            ->where('type_order', 1)
-            ->groupBy('grouping_date')
-            ->orderBy('grouping_date', 'desc')
-            ->pluck('count', 'grouping_date'); // Возвращает коллекцию, где ключ - дата, значение - количество
-        
-        
+                ->where('visit_data', '>=', $twoMonthsAgo) // Ограничение на дату                
+                ->whereNull('closed_at')
+                ->whereNull('cancelled_at')
+                ->whereNull('order_group_id')
+                ->where('type_order', 1)
+                ->groupBy('grouping_date')
+                ->orderBy('grouping_date', 'desc')
+                ->pluck('count', 'grouping_date'); // Возвращает коллекцию, где ключ - дата, значение - количество
+
+
         return view('orders-grouping.grouping_form', compact('groupingDates')); // Blade шаблон для выбора даты
     }
 
@@ -53,8 +57,6 @@ class OrderGroupingController extends BaseController {
         $timeTolerance = (int) $request->input('time_tolerance');
         $addressTolerance = (float) $request->input('address_tolerance');
         $maxPotentialGroupSize = (int) $request->input('max_potential_group_size'); // Получаем новое значение
-
-
         // Получаем заказы типа 1 (соцтакси) на выбранную дату, не закрытые и не отмененные
         $orders = Order::where('type_order', 1)
                 ->whereBetween('visit_data', [$selectedDate, $endDate])
@@ -87,12 +89,30 @@ class OrderGroupingController extends BaseController {
 
     // Обработать выбор группировки пользователем и сохранить
     public function processGrouping(Request $request) {
-        $request->validate([
-            'selected_groups' => 'required|array',
-            'selected_groups.*.order_ids' => 'required|array|max:3',
-            'selected_groups.*.order_ids.*' => 'required|exists:orders,id',
-        ]);
+        
+        // Определяем кастомные сообщения
+    $messages = [
+        'selected_groups.required' => 'Необходимо выбрать хотя бы одну группу.',
+        'selected_groups.array' => 'Выбранные группы должны быть представлены в виде массива.',
+        'selected_groups.*.order_ids.required' => 'В каждой выбранной группе должен быть указан список заказов.',
+        'selected_groups.*.order_ids.array' => 'Заказы в группе должны быть представлены в виде массива.',
+        'selected_groups.*.order_ids.max' => 'В одной группе не может быть более :max заказов.',
+        'selected_groups.*.order_ids.*.required' => 'ID заказа в группе не может быть пустым.',
+        'selected_groups.*.order_ids.*.exists' => 'Один или несколько выбранных заказов не существуют в базе данных.',
+    ];
+        
+        try {
+            Validator::make($request->all(), [
+                'selected_groups' => 'required|array',
+                'selected_groups.*.order_ids' => 'required|array|max:3',
+                'selected_groups.*.order_ids.*' => 'required|exists:orders,id',
+            ], $messages)->validate();
+        } catch (ValidationException $e) {
+            // Если валидация не проходит, редиректим на форму выбора даты
+            return redirect()->route('orders.grouping.form')->withErrors($e->errors())->withInput();
+        }
 
+        // Если валидация пройдена, продолжаем
         $selectedGroups = $request->input('selected_groups');
 
         \DB::transaction(function () use ($selectedGroups) {
@@ -122,13 +142,12 @@ class OrderGroupingController extends BaseController {
 
                     // Формируем имя группы по новому шаблону
                     $groupName = "До: {$destinationAddress} | Время {$earliestVisitTime->format('H:i')} - {$latestVisitTime->format('H:i')} ({$countOrders} чел.)";
-                    
+
                     // Берем дату поездки из первого заказа 
-                    $visitDate = $earliestOrder->visit_data; 
+                    $visitDate = $earliestOrder->visit_data;
 
                     // Получаем имя текущего оператора 
                     $currentOperatorName = auth()->user()->name ?? 'Неизвестный'; // 
-
                     // Формируем комментарий
                     $comment = "Сформирована оператором {$currentOperatorName} по методу адреса доставки";
                 }
@@ -144,7 +163,6 @@ class OrderGroupingController extends BaseController {
                             'name' => $groupName,
                             'visit_date' => $visitDate, // Добавляем дату поездки
                             'komment' => $comment      // Добавляем комментарий
-                    
                 ]);
 
                 foreach ($ordersToUpdate as $order) {
