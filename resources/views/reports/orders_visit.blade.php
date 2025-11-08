@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="bg-gray-100 py-6">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 class="text-2xl font-bold text-gray-800 mb-4">Сводка по статусам заказов</h2>
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Сводный отчет по статусам заказов</h2>
             <a href="{{ route('orders.report_visit_export', ['start_date' => $startDate, 'end_date' => $endDate]) }}"
                class="inline-flex items-center px-4 py-2 mb-4 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none ml-2">
                 Экспорт в Excel
