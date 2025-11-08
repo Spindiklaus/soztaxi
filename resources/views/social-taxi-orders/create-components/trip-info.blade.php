@@ -74,8 +74,7 @@
                   rows="2" 
                   required
                   placeholder="Введите адрес отправки"
-                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('adres_otkuda', $copiedOrder->adres_otkuda ?? '') }}
-        </textarea>
+                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('adres_otkuda', $copiedOrder->adres_otkuda ?? '') }}</textarea>
         @error('adres_otkuda')
             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
         @enderror
@@ -97,8 +96,7 @@
         <textarea name="adres_otkuda_info" id="adres_otkuda_info" 
               rows="1" 
               placeholder="Телефон, особенности заезда и т.д."
-              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('adres_otkuda_info', $copiedOrder->adres_otkuda_info ?? '') }}
-        </textarea>
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('adres_otkuda_info', $copiedOrder->adres_otkuda_info ?? '') }}</textarea>
         @error('adres_otkuda_info')
             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
         @enderror
@@ -110,8 +108,7 @@
                       rows="2" 
                       required
                       placeholder="Введите адрес назначения"
-                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('adres_kuda', $copiedOrder->adres_kuda ?? '') }}
-        </textarea>
+                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('adres_kuda', $copiedOrder->adres_kuda ?? '') }}</textarea>
         @error('adres_kuda')
             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
         @enderror
@@ -122,8 +119,7 @@
         <textarea name="adres_kuda_info" id="adres_kuda_info" 
               rows="1" 
               placeholder="Телефон, особенности заезда и т.д."
-              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('adres_kuda_info', $copiedOrder->adres_kuda_info ?? '') }}
-        </textarea>
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('adres_kuda_info', $copiedOrder->adres_kuda_info ?? '') }}</textarea>
         @error('adres_kuda_info')
             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
         @enderror
@@ -156,8 +152,7 @@
                       placeholder="{{ ($type == 2 || $type == 3) && (old('zena_type', $copiedOrder->zena_type ?? 1) == '2') ? 'Введите обратный адрес' : 'Поле недоступно для поездки в одну сторону' }}"
                       {{ ($type == 2 || $type == 3) && (old('zena_type', $copiedOrder->zena_type ?? 1) == '1') ? 'readonly disabled' : '' }}
                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 
-                      {{ ($type == 2 || $type == 3) && (old('zena_type', $copiedOrder->zena_type ?? 1) == '1') ? 'bg-gray-100 cursor-not-allowed' : '' }}">{{ old('adres_obratno', $copiedOrder->adres_obratno ?? '') }}
-            </textarea>
+                      {{ ($type == 2 || $type == 3) && (old('zena_type', $copiedOrder->zena_type ?? 1) == '1') ? 'bg-gray-100 cursor-not-allowed' : '' }}">{{ old('adres_obratno', $copiedOrder->adres_obratno ?? '') }}</textarea>
             @error('adres_obratno')
                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
             @enderror

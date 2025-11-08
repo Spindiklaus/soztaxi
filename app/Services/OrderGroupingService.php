@@ -19,6 +19,7 @@ class OrderGroupingService
 
     public function findPotentialGroupsForDate($orders, $timeToleranceMinutes = 30, $addressTolerancePercent = 80, $maxGroupSize = 10)
     {
+        
         $potentialGroups = [];
         $processedOrderIds = collect(); // Коллекция ID уже обработанных заказов
 
@@ -139,10 +140,10 @@ class OrderGroupingService
         // Если в группе только 1 заказ (например, при создании), используем формат "Предварительная группа"
         if ($count === 1) {
             $singleOrderTime = $orders[0]->visit_data->format('H:i');
-            return "Предварительная группа | {$singleOrderTime} | До: {$shortDestination}";
+            return "Группа | {$singleOrderTime} | До: {$shortDestination}";
         } else {
             // Если в группе уже несколько заказов (например, после добавления), используем формат с количеством и диапазоном
-            return "Предварительная группа {$count} чел. | {$timeRange} | До: {$shortDestination}";
+            return "Группа {$count} чел. | {$timeRange} | До: {$shortDestination}";
         }
         // --- КОНЕЦ ИЗМЕНЕНИЯ ---
 

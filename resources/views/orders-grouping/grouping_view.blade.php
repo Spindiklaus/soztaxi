@@ -19,6 +19,16 @@
                     @if(empty($potentialGroups))
                         <p class="text-gray-700 mb-4">На выбранную дату нет подходящих заказов для автоматической группировки.</p>
                     @else
+                        <!-- Кнопки "Выбрать все" и "Очистить все" -->
+                        <div class="mb-4 flex space-x-4">
+                            <button type="button" id="select-all-btn" class="inline-flex items-center px-3 py-1 bg-blue-600 border border-transparent rounded-md font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition ease-in-out duration-150">
+                                Выбрать все
+                            </button>
+                            <button type="button" id="clear-all-btn" class="inline-flex items-center px-3 py-1 bg-gray-600 border border-transparent rounded-md font-semibold text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition ease-in-out duration-150">
+                                Очистить все
+                            </button>
+                        </div>
+                        
                         <h3 class="text-xl font-semibold text-gray-800 mb-4">Предлагаемые группы (отметьте нужные):</h3>
                         @foreach($potentialGroups as $index => $group)
                             <div class="card mb-3 potential-group-card bg-gray-50 border border-gray-200 rounded-lg p-4" data-group-id="{{ $group['id'] }}">
@@ -65,7 +75,7 @@
 
                 </form>
 
-                <a href="{{ route('orders.grouping.form') }}" class="btn btn-secondary mt-3 inline-flex items-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-semibold text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition ease-in-out duration-150 ml-2">Назад</a>
+                <!--<a href="{{-- route('orders.grouping.form') --}}" class="btn btn-secondary mt-3 inline-flex items-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-semibold text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition ease-in-out duration-150 ml-2">Назад</a>-->
             </div>
         </div>
 
@@ -73,7 +83,21 @@
             document.addEventListener('DOMContentLoaded', function() {
                 const groupSelectors = document.querySelectorAll('.group-selector');
                 const saveButton = document.getElementById('save-groups-btn');
-
+                const selectAllBtn = document.getElementById('select-all-btn');
+                const clearAllBtn = document.getElementById('clear-all-btn');
+                
+                // Функция для обновления состояния кнопки "Сохранить"
+                function updateSaveButton() {
+                    let anyGroupSelected = false;
+                    groupSelectors.forEach(selector => {
+                        if (selector.checked) {
+                            anyGroupSelected = true;
+                        }
+                    });
+                    saveButton.disabled = !anyGroupSelected;
+                }
+                
+                // Обработчик для чекбоксов групп
                 groupSelectors.forEach(selector => {
                     selector.addEventListener('change', function() {
                         const card = this.closest('.potential-group-card');
@@ -89,17 +113,41 @@
                         updateSaveButton();
                     });
                 });
-
-                function updateSaveButton() {
-                    let anyGroupSelected = false;
+                
+                // Обработчик "Выбрать все"
+                selectAllBtn.addEventListener('click', function() {
                     groupSelectors.forEach(selector => {
-                        if (selector.checked) {
-                            anyGroupSelected = true;
+                        if (!selector.checked) { // Только если не отмечен
+                            selector.checked = true;
+                            const card = selector.closest('.potential-group-card');
+                            const orderCheckboxes = card.querySelectorAll('.order-checkbox');
+                            orderCheckboxes.forEach(cb => {
+                                cb.disabled = false;
+                                cb.checked = true; // Отмечаем чекбоксы заказов
+                            });
                         }
                     });
-                    saveButton.disabled = !anyGroupSelected;
-                }
+                    updateSaveButton();
+                });
 
+                // Обработчик "Очистить все"
+                clearAllBtn.addEventListener('click', function() {
+                    groupSelectors.forEach(selector => {
+                        if (selector.checked) { // Только если отмечен
+                            selector.checked = false;
+                            const card = selector.closest('.potential-group-card');
+                            const orderCheckboxes = card.querySelectorAll('.order-checkbox');
+                            orderCheckboxes.forEach(cb => {
+                                cb.disabled = true;
+                                cb.checked = false;
+                            });
+                        }
+                    });
+                    updateSaveButton();
+                });
+                
+                
+                // Инициализация состояния кнопки "Сохранить"
                 updateSaveButton();
             });
         </script>

@@ -95,8 +95,7 @@
             <textarea name="adres_otkuda_info" id="adres_otkuda_info" 
               rows="1" 
               placeholder="Телефон, особенности заезда и т.д."
-              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('adres_otkuda_info', $order->adres_otkuda_info) }}
-            </textarea>
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('adres_otkuda_info', $order->adres_otkuda_info) }}</textarea>
             @error('adres_otkuda_info')
                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
             @enderror
@@ -120,8 +119,7 @@
             <textarea name="adres_kuda_info" id="adres_kuda_info" 
                   rows="1" 
                   placeholder="Телефон, особенности заезда и т.д."
-                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('adres_kuda_info', $order->adres_kuda_info) }}
-            </textarea>
+                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('adres_kuda_info', $order->adres_kuda_info) }}</textarea>
             @error('adres_kuda_info')
                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
             @enderror
