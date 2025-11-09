@@ -38,8 +38,9 @@
 
     <div class="flex items-center justify-center w-full transition-opacity opacity-100 duration-750 lg:grow starting:opacity-0">
         <main class="flex max-w-[335px] w-full flex-col-reverse lg:max-w-4xl lg:flex-row">
+            <a href="{{ route('login') }}">
              <img src="{{ asset('img/soztaxi.jpg') }}" alt="Панель оператора" class="rounded-lg shadow-lg w-full max-w-xs lg:max-w-md">
-
+            </a>    
 <!--             Левая часть - текст 
             <div class="flex flex-col justify-center lg:pr-8 lg:w-1/2">
                 <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-6 text-center lg:text-left tracking-tight leading-tight text-[#1e3a8a] dark:text-[#3b82f6]">
