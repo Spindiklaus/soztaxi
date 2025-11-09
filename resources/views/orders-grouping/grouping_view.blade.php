@@ -29,7 +29,7 @@
                             </button>
                         </div>
                         
-                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Предлагаемые группы (отметьте нужные):</h3>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Потенциальные группы (отметьте нужные):</h3>
                         @foreach($potentialGroups as $index => $group)
                             <div class="card mb-3 potential-group-card bg-gray-50 border border-gray-200 rounded-lg p-4" data-group-id="{{ $group['id'] }}">
                                 <div class="card-header bg-gray-100 border-b border-gray-200 rounded-t-lg p-3">
@@ -43,23 +43,46 @@
                                             <li class="list-group-item p-2 border-b border-gray-100 bg-white">
                                                 <input type="checkbox" name="selected_groups[{{ $index }}][order_ids][]" value="{{ $order->id }}" class="order-checkbox h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" disabled>
                                                 <div class="ml-2">
-                                                    <strong>{{ $order->pz_nom }}</strong> - 
-                                                    <span 
-                                                        @if($order->has_duplicate_time)
+                                                    <div class="flex items-baseline gap-2">
+                                                        <strong>{{ $order->pz_nom }}</strong> - 
+                                                        <span 
+                                                            @if($order->has_duplicate_time)
                                                             class="bg-red-500 text-white px-1 rounded font-bold"
-                                                        @endif
-                                                    >
-                                                        {{ $order->visit_data->format('H:i') }}
-                                                    </span>
+                                                            @endif
+                                                            >
+                                                            {{ $order->visit_data->format('H:i') }}
+                                                        </span>
+                                                        <!-- Добавляем отображение статуса заказа -->
+                                                        <div>
+                                                            @if($order->currentStatus && $order->currentStatus->statusOrder)
+                                                            @php
+                                                            $status = $order->currentStatus->statusOrder;
+                                                            $colorClass = !empty($status->color) ? $status->color : 'bg-gray-100 text-gray-800';
+                                                            @endphp
+                                                            <span class="inline-flex items-center rounded-full text-xs font-medium {{ $colorClass }}">
+                                                                {{ $status->name }}
+                                                            </span>
+                                                            @else
+                                                            <span class="inline-flex items-center px-2  rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                                                Нет статуса
+                                                            </span>
+                                                            @endif
+                                                        </div>
+                                                        <!-- Конец отображения статуса -->
+                                                        <span class="text-sm text-gray-600">Клиент: <b>{{ $order->client ? $order->client->fio : 'N/A' }}</b></span>
+                                                    </div> <!-- Конец flex-контейнера -->
+
                                                     <br>
-                                                    <span class="text-sm text-gray-600">Клиент: {{ $order->client ? $order->client->fio : 'N/A' }}</span>
-                                                    <br>
-                                                    <span class="text-sm text-gray-600">От: <b>{{ $order->adres_otkuda }}</b></span>
-                                                    <span class="text-sm text-gray-600">До: <b>{{ $order->adres_kuda }}</b></span>
-                                                     @if($order->predv_way !== null && $order->predv_way !== '')
+                                                    <span class="text-lg text-gray-600">От: <b>{{ $order->adres_otkuda }}</b></span>
+                                                    <span class="text-lg text-gray-600">До: <b>{{ $order->adres_kuda }}</b></span>
+                                                     @if($order->taxi_way !== null && $order->taxi_way !== '')
                                                         <br>
-                                                        Предв. дальность, км: <span class="text-sm text-gray-600"><b>{{ number_format($order->predv_way, 3, ',', ' ') }}</b></span>
+                                                        Факт. дальность, км: <span class="text-sm text-gray-600"><b>{{ number_format($order->taxi_way, 3, ',', ' ') }}</b></span>
+                                                        | Цена поездки: <span class="text-sm text-gray-600"><b>{{ number_format($order->taxi_price, 11, ',', ' ') }}</b></span>
+                                                        | К возмещению: <span class="text-sm text-gray-600"><b>{{ number_format($order->taxi_vozm, 11, ',', ' ') }}</b></span>
                                                     @endif
+                                                   
+                                                    
                                                 </div>
                                             </li>
                                         @endforeach

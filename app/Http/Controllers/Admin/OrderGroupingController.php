@@ -27,10 +27,13 @@ class OrderGroupingController extends BaseController {
         $twoMonthsAgo = \Carbon\Carbon::now()->subMonths(6)->startOfDay();
 
         // Получаем даты и количество несгруппированных, незакрытых, неотмененных заказов типа 1
+        // и только со статусом "Переданные в такси, поскольку "принятые" могут еще редактироваться
         $groupingDates = Order::selectRaw('DATE(visit_data) as grouping_date, COUNT(*) as count')
                 ->where('visit_data', '>=', $twoMonthsAgo) // Ограничение на дату                
                 ->whereNull('closed_at')
                 ->whereNull('cancelled_at')
+                ->whereNotNull('taxi_sent_at')
+                ->where ('taxi_way', '>', 0)
                 ->whereNull('order_group_id')
                 ->where('type_order', 1)
                 ->groupBy('grouping_date')
@@ -45,7 +48,6 @@ class OrderGroupingController extends BaseController {
     public function showOrdersForGrouping(Request $request) {
         $request->validate([
             'grouping_date' => 'required|date',
-            // Валидация новых параметров
             'time_tolerance' => 'required|integer|min:20|max:60', // Пример: от 20 до 60 минут
             'address_tolerance' => 'required|numeric|min:20|max:100', // Пример: от 20 до 100%
             'max_potential_group_size' => 'required|integer|min:1|max:20', // Установите логичный максимум            
@@ -62,8 +64,14 @@ class OrderGroupingController extends BaseController {
                 ->whereBetween('visit_data', [$selectedDate, $endDate])
                 ->whereNull('closed_at')
                 ->whereNull('cancelled_at')
+                ->whereNotNull('taxi_sent_at')
+                ->where ('taxi_way', '>', 0)
                 ->whereNull('order_group_id')  // не сгруппированные 
-                ->with(['client']) // Загружаем связь client (метод в модели Order)   
+                ->with([
+                    'client', // Загружаем связь client (метод в модели Order)   
+                    'currentStatus', // Загружаем текущий статус
+                    'currentStatus.statusOrder' // Загружаем связь statusOrder для текущего статуса
+                ])   
                 ->orderBy('visit_data')
                 ->orderBy('adres_otkuda')
                 ->orderBy('adres_kuda')

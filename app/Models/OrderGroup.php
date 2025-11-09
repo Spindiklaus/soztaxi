@@ -15,6 +15,9 @@ class OrderGroup extends Model
     protected $fillable = [
         'name',
         'visit_date',
+        'taxi_way',
+        'taxi_price',
+        'taxi_vozm',
         'komment',
     ];
 
