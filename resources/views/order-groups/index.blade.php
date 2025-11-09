@@ -21,6 +21,7 @@
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Километраж</th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Цена поездки</th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Сумма к возмещению</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Создано</th>
                             <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Действия</th>
                         </tr>
                     </thead>
@@ -28,9 +29,14 @@
                         @forelse($orderGroups as $group)
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $group->visit_date->format('d.m.Y H:i') }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $group->name }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    {{ Str::limit($group->name, 100, '...') }}
+                                </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $group->orders->count() }}</td>
 <!--                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{-- $group->komment --}}</td>-->
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $group->taxi_way }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $group->taxi_price }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $group->taxi_vozm }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $group->created_at->format('d.m.Y H:i') }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <a href="{{ route('order-groups.show', $group) }}" class="text-blue-600 hover:text-blue-900 mr-3" title="Просмотр">
