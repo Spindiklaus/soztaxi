@@ -1,4 +1,4 @@
-<!-- resources/views/orders/close/close-components/filter.blade.php -->
+<!-- resources/views/social-taxi-orders/close-components/filter.blade.php -->
 <form action="{{ route('social-taxi-orders.close.index') }}" method="GET" class="bg-white shadow rounded-lg mb-4">
     <div class="px-4 py-3 bg-gray-50 border-b border-gray-200">
         <button type="button" 
