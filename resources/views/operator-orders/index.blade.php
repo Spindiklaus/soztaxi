@@ -13,18 +13,21 @@
                             $typeColor = 'text-blue-600';
                             $theadColor = 'bg-blue-800';
                             $hoverColor = 'bg-blue-700';
+                            $tableInclude = 'operator-orders.index-components.table_soz';
                             break;
                         case 2: 
                             $typeName = 'Легковое авто';
                             $typeColor = 'text-green-600';
                             $theadColor = 'bg-green-600';
                             $hoverColor = 'bg-green-500';
+                            $tableInclude = 'operator-orders.index-components.table_la';
                             break;
                         case 3: 
                             $typeName = 'ГАЗель';
                             $typeColor = 'text-yellow-600';
                             $theadColor = 'bg-yellow-600';
                             $hoverColor = 'bg-yellow-500';
+                            $tableInclude = 'operator-orders.index-components.table_gaz';
                             break;
                     }
                 @endphp
@@ -42,11 +45,11 @@
             <!-- Фильтры -->
             @include('operator-orders.index-components.filters')
             <!-- Пагинация -->
-            <div class="mt-4 mb-2"">
+            <div class="mt-4 mb-2">
                 {{ $orders->links() }}
             </div>
             <!-- Таблица заказов -->
-            @include('operator-orders.index-components.table')
+            @include($tableInclude)
 
             <!-- Пагинация -->
             <div class="mt-6">
