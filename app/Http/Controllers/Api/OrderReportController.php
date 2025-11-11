@@ -45,7 +45,9 @@ class OrderReportController extends Controller
                 'orders.adres_kuda',
                 'orders.adres_obratno as adres_obratno_addr', // Переименовываем, чтобы не пересекалось
                 'fio_dtrns.fio as client_name',    
-                DB::raw('JSON_OBJECT("status_order", JSON_OBJECT("id", so.id, "name", so.name, "color", so.color)) as current_status_json')
+                'so.id as status_order_id',
+                'so.name as status_order_name',
+                'so.color as status_order_color'   
             )
             ->leftJoinSub($latestStatusSubquery, 'ls', 'orders.id', '=', 'ls.order_id')
             ->leftJoin('fio_dtrns', 'orders.client_id', '=', 'fio_dtrns.id') // 
@@ -83,13 +85,26 @@ class OrderReportController extends Controller
             return response()->json(['error' => 'Внутренняя ошибка сервера'], 500);
         }
 
-        // Преобразуем JSON строку в объект для current_status
+        // Преобразуем результат, чтобы сформировать структуру current_status без JSON_OBJECT
         $orders = $orders->map(function ($order) {
-            $order->current_status = json_decode($order->current_status_json);
-            unset($order->current_status_json);
+            // Создаем объект current_status в PHP
+            $order->current_status = [
+                'status_order' => [
+                    'id' => $order->status_order_id,
+                    'name' => $order->status_order_name,
+                    'color' => $order->status_order_color,
+                ]
+            ];
+
+            // Удаляем временные поля, использованные для формирования current_status
+            unset($order->status_order_id);
+            unset($order->status_order_name);
+            unset($order->status_order_color);
+
             // Создаем объект клиента с именем из fio_dtrns
             $order->client = ['name' => $order->client_name];
             unset($order->client_name);
+
             return $order;
         });
 
