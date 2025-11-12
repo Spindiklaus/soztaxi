@@ -96,7 +96,7 @@ class FioDtrnController extends BaseController {
         $sort = $request->input('sort', 'id');
         $direction = $request->input('direction', 'asc');
 
-        $allowedSorts = ['id', 'fio', 'kl_id', 'data_r', 'sex', 'orders_count'];
+        $allowedSorts = ['id', 'fio', 'kl_id', 'data_r', 'sex', 'orders_count', 'rip_at'];
         if (!in_array($sort, $allowedSorts)) {
             $sort = 'id';
         }
