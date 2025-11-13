@@ -142,7 +142,7 @@
                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
             @enderror
             <p class="mt-1 text-xs text-gray-500">
-                Дата обратной поездки должна быть позже даты основной поездки
+                Время обратной поездки должно быть позже времени основной поездки
             </p>
         </div>
         <div>
@@ -158,7 +158,7 @@
             @enderror
             @if($type == 2 || $type == 3)
                 <p class="mt-1 text-xs text-gray-500">
-                    Обратный адрес доступен только для поездки в обе стороны
+                    Обратный адрес доступен только при поездке в обе стороны
                 </p>
             @endif
         </div>
@@ -229,15 +229,15 @@
             </div>
         @endif
     </div>
-    <!-- Комментарий -->
-    <div class="mt-4">
+    <!-- Комментарий, убрал по требрванию операторов -->
+<!--    <div class="mt-4">
         <label for="komment" class=" block text-sm font-medium text-gray-700">Комментарий</label>
         <textarea name="komment" id="komment" 
               rows="3" 
               placeholder="Введите комментарий к заказу"
               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('komment', $autoComment ?? $copiedOrder->komment ?? '') }}</textarea>
         @error('komment')
-            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+            <p class="mt-1 text-sm text-red-600">{{-- $message --}}</p>
         @enderror
-    </div>
+    </div>-->
 </div>

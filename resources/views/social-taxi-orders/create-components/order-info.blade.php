@@ -1,4 +1,4 @@
-<!-- Предварительная информация о заказе -->
+<!-- Предварительная информация о заказе, заголовок -->
 <!-- resources/views/social-taxi-orders/create-components/order-info.blade.php -->
 <div class="bg-gray-50 p-4 rounded-lg mb-6">
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
