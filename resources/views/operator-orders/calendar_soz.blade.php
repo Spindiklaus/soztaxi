@@ -1,5 +1,5 @@
 <x-app-layout>
- <div class="container mx-auto px-4 py-6">
+ <div class="max-w-4xl mx-auto px-4 py-6">
     <h1 class="text-2xl font-bold text-gray-800 mb-4">Календарь поездок клиента: {{ $client->fio }}</h1>
 
     <!-- Кнопка "Назад" -->
@@ -10,6 +10,15 @@
         </svg>
         Назад к списку заказов
     </a>
+    
+    <!-- Включаем компонент информации о клиенте -->
+        @include('operator-orders.calendar-components.client-info')
+
+        <!-- Включаем компонент количества поездок -->
+        @include('operator-orders.calendar-components.trip-counts')
+
+        <!-- Календарь -->
+    
 
     <div class="bg-white shadow overflow-hidden sm:rounded-lg p-4">
         @php
@@ -71,5 +80,32 @@
             @endphp
         </div>
     </div>
-</div>   
+        
+<!-- Модальное окно с поездками клиента -->
+@include('social-taxi-orders.show-components.client-trips-modal')        
+    
+        <!-- JavaScript для переключения блоков информации -->
+    <script>
+        function toggleClientInfo() {
+            const content = document.getElementById('client-info-content');
+            const arrow = document.getElementById('client-info-arrow');
+            content.classList.toggle('hidden');
+            arrow.classList.toggle('rotate-180');
+        }
+
+        function toggleTripCounts() {
+            const content = document.getElementById('trip-counts-content');
+            const arrow = document.getElementById('trip-counts-arrow');
+            content.classList.toggle('hidden');
+            arrow.classList.toggle('rotate-180');
+        }
+    </script>
+        
+        
+</div> 
+
+
+    
+<!-- JavaScript для модального окна -->
+    @include('social-taxi-orders.show-components.scripts.modal-scripts')    
 </x-app-layout>

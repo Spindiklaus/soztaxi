@@ -1,3 +1,4 @@
+<!-- resources/views/social-taxi-orders/show-components/client-trips-modal.blade.php -->
 <!-- Модальное окно с поездками клиента -->
 <div id="client-trips-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
         <div class="bg-white rounded-lg w-full max-w-6xl min-w-[300px] max-h-[90vh] overflow-hidden flex flex-col mx-auto">
