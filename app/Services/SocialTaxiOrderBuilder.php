@@ -102,6 +102,11 @@ class SocialTaxiOrderBuilder {
                 $q->where('fio', 'like', '%' . $request->input('client_fio') . '%');
             });
         }
+        
+        // Фильтрация по ID клиента
+        if ($request->filled('filter_client_id')) {
+            $this->query->where('client_id', $request->input('filter_client_id'));
+        }
 
         // Фильтрация по диапазону дат ПОЕЗДКИ
         $DateFrom = $request->input('date_from');
