@@ -39,11 +39,11 @@ class TaxiOrderController extends BaseController {
 //        'all_params' => $request->all()
 //    ]);
         // Устанавливаем фильтр по дате поездки по умолчанию - начало и конец текущего месяца
-        if (!$request->has('visit_date_from')) {
-            $request->merge(['visit_date_from' => Carbon::now()->startOfMonth()->toDateString()]);
+        if (!$request->has('date_from')) {
+            $request->merge(['date_from' => Carbon::now()->startOfMonth()->toDateString()]);
         }
-        if (!$request->has('visit_date_to')) {
-            $request->merge(['visit_date_to' => Carbon::now()->endOfMonth()->toDateString()]);
+        if (!$request->has('date_to')) {
+            $request->merge(['date_to' => Carbon::now()->endOfMonth()->toDateString()]);
         }
 
         // Собираем параметры для передачи в шаблон
@@ -76,8 +76,8 @@ class TaxiOrderController extends BaseController {
 
     public function exportToTaxi(Request $request) {
         \Log::info('Export to taxi called', [
-            'visit_date_from' => $request->get('visit_date_from'),
-            'visit_date_to' => $request->get('visit_date_to'),
+            'date_from' => $request->get('date_from'),
+            'date_to' => $request->get('date_to'),
             'taxi_id' => $request->get('taxi_id'),
             'all_params' => $request->all()
         ]);
@@ -95,12 +95,12 @@ class TaxiOrderController extends BaseController {
         \Log::info('Orders found for export', ['count' => $orders->count()]);
 
         // Формируем имя файла и передаем даты в экспорт
-        $visitDateFrom = $request->get('visit_date_from', date('Y-m-d'));
-        $visitDateTo = $request->get('visit_date_to', date('Y-m-d'));
+        $DateFrom = $request->get('date_from', date('Y-m-d'));
+        $DateTo = $request->get('date_to', date('Y-m-d'));
         // Создаем Carbon объекты для форматирования
-        $formattedDateFrom = \Carbon\Carbon::createFromFormat('Y-m-d', $visitDateFrom)->format('d.m.Y');
-        $formattedDateTo = \Carbon\Carbon::createFromFormat('Y-m-d', $visitDateTo)->format('d.m.Y');
-        $fileName = 'Сведения_для_передачи_оператору_такси_' . $visitDateFrom . '_по_' . $visitDateTo . '.xlsx';
+        $formattedDateFrom = \Carbon\Carbon::createFromFormat('Y-m-d', $DateFrom)->format('d.m.Y');
+        $formattedDateTo = \Carbon\Carbon::createFromFormat('Y-m-d', $DateTo)->format('d.m.Y');
+        $fileName = 'Сведения_для_передачи_оператору_такси_' . $DateFrom . '_по_' . $DateTo . '.xlsx';
 
         // Экспортируем - передаем все три аргумента!
         return Excel::download(new TaxiOrdersExport($orders, $formattedDateFrom, $formattedDateTo, $taxi), $fileName);
@@ -111,11 +111,11 @@ class TaxiOrderController extends BaseController {
 
             // Проверяем, что дата передачи меньше даты поездки
             $taxiSentAt = \Carbon\Carbon::createFromFormat('Y-m-d\TH:i', $validated['taxi_sent_at']);
-            $visitDateFrom = \Carbon\Carbon::parse($validated['visit_date_from']);
+            $DateFrom = \Carbon\Carbon::parse($validated['date_from']);
 
-            if ($taxiSentAt >= $visitDateFrom) {
+            if ($taxiSentAt >= $DateFrom) {
                 return redirect()->back()->with('error', 'Дата передачи в такси '.$taxiSentAt->format('d.m.Y') .' должна быть меньше даты фильтра '
-                        . $visitDateFrom->format('d.m.Y') . '.');
+                        . $DateFrom->format('d.m.Y') . '.');
             }
            
             // Получаем количество заказов для обновления

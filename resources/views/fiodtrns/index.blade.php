@@ -143,15 +143,15 @@
                                    class="rounded border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                         </div>
                         <div class="flex-1 min-w-[200px]">
-                            <label for="visit_date_from" class="block text-sm font-medium text-gray-700">Дата поездки с</label>
-                            <input type="date" name="visit_date_from" id="visit_date_from"
-                                   value="{{ request('visit_date_from') }}"
+                            <label for="date_from" class="block text-sm font-medium text-gray-700">Дата поездки с</label>
+                            <input type="date" name="date_from" id="date_from"
+                                   value="{{ request('date_from') }}"
                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                         </div>
                         <div class="flex-1 min-w-[200px]">
-                            <label for="visit_date_to" class="block text-sm font-medium text-gray-700">Дата поездки по</label>
-                            <input type="date" name="visit_date_to" id="visit_date_to"
-                                   value="{{ request('visit_date_to') }}"
+                            <label for="date_to" class="block text-sm font-medium text-gray-700">Дата поездки по</label>
+                            <input type="date" name="date_to" id="date_to"
+                                   value="{{ request('date_to') }}"
                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                         </div>
                         <!-- Кнопки перемещены сюда -->

@@ -13,14 +13,14 @@ class TaxiOrderBuilder extends SocialTaxiOrderBuilder
     public function applyFilters(Request $request): self
     {
         // Фильтрация по диапазону дат ПОЕЗДКИ
-        $visitDateFrom = $request->input('visit_date_from');
-        $visitDateTo = $request->input('visit_date_to');
+        $DateFrom = $request->input('date_from');
+        $DateTo = $request->input('date_to');
         
-        if ($visitDateFrom) {
-            $this->query->whereDate('visit_data', '>=', $visitDateFrom);
+        if ($DateFrom) {
+            $this->query->whereDate('visit_data', '>=', $DateFrom);
         }
-        if ($visitDateTo) {
-            $this->query->whereDate('visit_data', '<=', $visitDateTo);
+        if ($DateTo) {
+            $this->query->whereDate('visit_data', '<=', $DateTo);
         }
         
         // Исключаем отмененные заказы

@@ -23,11 +23,11 @@
                     <div class="flex flex-col">
                         <label class="block text-sm font-medium text-gray-700">Дата поездки</label>
                         <div class="flex gap-2">
-                            <input type="date" name="visit_date_from" id="visit_date_from" 
-                                    value="{{ request('visit_date_from', date('Y-m-d')) }}" 
+                            <input type="date" name="date_from" id="date_from" 
+                                    value="{{ request('date_from', date('Y-m-d')) }}" 
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                            <input type="date" name="visit_date_to" id="visit_date_to" 
-                                   value="{{ request('visit_date_to', date('Y-m-d')) }}" 
+                            <input type="date" name="date_to" id="date_to" 
+                                   value="{{ request('date_to', date('Y-m-d')) }}" 
                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                         </div>
                     </div>

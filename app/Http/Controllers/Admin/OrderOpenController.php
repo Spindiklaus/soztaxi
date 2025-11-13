@@ -24,11 +24,11 @@ class OrderOpenController extends BaseController {
         $direction = $request->get('direction', 'asc');
         
         // Устанавливаем фильтр по дате поездки по умолчанию - начало и конец текущего месяца
-        if (!$request->has('visit_date_from')) {
-            $request->merge(['visit_date_from' => Carbon::now()->startOfMonth()->toDateString()]);
+        if (!$request->has('date_from')) {
+            $request->merge(['date_from' => Carbon::now()->startOfMonth()->toDateString()]);
         }
-        if (!$request->has('visit_date_to')) {
-            $request->merge(['visit_date_to' => Carbon::now()->endOfMonth()->toDateString()]);
+        if (!$request->has('date_to')) {
+            $request->merge(['date_to' => Carbon::now()->endOfMonth()->toDateString()]);
         }
 
         $urlParams = $this->orderService->getUrlParams();        
@@ -61,16 +61,16 @@ class OrderOpenController extends BaseController {
         $validated = $request->validate([
             'order_ids' => 'required|array|min:1', // Обязательно, массив, минимум 1 элемент
             'order_ids.*' => 'integer|exists:orders,id',
-            'visit_date_from' => 'required|date_format:Y-m-d',
-            'visit_date_to' => 'required|date_format:Y-m-d',
+            'date_from' => 'required|date_format:Y-m-d',
+            'date_to' => 'required|date_format:Y-m-d',
             'taxi_id' => 'nullable|integer|exists:taxis,id',
         ]);
 
         $currentUser = auth()->user();
         $operatorInfo = $currentUser->name . ' (' . $currentUser->litera . ')';
 
-        $query = Order::whereDate('visit_data', '>=', $validated['visit_date_from'])
-                ->whereDate('visit_data', '<=', $validated['visit_date_to'])
+        $query = Order::whereDate('visit_data', '>=', $validated['date_from'])
+                ->whereDate('visit_data', '<=', $validated['date_to'])
                 ->where('taxi_id', $validated['taxi_id'])
                 ->whereNotNull('closed_at') // Только закрытые
                 ->whereHas('currentStatus', function ($q) {

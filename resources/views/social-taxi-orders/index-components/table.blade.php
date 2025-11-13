@@ -20,9 +20,9 @@
     <!--    <div class="p-4 text-sm text-gray-600">
             Текущая сортировка: <strong x-text="`Поле: ${sortField}, Направление: ${sortDirection}`"></strong>
         </div>  -->
-    <div class="overflow-x-auto">
+    <div class="overflow-auto max-h-[70vh]">
         <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-blue-800 text-gray-200">
+            <thead class="bg-blue-800 text-gray-200 sticky top-0 z-10 shadow-lg">
                 <tr>
                     <th @click="sortBy('pz_data')" scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-blue-700">
                         Заказ и статус

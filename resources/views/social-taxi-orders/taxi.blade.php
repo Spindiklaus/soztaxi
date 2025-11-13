@@ -15,8 +15,8 @@
                 </a>
                 <!-- Экспорт в такси -->
                 <form id="export-form" action="{{ route('taxi-orders.export.to.taxi') }}" method="GET" target="_blank" class="inline">
-                    <input type="hidden" name="visit_date_from" value="{{ request('visit_date_from', date('Y-m-d')) }}">
-                    <input type="hidden" name="visit_date_to" value="{{ request('visit_date_to', date('Y-m-d')) }}">
+                    <input type="hidden" name="date_from" value="{{ request('date_from', date('Y-m-d')) }}">
+                    <input type="hidden" name="date_to" value="{{ request('date_to', date('Y-m-d')) }}">
                     <input type="hidden" name="sort" value="{{ $sort ?? 'visit_data' }}">
                     <input type="hidden" name="direction" value="{{ $direction ?? 'asc' }}">
                     <button type="submit"
@@ -32,8 +32,8 @@
                 <form action="{{ route('taxi-orders.set-sent-date') }}" method="POST" class="inline">
                     @csrf
                     <input type="hidden" name="taxi_sent_at" value="{{ request('taxi_sent_at', now()->format('Y-m-d\TH:i')) }}">
-                    <input type="hidden" name="visit_date_from" value="{{ request('visit_date_from', date('Y-m-d')) }}">
-                    <input type="hidden" name="visit_date_to" value="{{ request('visit_date_to', date('Y-m-d')) }}">
+                    <input type="hidden" name="date_from" value="{{ request('date_from', date('Y-m-d')) }}">
+                    <input type="hidden" name="date_to" value="{{ request('date_to', date('Y-m-d')) }}">
                     <input type="hidden" name="taxi_id" value="{{ request('taxi_id') }}">
                     <button type="submit"
                             class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition ease-in-out duration-150"
@@ -50,8 +50,8 @@
                 <form action="{{ route('taxi-orders.unset-sent-date') }}" method="POST" class="inline">
                     @csrf
                     @method('PATCH')
-                    <input type="hidden" name="visit_date_from" value="{{ request('visit_date_from', date('Y-m-d')) }}">
-                    <input type="hidden" name="visit_date_to" value="{{ request('visit_date_to', date('Y-m-d')) }}">
+                    <input type="hidden" name="date_from" value="{{ request('date_from', date('Y-m-d')) }}">
+                    <input type="hidden" name="date_to" value="{{ request('date_to', date('Y-m-d')) }}">
                     <input type="hidden" name="taxi_id" value="{{ request('taxi_id') }}">
                     <input type="hidden" name="taxi_sent_at" value="{{ request('taxi_sent_at') }}">                        
                     <button type="submit"
@@ -69,8 +69,8 @@
                  <form action="{{ route('taxi-orders.transfer.predictive.data') }}" method="POST" class="inline">
                     @csrf
                     @method('PATCH')
-                    <input type="hidden" name="visit_date_from" value="{{ request('visit_date_from', date('Y-m-d')) }}">
-                    <input type="hidden" name="visit_date_to" value="{{ request('visit_date_to', date('Y-m-d')) }}">
+                    <input type="hidden" name="date_from" value="{{ request('date_from', date('Y-m-d')) }}">
+                    <input type="hidden" name="date_to" value="{{ request('date_to', date('Y-m-d')) }}">
                     <input type="hidden" name="taxi_id" value="{{ request('taxi_id') }}">
                     <input type="hidden" name="taxi_sent_at" value="{{ request('taxi_sent_at') }}">                        
                     <button type="submit"

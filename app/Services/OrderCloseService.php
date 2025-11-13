@@ -12,7 +12,7 @@ class OrderCloseService extends SocialTaxiOrderService
     public function getUrlParams() {
         
         $params = request()->only([
-            'sort', 'direction', 'visit_date_from', 'visit_date_to', 'page', 'taxi_id'
+            'sort', 'direction', 'date_from', 'date_to', 'page', 'taxi_id'
         ]);
         \Log::info('GetUrlParams OrderCloseService result', ['params' => $params]);
         return $params;

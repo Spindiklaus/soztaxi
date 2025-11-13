@@ -80,14 +80,14 @@ class SocialTaxiOrderBuilder {
             });
         }
 
-        // Фильтрация по диапазону дат ПРИЕМА заказа
-        $dateFrom = $request->input('date_from', '2016-08-01');
+        // Фильтрация по диапазону дат поездок
+        $dateFrom = $request->input('date_from', '2025-01-01');
         $dateTo = $request->input('date_to', date('Y-m-d'));
         if ($dateFrom) {
-            $this->query->whereDate('pz_data', '>=', $dateFrom);
+            $this->query->whereDate('visit_data', '>=', $dateFrom);
         }
         if ($dateTo) {
-            $this->query->whereDate('pz_data', '<=', $dateTo);
+            $this->query->whereDate('visit_data', '<=', $dateTo);
         }
 
         // Фильтрация по оператору (user_id)
@@ -104,14 +104,14 @@ class SocialTaxiOrderBuilder {
         }
 
         // Фильтрация по диапазону дат ПОЕЗДКИ
-        $visitDateFrom = $request->input('visit_date_from');
-        $visitDateTo = $request->input('visit_date_to');
+        $DateFrom = $request->input('date_from');
+        $DateTo = $request->input('date_to');
 
-        if ($visitDateFrom) {
-            $this->query->whereDate('visit_data', '>=', $visitDateFrom);
+        if ($DateFrom) {
+            $this->query->whereDate('visit_data', '>=', $DateFrom);
         }
-        if ($visitDateTo) {
-            $this->query->whereDate('visit_data', '<=', $visitDateTo);
+        if ($DateTo) {
+            $this->query->whereDate('visit_data', '<=', $DateTo);
         }
 
 

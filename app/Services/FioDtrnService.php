@@ -20,8 +20,8 @@ class FioDtrnService {
             'filter_kl_id',
             'filter_sex',
             'rip',
-            'visit_date_from',
-            'visit_date_to',
+            'date_from',
+            'date_to',
             'page', 
             // Добавьте другие параметры, если они используются
         ]);

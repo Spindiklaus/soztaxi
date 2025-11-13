@@ -21,8 +21,8 @@
             <div class="flex flex-wrap gap-2 mb-4">
             <form action="{{ route('social-taxi-orders.close.bulk-close') }}" method="POST" class="mb-4">
                 @csrf
-                <input type="hidden" name="visit_date_from" value="{{ request('visit_date_from', date('Y-m-d')) }}">
-                <input type="hidden" name="visit_date_to" value="{{ request('visit_date_to', date('Y-m-d')) }}">
+                <input type="hidden" name="date_from" value="{{ request('date_from', date('Y-m-d')) }}">
+                <input type="hidden" name="date_to" value="{{ request('date_to', date('Y-m-d')) }}">
                 <input type="hidden" name="taxi_id" value="{{ request('taxi_id') }}">
 
                 <button type="submit"

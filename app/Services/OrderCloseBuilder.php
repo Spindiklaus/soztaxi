@@ -13,14 +13,14 @@ class OrderCloseBuilder
         $query = Order::with(['currentStatus.statusOrder', 'client', 'category', 'dopus', 'taxi', 'user']);
 
         // Фильтрация по дате поездки
-        $visitDateFrom = $request->get('visit_date_from');
-        $visitDateTo = $request->get('visit_date_to');
+        $DateFrom = $request->get('date_from');
+        $DateTo = $request->get('date_to');
 
-        if ($visitDateFrom) {
-            $query->whereDate('visit_data', '>=', $visitDateFrom);
+        if ($DateFrom) {
+            $query->whereDate('visit_data', '>=', $DateFrom);
         }
-        if ($visitDateTo) {
-            $query->whereDate('visit_data', '<=', $visitDateTo);
+        if ($DateTo) {
+            $query->whereDate('visit_data', '<=', $DateTo);
         }
 
         // Фильтрация по оператору такси

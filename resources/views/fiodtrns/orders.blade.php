@@ -6,15 +6,15 @@
             </h1>
             
             <!-- Отображение применённых фильтров даты (опционально) -->
-            @if(request('visit_date_from') || request('visit_date_to'))
+            @if(request('date_from') || request('date_to'))
             <div class="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
                 <p class="text-sm text-blue-800">
                     <strong>Фильтр по дате поездки:</strong>
-                    @if(request('visit_date_from'))
-                        с {{ \Carbon\Carbon::parse(request('visit_date_from'))->format('d.m.Y') }}
+                    @if(request('date_from'))
+                        с {{ \Carbon\Carbon::parse(request('date_from'))->format('d.m.Y') }}
                     @endif
-                    @if(request('visit_date_to'))
-                        по {{ \Carbon\Carbon::parse(request('visit_date_to'))->format('d.m.Y') }}
+                    @if(request('date_to'))
+                        по {{ \Carbon\Carbon::parse(request('date_to'))->format('d.m.Y') }}
                     @endif
                 </p>
             </div>

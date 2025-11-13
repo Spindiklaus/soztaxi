@@ -43,18 +43,18 @@ class FioDtrnController extends BaseController {
         }
 
         // --- Фильтр по дате поездок ---
-        $visitDateFrom = $request->input('visit_date_from');
-        $visitDateTo = $request->input('visit_date_to');
+        $DateFrom = $request->input('date_from');
+        $DateTo = $request->input('date_to');
 
         // Коллекция для хранения ID клиентов, у которых есть заказы в диапазоне
         $filteredClientIds = null;
-        if ($visitDateFrom || $visitDateTo) {
+        if ($DateFrom || $DateTo) {
             $orderQuery = Order::select('client_id'); // Ищем по client_id
-            if ($visitDateFrom) {
-                $orderQuery->whereDate('visit_data', '>=', $visitDateFrom);
+            if ($DateFrom) {
+                $orderQuery->whereDate('visit_data', '>=', $DateFrom);
             }
-            if ($visitDateTo) {
-                $orderQuery->whereDate('visit_data', '<=', $visitDateTo);
+            if ($DateTo) {
+                $orderQuery->whereDate('visit_data', '<=', $DateTo);
             }
 
             // Получаем уникальные ID клиентов из заказов
@@ -230,8 +230,8 @@ class FioDtrnController extends BaseController {
     public function showOrders(FioDtrn $fiodtrn, Request $request) {
         
         // Получаем фильтры даты из запроса
-        $visitDateFrom = $request->input('visit_date_from');
-        $visitDateTo = $request->input('visit_date_to');
+        $DateFrom = $request->input('date_from');
+        $DateTo = $request->input('date_to');
       
         $orderQuery = Order::where('client_id', $fiodtrn->id)
             ->whereNull('deleted_at');
@@ -249,7 +249,7 @@ class FioDtrnController extends BaseController {
             ->paginate(15);
 
         // Для корректной работы пагинации с параметрами, добавляем их к пагинатору
-        $orders->appends($request->only(['visit_date_from', 'visit_date_to']));
+        $orders->appends($request->only(['date_from', 'date_to']));
         $urlParams = $this->fioDtrnService->getUrlParams();
 
         return view('fiodtrns.orders', compact('fiodtrn', 'orders', 'urlParams'));

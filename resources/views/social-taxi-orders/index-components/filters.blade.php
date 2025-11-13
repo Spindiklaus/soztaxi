@@ -79,11 +79,11 @@
             
 
             <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700">Дата приема заказа</label>
+                <label class="block text-sm font-medium text-gray-700">Дата поездки:</label>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
                         <input type="date" name="date_from" id="date_from" 
-                               value="{{ request('date_from', '2016-08-01') }}" 
+                               value="{{ request('date_from', '2025-01-01') }}" 
                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                     </div>
                     <div>
@@ -103,7 +103,7 @@
                     // Собираем параметры для сброса - оставляем только базовые
                     $baseParams = request()->only(['sort', 'direction']);
                     $resetParams = array_merge($baseParams, [
-                        'date_from' => '2016-08-01',
+                        'date_from' => '2025-01-01',
                         'date_to' => date('Y-m-d'),
                         'show_deleted' => '0'
                      ]);
@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const hasUserFilters = {{ 
         collect(request()->except(['sort', 'direction', 'page']))->filter(function($value, $key) {
             // Исключаем параметры по умолчанию
-            if ($key === 'date_from' && $value === '2016-08-01') return false;
+            if ($key === 'date_from' && $value === '2025-01-01') return false;
             if ($key === 'date_to' && $value === date('Y-m-d')) return false;
             if ($key === 'show_deleted' && $value === '0') return false;
             if ($key === 'filter_user_id' && $value === '0') return false;

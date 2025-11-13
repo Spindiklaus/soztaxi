@@ -14,7 +14,7 @@ class TaxiOrderService extends SocialTaxiOrderService
     public function getUrlParams() {
         
         $params = request()->only([
-            'sort', 'direction', 'visit_date_from', 'visit_date_to', 'page', 'taxi_id'
+            'sort', 'direction', 'date_from', 'date_to', 'page', 'taxi_id'
         ]);
         \Log::info('GetUrlParams result', ['params' => $params]);
         return $params;
@@ -23,8 +23,8 @@ class TaxiOrderService extends SocialTaxiOrderService
     //передача в такси
     public function setSentDate($validatedData, $taxiSentAt)
 {
-    $query = Order::whereDate('visit_data', '>=', $validatedData['visit_date_from'])
-        ->whereDate('visit_data', '<=', $validatedData['visit_date_to'])
+    $query = Order::whereDate('visit_data', '>=', $validatedData['date_from'])
+        ->whereDate('visit_data', '<=', $validatedData['date_to'])
         ->whereDoesntHave('currentStatus', function ($q) {
             $q->whereIn('status_order_id', [3, 4]);
         })
@@ -58,8 +58,8 @@ class TaxiOrderService extends SocialTaxiOrderService
 
 public function unsetSentDate($validatedData)
 {
-    $query = Order::whereDate('visit_data', '>=', $validatedData['visit_date_from'])
-        ->whereDate('visit_data', '<=', $validatedData['visit_date_to'])
+    $query = Order::whereDate('visit_data', '>=', $validatedData['date_from'])
+        ->whereDate('visit_data', '<=', $validatedData['date_to'])
         ->whereDoesntHave('currentStatus', function ($q) {
             $q->whereIn('status_order_id', [3, 4]);
         })
@@ -87,8 +87,8 @@ public function unsetSentDate($validatedData)
 
 public function transferPredictiveData($validatedData)
 {
-    $query = Order::whereDate('visit_data', '>=', $validatedData['visit_date_from'])
-        ->whereDate('visit_data', '<=', $validatedData['visit_date_to'])
+    $query = Order::whereDate('visit_data', '>=', $validatedData['date_from'])
+        ->whereDate('visit_data', '<=', $validatedData['date_to'])
         ->where('type_order', 1)
         ->whereHas('currentStatus', function ($q) {
             $q->where('status_order_id', 2);
