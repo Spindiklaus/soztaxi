@@ -250,7 +250,7 @@
                 @empty
                 <tr>
                     <td colspan="8" class="px-6 py-4 text-center text-gray-500">
-                        Заказы не найдены
+                        Закрытые заказы не найдены
                     </td>
                 </tr>
                 @endforelse

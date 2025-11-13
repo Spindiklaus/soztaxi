@@ -53,9 +53,12 @@
             </thead>
             <tbody class="divide-y divide-gray-200">
                 @forelse ($orders as $order)
+                <!-- 🔥 Красный фон для заказов без taxi_vozm -->
                 <tr 
                     @if(is_null($order->taxi_vozm) || $order->taxi_vozm <= 0)
-                        class="bg-red-100 hover:bg-red-200"  <!-- 🔥 Красный фон для заказов без taxi_vozm -->
+                        class="bg-red-100 hover:bg-red-200" title="Внимание! Нет фактических данных по заказу!"  
+                    @else
+                        class="divide-y divide-gray-200"
                     @endif
                 >
                     <td class="px-6 py-4">
@@ -250,7 +253,7 @@
                 @empty
                 <tr>
                     <td colspan="8" class="px-6 py-4 text-center text-gray-500">
-                        Заказы не найдены
+                        Заказы для закрытия не найдены
                     </td>
                 </tr>
                 @endforelse
