@@ -3,7 +3,6 @@
 // app/Http/Controllers/Operator/GazelleController.php
 namespace App\Http\Controllers\Operator;
 
-use App\Models\Order;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Services\SocialTaxiOrderService;
@@ -21,6 +20,12 @@ class GazelleController extends BaseController
     }
 
     public function index(Request $request) {
+        
+        // Получаем данные для маршрутов оператора из BaseController
+        $operatorRouteData = $this->getOperatorRouteData();
+        $operatorRoute = $operatorRouteData['operatorRoute'];
+        $operatorCurrentType = $operatorRouteData['operatorCurrentType'];
+        
         // Устанавливаем фильтр по типу заказа "ГАЗель" (ID = 3) и по текущему пользователю
         if (!$request->has('filter_type_order')) {
             $request->merge(['filter_type_order' => 3]);
@@ -53,7 +58,9 @@ class GazelleController extends BaseController
             'sort',
             'direction',
             'urlParams',
-            'operators'
+            'operators',
+            'operatorRoute',
+            'operatorCurrentType'
         ));
     }
 }

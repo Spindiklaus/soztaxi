@@ -1,4 +1,4 @@
-<!-- operator-orders.index-components/table.blade.php -->
+<!-- operator-orders.index-components/table_gaz.blade.php -->
 
 <div x-data="{
      sortField: '{{ $sort ?? 'pz_data' }}',
@@ -259,25 +259,13 @@
                         <div class="flex flex-col space-y-1">
                             <!-- Ссылка на просмотр заказа -->
                             @php
-                                $showRoute = route('social-taxi-orders.show', array_merge(['social_taxi_order' => $order], $urlParams));
-
-                                // Проверяем, если находимся на странице оператора
-                                $fromOperatorPage = session('from_operator_page');
-                                $operatorCurrentType = session('operator_current_type');
-
-                                if ($fromOperatorPage && $operatorCurrentType) {
-                                    $routeMap = [
-                                        1 => 'operator.social-taxi.index',
-                                        2 => 'operator.car.index',
-                                        3 => 'operator.gazelle.index'
-                                    ];
-                                    if (isset($routeMap[$operatorCurrentType])) {
-                                        $showParams = array_merge($urlParams, [
-                                            'back_to_operator' => $routeMap[$operatorCurrentType],
-                                            'operator_type' => $operatorCurrentType
-                                        ]);
-                                        $showRoute = route('social-taxi-orders.show', array_merge(['social_taxi_order' => $order], $showParams));
-                                    }
+                                $showRoute = route('social-taxi-orders.show', ['social_taxi_order' => $order] + $urlParams);
+                                if ($operatorRoute) {
+                                    $showRoute = route('social-taxi-orders.show', [
+                                    'social_taxi_order' => $order,
+                                    'back_to_operator' => $operatorRoute,
+                                    'operator_type' => $operatorCurrentType
+                                    ] + $urlParams);
                                 }
                             @endphp
 
@@ -291,25 +279,15 @@
 
                             @if(!$order->deleted_at)
                                 @if($status->id == 1)
-                                    <!-- В таблице, в кнопке редактирования -->
+                                    <!-- редактирование -->
                                     @php
-                                        $editRoute = route('social-taxi-orders.edit', array_merge(['social_taxi_order' => $order], $urlParams));
-                                        // Проверяем, если находимся на странице оператора
-                                        $fromOperatorPage = session('from_operator_page');
-                                        $operatorCurrentType = session('operator_current_type');
-                                        if ($fromOperatorPage && $operatorCurrentType) {
-                                            $routeMap = [
-                                                1 => 'operator.social-taxi.index',
-                                                2 => 'operator.car.index',
-                                                3 => 'operator.gazelle.index'
-                                            ];
-                                            if (isset($routeMap[$operatorCurrentType])) {
-                                                $editParams = array_merge($urlParams, [
-                                                'back_to_operator' => $routeMap[$operatorCurrentType],
-                                                'operator_type' => $operatorCurrentType
-                                                ]);
-                                                $editRoute = route('social-taxi-orders.edit', array_merge(['social_taxi_order' => $order], $editParams));
-                                            }
+                                        $editRoute = route('social-taxi-orders.edit', ['social_taxi_order' => $order] + $urlParams);
+                                        if ($operatorRoute) {
+                                            $editRoute = route('social-taxi-orders.edit', [
+                                            'social_taxi_order' => $order,
+                                            'back_to_operator' => $operatorRoute,
+                                            'operator_type' => $operatorCurrentType
+                                            ] + $urlParams);
                                         }
                                     @endphp
                                     <a href="{{ $editRoute }}" class="inline-flex items-center px-3 py-1 bg-yellow-100 text-yellow-800 rounded-md hover:bg-yellow-200 text-sm">

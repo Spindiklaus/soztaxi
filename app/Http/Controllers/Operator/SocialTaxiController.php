@@ -3,7 +3,6 @@
 // app/Http/Controllers/Operator/SocialTaxiController.php
 namespace App\Http\Controllers\Operator;
 
-use App\Models\Order;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Services\SocialTaxiOrderService;
@@ -21,6 +20,12 @@ class SocialTaxiController extends BaseController
     }
 
     public function index(Request $request) {
+        
+        // Получаем данные для маршрутов оператора из BaseController
+        $operatorRouteData = $this->getOperatorRouteData();
+        $operatorRoute = $operatorRouteData['operatorRoute'];
+        $operatorCurrentType = $operatorRouteData['operatorCurrentType'];
+        
         // Устанавливаем фильтр по типу заказа "Соцтакси" (ID = 1) и по текущему пользователю
         if (!$request->has('filter_type_order')) {
             $request->merge(['filter_type_order' => 1]);
@@ -41,7 +46,7 @@ class SocialTaxiController extends BaseController
         $urlParams = $this->orderService->getUrlParams();
 
         $query = $this->queryBuilder->build($request, $showDeleted == '1');
-        $orders = $query->paginate(15)->appends($request->all());
+        $orders = $query->paginate(100)->appends($request->all());
         
         
         // Сохраняем текущий тип заказа в сессии только для операторов
@@ -54,7 +59,9 @@ class SocialTaxiController extends BaseController
             'sort',
             'direction',
             'urlParams',
-            'operators'
+            'operators',
+            'operatorRoute',
+            'operatorCurrentType'
         ));
     }
 }
