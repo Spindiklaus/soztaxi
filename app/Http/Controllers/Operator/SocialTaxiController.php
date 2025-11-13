@@ -66,7 +66,7 @@ class SocialTaxiController extends BaseController
         ));
     }
     
-    public function calendarByClient(Request $request, FioDtrn $client, $date = null) // $date определяет метод календаря
+   public function calendarByClient(Request $request, FioDtrn $client, $date = null) // $date определяет метод календаря
 {
     // Получаем данные для маршрутов оператора из BaseController
     $operatorRouteData = $this->getOperatorRouteData();
@@ -78,8 +78,6 @@ class SocialTaxiController extends BaseController
         $request->merge(['filter_type_order' => 1]);
     }
 
-    // Фильтрация по клиенту через связь с моделью Order
-    // В SocialTaxiOrderBuilder нужно будет добавить обработку этого параметра
     if (!$request->has('filter_client_id')) {
         $request->merge(['filter_client_id' => $client->id]);
     }
@@ -88,26 +86,55 @@ class SocialTaxiController extends BaseController
     $sort = $request->get('sort', 'visit_data'); // Сортировка по дате поездки
     $direction = $request->get('direction', 'asc');
 
-    // Получаем заказы, отфильтрованные по клиенту
+    // --- ОПРЕДЕЛЕНИЕ МЕСЯЦА КАЛЕНДАРЯ ---
+    $targetDate = null;
+    if ($date) {
+        try {
+            $targetDate = \Carbon\Carbon::parse($date);
+        } catch (\Exception $e) {
+            // Если дата некорректна, используем текущую
+            $targetDate = now();
+        }
+    } else {
+        // Если параметр даты не передан, можно использовать текущий месяц или первый заказ
+        // Пока используем текущий
+        $targetDate = now();
+    }
+
+    // Определяем месяц календаря на основе $targetDate
+    $calendarMonth = $targetDate->startOfMonth();
+    // --- КОНЕЦ ОПРЕДЕЛЕНИЯ МЕСЯЦА ---
+
+    // --- ФИЛЬТРАЦИЯ ЗАКАЗОВ ЗА ВЫБРАННЫЙ МЕСЯЦ ---
+    // Временно добавляем фильтр по диапазону дат для получения заказов за конкретный месяц
+    $request->merge([
+        'date_from' => $calendarMonth->format('Y-m-d'),
+        'date_to' => $calendarMonth->endOfMonth()->format('Y-m-d'),
+    ]);
+    // --- КОНЕЦ ФИЛЬТРАЦИИ ---
+
+    // Получаем заказы, отфильтрованные по клиенту И по месяцу
     $query = $this->queryBuilder->build($request, $showDeleted == '1');
     $orders = $query->paginate(50)->appends($request->all());
 
-    // Подготовка данных для календаря
-    $targetDate = null;
-    if ($date) {
-        $targetDate = \Carbon\Carbon::parse($date);
-    } else {
-        $targetDate - now();
+    // --- ПОДГОТОВКА ДАННЫХ ДЛЯ КАЛЕНДАРЯ ---
+    $calendarData = [];
+    foreach ($orders as $order) {
+        if ($order->visit_data) {
+            $dateKey = $order->visit_data->format('Y-m-d');
+            $calendarData[$dateKey][] = $order;
+        }
     }
-    
+    // --- КОНЕЦ ПОДГОТОВКИ ---
 
-    // Определяем начальную и конечную даты для построения календаря
-    // Учитываем только заказы, отфильтрованные выше
-    $startDate = collect($calendarData)->keys()->min() ? now()->parse(collect($calendarData)->keys()->min())->startOfMonth() : now()->startOfMonth();
-    $endDate = collect($calendarData)->keys()->max() ? now()->parse(collect($calendarData)->keys()->max())->endOfMonth() : now()->endOfMonth();
+    // --- ОПРЕДЕЛЕНИЕ $startDate и $endDate ---
+    // Устанавливаем startDate и endDate на начало и конец *вычисленного* месяца
+    $startDate = $calendarMonth->copy()->startOfMonth();
+    $endDate = $calendarMonth->copy()->endOfMonth();
+    // --- КОНЕЦ ОПРЕДЕЛЕНИЯ ---
 
     // Собираем параметры URL для передачи в шаблон и обратной навигации
-    $urlParams = $this->orderService->getUrlParams(); // Убедитесь, что этот метод возвращает массив параметров
+    $urlParams = $this->orderService->getUrlParams();
 
     // Сохраняем тип заказа и путь оператора в сессию
     session(['operator_current_type' => $request->get('type_order', 1)]);
@@ -120,7 +147,7 @@ class SocialTaxiController extends BaseController
         'endDate',
         'operatorRoute',
         'operatorCurrentType',
-        'urlParams' // Передаем параметры
+        'urlParams'
     ));
 }
     

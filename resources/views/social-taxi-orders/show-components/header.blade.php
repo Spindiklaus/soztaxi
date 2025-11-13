@@ -1,3 +1,5 @@
+<!-- resources/views/sozial-taxi-orders/show-components/header.blade.php -->
+
 <div class="flex justify-between items-center mb-6">
     <div>
         <h1 class="text-3xl font-bold text-gray-800">Заказ №{{ $order->pz_nom ?? 'Неизвестный'}}</h1>

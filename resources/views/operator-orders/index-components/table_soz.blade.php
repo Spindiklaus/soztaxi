@@ -94,7 +94,7 @@
                                     <span class="text-lg">{{ $order->visit_obratno->format('H:i') }}</span>
                                 </div>
                             @endif                            
-                            {{-- --- Добавляем отображение имени группы --- --}}
+                            <!-- Добавляем отображение имени группы -->
                             @if($order->orderGroup) {{-- Проверяем, есть ли связанная группа --}}
                                 <div class="mt-1">
                                     <span class="inline-block px-2 py-1 text-xs font-semibold bg-blue-100 text-blue-800 rounded-full">
@@ -102,7 +102,7 @@
                                     </span>
                                 </div>
                             @endif
-                            {{-- --- Конец добавления группы--- --}}
+                            <!-- Конец добавления группы -->
                         @endif
                     </td>
                     <td class="px-4 py-2"><!-- откуда -->
@@ -131,7 +131,7 @@
                     </td>
                     <td class="px-4 py-2"> <!-- клиент -->
                         @if($order->client)
-                            <a href="{{ route('operator.social-taxi.calendar.client', ['client' => $order->client_id, 'date' => $order->visit_data->format('Y-m-d')] + $urlParams) }}" class="text-sm font-medium text-blue-600 hover:text-blue-900 hover:underline"
+                           <a href="{{ route('operator.social-taxi.calendar.client', ['client' => $order->client_id, 'date' => $order->visit_data->format('Y-m-d')] + $urlParams) }}" class="text-sm font-medium text-blue-600 hover:text-blue-900 hover:underline"
                                 title="{{ $order->client_tel ? 'Тел: ' . $order->client_tel . "\n" : '' }}{{ $order->client_invalid ? 'Удостоверение: ' . $order->client_invalid . "\n" : '' }}{{ $order->client_sopr ? 'Сопровождающий: ' . $order->client_sopr . "\n" : '' }}{{ $order->category ? 'NMV: ' . $order->category->nmv . "\nКатегория: " . $order->category->name . "\nСкидка: " . $order->category->skidka . "%\nЛимит: " . $order->category->kol_p . " поездок/мес\n" : '' }}{{ $order->dopus ? $order->dopus->name : '' }}"
                             >
                                 {{ $order->client->fio }}

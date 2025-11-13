@@ -117,8 +117,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/social-taxi', [SocialTaxiController::class, 'index'])->name('social-taxi.index');
         Route::get('/car', [CarController::class, 'index'])->name('car.index');
         Route::get('/gazelle', [GazelleController::class, 'index'])->name('gazelle.index');
-        
-        Route::get('/social-taxi/calendar/client/{client}/date/{date}', [SocialTaxiController::class, 'calendarByClient'])->name('operator.social-taxi.calendar.client');
+
+        Route::get('/social-taxi/calendar/client/{client}/date/{date}', [SocialTaxiController::class, 'calendarByClient'])->name('social-taxi.calendar.client');
     });
     Route::resource('social-taxi-orders', SocialTaxiOrderController::class)->names('social-taxi-orders'); 
     // маршрут для восстановления
