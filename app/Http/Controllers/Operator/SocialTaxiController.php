@@ -172,6 +172,20 @@ public function copyOrder(Request $request)
 
         // Загружаем оригинальный заказ
         $originalOrder = Order::findOrFail($orderId);
+        
+        
+        // Проверка, отличается ли новая дата/время от оригинальной более чем на 30 минут ---
+        if ($originalOrder->visit_data) {
+            $originalVisitDateTime = $originalOrder->visit_data;
+            // Вычисляем абсолютную разницу в минутах
+            $diffInMinutes = abs($newVisitDateTime->diffInMinutes($originalVisitDateTime));
+
+            if ($diffInMinutes <= 30) {
+                return response()->json(['success' => false, 'message' => 'Невозможно создать заказ: новая дата/время поездки должна отличаться от оригинальной более чем на 30 минут.'], 422);
+            }
+        }
+        // --- КОНЕЦ НОВОГО ---
+        
 
         // Проверка ограничения: не больше 2 поездок в день
         $existingTripsCount = Order::where('client_id', $originalOrder->client_id)
@@ -215,7 +229,7 @@ public function copyOrder(Request $request)
         $newOrderData['pz_data'] = now(); 
         
         $directionText = ($newZenaType == 2) ? ' (обратный путь)' : '';
-        $newOrderData['komment'] = "Копия заказа №{$originalOrder->pz_nom} от {$originalOrder->pz_data->format('d.m.Y H:i')}" . $directionText;
+        $newOrderData['komment'] = "Копия заказа №{$originalOrder->pz_nom} от {$originalOrder->pz_data->format('d.m.Y H:i')}" . $directionText." Выполнена из календаря поездок ". now()->format('d.m.Y H:i');
         
         // Создаем новый заказ
         $newOrder = Order::create($newOrderData);

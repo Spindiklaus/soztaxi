@@ -58,11 +58,14 @@
                 <div class="min-h-24 p-1 border border-gray-200 @if($isToday) bg-blue-50 @endif">
                     <div class="text-xs font-medium text-gray-700 mb-1">{{ $currentDate->format('j') }}</div>
                     <div class="space-y-1 max-h-20 overflow-y-auto">
-                        @foreach($ordersForDay as $order)
+                        @php
+                            // Сортировка заказов по времени поездки ---
+                            $sortedOrdersForDay = collect($ordersForDay)->sortBy('visit_data')->values(); // превращает массив $ordersForDay в Laravel-коллекцию.
+                        @endphp
+                        @foreach($sortedOrdersForDay as $order) {{-- Используем отсортированную коллекцию --}}
                             <div class="text-xs bg-blue-100 text-blue-800 rounded px-1 truncate" title="{{ $order->adres_otkuda }} -> {{ $order->adres_kuda }} ({{ $order->visit_data->format('H:i') }})">
                                 {{ $order->visit_data->format('H:i') }}
-                            </div>
-                            <!-- Кнопка "Копировать" -->
+                                <!-- Кнопка "Копировать" -->
                                 <button
                                     onclick="openCopyModal({{ $order->id }}, '{{ $order->visit_data->format('Y-m-d H:i') }}', '{{ $order->adres_otkuda }}', '{{ $order->adres_kuda }}', '{{ $order->adres_obratno }}', '{{ $order->zena_type }}')"
                                     class="ml-1 text-xs bg-gray-200 text-gray-700 rounded px-1 hover:bg-gray-300"
@@ -70,6 +73,7 @@
                                 >
                                     К
                                 </button>
+                            </div>
                         @endforeach
                     </div>
                 </div>
