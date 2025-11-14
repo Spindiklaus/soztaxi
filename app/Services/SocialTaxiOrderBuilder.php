@@ -53,16 +53,16 @@ class SocialTaxiOrderBuilder {
      * @return self Возвращает себя для цепочного вызова
      */
     public function applyFilters(Request $request): self {
-        \Log::info('Apply filters params', [
-            'filter_pz_nom' => $request->input('filter_pz_nom'),
-            'filter_type_order' => $request->input('filter_type_order'),
-            'status_order_id' => $request->input('status_order_id'),
-            'filter_user_id' => $request->input('filter_user_id'),
-            'client_fio' => $request->input('client_fio'),
-            'date_from' => $request->input('date_from'),
-            'date_to' => $request->input('date_to'),
-            'all_request' => $request->all()
-        ]);
+//        \Log::info('Apply filters params', [
+//            'filter_pz_nom' => $request->input('filter_pz_nom'),
+//            'filter_type_order' => $request->input('filter_type_order'),
+//            'status_order_id' => $request->input('status_order_id'),
+//            'filter_user_id' => $request->input('filter_user_id'),
+//            'client_fio' => $request->input('client_fio'),
+//            'date_from' => $request->input('date_from'),
+//            'date_to' => $request->input('date_to'),
+//            'all_request' => $request->all()
+//        ]);
 
         // Фильтрация
         if ($request->filled('filter_pz_nom')) {

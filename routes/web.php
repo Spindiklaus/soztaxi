@@ -119,6 +119,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/gazelle', [GazelleController::class, 'index'])->name('gazelle.index');
 
         Route::get('/social-taxi/calendar/client/{client}/date/{date}', [SocialTaxiController::class, 'calendarByClient'])->name('social-taxi.calendar.client');
+        Route::post('/social-taxi/copy-order', [SocialTaxiController::class, 'copyOrder'])->name('social-taxi.copy-order');
     });
     Route::resource('social-taxi-orders', SocialTaxiOrderController::class)->names('social-taxi-orders'); 
     // маршрут для восстановления

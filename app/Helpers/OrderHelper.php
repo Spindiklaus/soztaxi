@@ -109,7 +109,7 @@ if (!function_exists('generateOrderNumber')) {
         $nextNumber = $maxNumber + 1;
 
     
-        // Формируем номер заказа: ST-000499SEM, LA-000001SEM, GA-000001SEM
+        // Формируем номер заказа: Соц-000499SEM, ЛАВ-000001SEM, ГАЗ-000001SEM
         return $prefix . '-' . str_pad($nextNumber, 6, '0', STR_PAD_LEFT) . $litera;
     }
 }
