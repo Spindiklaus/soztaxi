@@ -191,7 +191,7 @@ class SocialTaxiOrderController extends BaseController {
         $urlParams = $this->orderService->getUrlParams(); // параметры фильтрации
         $backRoute = $this->getBackRoute($urlParams);
 
-        return redirect()->to($backRoute)->with('success', 'Заказ {$orderNumber} удален.');
+        return redirect()->to($backRoute)->with('success', 'Заказ {{$orderNumber}} удален.');
     }
 
     public function restore($id) {
