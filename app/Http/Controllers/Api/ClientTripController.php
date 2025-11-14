@@ -95,12 +95,7 @@ class ClientTripController extends Controller {
             $trips = $query->get();
             
             // Форматируем название периода на русском
-            $monthNames = [
-                'январь', 'февраль', 'март', 'апрель', 'май', 'июнь',
-                'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'
-            ];
-            $monthName = $monthNames[$date->month - 1];
-            $period = $monthName . ' ' . $date->year;
+            $period = getRussianMonthName($date) . ' ' . $date->year;
             
             return response()->json([
                 'trips' => $trips,

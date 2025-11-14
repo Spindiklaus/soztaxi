@@ -113,3 +113,37 @@ if (!function_exists('generateOrderNumber')) {
         return $prefix . '-' . str_pad($nextNumber, 6, '0', STR_PAD_LEFT) . $litera;
     }
 }
+
+if (!function_exists('getRussianMonthName')) {
+    /**
+     * Получить русское название месяца в родительном падеже по дате
+     *
+     * @param string|\Carbon\Carbon|\DateTime|null $date Дата
+     * @return string Русское название месяца (например, 'января', 'февраля', ...)
+     */
+    function getRussianMonthName($date = null)
+    {
+        $months = [
+            1 => 'Январь',
+            2 => 'Февраль',
+            3 => 'Март',
+            4 => 'Апрель',
+            5 => 'Май',
+            6 => 'Июнь',
+            7 => 'Июль',
+            8 => 'Август',
+            9 => 'Сентябрь',
+            10 => 'Октябрь',
+            11 => 'Ноябрь',
+            12 => 'Декабрь',
+        ];
+
+        if ($date === null) {
+            $date = now(); // Используем текущую дату, если не передана
+        }
+
+        $monthNumber = (int) $date->format('n'); // 'n' - месяц без ведущего нуля (1-12)
+
+        return $months[$monthNumber];
+    }
+}

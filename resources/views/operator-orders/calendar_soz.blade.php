@@ -1,31 +1,32 @@
 <x-app-layout>
- <div class="max-w-4xl mx-auto px-4 py-6">
-    <h1 class="text-2xl font-bold text-gray-800 mb-4">Календарь поездок клиента: {{ $client->fio }}</h1>
+ <div class="max-w-3xl mx-auto px-4 py-6">
+    <h1 class="text-2xl font-bold text-gray-800 mb-2">Календарь поездок клиента: {{ $client->fio }}</h1>
 
     <!-- Кнопка "Назад" -->
     <a href="{{ route($operatorRoute) . '?' . http_build_query($urlParams) }}"
-       class="mb-4 inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 text-sm">
+       class="mb-4 inline-flex items-center px-4 py-1 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 text-sm">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
         </svg>
         Назад к списку заказов
     </a>
     
+    @php
+        // $currentMonth = $startDate->format('F Y'); // Месяц, который отображаем
+        $currentMonth = getRussianMonthName($startDate) . ' ' . $startDate->format('Y');
+    @endphp
+    
     <!-- Включаем компонент информации о клиенте -->
-        @include('operator-orders.calendar-components.client-info')
+    @include('operator-orders.calendar-components.client-info')
 
-        <!-- Включаем компонент количества поездок -->
-        @include('operator-orders.calendar-components.trip-counts')
+    <!-- Включаем компонент количества поездок -->
+    @include('operator-orders.calendar-components.trip-counts')
 
         <!-- Календарь -->
     
 
     <div class="bg-white shadow overflow-hidden sm:rounded-lg p-4">
-        @php
-            $currentMonth = $startDate->format('F Y'); // Месяц, который отображаем
-        @endphp
-
-        <h2 class="text-xl font-semibold text-gray-700 mb-4 text-center">{{ $currentMonth }}</h2>
+        <h2 class="text-xl font-semibold text-gray-700 mb-4 text-center">{{ $currentMonth }}. Календарь</h2>
 
         <div class="grid grid-cols-7 gap-1 mb-2 w-full">
             @foreach(['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'] as $day)
