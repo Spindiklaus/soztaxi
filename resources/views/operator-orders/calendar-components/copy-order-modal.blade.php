@@ -13,9 +13,9 @@
                         </div>
                         <div>
                             <label for="copy-direction" class="block text-sm font-medium text-gray-700">Направление</label>
-                            <select id="copy-direction" name="zena_type" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
-                                <option value="1">Туда (откуда -> куда)</option>
-                                <option value="2">Обратно (куда -> откуда)</option>
+                            <select id="copy-direction" name="type_kuda" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                                <option value="1">Туда же</option>
+                                <option value="2">Обратно</option>
                             </select>
                         </div>
                     </div>

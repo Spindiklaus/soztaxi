@@ -162,31 +162,48 @@ public function copyOrder(Request $request)
     $request->validate([
         'order_id' => 'required|exists:orders,id',
         'visit_data' => 'required|date',
-        'zena_type' => 'required|in:1,2',
+        'type_kuda' => 'required|in:1,2',
     ]);
 
     try {
         $orderId = $request->input('order_id');
         $newVisitDateTime = Carbon::parse($request->input('visit_data'));
-        $newZenaType = (int) $request->input('zena_type');
+        $TypeKuda = (int) $request->input('type_kuda');
+        
+        
 
         // Загружаем оригинальный заказ
         $originalOrder = Order::findOrFail($orderId);
         
-        
+        // Проверка лимита поездок клиента в месяц из оригинального заказа ---
+        $limit = $originalOrder->kol_p_limit; // Берём лимит из оригинального заказа
+        $existingTripsCountForMonth = getClientTripsCountInMonthByVisitDate($originalOrder->client_id, $newVisitDateTime);
+
+        // Сравниваем с лимитом. Если уже достигнут лимит, не позволяем создать ещё.
+        if ($existingTripsCountForMonth >= $limit) {
+            return response()->json(['success' => false, 'message' => "Невозможно создать заказ: достигнут лимит поездок для клиента ({$limit})."], 422);
+        }
+
         // Проверка, отличается ли новая дата/время от оригинальной более чем на 30 минут ---
         if ($originalOrder->visit_data) {
             $originalVisitDateTime = $originalOrder->visit_data;
             // Вычисляем абсолютную разницу в минутах
             $diffInMinutes = abs($newVisitDateTime->diffInMinutes($originalVisitDateTime));
 
-            if ($diffInMinutes <= 30) {
+            if ($diffInMinutes <= 60) {
                 return response()->json(['success' => false, 'message' => 'Невозможно создать заказ: новая дата/время поездки должна отличаться от оригинальной более чем на 30 минут.'], 422);
             }
         }
-        // --- КОНЕЦ НОВОГО ---
         
+        // --- Проверка, что дата поездки в текущем месяце ---
+        $currentMonthStart = now()->startOfMonth();
+        $currentMonthEnd = now()->endOfMonth();
 
+        if (!$newVisitDateTime->between($currentMonthStart, $currentMonthEnd)) {
+            return response()->json(['success' => false, 'message' => 'Невозможно создать заказ: дата поездки должна быть в месяце заказа.'], 422);
+        }
+        
+        
         // Проверка ограничения: не больше 2 поездок в день
         $existingTripsCount = Order::where('client_id', $originalOrder->client_id)
             ->whereDate('visit_data', $newVisitDateTime->toDateString()) // Сравниваем только дату
@@ -203,33 +220,40 @@ public function copyOrder(Request $request)
         unset($newOrderData['id']); // Удаляем ID, чтобы создать новый
         unset($newOrderData['pz_nom']); 
         unset($newOrderData['pz_data']); // pz_data генерируется автоматически
+        unset($newOrderData['taxi_sent_at']);
+        unset($newOrderData['order_group_id']); // убираем группировку заказа
+        unset($newOrderData['taxi_price']); // факт цена поездки
+        unset($newOrderData['taxi_way']); // факт километраж
+        unset($newOrderData['taxi_vozm']); // сумма к возмещению
+        unset($newOrderData['cancelled_at']);
+        unset($newOrderData['otmena_taxi']); // убираем отменту передачи сведений в такси
+        unset($newOrderData['closed_at']);
+        unset($newOrderData['komment']);
         unset($newOrderData['created_at']);
         unset($newOrderData['updated_at']);
-        unset($newOrderData['deleted_at']);
-        unset($newOrderData['cancelled_at']);
-        unset($newOrderData['closed_at']);
-        unset($newOrderData['taxi_sent_at']);
-        unset($newOrderData['komment']);
+        unset($newOrderData['deleted_at']);        
+       
         // ... возможно, другие поля, которые не нужно копировать, например, связанные с такси или статусами
 
         // Устанавливаем новые значения
         $newOrderData['user_id'] = auth()->id(); // Новый оператор (текущий)
         $newOrderData['visit_data'] = $newVisitDateTime; // Новая дата поездки
-        $newOrderData['zena_type'] = $newZenaType; // Новое направление
+        $newOrderData['zena_type'] = 1; // У соцтакси поездки - только в одну сторону. всегда 1
 
         // Меняем адреса в зависимости от направления
-        if ($newZenaType == 2) { // Обратно
+        if ($TypeKuda == 2) { // переставляем местами откуда-куда али нет
             $newOrderData['adres_otkuda'] = $originalOrder->adres_kuda; // Было "куда" -> станет "откуда"
+            $newOrderData['adres_otkuda_info'] = $originalOrder->adres_kuda_info; // Было "куда" -> станет "откуда"
             $newOrderData['adres_kuda'] = $originalOrder->adres_otkuda; // Было "откуда" -> станет "куда"
+            $newOrderData['adres_kuda_info'] = $originalOrder->adres_otkuda_info; // Было "откуда" -> станет "куда"
         }
-        // Если $newZenaType == 1 (Туда), адреса остаются как в оригинале
-      
-        
+       
         $newOrderData['pz_nom'] = generateOrderNumber($originalOrder->type_order, auth()->id());
         $newOrderData['pz_data'] = now(); 
         
-        $directionText = ($newZenaType == 2) ? ' (обратный путь)' : '';
-        $newOrderData['komment'] = "Копия заказа №{$originalOrder->pz_nom} от {$originalOrder->pz_data->format('d.m.Y H:i')}" . $directionText." Выполнена из календаря поездок ". now()->format('d.m.Y H:i');
+        $directionText = ($TypeKuda == 2) ? ' (обратный путь)' : '';
+        $newOrderData['komment'] = "Копия заказа №{$originalOrder->pz_nom} от {$originalOrder->pz_data->format('d.m.Y H:i')}" . $directionText
+                ." Выполнена из календаря поездок ". now()->format('d.m.Y H:i');
         
         // Создаем новый заказ
         $newOrder = Order::create($newOrderData);

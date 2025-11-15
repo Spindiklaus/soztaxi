@@ -1,7 +1,5 @@
 <x-app-layout>
  <div class="max-w-3xl mx-auto px-4 py-6">
-    <h1 class="text-2xl font-bold text-gray-800 mb-2">Календарь поездок клиента: {{ $client->fio }}</h1>
-
     <!-- Кнопка "Назад" -->
     <a href="{{ route($operatorRoute) . '?' . http_build_query($urlParams) }}"
        class="mb-4 inline-flex items-center px-4 py-1 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 text-sm">
@@ -26,7 +24,7 @@
     
 
     <div class="bg-white shadow overflow-hidden sm:rounded-lg p-4">
-        <h2 class="text-xl font-semibold text-gray-700 mb-4 text-center">{{ $currentMonth }}. Календарь</h2>
+        <h3 class="text-xl font-semibold text-gray-700 mb-4 text-center">{{ $currentMonth }}. Календарь поездок </h3>
 
         <div class="grid grid-cols-7 gap-1 mb-2 w-full">
             @foreach(['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'] as $day)
@@ -67,11 +65,13 @@
                                 {{ $order->visit_data->format('H:i') }}
                                 <!-- Кнопка "Копировать" -->
                                 <button
-                                    onclick="openCopyModal({{ $order->id }}, '{{ $order->visit_data->format('Y-m-d H:i') }}', '{{ $order->adres_otkuda }}', '{{ $order->adres_kuda }}', '{{ $order->adres_obratno }}', '{{ $order->zena_type }}')"
+                                    onclick="openCopyModal({{ $order->id }}, '{{ $order->visit_data->format('Y-m-d H:i') }}', '{{ $order->adres_otkuda }}', '{{ $order->adres_kuda }}' )"
                                     class="ml-1 text-xs bg-gray-200 text-gray-700 rounded px-1 hover:bg-gray-300"
                                     title="Копировать заказ"
                                 >
-                                    К
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                    </svg>
                                 </button>
                             </div>
                         @endforeach

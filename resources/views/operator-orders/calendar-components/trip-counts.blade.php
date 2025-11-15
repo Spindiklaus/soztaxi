@@ -1,12 +1,11 @@
 <!-- resources/views/operator-orders/calendar-components/trip-counts.blade.php -->
 
-<div class="bg-white shadow overflow-hidden sm:rounded-lg mb-6">
-    <div class="bg-gray-50 px-4 py-3 rounded-t-lg">
+<div class="bg-white shadow overflow-hidden sm:rounded-lg mb-2">
+    <div class="bg-gray-50 px-4 py-2 rounded-t-lg">
         <button type="button"
                 onclick="toggleTripCounts()"
                 class="flex items-center justify-between w-full text-left">
             <h2 class="text-lg font-semibold text-gray-800">
-                <!-- Просто заголовок, числа будут внутри контента -->
                 Количество поездок клиента за {{ $currentMonth }}
             </h2>
             <svg id="trip-counts-arrow" class="h-5 w-5 transform transition-transform text-gray-500"
@@ -16,7 +15,7 @@
         </button>
     </div>
 
-    <div id="trip-counts-content" class="p-4 hidden">
+    <div id="trip-counts-content" class="p-2 "> <!-- Убран класс hidden -->
         <div class="flex flex-wrap items-center gap-2 md:gap-4">
         </div>
         <!-- Количество поездок клиента -->
