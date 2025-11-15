@@ -191,7 +191,7 @@ public function copyOrder(Request $request)
             $diffInMinutes = abs($newVisitDateTime->diffInMinutes($originalVisitDateTime));
 
             if ($diffInMinutes <= 60) {
-                return response()->json(['success' => false, 'message' => 'Невозможно создать заказ: новая дата/время поездки должна отличаться от оригинальной более чем на 30 минут.'], 422);
+                return response()->json(['success' => false, 'message' => 'Невозможно создать заказ: новая дата/время поездки должна отличаться от оригинальной более чем на 60 минут.'], 422);
             }
         }
         
