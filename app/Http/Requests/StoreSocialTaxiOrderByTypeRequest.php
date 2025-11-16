@@ -6,15 +6,14 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Carbon\Carbon;
 
-class StoreSocialTaxiOrderByTypeRequest extends FormRequest
-{
+class StoreSocialTaxiOrderByTypeRequest extends FormRequest {
+
     /**
      * Determine if the user is authorized to make this request.
      *
      * @return bool
      */
-    public function authorize()
-    {
+    public function authorize() {
         return true;
     }
 
@@ -23,8 +22,7 @@ class StoreSocialTaxiOrderByTypeRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
-    {
+    public function rules() {
         $now = now();
         $minVisitDate = $now->copy()->addDay()->startOfDay();
         $maxVisitDate = $now->copy()->addMonths(6)->endOfDay();
@@ -38,6 +36,9 @@ class StoreSocialTaxiOrderByTypeRequest extends FormRequest
                 'before:' . $maxVisitDate->format('Y-m-d H:i:s'),
                 function ($attribute, $value, $fail) {
                     $this->validateVisitTime($attribute, $value, $fail);
+                },
+                function ($attribute, $value, $fail) { // проверка по количеству заказов в день
+                   $this->validateTripCount($attribute, $value, $fail);
                 }
             ],
             'visit_obratno' => 'nullable|date|after:visit_data',
@@ -77,7 +78,7 @@ class StoreSocialTaxiOrderByTypeRequest extends FormRequest
                 'numeric',
                 'min:0',
                 'max:100',
-            ],        
+            ],
             'zena_type' => 'required|integer|in:1,2',
             'dopus_id' => 'nullable|exists:skidka_dops,id',
             'skidka_dop_all' => [
@@ -105,8 +106,7 @@ class StoreSocialTaxiOrderByTypeRequest extends FormRequest
      *
      * @return array
      */
-    public function messages()
-    {
+    public function messages() {
         $now = now();
         $minVisitDate = $now->copy()->addDay()->startOfDay();
         $maxVisitDate = $now->copy()->addMonths(6)->endOfDay();
@@ -172,81 +172,117 @@ class StoreSocialTaxiOrderByTypeRequest extends FormRequest
         ];
     }
 
-    public function withValidator($validator)
-{
-    $validator->after(function ($validator) {
-        $request = request();
-  
-        // Проверяем дату обратной поездки
-        if (!empty($request->visit_obratno)) {
-            // Проверяем, что это корректная дата
-            if (!strtotime($request->visit_obratno)) {
-                $validator->errors()->add('visit_obratno', 'Дата обратной поездки должна быть корректной датой.');
-                return;
-            }
-            
-            // Проверяем, что дата позже основной поездки
-            if (!empty($request->visit_data)) {
-                $visitData = strtotime($request->visit_data);
-                $visitObratno = strtotime($request->visit_obratno);
-                if ($visitObratno <= $visitData) {
-                    $validator->errors()->add('visit_obratno', 'Время обратной поездки должна быть больше времени основной поездки.');
+    public function withValidator($validator) {
+        $validator->after(function ($validator) {
+            $request = request();
+
+            // Проверяем дату обратной поездки
+            if (!empty($request->visit_obratno)) {
+                // Проверяем, что это корректная дата
+                if (!strtotime($request->visit_obratno)) {
+                    $validator->errors()->add('visit_obratno', 'Дата обратной поездки должна быть корректной датой.');
                     return;
                 }
-            }
-            
-            // Проверяем, что дата совпадает по дням (день, месяц, год)
+
+                // Проверяем, что дата позже основной поездки
+                if (!empty($request->visit_data)) {
+                    $visitData = strtotime($request->visit_data);
+                    $visitObratno = strtotime($request->visit_obratno);
+                    if ($visitObratno <= $visitData) {
+                        $validator->errors()->add('visit_obratno', 'Время обратной поездки должна быть больше времени основной поездки.');
+                        return;
+                    }
+                }
+
+                // Проверяем, что дата совпадает по дням (день, месяц, год)
                 $visitDataDate = date('Y-m-d', $visitData);
                 $visitObratnoDate = date('Y-m-d', $visitObratno);
-                
+
                 if ($visitDataDate !== $visitObratnoDate) {
                     $validator->errors()->add('visit_obratno', 'Дата обратной поездки должна быть той же, что и основная поездка.');
                     return;
                 }
-            
-            
-        }
-        
-        // Основная логика валидации
-        if (($request->type_order == 2 || $request->type_order == 3)) {
-            // Для легкового авто и ГАЗели
-            if (!empty($request->adres_obratno) && empty($request->visit_obratno)) {
-                // Если есть обратный адрес, то дата обязательна
-                $validator->errors()->add('visit_obratno', 'При наличии обратного адреса дата обратной поездки обязательна.');
             }
-            if (empty($request->adres_obratno) && !empty($request->visit_obratno)) {
-                // Если нет обратного адреса, то дата должна быть null
-                $validator->errors()->add('visit_obratno', 'При отсутствии обратного адреса дата обратной поездки должна быть пустой.');
-            }
-        } else {
-            // Для соцтакси дата всегда должна быть null
-            if (!empty($request->visit_obratno)) {
-                // Добавляем ошибку 
-                $validator->errors()->add('visit_obratno', 'Для соцтакси дата обратной поездки должна быть пустой.');
-            }
-        }
-        
-        // Проверка predv_way для type_order = 1
-        if (isset($request['type_order']) && $request['type_order'] == 1) {
-            $predvWay = $request['predv_way'] ?? null;
 
-            if (!$predvWay || !is_numeric($predvWay) || $predvWay <= 0) {
-                $validator->errors()->add('predv_way', 'Предварительная дальность обязательна и должна быть больше 0 для соцтакси.');
-            } elseif ($predvWay > 100) {
-                 $validator->errors()->add('predv_way', 'Предварительная дальность не может быть больше 100км.');
+            // Основная логика валидации
+            if (($request->type_order == 2 || $request->type_order == 3)) {
+                // Для легкового авто и ГАЗели
+                if (!empty($request->adres_obratno) && empty($request->visit_obratno)) {
+                    // Если есть обратный адрес, то дата обязательна
+                    $validator->errors()->add('visit_obratno', 'При наличии обратного адреса дата обратной поездки обязательна.');
+                }
+                if (empty($request->adres_obratno) && !empty($request->visit_obratno)) {
+                    // Если нет обратного адреса, то дата должна быть null
+                    $validator->errors()->add('visit_obratno', 'При отсутствии обратного адреса дата обратной поездки должна быть пустой.');
+                }
             }
+            else {
+                // Для соцтакси дата всегда должна быть null
+                if (!empty($request->visit_obratno)) {
+                    // Добавляем ошибку 
+                    $validator->errors()->add('visit_obratno', 'Для соцтакси дата обратной поездки должна быть пустой.');
+                }
+            }
+
+            // Проверка predv_way для type_order = 1
+            if (isset($request['type_order']) && $request['type_order'] == 1) {
+                $predvWay = $request['predv_way'] ?? null;
+
+                if (!$predvWay || !is_numeric($predvWay) || $predvWay <= 0) {
+                    $validator->errors()->add('predv_way', 'Предварительная дальность обязательна и должна быть больше 0 для соцтакси.');
+                }
+                elseif ($predvWay > 100) {
+                    $validator->errors()->add('predv_way', 'Предварительная дальность не может быть больше 100км.');
+                }
+            }
+        });
+    }
+
+    /**
+     * Validate daily trip count restrictions based on order type
+     */
+    private function validateTripCount($attribute, $value, $fail) {
+        $clientId = $this->client_id;
+        $typeOrder = (int)$this->type_order;
+        $orderId = $this->route('social_taxi_order'); // ID заказа при обновлении, null при создании
+        // Определяем дату поездки
+        $visitDate = \Carbon\Carbon::parse($value)->toDateString();
+
+        // Проверяем ограничения
+        $existing_Count = \App\Models\Order::where('client_id', $clientId)
+                ->whereDate('visit_data', $visitDate) // Сравниваем только дату
+                ->where('type_order', $typeOrder) // Только заказы того же типа
+                ->whereNull('deleted_at') // Исключаем удаленные
+                ->whereNull('cancelled_at'); // Исключаем отмененные
+        // Если это обновление заказа, исключаем сам заказ из подсчета
+        if ($orderId) {
+            $existing_Count->where('id', '!=', $orderId);
         }
-        
-        
-    });
-}
-    
-    
+
+        $existingCount = $existing_Count->count();
+
+        $maxAllowed = match ($typeOrder) {
+            1 => 2, // Соцтакси: максимум 2
+            2 => 1, // Легковое авто: максимум 1
+            3 => 1, // ГАЗель: максимум 1
+            default => 0, // Другие типы: 0 (на всякий случай)
+        };
+
+        if ($existingCount >= $maxAllowed) {
+            $typeName = match ($typeOrder) {
+                1 => 'Соцтакси',
+                2 => 'Легковое авто',
+                3 => 'ГАЗель',
+                default => 'Неизвестный тип',
+            };
+            $fail("Невозможно создать заказ: клиент уже имеет {$maxAllowed} поездок(у) типа '{$typeName}' в этот день.");
+        }
+    }
+
     /**
      * Validate visit time restrictions
      */
-    private function validateVisitTime($attribute, $value, $fail)
-    {
+    private function validateVisitTime($attribute, $value, $fail) {
         $visitTime = Carbon::parse($value);
         $visitHour = $visitTime->hour;
 
@@ -261,10 +297,10 @@ class StoreSocialTaxiOrderByTypeRequest extends FormRequest
             $endTime = $visitTime->copy()->addHour();
 
             $existingOrder = \App\Models\Order::where('client_id', $this->client_id)
-                ->whereBetween('visit_data', [$startTime, $endTime])
-                ->whereNull('deleted_at')
-                ->whereNull('cancelled_at')    
-                ->first();
+                    ->whereBetween('visit_data', [$startTime, $endTime])
+                    ->whereNull('deleted_at')
+                    ->whereNull('cancelled_at')
+                    ->first();
 
             if ($existingOrder) {
                 $existingTime = Carbon::parse($existingOrder->visit_data)->format('d.m.Y H:i');
@@ -276,11 +312,10 @@ class StoreSocialTaxiOrderByTypeRequest extends FormRequest
     /**
      * Validate taxi vozvratshenie
      */
-    private function validateTaxiVozm($attribute, $value, $fail)
-    {
+    private function validateTaxiVozm($attribute, $value, $fail) {
         // Для легкового авто и ГАЗели (zena_type != 1) проверяем, что taxi_vozm = taxi_price
         if (($this->type_order == 2 || $this->type_order == 3) &&
-            abs((float) $this->taxi_price - (float) $value) > 0.00000000001) {
+                abs((float) $this->taxi_price - (float) $value) > 0.00000000001) {
             $fail('Для легкового авто и ГАЗели сумма возмещения должна равняться цене поездки.');
         }
     }
@@ -288,8 +323,7 @@ class StoreSocialTaxiOrderByTypeRequest extends FormRequest
     /**
      * Validate skidka dop all
      */
-    private function validateSkidkaDopAll($attribute, $value, $fail)
-    {
+    private function validateSkidkaDopAll($attribute, $value, $fail) {
         $type = $this->route('type');
         // Для легкового авто и ГАЗели скидка должна быть 100%
         if (($type == 2 || $type == 3) && $value != 100) {
@@ -300,8 +334,7 @@ class StoreSocialTaxiOrderByTypeRequest extends FormRequest
     /**
      * Validate kol p limit
      */
-    private function validateKolPLimit($attribute, $value, $fail)
-    {
+    private function validateKolPLimit($attribute, $value, $fail) {
         // Проверяем для всех типов заказов
         if ($value && $this->client_id && $this->visit_data) {
             $visitDate = Carbon::parse($this->visit_data);
@@ -315,4 +348,5 @@ class StoreSocialTaxiOrderByTypeRequest extends FormRequest
             }
         }
     }
+
 }

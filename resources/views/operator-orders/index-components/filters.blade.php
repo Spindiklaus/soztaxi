@@ -117,7 +117,7 @@
                     </div>
                     <div>
                         <input type="date" name="date_to" id="date_to" 
-                               value="{{ request('date_to', date('Y-m-d', strtotime('+4 months'))) }}" 
+                               value="{{ request('date_to', date('Y-m-d', strtotime('+6 months'))) }}" 
                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                     </div>
                 </div>

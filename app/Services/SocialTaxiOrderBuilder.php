@@ -82,7 +82,7 @@ class SocialTaxiOrderBuilder {
 
         // Фильтрация по диапазону дат поездок
         $dateFrom = $request->input('date_from', '2025-01-01');
-        $dateTo = $request->input('date_to', date('Y-m-d', strtotime('+4 months')));
+        $dateTo = $request->input('date_to', date('Y-m-d', strtotime('+6 months')));
         if ($dateFrom) {
             $this->query->whereDate('visit_data', '>=', $dateFrom);
         }
