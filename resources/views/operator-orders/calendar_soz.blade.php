@@ -1,7 +1,13 @@
 <x-app-layout>
  <div class="max-w-3xl mx-auto px-4 py-6">
     <!-- Кнопка "Назад" -->
-    <a href="{{ route($operatorRoute) . '?' . http_build_query($urlParams) }}"
+    <a href="
+       @if($operatorRoute)
+            {{ route($operatorRoute) . '?' . http_build_query($urlParams) }}
+        @else
+            {{ route('social-taxi-orders.index') . '?' . http_build_query($urlParams) }} {{-- Или другой маршрут по умолчанию --}}
+        @endif
+        "
        class="mb-4 inline-flex items-center px-4 py-1 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 text-sm">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -24,7 +30,7 @@
     
 
     <div class="bg-white shadow overflow-hidden sm:rounded-lg p-4">
-        <h3 class="text-xl font-semibold text-gray-700 mb-4 text-center">{{ $currentMonth }}. Календарь поездок </h3>
+        <h3 class="text-xl font-semibold text-gray-700 mb-4 text-center">{{ $currentMonth }}. Календарь заказов соцтакси</h3>
 
         <div class="grid grid-cols-7 gap-1 mb-2 w-full">
             @foreach(['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'] as $day)
@@ -51,9 +57,13 @@
                     $dateKey = $currentDate->format('Y-m-d');
                     $ordersForDay = $calendarData[$dateKey] ?? [];
                     $isToday = $currentDate->format('Y-m-d') === now()->format('Y-m-d');
+                    // Определяем количество поездок в этот день 
+                    $tripCountForDay = count($ordersForDay);
                 @endphp
 
-                <div class="min-h-24 p-1 border border-gray-200 @if($isToday) bg-blue-50 @endif">
+                <div class="h-16 p-1 border border-gray-200 
+                     @if($isToday) bg-blue-50 @endif 
+                ">
                     <div class="text-xs font-medium text-gray-700 mb-1">{{ $currentDate->format('j') }}</div>
                     <div class="space-y-1 max-h-20 overflow-y-auto">
                         @php
@@ -61,18 +71,33 @@
                             $sortedOrdersForDay = collect($ordersForDay)->sortBy('visit_data')->values(); // превращает массив $ordersForDay в Laravel-коллекцию.
                         @endphp
                         @foreach($sortedOrdersForDay as $order) {{-- Используем отсортированную коллекцию --}}
-                            <div class="text-xs bg-blue-100 text-blue-800 rounded px-1 truncate" title="{{ $order->adres_otkuda }} -> {{ $order->adres_kuda }} ({{ $order->visit_data->format('H:i') }})">
+                            @php
+                                // Определяем цвет фона для конкретного заказа ---
+                                if ($order->type_order == 1) { // Соцтакси
+                                    $orderBgColor = ($tripCountForDay >= 2) ? 'bg-yellow-100' : 'bg-blue-100';
+                                    $orderTextColor = ($tripCountForDay >= 2) ? 'text-yellow-800' : 'text-blue-800';
+                                } else { // Газель (2) или Легковое авто (3)
+                                    $orderBgColor = 'bg-gray-100';
+                                    $orderTextColor = 'text-gray-800';
+                                }
+                            @endphp
+                            <div class="text-xs {{ $orderBgColor }} {{ $orderTextColor }} rounded px-1 truncate flex items-center justify-between" 
+                                 title="Тип: {{ getOrderTypeName($order->type_order) }}. Откуда: {{ $order->adres_otkuda }}. Куда: {{ $order->adres_kuda }}.
+                                    @if($order->zena_type == 2) Обратно: {{ $order->adres_obratno }}.@endif
+                                 ">
                                 {{ $order->visit_data->format('H:i') }}
-                                <!-- Кнопка "Копировать" -->
-                                <button
-                                    onclick="openCopyModal({{ $order->id }}, '{{ $order->visit_data->format('Y-m-d H:i') }}', '{{ $order->adres_otkuda }}', '{{ $order->adres_kuda }}' )"
-                                    class="ml-1 text-xs bg-gray-200 text-gray-700 rounded px-1 hover:bg-gray-300"
-                                    title="Копировать заказ"
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                                    </svg>
-                                </button>
+                                <!-- Кнопка "Копировать" - отображается только для соцтакси -->
+                                @if($order->type_order == 1)
+                                    <button
+                                        onclick="openCopyModal({{ $order->id }}, '{{ $order->visit_data->format('Y-m-d H:i') }}', '{{ $order->adres_otkuda }}', '{{ $order->adres_kuda }}' )"
+                                        class="ml-1 text-xs bg-gray-200 text-gray-700 rounded px-1 hover:bg-gray-300"
+                                        title="Копировать заказ"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                        </svg>
+                                    </button>
+                                @endif
                             </div>
                         @endforeach
                     </div>

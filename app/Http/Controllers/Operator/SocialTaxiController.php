@@ -49,6 +49,7 @@ class SocialTaxiController extends BaseController
         $urlParams = $this->orderService->getUrlParams();
 
         $query = $this->queryBuilder->build($request, $showDeleted == '1');
+        
         $orders = $query->paginate(100)->appends($request->all());
         
         
@@ -109,10 +110,16 @@ class SocialTaxiController extends BaseController
 
     // --- ФИЛЬТРАЦИЯ ЗАКАЗОВ ЗА ВЫБРАННЫЙ МЕСЯЦ ---
     // Временно добавляем фильтр по диапазону дат для получения заказов за конкретный месяц
+    
+    // Удаляем filter_user_id из запроса, чтобы он не был передан в SocialTaxiOrderBuilder
+    $request->merge(['filter_user_id' => null]);    
+    // filter_type_order не должен влиять на календарь
+    $request->merge(['filter_type_order' => null]);
     $request->merge([
         'date_from' => $calendarMonth->format('Y-m-d'),
         'date_to' => $calendarMonth->endOfMonth()->format('Y-m-d'),
     ]);
+//    dd($request);
     // --- КОНЕЦ ФИЛЬТРАЦИИ ---
 
     // Получаем заказы, отфильтрованные по клиенту И по месяцу

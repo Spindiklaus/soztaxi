@@ -6,7 +6,7 @@
                 onclick="toggleTripCounts()"
                 class="flex items-center justify-between w-full text-left">
             <h2 class="text-lg font-semibold text-gray-800">
-                Количество поездок клиента за {{ $currentMonth }}
+                Количество заказов клиента за {{ $currentMonth }}
             </h2>
             <svg id="trip-counts-arrow" class="h-5 w-5 transform transition-transform text-gray-500"
                  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -21,7 +21,7 @@
         <!-- Количество поездок клиента -->
         <div class="bg-gray-50 p-4 rounded-lg mb-6">
             <div class="flex items-center">
-                <span class="text-lg font-semibold text-gray-800">Количество поездок клиента в этом месяце:</span>
+                <span class="text-lg font-semibold text-gray-800">Общее число заказов клиента в этом месяце:</span>
                 <button 
                     onclick="showClientTrips({{ $client->id }}, '{{ $startDate->format('Y-m') }}')"
                     class="ml-2 inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors">
@@ -30,7 +30,7 @@
             </div>
             <!-- Число поездок переданных в такси -->
             <div class="flex items-center mt-2">
-                <span class="text-lg font-semibold text-gray-800">Число поездок, переданных оператору такси:</span>
+                <span class="text-lg font-semibold text-gray-800">Число заказов, переданных оператору такси:</span>
                 <button 
                     onclick="showClientTaxiSentTrips({{ $client->id }}, '{{ $startDate->format('Y-m') }}')"
                     class="ml-2 inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-yellow-100 text-yellow-800 hover:bg-yellow-200 transition-colors">
