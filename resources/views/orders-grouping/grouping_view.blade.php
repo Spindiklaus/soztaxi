@@ -40,7 +40,7 @@
                         <div class="card-header bg-gray-100 border-b border-gray-200 rounded-t-lg p-1">
                             <input type="checkbox" name="selected_groups[{{ $index }}][selected]" value="1" class="group-selector h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
                             <strong class="ml-2">{{ $group['name'] }}</strong>
-                            <span class="badge bg-blue-100 text-blue-800 text-xs px-2 py-1 ml-2 rounded">Время: {{ $group['base_time']->format('H:i') }} +/- {{ $timeTolerance }} мин</span>
+                            <span class="badge bg-blue-100 text-blue-800 text-xs px-2 py-1 ml-2 rounded">Время: {{ $group['base_time']->format('H:i') }} (+ {{ $timeTolerance }}) мин</span>
                         </div>
                         <div class="card-body p-1">
                             <ul class="list-group">
