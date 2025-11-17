@@ -52,7 +52,14 @@
                                             </div>    
                                             <div class="flex-grow">
                                                 <div class="flex items-baseline gap-2">
-                                                    {{ $order->pz_nom }} - 
+                                                    @php
+                                                        $status = $order->currentStatus->statusOrder;
+                                                        $colorClass = !empty($status->color) ? $status->color : 'bg-gray-100 text-gray-800';
+                                                    @endphp
+                                                    <span class="{{ $colorClass }} px-1 rounded font-bold" title="статус: {{ $status->name }}"> 
+                                                        {{ $order->pz_nom }} 
+                                                    </span>
+                                                    - 
                                                     <span 
                                                         @if($order->has_duplicate_time)
                                                             class="bg-red-500 text-white px-1 rounded font-bold"
@@ -60,23 +67,6 @@
                                                     >
                                                     <b>{{ $order->visit_data->format('H:i') }}</b>
                                                     </span>
-                                                    <!-- Добавляем отображение статуса заказа -->
-                                                    <div>
-                                                        @if($order->currentStatus && $order->currentStatus->statusOrder)
-                                                            @php
-                                                                $status = $order->currentStatus->statusOrder;
-                                                                $colorClass = !empty($status->color) ? $status->color : 'bg-gray-100 text-gray-800';
-                                                            @endphp
-                                                            <span class="inline-flex items-center rounded-full text-xs font-medium {{ $colorClass }}">
-                                                                {{ $status->name }}
-                                                            </span>
-                                                        @else
-                                                            <span class="inline-flex items-center px-2  rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                                                Нет статуса
-                                                            </span>
-                                                        @endif
-                                                    </div>
-                                                    <!-- Конец отображения статуса -->
                                                     <span class="text-sm text-gray-600">Клиент: <b>{{ $order->client ? $order->client->fio : 'N/A' }}</b></span>
                                                 </div> <!-- Конец flex-контейнера -->
                                                 <span class="text-sm text-gray-600">От: <b>{{ $order->adres_otkuda }}</b></span>
