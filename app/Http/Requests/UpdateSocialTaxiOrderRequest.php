@@ -48,6 +48,9 @@ class UpdateSocialTaxiOrderRequest extends FormRequest {
                 'before:' . $maxVisitDate->format('Y-m-d H:i:s'),
                 function ($attribute, $value, $fail) {
                     $this->validateVisitTime($attribute, $value, $fail);
+                },
+                function ($attribute, $value, $fail) { // проверка по количеству заказов в день
+                   $this->validateTripCount($attribute, $value, $fail);
                 }
             ],
             'visit_obratno' => 'nullable|date|after:visit_data',
@@ -252,7 +255,50 @@ class UpdateSocialTaxiOrderRequest extends FormRequest {
     });
 }
     
-    
+    /**
+     * Validate daily trip count restrictions based on order type
+     * Не больше 2-х поездок в день для соцтакси, 1 - для ЛА и ГАЗель
+     */
+    private function validateTripCount($attribute, $value, $fail) {
+        $clientId = $this->client_id;
+        $typeOrder = (int)$this->type_order;
+        $orderId = $this->route('social_taxi_order'); // ID заказа при обновлении, null при создании
+        // Определяем дату поездки
+        $visitDate = \Carbon\Carbon::parse($value)->toDateString();
+
+        // Проверяем ограничения
+        $existing_Count = \App\Models\Order::where('client_id', $clientId)
+                ->whereDate('visit_data', $visitDate) // Сравниваем только дату
+                ->where('type_order', $typeOrder) // Только заказы того же типа
+                ->whereNull('deleted_at') // Исключаем удаленные
+                ->whereNull('cancelled_at'); // Исключаем отмененные
+        // Если это обновление заказа, исключаем сам заказ из подсчета
+        if ($orderId) {
+            $existing_Count->where('id', '!=', $orderId->id);
+        }
+
+        $existingCount = $existing_Count->count();
+
+        $maxAllowed = match ($typeOrder) {
+            1 => 2, // Соцтакси: максимум 2
+            2 => 1, // Легковое авто: максимум 1
+            3 => 1, // ГАЗель: максимум 1
+            default => 0, // Другие типы: 0 (на всякий случай)
+        };
+
+        if ($existingCount >= $maxAllowed) {
+            $typeName = match ($typeOrder) {
+                1 => 'Соцтакси',
+                2 => 'Легковое авто',
+                3 => 'ГАЗель',
+                default => 'Неизвестный тип',
+            };
+            $fail("Невозможно создать заказ: клиент уже имеет {$maxAllowed} поездок(у) типа '{$typeName}' в этот день.");
+        }
+    }
+
+
+
     /**
      * Validate visit time restrictions
      */
@@ -316,10 +362,12 @@ class UpdateSocialTaxiOrderRequest extends FormRequest {
         // Проверяем для всех типов заказов
         if ($value && $this->client_id && $this->visit_data) {
             $visitDate = Carbon::parse($this->visit_data);
+            $orderId = $this->route('social_taxi_order'); // ID заказа при обновлении, null при создании
+//            dd($orderId);
 
             // Используем существующую функцию хелпера для получения количества поездок клиента в месяц
-            $clientTripsCount = getClientTripsCountInMonthByVisitDate($this->client_id, $visitDate);
-
+            $clientTripsCount = getClientTripsCountInMonthByVisitDate($this->client_id, $visitDate, $orderId->id);
+//            dd($clientTripsCount);
             // Проверяем, не превышает ли лимит (учитываем, что создается новый заказ)
             if ($clientTripsCount >= $value) {
                 $fail("Клиент уже совершил {$clientTripsCount} поездок из доступных {$value} в этом месяце. Невозможно создать новый заказ.");

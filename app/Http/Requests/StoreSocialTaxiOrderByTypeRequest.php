@@ -240,6 +240,7 @@ class StoreSocialTaxiOrderByTypeRequest extends FormRequest {
 
     /**
      * Validate daily trip count restrictions based on order type
+     * Не больше 2-х поездок в день для соцтакси
      */
     private function validateTripCount($attribute, $value, $fail) {
         $clientId = $this->client_id;
@@ -256,7 +257,7 @@ class StoreSocialTaxiOrderByTypeRequest extends FormRequest {
                 ->whereNull('cancelled_at'); // Исключаем отмененные
         // Если это обновление заказа, исключаем сам заказ из подсчета
         if ($orderId) {
-            $existing_Count->where('id', '!=', $orderId);
+            $existing_Count->where('id', '!=', $orderId->id);
         }
 
         $existingCount = $existing_Count->count();

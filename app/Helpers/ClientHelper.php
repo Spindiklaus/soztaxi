@@ -43,7 +43,7 @@ if (!function_exists('getClientTripsCountInMonthByVisitDate')) {
         if ($excludeOrderId) {
             $tripCount->where('id', '!=', $excludeOrderId);
         }
-        
+//        dd($tripCount);
             
 
         return $tripCount->count();
