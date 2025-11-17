@@ -32,8 +32,7 @@ class OrderGroupingController extends BaseController {
                 ->where('visit_data', '>=', $twoMonthsAgo) // Ограничение на дату                
                 ->whereNull('closed_at')
                 ->whereNull('cancelled_at')
-                ->whereNotNull('taxi_sent_at')
-                ->where ('taxi_way', '>', 0)
+                ->whereNull('taxi_sent_at')
                 ->whereNull('order_group_id')
                 ->where('type_order', 1)
                 ->groupBy('grouping_date')
@@ -64,8 +63,7 @@ class OrderGroupingController extends BaseController {
                 ->whereBetween('visit_data', [$selectedDate, $endDate])
                 ->whereNull('closed_at')
                 ->whereNull('cancelled_at')
-                ->whereNotNull('taxi_sent_at')
-                ->where ('taxi_way', '>', 0)
+                ->whereNull('taxi_sent_at')
                 ->whereNull('order_group_id')  // не сгруппированные 
                 ->with([
                     'client', // Загружаем связь client (метод в модели Order)   
