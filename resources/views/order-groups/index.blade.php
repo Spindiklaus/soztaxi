@@ -1,3 +1,4 @@
+{{-- resources/views/order-groups/index.blade.php --}}
 <x-app-layout>
     <div class="container mx-auto py-8">
         <div class="bg-white shadow-md rounded-lg overflow-hidden">
@@ -30,9 +31,9 @@
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $group->visit_date->format('d.m.Y H:i') }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                    {{ Str::limit($group->name, 100, '...') }}
+                                    {{ Str::limit($group->name, 60, '...') }}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $group->orders->count() }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $group->orders_count }}</td>
 <!--                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{-- $group->komment --}}</td>-->
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $group->taxi_way }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $group->taxi_price }}</td>

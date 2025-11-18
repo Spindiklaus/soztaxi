@@ -15,7 +15,8 @@ class OrderGroupController extends BaseController //
      */
     public function index()
     {
-        $orderGroups = OrderGroup::orderBy('visit_date', 'desc')->paginate(15); // Пагинация
+        $orderGroups = OrderGroup::withCount('orders')
+                ->orderBy('visit_date', 'desc')->paginate(15); // Пагинация
         return view('order-groups.index', compact('orderGroups'));
     }
 

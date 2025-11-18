@@ -26,7 +26,7 @@
                                     ? 'selected' : ''  
                                 }}
                             >
-                                {{ \Carbon\Carbon::parse($date)->format('d.m.Y') }} ({{ $count }} заказов)
+                                {{ \Carbon\Carbon::parse($date)->format('d.m.Y') }} ({{ $count }} зак.)
                             </option>
                         @empty
                             <option value="" disabled>Нет доступных дат для группировки</option>
