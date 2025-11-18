@@ -38,9 +38,10 @@ class OrderGroupingController extends BaseController {
                 ->groupBy('grouping_date')
                 ->orderBy('grouping_date', 'desc')
                 ->pluck('count', 'grouping_date'); // Возвращает коллекцию, где ключ - дата, значение - количество
+        
+        $lastSelectedDate = session('last_grouping_date');
 
-
-        return view('orders-grouping.grouping_form', compact('groupingDates')); // Blade шаблон для выбора даты
+        return view('orders-grouping.grouping_form', compact('groupingDates', 'lastSelectedDate')); // Blade шаблон для выбора даты
     }
 
     // Обработать выбор даты и показать заказы для группировки
@@ -51,9 +52,13 @@ class OrderGroupingController extends BaseController {
             'address_tolerance' => 'required|numeric|min:20|max:100', // Пример: от 20 до 100%
             'max_potential_group_size' => 'required|integer|min:1|max:20', // Установите логичный максимум            
         ]);
-
+        
         $selectedDate = Carbon::parse($request->input('grouping_date'))->startOfDay();
         $endDate = $selectedDate->copy()->endOfDay();
+        
+        // --- НОВАЯ СТРОКА: Сохраняем выбранную дату в сессию ---
+        session(['last_grouping_date' => $selectedDate->toISOString()]);
+        
         // Получаем параметры из запроса
         $timeTolerance = (int) $request->input('time_tolerance');
         $addressTolerance = (float) $request->input('address_tolerance');
@@ -178,6 +183,10 @@ class OrderGroupingController extends BaseController {
                 }
             }
         });
+        
+        // Сохранение выбранной даты в сессию ---
+        $selectedDate = $request->input('selected_date'); // Получаем дату из запроса
+        session(['last_grouping_date' => $selectedDate]);
 
         // Редирект на форму выбора даты
         return redirect()->route('orders.grouping.form')->with('success', 'Группировка успешно сохранена!');
