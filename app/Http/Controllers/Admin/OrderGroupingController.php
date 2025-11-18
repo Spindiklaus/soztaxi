@@ -120,6 +120,13 @@ class OrderGroupingController extends BaseController {
             ], $messages)->validate();
         } catch (ValidationException $e) {
             // Если валидация не проходит, редиректим на форму выбора даты
+            // перед этим сохраняем дату из запроса в сессию перед редиректом 
+            // Дата, которую пользователь выбрал до отправки формы, находится в скрытом поле 'selected_date'
+            $selectedDateFromForm = $request->input('selected_date');
+            if ($selectedDateFromForm) {
+                session(['last_grouping_date' => $selectedDateFromForm]);
+            }
+            
             return redirect()->route('orders.grouping.form')->withErrors($e->errors())->withInput();
         }
 
