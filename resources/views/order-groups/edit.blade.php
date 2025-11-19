@@ -34,8 +34,8 @@
                         </div>
                         <div class="mb-2 md:col-span-1">
                             <label for="visit_date" class="block text-gray-700 text-sm font-bold mb-2">Дата поездки (группы):</label>
-                            <input type="datetime-local" name="visit_data" id="visit_date"
-                                   value="{{ old('visit_data', $orderGroup->visit_date ? $orderGroup->visit_date->format('Y-m-d\TH:i') : '') }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                            <input type="datetime-local" name="visit_date" id="visit_date"
+                                   value="{{ old('visit_date', $orderGroup->visit_date ? $orderGroup->visit_date->format('Y-m-d\TH:i') : '') }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                         </div>
                     </div>
 

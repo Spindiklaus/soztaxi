@@ -149,6 +149,31 @@ class OrderGroupController extends BaseController //
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
+        
+        // --- Проверка даты поездки и минимальной даты заказа. Они должны совпадать ---
+        $newVisitDate = Carbon::parse($request->input('visit_date'));
+
+        // Загружаем связанные заказы для проверки
+        $relatedOrders = $orderGroup->orders; // Используем отношение 'orders'
+
+        if ($relatedOrders->isNotEmpty()) {
+            // Находим самый ранний заказ в группе
+            $earliestOrder = $relatedOrders->sortBy('visit_data')->first();
+            $expectedDateTime = $earliestOrder->visit_data; // Carbon объект с датой и временем
+
+            // Сравниваем новую дату/время группы с датой/временем самого раннего заказа, но только до минуты
+            // Для этого уберём секунды и микросекунды из обеих дат и сравним их.
+            $newVisitDateWithoutSeconds = $newVisitDate->copy()->second(0)->microsecond(0);
+            $expectedDateTimeWithoutSeconds = $expectedDateTime->copy()->second(0)->microsecond(0);
+
+            if ($newVisitDateWithoutSeconds->ne($expectedDateTimeWithoutSeconds)) { // ne = not equal
+                return redirect()->back()
+                    ->withErrors(['visit_date' => "Дата и время группы должны совпадать с датой и временем самого раннего заказа в группе ({$expectedDateTime->format('d.m.Y H:i')})."])
+                    ->withInput();
+            }
+        }
+        
+        
 
         $orderGroup->update($request->only(['name', 'visit_date', 'komment'])); 
         // Указываем только разрешённые поля
