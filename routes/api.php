@@ -3,14 +3,23 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ClientTripController;
 use App\Http\Controllers\Admin\SocialTaxiOrderController;
 use App\Http\Controllers\Api\OrderReportController;
-// Добавляем новые контроллеры
 use App\Http\Controllers\Api\HelperController;
 use App\Http\Controllers\Api\CalculationController;
+// Маршруты для добавления заказа в группу 
+use App\Http\Controllers\Admin\OrderGroupController; 
+
+
+// Маршруты для добавления заказа в группу 
+Route::prefix('order-groups')->group(function () {
+    Route::get('/{orderGroup}/available-orders', [OrderGroupController::class, 'getAvailableOrdersForGroup'])->name('api.order-groups.available-orders');
+    Route::post('/{orderGroup}/add-order', [OrderGroupController::class, 'addOrderToGroup'])->name('api.order-groups.add-order');
+});
 
 Route::get('/client-trips/{clientId}/{monthYear}', [ClientTripController::class, 'getClientTrips']);
 Route::get('/client-actual-trips/{clientId}/{monthYear}', [ClientTripController::class, 'getClientActualTrips']);
 Route::get('/client-taxi-sent-trips/{clientId}/{monthYear}', [ClientTripController::class, 'getClientTaxiSentTrips']);
 
+// маршрут для получения данных клиента по AJAX
 Route::get('/social-taxi-orders/client-data/{clientId}', [SocialTaxiOrderController::class, 'getClientData'])
      ->name('api.social-taxi-orders.client-data');
 

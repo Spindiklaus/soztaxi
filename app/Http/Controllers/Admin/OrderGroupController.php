@@ -4,9 +4,11 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\Order;
 use App\Models\OrderGroup;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator; // Импортируем Validator
+use Carbon\Carbon;
 
 class OrderGroupController extends BaseController // 
 {
@@ -170,4 +172,116 @@ class OrderGroupController extends BaseController //
 
         return redirect()->route('order-groups.index')->with('success', 'Группа успешно удалена.');
     }
+    
+    /**
+     * Добавить заказ в группу
+     */
+    public function addOrderToGroup(Request $request, OrderGroup $orderGroup)
+    {
+        $request->validate([
+            'order_id' => 'required|exists:orders,id', // Проверяем, что ID заказа передан и существует
+        ]);
+
+        $orderId = $request->input('order_id');
+
+        try {
+            // Загружаем заказ, который хотим добавить
+            $orderToAdd = Order::findOrFail($orderId);
+
+            // --- Валидация ---
+            // 1. Заказ не в другой группе
+            if ($orderToAdd->order_group_id !== null) {
+                return response()->json(['success' => false, 'message' => 'Заказ уже входит в другую группу.'], 422);
+            }
+
+            // 2. Дата поездки совпадает с датой группы
+            if ($orderToAdd->visit_data->format('Y-m-d') !== $orderGroup->visit_date->format('Y-m-d')) {
+                return response()->json(['success' => false, 'message' => 'Дата поездки заказа не совпадает с датой поездки группы.'], 422);
+            }
+
+            // 3. Время поездки в пределах 45 минут от времени группы (берем время начала группы как visit_date)
+            $groupStartTime = $orderGroup->visit_date; // Это datetime
+            $orderVisitTime = $orderToAdd->visit_data; // Это datetime
+
+            $diffInMinutes = $groupStartTime->diffInMinutes($orderVisitTime, false); // false означает, что может быть отрицательное значение
+
+            if (abs($diffInMinutes) > 45) {
+                return response()->json(['success' => false, 'message' => 'Время поездки заказа отличается от времени группы более чем на 45 минут.'], 422);
+            }
+
+            // 4. Заказ не удалён
+            if ($orderToAdd->deleted_at !== null) {
+                return response()->json(['success' => false, 'message' => 'Заказ удалён.'], 422);
+            }
+
+            // 5. Заказ не отменён
+            if ($orderToAdd->cancelled_at !== null) {
+                return response()->json(['success' => false, 'message' => 'Заказ отменён.'], 422);
+            }
+
+            // 6. Статус заказа "Принят" (не передан в такси)
+            if ($orderToAdd->taxi_sent_at !== null) {
+                return response()->json(['success' => false, 'message' => 'Заказ уже передан в такси.'], 422);
+            }
+
+            // 7. В группе не больше 3 заказов
+            $currentOrderCount = $orderGroup->orders()->count(); // Используем отношение
+            if ($currentOrderCount >= 3) {
+                return response()->json(['success' => false, 'message' => 'В группе уже 3 заказа. Невозможно добавить больше.'], 422);
+            }
+            // --- Конец валидации ---
+
+            // Обновляем заказ, присвоив ему ID группы
+            $orderToAdd->update(['order_group_id' => $orderGroup->id]);
+
+            // Возвращаем успешный ответ
+            return response()->json(['success' => true, 'message' => 'Заказ успешно добавлен в группу.', 'order' => $orderToAdd->load('client')]); // Возвращаем обновлённый заказ с клиентом
+
+        } catch (\Exception $e) {
+            \Log::error('Ошибка при добавлении заказа в группу: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Произошла ошибка при добавлении заказа.'], 500);
+        }
+    }
+    
+    /**
+     * Получить доступные заказы для добавления в группу
+     */
+    public function getAvailableOrdersForGroup(OrderGroup $orderGroup)
+    {
+        try {
+            $groupId = $orderGroup->id;
+            $groupDate = $orderGroup->visit_date->format('Y-m-d');
+            $groupTime = $orderGroup->visit_date; // Это DateTime
+
+            // Запрос для получения заказов, подходящих по критериям
+            $availableOrders = Order::where('visit_data', '>=', $groupTime->copy()->subMinutes(45)) // Время не раньше чем -45 мин от времени группы
+                                  ->where('visit_data', '<=', $groupTime->copy()->addMinutes(45))  // Время не позже чем +45 мин от времени группы
+                                  ->whereDate('visit_data', $groupDate) // Совпадение даты
+                                  ->whereNull('order_group_id') // Не в группе
+                                  ->whereNull('deleted_at') // Не удалён
+                                  ->whereNull('cancelled_at') // Не отменён
+                                  ->whereNull('taxi_sent_at') // Не передан в такси
+                                  ->with(['client']) // Загружаем клиента
+                                  ->orderBy('visit_data') // Сортируем по времени
+                                  ->get();
+
+            // Проверяем лимит на 3 заказа в группе перед отправкой
+            $currentOrderCount = $orderGroup->orders()->count();
+            if ($currentOrderCount >= 3) {
+                // Если лимит достигнут, возвращаем пустой массив
+                $availableOrders = collect(); // Пустая коллекция
+            }
+
+            return response()->json([
+                'success' => true,
+                'orders' => $availableOrders
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Ошибка при получении доступных заказов для группы: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Произошла ошибка при загрузке заказов.'], 500);
+        }
+    }
+
+    
 }

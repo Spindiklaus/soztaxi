@@ -33,6 +33,6 @@ class OrderGroup extends Model
      */
     public function orders()
     {
-        return $this->hasMany(Order::class, 'order_group_id');
+        return $this->hasMany(Order::class, 'order_group_id')->orderBy('visit_data', 'asc');
     }
 }
