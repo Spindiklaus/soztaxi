@@ -64,8 +64,8 @@
     @endif
     
     <!-- Содержимое фильтров (скрыто по умолчанию) -->
-    <div id="filters-content" class="p-2 hidden">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-2">
+    <div id="filters-content" class="p-1 hidden">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-0">
             <!-- Скрытое поле для сохранения типа заказа -->
             <input type="hidden" name="filter_type_order" value="{{ request('type_order', 1) }}">
             
@@ -133,7 +133,7 @@
                     $baseParams['type_order'] = request('type_order', 1);
                     $resetParams = array_merge($baseParams, [
                         'date_from' => '2025-01-01',
-                        'date_to' => date('Y-m-d'),
+                        'date_to' => \Carbon\Carbon::now()->addMonths(6)->format('Y-m-d'),
                         'show_deleted' => '0'
                      ]);
                 @endphp

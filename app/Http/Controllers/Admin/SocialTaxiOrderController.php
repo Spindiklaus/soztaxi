@@ -32,7 +32,7 @@ class SocialTaxiOrderController extends BaseController {
     public function index(Request $request) {
         
         
-            // Сбрасываем сессию при входе на общую страницу администратора
+        // Сбрасываем сессию при входе на общую страницу администратора
         session()->forget(['from_operator_page', 'operator_current_type']);
 
         // По умолчанию показываем только неудаленные записи

@@ -1,84 +1,53 @@
 {{-- resources/views/order-groups/index.blade.php --}}
 <x-app-layout>
-    <div class="container mx-auto py-8">
+    <div class="container mx-auto py-2 px-4 sm:px-6 lg:px-8">
         <div class="bg-white shadow-md rounded-lg overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <h2 class="text-2xl font-semibold text-gray-800 leading-tight">Управление поездками соцтакси</h2>
+            <div class="px-6 py-2 border-b border-gray-200">
+                <h2 class="text-2xl font-semibold text-gray-800 leading-tight">Управление группами соцтакси</h2>
                 <!-- Если разрешено создание вручную -->
                 <!-- <a href="{{-- route('order-groups.create') --}}" class="ml-4 inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                     Создать новую группу
                 </a> -->
             </div>
-            <div class="p-6">
-                <!-- Обертка для прокрутки таблицы -->
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200 bg-white">
-                        <thead class="bg-gray-50 text-gray-200 sticky top-0 z-10 shadow-lg">
-                        <tr>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Дата поездки</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Название</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Кол-во заказов в поездке</th>
-<!--                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Комментарии</th>-->
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Километраж</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Цена поездки</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Сумма к возмещению</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Создано</th>
-                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Действия</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        @forelse($orderGroups as $group)
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $group->visit_date->format('d.m.Y H:i') }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                    {{ Str::limit($group->name, 60, '...') }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $group->orders_count }}</td>
-<!--                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{-- $group->komment --}}</td>-->
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $group->taxi_way }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $group->taxi_price }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $group->taxi_vozm }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $group->created_at->format('d.m.Y H:i') }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <a href="{{ route('order-groups.show', $group) }}" class="text-blue-600 hover:text-blue-900 mr-3" title="Просмотр">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                        </svg>
-                                    </a>
-
-                                    <!-- Кнопка Редактировать -->
-                                    <a href="{{ route('order-groups.edit', $group) }}" class="text-indigo-600 hover:text-indigo-900 mr-3" title="Редактировать">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                        </svg>
-                                    </a>
-
-                                    <!-- Кнопка Удалить -->
-                                    <form action="{{ route('order-groups.destroy', $group) }}" method="POST" class="inline-block" onsubmit="return confirm('Вы уверены, что хотите удалить эту группу?')" title="Удалить">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-red-600 hover:text-red-900">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                            </svg>
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">Группы заказов не найдены.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-                </div> <!-- Конец обертки прокрутки -->    
+            <div class="p-2">
+                <!-- Включаем фильтры -->
+                @include('order-groups.index-components.filters')
+                 <div class="mt-6">
+                    <!-- Обертка для прокрутки таблицы -->
+                    <div class="rounded-lg border border-gray-200"> 
+                        <div class="overflow-y-auto max-h-[70vh]">
+                            @include('order-groups.index-components.table') <!-- Подключаем таблицу -->
+                        </div>    
+                    </div>
+                </div>
 
                 <div class="mt-4">
-                    {{ $orderGroups->links() }} <!-- Пагинация -->
+                    {{ $orderGroups->appends(request()->all())->links() }} <!-- Пагинация с сохранением параметров -->
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- JavaScript для сортировки -->
+    <script>
+        function sortBy(field) {
+            const currentSort = '{{ request("sort") }}';
+            const currentDirection = '{{ request("direction") }}';
+            let newDirection = 'asc';
+
+            // Если поле сортировки то же самое, меняем направление
+            if (currentSort === field) {
+                newDirection = currentDirection === 'asc' ? 'desc' : 'asc';
+            }
+
+            // Формируем URL с новыми параметрами сортировки
+            const url = new URL(window.location);
+            url.searchParams.set('sort', field);
+            url.searchParams.set('direction', newDirection);
+            // Сохраняем остальные параметры (фильтры)
+            // Параметры фильтров уже будут в URL, если они были, благодаря request()->all()
+
+            window.location.href = url.toString();
+        }
+    </script>
 </x-app-layout>

@@ -13,11 +13,60 @@ class OrderGroupController extends BaseController //
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $orderGroups = OrderGroup::withCount('orders')
-                ->orderBy('visit_date', 'desc')->paginate(15); // Пагинация
-        return view('order-groups.index', compact('orderGroups'));
+        $query = OrderGroup::query(); // Начинаем строить запрос
+        // Фильтрация по дате поездки
+        $dateFrom = $request->input('date_from', '2025-01-01');
+        $dateTo = $request->input('date_to', date('Y-m-d', strtotime('+6 months')));
+        if ($dateFrom) {
+            $query->whereDate('visit_date', '>=', $dateFrom);
+        }
+        if ($dateTo) {
+            $query->whereDate('visit_date', '<=', $dateTo);
+        }
+        
+        // Фильтрация по названию (частичное совпадение)
+        $nameFilter = $request->input('filter_name');
+        if ($nameFilter) {
+            $query->where('name', 'like', '%' . $nameFilter . '%');
+        }
+        
+        // Сортировка
+        $sort = $request->input('sort', 'visit_date'); // Поле для сортировки (по умолчанию 'visit_date')
+        $direction = $request->input('direction', 'desc'); // Направление (по умолчанию 'desc')
+
+        // Проверяем, что поле сортировки допустимо, чтобы избежать ошибок безопасности
+        $allowedSorts = ['visit_date', 'name', 'taxi_way', 'taxi_price', 'taxi_vozm', 'created_at', 'orders_count'];
+        if (!in_array($sort, $allowedSorts)) {
+            $sort = 'visit_date'; // Значение по умолчанию, если передано недопустимое поле
+        }
+        
+        // Проверяем направление
+        if (!in_array(strtolower($direction), ['asc', 'desc'])) {
+            $direction = 'desc'; // Значение по умолчанию, если передано недопустимое направление
+        }
+
+        // Применяем сортировку
+        if ($sort === 'orders_count') {
+            // Если сортировка по количеству заказов, используем withCount
+            $query->withCount('orders')->orderBy('orders_count', $direction);
+        } else {
+            // Иначе сортировка по обычному полю
+            $query->orderBy($sort, $direction);
+        }
+        
+        // Добавляем withCount для подсчета заказов ---
+        $orderGroups = $query->withCount('orders')->paginate(20)->appends($request->all());
+        // appends($request->all()) сохраняет все параметры запроса (фильтры, сортировку) в ссылках пагинации
+        // --- КОНЕЦ НОВОГО ---
+
+        // --- НОВОЕ: Собираем параметры для передачи в шаблон ---
+        $urlParams = $request->only(['sort', 'direction', 'date_from', 'date_to', 'filter_name']);
+        // --- КОНЕЦ НОВОГО ---
+
+        return view('order-groups.index', compact('orderGroups', 'urlParams')); // Передаем и группы, и параметры
+
     }
 
     /**

@@ -104,7 +104,7 @@
                     $baseParams = request()->only(['sort', 'direction']);
                     $resetParams = array_merge($baseParams, [
                         'date_from' => '2025-01-01',
-                        'date_to' => date('Y-m-d'),
+                        'date_to' => \Carbon\Carbon::now()->addMonths(6)->format('Y-m-d'),
                         'show_deleted' => '0'
                      ]);
                 @endphp
