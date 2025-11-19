@@ -68,23 +68,23 @@ class FioDtrnController extends BaseController {
         // Если фильтр по дате применяется, нужно изменить, как считается orders_count
         // Лучше всего сделать это через отношения и скоупы, но для простоты, добавим условие в withCount
         $ordersCountQuery = Order::query();
-        if ($visitDateFrom) {
-            $ordersCountQuery->whereDate('visit_data', '>=', $visitDateFrom);
+        if ($DateFrom) {
+            $ordersCountQuery->whereDate('visit_data', '>=', $DateFrom);
         }
-        if ($visitDateTo) {
-            $ordersCountQuery->whereDate('visit_data', '<=', $visitDateTo);
+        if ($DateTo) {
+            $ordersCountQuery->whereDate('visit_data', '<=', $DateTo);
         }
 
         if ($filteredClientIds !== null) {
             // Если фильтр по дате был, и $filteredClientIds содержит ID клиентов с заказами в диапазоне
             // Мы уже отфильтровали $query по этим ID
             // Теперь подсчитываем заказы только в этом диапазоне для каждого клиента в результирующем наборе
-            $query->withCount(['orders' => function ($q) use ($visitDateFrom, $visitDateTo) {
-                    if ($visitDateFrom) {
-                        $q->whereDate('visit_data', '>=', $visitDateFrom);
+            $query->withCount(['orders' => function ($q) use ($DateFrom, $DateTo) {
+                    if ($DateFrom) {
+                        $q->whereDate('visit_data', '>=', $DateFrom);
                     }
-                    if ($visitDateTo) {
-                        $q->whereDate('visit_data', '<=', $visitDateTo);
+                    if ($DateTo) {
+                        $q->whereDate('visit_data', '<=', $DateTo);
                     }
                 }]);
         } else {
@@ -237,11 +237,11 @@ class FioDtrnController extends BaseController {
             ->whereNull('deleted_at');
 
         // Применяем фильтры даты, если они указаны
-        if ($visitDateFrom) {
-            $orderQuery->whereDate('visit_data', '>=', $visitDateFrom);
+        if ($DateFrom) {
+            $orderQuery->whereDate('visit_data', '>=', $DateFrom);
         }
-        if ($visitDateTo) {
-            $orderQuery->whereDate('visit_data', '<=', $visitDateTo);
+        if ($DateTo) {
+            $orderQuery->whereDate('visit_data', '<=', $DateTo);
         }
 
         // Сортируем и пагинируем
