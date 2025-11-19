@@ -13,12 +13,12 @@ class OrderGroup extends Model
 
     // Уточните fillable поля, если планируете массовое заполнение
     protected $fillable = [
-        'name',
-        'visit_date',
+        'name', // Название группы
+        'visit_date', // Общая дата поездки (самая ранняя из заказов)
         'taxi_way',
         'taxi_price',
         'taxi_vozm',
-        'komment',
+        'komment',  // Комментарий к группе
     ];
 
     // Уточните casts, если необходимо

@@ -167,7 +167,7 @@ class OrderGroupingController extends BaseController {
                     // Получаем имя текущего оператора 
                     $currentOperatorName = auth()->user()->name ?? 'Неизвестный'; // 
                     // Формируем комментарий
-                    $comment = "Сформирована оператором {$currentOperatorName} по методу адреса доставки";
+                    $comment = "Сформирована оператором {$currentOperatorName} по методу адреса КУДА";
                 }
                 else {
                     // На всякий случай, если заказы не найдены (хотя валидация должна это исключить)

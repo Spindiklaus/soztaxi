@@ -136,10 +136,11 @@ class OrderGroupController extends BaseController //
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'visit_data' => [
+            'visit_date' => [
                 'required',
                 'date',
             ],
+            'komment' => 'nullable|string|max:1000', // Комментарий
             // Добавьте другие поля, если есть
         ]);
 
@@ -147,9 +148,13 @@ class OrderGroupController extends BaseController //
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        $orderGroup->update($validator->validated());
+        $orderGroup->update($request->only(['name', 'visit_date', 'komment'])); 
+        // Указываем только разрешённые поля
+        // Получаем параметры из $request->all(), включая скрытые поля формы ---
+        $allowedParams = ['sort', 'direction', 'date_from', 'date_to', 'filter_name']; // все разрешённые параметры
+        $urlParams = $request->only($allowedParams);
 
-        return redirect()->route('order-groups.index')->with('success', 'Группа успешно обновлена.');
+        return redirect()->route('order-groups.index', $urlParams)->with('success', 'Группа успешно обновлена.');
     }
 
     /**
