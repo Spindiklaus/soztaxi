@@ -59,11 +59,9 @@ class OrderGroupController extends BaseController //
         // Добавляем withCount для подсчета заказов ---
         $orderGroups = $query->withCount('orders')->paginate(20)->appends($request->all());
         // appends($request->all()) сохраняет все параметры запроса (фильтры, сортировку) в ссылках пагинации
-        // --- КОНЕЦ НОВОГО ---
 
-        // --- НОВОЕ: Собираем параметры для передачи в шаблон ---
+        // Собираем параметры для передачи в шаблон ---
         $urlParams = $request->only(['sort', 'direction', 'date_from', 'date_to', 'filter_name']);
-        // --- КОНЕЦ НОВОГО ---
 
         return view('order-groups.index', compact('orderGroups', 'urlParams')); // Передаем и группы, и параметры
 
@@ -114,7 +112,11 @@ class OrderGroupController extends BaseController //
     {
         // Загружаем связанные заказы для отображения
         $orderGroup->load('orders.client'); // Загружаем заказы и их клиентов
-        return view('order-groups.show', compact('orderGroup'));
+        
+        $urlParams = request()->only(['sort', 'direction', 'date_from', 'date_to', 'filter_name']);
+//        dd($urlParams);
+        
+        return view('order-groups.show', compact('orderGroup', 'urlParams'));
     }
 
     /**
@@ -122,7 +124,9 @@ class OrderGroupController extends BaseController //
      */
     public function edit(OrderGroup $orderGroup)
     {
-        return view('order-groups.edit', compact('orderGroup'));
+        $urlParams = request()->only(['sort', 'direction', 'date_from', 'date_to', 'filter_name']);
+
+        return view('order-groups.edit', compact('orderGroup', 'urlParams'));
     }
 
     /**

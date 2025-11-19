@@ -4,7 +4,13 @@
             <div class="px-6 py-4 border-b border-gray-200">
                 <h2 class="text-2xl font-semibold text-gray-800 leading-tight">Редактировать Группу: {{ $orderGroup->name }}</h2>
                 <div class="mt-2">
-                    <a href="{{ route('order-groups.index') }}" class="text-blue-600 hover:text-blue-900">&larr; Назад к списку</a>
+                    <a href="{{ route('order-groups.index') . '?' . http_build_query($urlParams) }}"
+                       class="mb-4 inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 text-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        Назад к списку
+                    </a>
                 </div>
             </div>
             <div class="p-6">

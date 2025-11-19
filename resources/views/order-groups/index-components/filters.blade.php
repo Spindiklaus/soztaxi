@@ -13,7 +13,51 @@
             </svg>
         </button>
     </div>
-    
+
+    <!-- Отображение активных фильтров --- -->
+    @php
+        $activeFilters = [];
+        $filterLabels = [
+            'date_from' => 'Дата от',
+            'date_to' => 'Дата до',
+            'filter_name' => 'Название группы',
+        ];
+
+        // Собираем активные фильтры
+        foreach (request()->all() as $key => $value) {
+            // Проверяем, является ли параметр фильтром и не является ли он служебным
+            if (in_array($key, ['date_from', 'date_to', 'filter_name']) && !empty($value) && !in_array($key, ['sort', 'direction', 'page'])) {
+                if (isset($filterLabels[$key])) {
+                    $label = $filterLabels[$key];
+                    $activeFilters[] = $label . ': ' . $value;
+                }
+            }
+        }
+    @endphp
+
+    @if(!empty($activeFilters))
+        <div class="px-4 py-2 bg-blue-50 border-b border-blue-100">
+            <div class="flex flex-wrap items-center gap-2">
+                <span class="text-sm font-medium text-blue-700">Активные фильтры:</span>
+                @foreach($activeFilters as $filter)
+                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        {{ $filter }}
+                    </span>
+                @endforeach
+                <!-- Кнопка "Сбросить все" -->
+                @php
+                    // Собираем параметры для сброса - оставляем только базовые (сортировка)
+                    $baseParams = request()->only(['sort', 'direction']);
+                @endphp
+                <a href="{{ route('order-groups.index', $baseParams) }}"
+                   class="ml-2 text-xs text-blue-600 hover:text-blue-800">
+                    Сбросить все
+                </a>
+            </div>
+        </div>
+    @endif
+    <!-- --- КОНЕЦ НОВОГО --- -->
+
     <!-- Содержимое фильтров (скрыто по умолчанию) -->
     <div id="filters-content" class="p-2 hidden">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
@@ -75,19 +119,19 @@ function toggleFilters() {
     }
 }
 
-// Показываем фильтры, если есть активные фильтры
-document.addEventListener('DOMContentLoaded', function() {
-    // Проверяем, есть ли активные пользовательские фильтры
-    const hasUserFilters = {{ 
-        collect(request()->except(['sort', 'direction', 'page']))->filter(function($value, $key) {
-            // Исключаем параметры по умолчанию или пустые значения
-            return !empty($value);
-        })->isNotEmpty() ? 'true' : 'false' 
-    }};
-    
-    if (hasUserFilters) {
-        document.getElementById('filters-content').classList.remove('hidden');
-        document.getElementById('filter-arrow').classList.add('rotate-180');
-    }
-});
+//// Показываем фильтры, если есть активные фильтры
+//document.addEventListener('DOMContentLoaded', function() {
+//    // Проверяем, есть ли активные пользовательские фильтры
+//    const hasUserFilters = {{-- 
+//        collect(request()->except(['sort', 'direction', 'page']))->filter(function($value, $key) {
+//            // Исключаем параметры по умолчанию или пустые значения
+//            return !empty($value);
+//        })->isNotEmpty() ? 'true' : 'false' 
+//    --}};
+//    
+//    if (hasUserFilters) {
+//        document.getElementById('filters-content').classList.remove('hidden');
+//        document.getElementById('filter-arrow').classList.add('rotate-180');
+//    }
+//});
 </script>

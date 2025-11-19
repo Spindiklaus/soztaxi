@@ -11,8 +11,11 @@
             </div>
             <div class="p-2">
                 <!-- Включаем фильтры -->
-                @include('order-groups.index-components.filters')
+                @include('order-groups.index-components.filters', ['urlParams' => $urlParams])
                  <div class="mt-6">
+                      <div class="mb-2">
+                        {{ $orderGroups->appends(request()->all())->links() }} <!-- Пагинация с сохранением параметров -->
+                    </div>
                     <!-- Обертка для прокрутки таблицы -->
                     <div class="rounded-lg border border-gray-200"> 
                         <div class="overflow-y-auto max-h-[70vh]">
