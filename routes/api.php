@@ -11,7 +11,6 @@ Route::get('/client-trips/{clientId}/{monthYear}', [ClientTripController::class,
 Route::get('/client-actual-trips/{clientId}/{monthYear}', [ClientTripController::class, 'getClientActualTrips']);
 Route::get('/client-taxi-sent-trips/{clientId}/{monthYear}', [ClientTripController::class, 'getClientTaxiSentTrips']);
 
-// Новый маршрут для получения данных клиента по AJAX
 Route::get('/social-taxi-orders/client-data/{clientId}', [SocialTaxiOrderController::class, 'getClientData'])
      ->name('api.social-taxi-orders.client-data');
 
