@@ -67,8 +67,6 @@ Route::middleware(['web', 'auth', IsAdmin::class])->group(function () {
     Route::post('/users/{user}/assign-role', [UserController::class, 'assignRole'])->name('users.assign-role');
     Route::resource('roles', RoleController::class);
     Route::resource('taxis', TaxiController::class);
-    Route::resource('fiodtrns', FioDtrnController::class);
-    Route::get('/fiodtrns/{fiodtrn}/orders', [FiodtrnController::class, 'showOrders'])->name('fiodtrns.orders');
     Route::group(['namespace' => '', 'prefix' => 'import'], function() {
         Route::get('/fiodtrns', [ImportFioDtrnController::class, 'showClientsImportForm'])->name('import.fiodtrns.form');
         Route::post('/fiodtrns', [ImportFioDtrnController::class, 'importClients'])->name('import.fiodtrns.process');
@@ -106,8 +104,9 @@ Route::middleware(['web', 'auth', IsAdmin::class])->group(function () {
     Route::post('/orders/grouping/show', [OrderGroupingController::class, 'showOrdersForGrouping'])->name('orders.grouping.show');
     Route::post('/orders/grouping/process', [OrderGroupingController::class, 'processGrouping'])->name('orders.grouping.process');
 
+    // --- маршрут для удаления заказа из группы --- //
+    Route::delete('/order-groups/{orderGroup}/remove-order/{order}', [OrderGroupController::class, 'removeOrderFromGroup'])->name('order-groups.remove-order');
     Route::resource('order-groups', OrderGroupController::class)->names('order-groups'); 
-
     
 });
 
@@ -121,6 +120,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/social-taxi/calendar/client/{client}/date/{date}', [SocialTaxiController::class, 'calendarByClient'])->name('social-taxi.calendar.client');
         Route::post('/social-taxi/copy-order', [SocialTaxiController::class, 'copyOrder'])->name('social-taxi.copy-order');
     });
+    Route::resource('fiodtrns', FioDtrnController::class);
+    Route::get('/fiodtrns/{fiodtrn}/orders', [FiodtrnController::class, 'showOrders'])->name('fiodtrns.orders');
     Route::resource('social-taxi-orders', SocialTaxiOrderController::class)->names('social-taxi-orders'); 
     // маршрут для восстановления
     Route::patch('/social-taxi-orders/{social_taxi_order}/restore', [SocialTaxiOrderController::class, 'restore'])->name('social-taxi-orders.restore');

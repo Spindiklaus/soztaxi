@@ -101,7 +101,8 @@
                     </a>
 
                     <!-- Кнопка Удалить -->
-                    <form action="{{ route('order-groups.destroy', $group) }}" method="POST" class="inline-block" onsubmit="return confirm('Вы уверены, что хотите удалить эту группу?')" title="Удалить">
+                    <form action="{{ route('order-groups.destroy', $group) }}" method="POST" class="inline-block" onsubmit="return confirm('Вы уверены, что хотите удалить эту группу?')" 
+                          title="Удалить группу">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="text-red-600 hover:text-red-900">

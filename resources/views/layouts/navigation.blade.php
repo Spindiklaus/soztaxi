@@ -99,7 +99,9 @@
                         </x-dropdown>
                     </div>
                     <!-- Конец подменю "Управление заказами" -->
-                   
+                    <x-nav-link :href="route('fiodtrns.index')" :active="request()->routeIs('fiodtrns.index')">
+                        {{ __('Клиенты') }}
+                    </x-nav-link>                   
  
                     <x-nav-link :href="route('orders.report_visit')" :active="request()->routeIs('orders.report_visit')">
                         {{ __('Сводный отчет') }}

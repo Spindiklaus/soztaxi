@@ -192,7 +192,7 @@ class OrderGroupController extends BaseController //
         // Важно: Удаление группы может повлиять на связанные заказы.
         // Перед удалением вызывается deleting(OrderGroup $orderGroup)
         // $orderGroup->orders()->update(['order_group_id' => null]); // Пример
-
+        
         $orderGroup->delete();
 
         return redirect()->route('order-groups.index')->with('success', 'Группа успешно удалена.');
@@ -305,6 +305,41 @@ class OrderGroupController extends BaseController //
         } catch (\Exception $e) {
             \Log::error('Ошибка при получении доступных заказов для группы: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Произошла ошибка при загрузке заказов.'], 500);
+        }
+    }
+    
+    /**
+     * Удалить заказ из группы
+     */
+    public function removeOrderFromGroup(OrderGroup $orderGroup, Order $order) // Model Binding для обеих моделей
+    {
+        try {
+            // Проверяем, что заказ действительно принадлежит этой группе
+            if ($order->order_group_id !== $orderGroup->id) {
+                return redirect()->back()->with('error', 'Заказ не принадлежит этой группе.');
+            }
+
+            // --- Проверка ограничений ---
+            // 1. В группе должен остаться минимум один заказ
+            $currentOrderCount = $orderGroup->orders()->count(); // Используем отношение
+            if ($currentOrderCount <= 1) {
+                return redirect()->back()->with('error', 'Невозможно удалить заказ: в группе должен остаться минимум один заказ.');
+            }
+
+            // 2. Заказ должен иметь статус "Принят" (предположим, это означает, что taxi_sent_at = null)
+            if ($order->taxi_sent_at !== null) {
+                return redirect()->back()->with('error', 'Невозможно удалить заказ: заказ уже передан в такси.');
+            }
+            // --- Конец проверки ---
+
+            // Удаляем связь заказа с группой
+            $order->update(['order_group_id' => null]); // Устанавливаем order_group_id в NULL
+
+            return redirect()->back()->with('success', 'Заказ успешно удалён из группы.');
+
+        } catch (\Exception $e) {
+            \Log::error('Ошибка при удалении заказа из группы: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Произошла ошибка при удалении заказа.');
         }
     }
 

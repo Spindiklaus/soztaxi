@@ -44,6 +44,13 @@
                         <textarea name="komment" id="komment" rows="2" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">{{ old('komment', $orderGroup->komment) }}</textarea>
                         <p class="text-xs text-gray-500 mt-1">Максимум 1000 символов.</p>
                     </div>
+                    
+                    <div class="flex items-center justify-end mt-2 mb-6">
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                            Обновить группу
+                        </button>
+                    </div>
+                </form>
 
                     @if($orderGroup->orders->isNotEmpty())
                         <div class="mb-2">
@@ -52,7 +59,7 @@
                                 <!-- Кнопка "Добавить заказ в группу" - отображается только если заказов меньше 3 -->
                                 @if($orderGroup->orders->count() < 3)
                                     <button type="button" onclick="openAddOrderModal({{ $orderGroup->id }})" class="inline-flex items-center px-3 py-1 bg-green-600 border border-transparent rounded-md font-semibold text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition ease-in-out duration-150 text-sm">
-                                        Добавить заказ
+                                        Добавить заказ в группу
                                     </button>
                                 @else
                                     <span class="text-sm text-gray-500 italic">Группа заполнена (3/3)</span>
@@ -62,21 +69,18 @@
                                 <table class="w-full table-auto divide-y divide-gray-200">
                                     <thead class="bg-gray-50">
                                         <tr>
-                                            <th scope="col" class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Клиент</th>
                                             <th scope="col" class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Время посадки</th>
                                             <th scope="col" class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Откуда</th>
                                             <th scope="col" class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Куда</th>
+                                            <th scope="col" class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Клиент</th>
                                             <th scope="col" class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Предв. дальность</th>
                                             <th scope="col" class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Заказ</th>
-                                            <th scope="col" class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">id заказа</th>
+                                            <th scope="col" class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Действия</th>
                                         </tr>
                                     </thead>
                                     <tbody class="bg-white divide-y divide-gray-200">
                                         @foreach($orderGroup->orders as $order)
                                             <tr>
-                                                <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-500">
-                                                    {{ $order->client ? $order->client->fio : 'N/A' }}
-                                                </td>
                                                 <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-500">
                                                     {{ $order->visit_data ? $order->visit_data->format('H:i') : 'N/A' }}
                                                 </td>
@@ -96,6 +100,9 @@
                                                         </div>
                                                     @endif
                                                 </td>
+                                                <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-500">
+                                                    {{ $order->client ? $order->client->fio : 'N/A' }}
+                                                </td>                                                
                                                 <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-500">
                                                     {{ $order->predv_way }}
                                                 </td>
@@ -117,8 +124,17 @@
                                                         </div>
                                                     @endif
                                                 </td>
-                                                <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-500">
-                                                    {{ $order->id }}
+                                                <td class="px-2 py-2 whitespace-nowrap text-sm font-medium">
+                                                    <!-- Кнопка "Удалить из группы" -->
+                                                    <form method="POST" action="{{ route('order-groups.remove-order', ['orderGroup' => $orderGroup->id, 'order' => $order->id]) }}" class="inline-block" onsubmit="return confirm('Вы уверены, что хотите удалить этот заказ из группы?')">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="text-red-600 hover:text-red-900" title="Удалить заказ из группы">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                            </svg>
+                                                        </button>
+                                                    </form>
                                                 </td>
                                             </tr>
                                         @endforeach
@@ -139,38 +155,38 @@
                         </div>
                     @endif
 
-                    <div class="flex items-center justify-end mt-4">
-                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                            Обновить
-                        </button>
-                    </div>
-                </form>
+                    
             </div>
         </div>
     </div>
 
     <!-- Модальное окно для добавления заказа -->
     <div id="add-order-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div class="mt-3">
-                <h3 class="text-lg font-medium text-gray-900">Добавить заказ в группу</h3>
-                <form id="add-order-form" method="POST">
-                    @csrf
-                    @method('POST')
-                    <input type="hidden" id="modal-order-group-id" name="order_group_id">
-                    <div class="mt-2 space-y-2">
-                        <div>
-                            <label for="modal-order-id" class="block text-sm font-medium text-gray-700">Выберите заказ</label>
-                            <select id="modal-order-id" name="order_id" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
-                                <option value="">Загрузка...</option>
-                            </select>
-                        </div>
+        <!-- Центрируем контейнер модального окна -->
+        <div class="flex items-center justify-center min-h-full p-4">
+            <div class="relative w-full max-w-2xl mx-auto border shadow-lg rounded-md bg-white"> <!-- max-w-2xl (~48rem или ~768px) -->
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="mt-3 sm:mt-0 sm:ml-4 sm:text-left">
+                        <h3 class="text-lg font-medium text-gray-900">Добавить заказ в группу</h3>
+                        <form id="add-order-form" method="POST">
+                            @csrf
+                            @method('POST')
+                            <input type="hidden" id="modal-order-group-id" name="order_group_id">
+                            <div class="mt-2 space-y-2">
+                                <div>
+                                    <label for="modal-order-id" class="block text-sm font-medium text-gray-700">Выберите заказ</label>
+                                    <select id="modal-order-id" name="order_id" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                                        <option value="">Загрузка...</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="items-center gap-2 mt-4">
+                                <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none">Добавить</button>
+                                <button type="button" onclick="closeAddOrderModal()" class="px-4 py-2 bg-gray-300 rounded-md hover:bg-gray-400 focus:outline-none">Отмена</button>
+                            </div>
+                        </form>
                     </div>
-                    <div class="items-center gap-2 mt-4">
-                        <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none">Добавить</button>
-                        <button type="button" onclick="closeAddOrderModal()" class="px-4 py-2 bg-gray-300 rounded-md hover:bg-gray-400 focus:outline-none">Отмена</button>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>
