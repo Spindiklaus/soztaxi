@@ -252,7 +252,6 @@ class StoreSocialTaxiOrderByTypeRequest extends FormRequest {
         // Проверяем ограничения
         $existing_Count = \App\Models\Order::where('client_id', $clientId)
                 ->whereDate('visit_data', $visitDate) // Сравниваем только дату
-                ->where('type_order', $typeOrder) // Только заказы того же типа
                 ->whereNull('deleted_at') // Исключаем удаленные
                 ->whereNull('cancelled_at'); // Исключаем отмененные
         // Если это обновление заказа, исключаем сам заказ из подсчета
@@ -276,7 +275,7 @@ class StoreSocialTaxiOrderByTypeRequest extends FormRequest {
                 3 => 'ГАЗель',
                 default => 'Неизвестный тип',
             };
-            $fail("Невозможно создать заказ: клиент уже имеет {$maxAllowed} поездок(у) типа '{$typeName}' в этот день.");
+            $fail("Невозможно создать заказ: клиент уже имеет {$maxAllowed} поездок(у) в этот день.");
         }
     }
 
