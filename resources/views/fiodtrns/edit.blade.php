@@ -15,15 +15,24 @@
                 @endforeach
                 
                 <!-- ID клиента -->
-                                <div>
-                    <label for="kl_id" class="block text-sm font-medium text-gray-700">ID клиента (серия^номер)</label>
-                    <input type="text" name="kl_id" id="kl_id" value="{{ old('kl_id', $fiodtrn->kl_id) }}" required
-                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500">
-                    @error('kl_id')
-                    <span class="text-red-500 text-xs">{{ $message }}</span>
-                    @enderror
-                </div>
-
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="kl_id" class="block text-sm font-medium text-gray-700">ID клиента (серия^номер)</label>
+                        <input type="text" name="kl_id" id="kl_id" value="{{ old('kl_id', $fiodtrn->kl_id) }}" required
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500">
+                        @error('kl_id')
+                        <span class="text-red-500 text-xs">{{ $message }}</span>
+                        @enderror
+                    </div>
+                    <div>
+                        <label for="client_invalid" class="block text-sm font-medium text-gray-700">Удостоверение инвалида</label>
+                        <input type="text" name="client_invalid" id="client_invalid" value="{{ old('client_invalid', $fiodtrn->client_invalid) }}" required
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500">
+                        @error('client_invalid')
+                            <span class="text-red-500 text-xs">{{ $message }}</span>
+                        @enderror
+                    </div>
+                 </div>     
                 <!-- ФИО -->
                 <div>
                     <label for="fio" class="block text-sm font-medium text-gray-700">ФИО</label>

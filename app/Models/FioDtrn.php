@@ -15,6 +15,7 @@ class FioDtrn extends Model
     protected $fillable = [
         'kl_id',
         'fio',
+        'client_invalid',
         'data_r',
         'sex',
         'rip_at',

@@ -200,8 +200,9 @@ class FioDtrnController extends BaseController {
 //        $request->replace($data);
 
         $request->validate([
-            'kl_id' => 'required|string|max:255|unique:fio_dtrns,kl_id,' . $fiodtrn->id,
-            'fio' => 'required|string|max:255',
+            'kl_id' => 'required|string|max:191|unique:fio_dtrns,kl_id,' . $fiodtrn->id,
+            'fio' => 'required|string|max:191',
+            'client_invalid' => 'nullable|string|max:191',
             'data_r' => 'nullable|date',
             'sex' => 'nullable|in:М,Ж',
             'rip_at' => 'nullable|date',

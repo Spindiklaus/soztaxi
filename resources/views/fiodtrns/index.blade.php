@@ -54,7 +54,7 @@
 
             <!-- Раскрывающийся список дубликатов -->
             @if($duplicateCounts->isNotEmpty())
-            <div x-data="{ open: false }" class="mb-4">
+            <div x-data="{ open: false }" class="mb-2">
                 <button @click="open = !open"
                          class="w-full text-left flex justify-between items-center bg-yellow-50 border border-yellow-200 rounded-lg p-4 hover:bg-yellow-100 focus:outline-none focus:ring-2 focus:ring-yellow-500">
                     <span class="font-bold text-yellow-700">
@@ -96,7 +96,7 @@
 
 
             <!-- Форма фильтрации -->
-            <div class="bg-white shadow rounded-lg p-4 mb-2">
+            <div class="bg-white shadow rounded-lg p-2 mb-2">
                 <form action="{{ route('fiodtrns.index') }}" method="GET" class="flex flex-wrap items-end gap-3">
                      <!-- Скрытое поле для сохранения сортировки и других параметров -->
                     @if(request('sort'))
@@ -171,7 +171,7 @@
                 </form>
             </div>
             
-            <div class="mt-4 mb-4">
+            <div class="mt-2 mb-2">
                 {{ $fiodtrns->appends(request()->all())->links() }}
             </div>
 
@@ -216,6 +216,10 @@
                                 <span class="ml-1" x-show="sortField === 'kl_id' && sortDirection === 'asc'">↑</span>
                                 <span class="ml-1" x-show="sortField === 'kl_id' && sortDirection === 'desc'">↓</span>
                             </th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">
+                                Удостоверение
+                            </th>
                             <th @click="sortBy('data_r')" scope="col"
                                  class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-blue-700">
                                 Дата рождения
@@ -241,12 +245,12 @@
                                 <span class="ml-1" x-show="sortField === 'orders_count' && sortDirection === 'desc'">↓</span>
                             </th>
                             <th scope="col"
-                                class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">
-                                Оператор
-                            </th>
-                            <th scope="col"
                                 class="px-6 py-3 text-right text-xs font-bold uppercase tracking-wider">
                                 Действия
+                            </th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">
+                                Оператор
                             </th>
                         </tr>
                     </thead>
@@ -254,21 +258,22 @@
                         {{-- Используем @forelse для отображения данных от Laravel --}}
                         @forelse ($fiodtrns as $fiodtrn)
                         <tr>
-                            <td class="{{ $fiodtrn->rip_at ? 'px-6 py-4 whitespace-nowrap text-sm bg-gray-500' : 'px-6 py-4 whitespace-nowrap text-sm text-gray-900' }}">
+                            <td class="{{ $fiodtrn->rip_at ? 'px-4 py-2 whitespace-nowrap text-sm bg-gray-500' : 'px-6 py-4 whitespace-nowrap text-sm text-gray-900' }}">
                                 <div>{{ $fiodtrn->fio }}</div>
                                 @if($fiodtrn->komment)
                                     <div class="text-xs text-gray-600 mt-1">{{ $fiodtrn->komment }}</div>
                                 @endif
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $fiodtrn->kl_id }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ optional($fiodtrn->data_r)->format('d.m.Y') }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{{ $fiodtrn->kl_id }}</td>
+                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{{ $fiodtrn->client_invalid }}</td>
+                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{{ optional($fiodtrn->data_r)->format('d.m.Y') }}</td>
+                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
                                 <span class="{{ $fiodtrn->sex === 'М' ? 'text-blue-700' : ($fiodtrn->sex === 'Ж' ? 'text-pink-700' : 'text-gray-500') }}">
                                     {{ $fiodtrn->sex === 'М' ? 'Мужской' : ($fiodtrn->sex === 'Ж' ? 'Женский' : '-') }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ optional($fiodtrn->rip_at)->format('d.m.Y') }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{{ optional($fiodtrn->rip_at)->format('d.m.Y') }}</td>
+                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
                                 @if($fiodtrn->orders_count > 0)
                                     <a href="{{ route('fiodtrns.orders', array_merge(['fiodtrn' => $fiodtrn], $urlParams)) }}" target ="_blank"
                                         class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 hover:bg-blue-200">
@@ -276,8 +281,7 @@
                                     </a>
                                 @endif
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ optional($fiodtrn->user)->name ?? '-' }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm space-x-2 flex justify-end">
+                            <td class="px-4 py-2 whitespace-nowrap text-right text-sm space-x-2 flex justify-end">
                                 <a href="{{ route('fiodtrns.show', array_merge(['fiodtrn' => $fiodtrn], $urlParams)) }}"
                                    class="inline-flex items-center px-2 py-1 rounded-md text-sm font-medium bg-blue-100 text-blue-800 hover:bg-blue-200"
                                    title="Просмотр">
@@ -320,6 +324,7 @@
                                     </button>
                                 </form>
                             </td>
+                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{{ optional($fiodtrn->user)->name ?? '-' }}</td>
                         </tr>
                         @empty
                         <tr>

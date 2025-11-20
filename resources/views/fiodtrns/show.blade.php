@@ -4,10 +4,15 @@
             <h1 class="text-3xl font-bold text-gray-800 mb-4">Сведения по клиенту</h1>
 
             <div class="bg-white shadow rounded-lg p-6">
-                <div class="mb-4">
-                    <strong>ID клиента:</strong> {{ $fiodtrn->kl_id }}
-                </div>
-                <div class="mb-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div class="mb-4">
+                        <strong>ID клиента:</strong> {{ $fiodtrn->kl_id }}
+                    </div>
+                    <div class="mb-4">
+                        <strong>Удостоверение инвалида:</strong> {{ $fiodtrn->client_invalid }}
+                    </div>
+                </div>    
+                <div class="mb-8">
                     <strong>ФИО:</strong> {{ $fiodtrn->fio }}
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -22,7 +27,7 @@
                         <strong>Дата и время добавления информации о RIP:</strong> {{ optional($fiodtrn->created_rip)->format('d.m.Y H:i') ?: '-' }}
                     </div>
                 </div>    
-                <div class="mb-4">
+                <div class="mb-8">
                     <strong>Комментарии:</strong> {{ $fiodtrn->komment ?: '-' }}
                 </div>
                 <div class="mb-4">
