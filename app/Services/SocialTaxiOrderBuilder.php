@@ -239,7 +239,7 @@ class SocialTaxiOrderBuilder {
 
         // Последовательно применяем фильтры и сортировку
         return $this->applyFilters($request)
-                        ->applySorting($request);
+               ->applySorting($request);
     }
 
 }

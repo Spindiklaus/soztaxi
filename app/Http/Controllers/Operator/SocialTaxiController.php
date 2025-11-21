@@ -124,7 +124,12 @@ class SocialTaxiController extends BaseController
 
     // Получаем заказы, отфильтрованные по клиенту И по месяцу
     $query = $this->queryBuilder->build($request, $showDeleted == '1');
-    $orders = $query->paginate(50)->appends($request->all());
+    $orders = $query->get(); // <-- Используем get(), получаем коллекцию
+    
+    // Фильтруем коллекцию, удаляя отменённые заказы ---
+    $orders = $orders->filter(function ($order) {
+        return $order->cancelled_at === null; // Оставляем только неотменённые
+    });
 
     // --- ПОДГОТОВКА ДАННЫХ ДЛЯ КАЛЕНДАРЯ ---
     $calendarData = [];
