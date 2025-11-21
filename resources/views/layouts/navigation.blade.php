@@ -90,7 +90,7 @@
                                     {{ __('Передача в такси') }}
                                 </x-dropdown-link>
                                 <x-dropdown-link :href="route('taxi_sent-orders.index')" :active="request()->routeIs('taxi_sent-orders.index')">
-                                    {{ __('Отмена передачи') }}
+                                    {{ __('Подтверждение/отмена передачи') }}
                                 </x-dropdown-link>
                                 <x-dropdown-link :href="route('social-taxi-orders.close.index')" :active="request()->routeIs('social-taxi-orders.close.index')">
                                     {{ __('Закрыть заказы') }}

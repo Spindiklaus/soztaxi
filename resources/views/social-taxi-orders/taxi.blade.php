@@ -21,11 +21,15 @@
                     <input type="hidden" name="direction" value="{{ $direction ?? 'asc' }}">
                     <button type="submit"
                         class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition ease-in-out duration-150"
-                        onclick="return confirm('Вы уверены, что хотите сформировать список для передачи в такси за выбранный период?')">
+                        onclick="return confirm('Сформировать список для передачи в такси за выбранный период?')">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" />
+                        <polyline points="13 2 13 9 20 9" />
+                        <line x1="16" y1="13" x2="8" y2="13" />
+                        <line x1="16" y1="17" x2="8" y2="17" />
+                        <polyline points="10 9 9 9 8 9" />
                         </svg>
-                        В такси (xls)
+                        В такси (xlsx)
                     </button>
                 </form>
                 

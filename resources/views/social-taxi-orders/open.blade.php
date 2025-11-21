@@ -3,7 +3,7 @@
     <div class="bg-gray-100 py-6">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Заголовок -->
-            <div class="flex justify-between items-center mb-6">
+            <div class="flex justify-between items-center mb-2">
                 <h1 class="text-3xl font-bold text-gray-800">Открытие заказов </h1>
                 
                 <a href="{{ route('social-taxi-orders.index', $urlParams) }}" 
@@ -18,7 +18,7 @@
             @include('social-taxi-orders.open-components.filter') <!-- Можно использовать тот же фильтр -->
 
             <!-- Форма действий -->
-            <div class="flex flex-wrap gap-2 mb-4">
+            <div class="flex flex-wrap gap-2 mb-2">
                 <!-- Форма только для открытия -->
                 <form action="{{ route('social-taxi-orders.open.bulk-unset') }}" method="POST" class="mb-4">
                     @csrf
@@ -27,7 +27,9 @@
                     <input type="hidden" name="taxi_id" value="{{ request('taxi_id') }}">
 
                     <button type="submit"
-                            class="inline-flex items-center px-4 py-2 bg-yellow-600 border border-transparent rounded-md font-semibold text-white hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition ease-in-out duration-150"
+                            class="inline-flex items-center px-4 py-2 bg-yellow-600 border border-transparent rounded-md font-semibold 
+                            text-white hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 
+                            transition ease-in-out duration-150 mb-2"
                             onclick="return confirm('Вы уверены, что хотите открыть все отмеченные заказы?')"
                             title="открыть отмеченные">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
