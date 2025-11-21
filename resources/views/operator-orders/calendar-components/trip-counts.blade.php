@@ -39,7 +39,7 @@
             </div>
             <!-- Число фактических поездок в месяц -->
             <div class="flex items-center mt-2">
-                <span class="text-lg font-semibold text-gray-800">Число фактических поездок в месяц:</span>
+                <span class="text-lg font-semibold text-gray-800">Число закрытых поездок в месяц:</span>
                 <button 
                     onclick="showClientActualTrips({{ $client->id }}, '{{ $startDate->format('Y-m') }}')"
                     class="ml-2 inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-green-100 text-green-800 hover:bg-green-200 transition-colors">

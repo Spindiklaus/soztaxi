@@ -26,7 +26,7 @@
                 <input type="hidden" name="taxi_id" value="{{ request('taxi_id') }}">
 
                  <p class="mb-1 text-xs text-gray-500">
-                    Будут закрыты заказы ТОЛЬКО с фактическими данными о поездке
+                    Будут закрыты принятый в такси заказы ТОЛЬКО с фактическими данными о поездке
                 </p>    
                     
                 <button type="submit"

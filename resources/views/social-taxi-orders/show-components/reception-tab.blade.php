@@ -208,7 +208,7 @@
                         </div>
                         <!-- Число фактических поездок в месяц -->
                         <div class="flex items-center mt-2">
-                            <span class="text-lg font-semibold text-gray-800">Число фактических поездок в месяц:</span>
+                            <span class="text-lg font-semibold text-gray-800">Число закрытых поездок в месяц:</span>
                             <button 
                                 onclick="showClientActualTrips({{ $order->client_id }}, '{{ $order->visit_data ? $order->visit_data->format('Y-m') : date('Y-m') }}')"
                                 class="ml-2 inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-green-100 text-green-800 hover:bg-green-200 transition-colors">
@@ -245,7 +245,6 @@
                 </button>
             </div>
 
-
             <!-- Содержимое расчета (скрыто по умолчанию) -->
             <div id="calculation-content" class="p-4 hidden">
                 <div class="space-y-3">
@@ -253,9 +252,9 @@
                         <span class="text-sm font-medium text-gray-700">Оператор такси</span>
                         <span class="text-sm text-gray-900">
                             @if($order->taxi)
-                            {{ $order->taxi->name }} (#{{ $order->taxi->id }})
+                                {{ $order->taxi->name }} (#{{ $order->taxi->id }})
                             @else
-                            {{ $order->taxi_id ? 'Оператор #' . $order->taxi_id : 'Не выбран' }}
+                                {{ $order->taxi_id ? 'Оператор #' . $order->taxi_id : 'Не выбран' }}
                             @endif
                         </span>
                     </div>

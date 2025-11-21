@@ -58,13 +58,26 @@ class OrderOpenController extends BaseController {
 
     public function bulkUnset(Request $request) {
         // отмена закрытия заказа
+        $messages = [
+        'order_ids.required' => 'Необходимо выбрать хотя бы один заказ для снятия отметки "Закрыт".',
+        'order_ids.array' => 'Выбранные заказы должны быть представлены в виде массива.',
+        'order_ids.min' => 'Необходимо выбрать хотя бы один заказ для снятия отметки "Закрыт".',
+        'order_ids.*.integer' => 'ID заказа должен быть числом.',
+        'order_ids.*.exists' => 'Один или несколько выбранных заказов не существуют в базе данных.',
+        'date_from.required' => 'Поле "Дата от" обязательно для заполнения.',
+        'date_from.date_format' => 'Поле "Дата от" должно быть в формате ГГГГ-ММ-ДД.',
+        'date_to.required' => 'Поле "Дата до" обязательно для заполнения.',
+        'date_to.date_format' => 'Поле "Дата до" должно быть в формате ГГГГ-ММ-ДД.',
+        'taxi_id.integer' => 'ID оператора такси должен быть числом.',
+        'taxi_id.exists' => 'Выбранный оператор такси не существует.',
+        ];
         $validated = $request->validate([
             'order_ids' => 'required|array|min:1', // Обязательно, массив, минимум 1 элемент
             'order_ids.*' => 'integer|exists:orders,id',
             'date_from' => 'required|date_format:Y-m-d',
             'date_to' => 'required|date_format:Y-m-d',
             'taxi_id' => 'nullable|integer|exists:taxis,id',
-        ]);
+        ], $messages);
 
         $currentUser = auth()->user();
         $operatorInfo = $currentUser->name . ' (' . $currentUser->litera . ')';

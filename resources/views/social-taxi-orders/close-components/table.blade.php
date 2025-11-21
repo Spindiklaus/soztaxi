@@ -61,10 +61,10 @@
                         class="divide-y divide-gray-200"
                     @endif
                 >
-                    <td class="px-6 py-4">
+                    <td class="px-6 py-2">
                         <input type="checkbox" name="order_ids[]" value="{{ $order->id }}" class="order-checkbox rounded">
                     </td>
-                    <td class="px-6 py-4">
+                    <td class="px-6 py-2">
                         @if($order->deleted_at)
                         <div class="text-sm font-medium text-red-600">
                             {{ getOrderTypeName($order->type_order) }}
@@ -101,7 +101,7 @@
                             @endif
                         </div>
                     </td>
-                    <td class="px-6 py-4">
+                    <td class="px-6 py-2">
                         @if($order->visit_data)
                         <div class="text-sm font-medium text-gray-900">
                             {{ $order->visit_data->format('d.m.Y') }}
@@ -119,7 +119,7 @@
                         <div class="text-sm text-gray-500">-</div>
                         @endif
                     </td>
-                    <td class="px-6 py-4">
+                    <td class="px-6 py-2">
                         <div class="text-sm text-gray-900">
                             <span class="font-medium">Откуда:</span> {{ $order->adres_otkuda }}
                         </div>
@@ -132,71 +132,24 @@
                         </div>
                         @endif
                     </td>
-                    <td class="px-6 py-4">
+                    <td class="px-6 py-2">
                         @if($order->client)
-                        <div class="text-sm font-medium text-gray-900">
-                            {{ $order->client->fio }}
-                        </div>
-                        @if($order->client_tel)
-                        <div class="text-sm text-gray-600">
-                            Тел: {{ $order->client_tel }}
-                        </div>
-                        @endif
-                        @if($order->client_invalid)
-                        <div class="text-sm text-gray-600">
-                            Удостоверение: {{ $order->client_invalid }}
-                        </div>
-                        @endif
-                        @if($order->client_sopr)
-                        <div class="text-sm text-gray-600">
-                            Сопровождающий: {{ $order->client_sopr }}
-                        </div>
-                        @endif
-                        @if($order->category)
-                        <div class="text-sm text-gray-600" title="Категория: {{ $order->category->name }}&#10;Скидка: {{ $order->category->skidka }}%&#10;Лимит: {{ $order->category->kol_p }} поездок/мес">
-                            NMV: {{ $order->category->nmv }}
-                        </div>
-                        @endif
-                        @if($order->dopus)
-                        <div class="text-sm text-gray-900">
-                            {{ $order->dopus->name }}
-                        </div>
-                        @endif
-                        @if($order->client->rip_at)
-                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-800 text-white mt-1">
-                            RIP: {{ $order->client->rip_at->format('d.m.Y') }}
-                        </span>
-                        @endif
+                                <a href="{{ route('operator.social-taxi.calendar.client', ['client' => $order->client_id, 'date' => $order->visit_data->format('Y-m-d')] + $urlParams) }}" class="text-sm font-medium text-blue-600 hover:text-blue-900 hover:underline"
+                                    title="{{ $order->client_tel ? 'Тел: ' . $order->client_tel."\n" : '' }}{{ $order->client_invalid ? 'Удостоверение: ' . $order->client_invalid."\n"  : '' }}{{ $order->client_sopr ? 'Сопровождающий: ' . $order->client_sopr . "\n" : '' }}{{ $order->category ? 'NMV: ' . $order->category->nmv . ' Категория: ' . $order->category->name . ' Скидка: ' . $order->category->skidka . ' Лимит: ' . $order->category->kol_p . ' поездок/мес' : '' }}{{ $order->dopus ? $order->dopus->name : '' }}"
+                                    target="_blank"
+                                >
+                                    {{ $order->client->fio }}
+                                </a>
+                                @if($order->client->rip_at)
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-800 text-white mt-1">
+                                        RIP: {{ $order->client->rip_at->format('d.m.Y') }}
+                                    </span>
+                                @endif
                         @else
-                        <div class="text-sm text-gray-500">Клиент не найден</div>
-                        @if($order->client_tel)
-                        <div class="text-sm text-gray-600">
-                            Тел: {{ $order->client_tel }}
-                        </div>
-                        @endif
-                        @if($order->client_invalid)
-                        <div class="text-sm text-gray-600">
-                            Удостоверение: {{ $order->client_invalid }}
-                        </div>
-                        @endif
-                        @if($order->client_sopr)
-                        <div class="text-sm text-gray-600">
-                            Сопровождающий: {{ $order->client_sopr }}
-                        </div>
-                        @endif
-                        @if($order->category)
-                        <div class="text-sm text-gray-600" title="Категория: {{ $order->category->name }}&#10;Скидка: {{ $order->category->skidka }}%&#10;Лимит: {{ $order->category->kol_p }} поездок/мес">
-                            NMV: {{ $order->category->nmv }}
-                        </div>
-                        @endif
-                        @if($order->dopus)
-                        <div class="text-sm text-gray-600">
-                            {{ $order->dopus->name }}
-                        </div>
-                        @endif
+                            <div class="text-sm text-gray-500">Клиент не найден</div>
                         @endif
                     </td>
-                    <td class="px-6 py-4">
+                    <td class="px-6 py-2">
                         @if($order->skidka_dop_all !== null)
                         <div class="text-sm text-gray-900">
                             Скидка: <span class="font-medium">{{ $order->skidka_dop_all }}%</span>
@@ -212,7 +165,7 @@
                         <div class="text-sm text-gray-500 mt-1">Лимит: -</div>
                         @endif
                     </td>
-                    <td class="px-6 py-4">
+                    <td class="px-6 py-2">
                         @if($order->taxi_way)
                             <div class="text-sm text-gray-900">
                                 <span class="font-medium">Километраж:</span> {{number_format($order->taxi_way, 3, ',', ' ') . ' км' }}
@@ -236,7 +189,7 @@
                         @endif
                     </td>
 
-                    <td class="px-6 py-4">
+                    <td class="px-6 py-2">
                         <div class="flex flex-col space-y-1">
                             <!-- Только кнопка "Просмотр" для страницы закрытия -->
                             <a href="{{ route('social-taxi-orders.show', array_merge(['social_taxi_order' => $order, 'from_close_page' => 1], $urlParams)) }}" 
