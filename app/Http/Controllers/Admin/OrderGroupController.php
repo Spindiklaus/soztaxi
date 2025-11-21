@@ -127,8 +127,11 @@ class OrderGroupController extends BaseController //
     public function edit(OrderGroup $orderGroup)
     {
         $urlParams = request()->only(['sort', 'direction', 'date_from', 'date_to', 'filter_name']);
+        // Находим ID самого раннего заказа ---
+        $earliestOrder = $orderGroup->orders->sortBy('visit_data')->first();
+        $earliestOrderId = $earliestOrder ? $earliestOrder->id : null;
 
-        return view('order-groups.edit', compact('orderGroup', 'urlParams'));
+        return view('order-groups.edit', compact('orderGroup', 'urlParams', 'earliestOrderId'));
     }
 
     /**
@@ -279,7 +282,8 @@ class OrderGroupController extends BaseController //
             $groupTime = $orderGroup->visit_date; // Это DateTime
 
             // Запрос для получения заказов, подходящих по критериям
-            $availableOrders = Order::where('visit_data', '>=', $groupTime->copy()->subMinutes(45)) // Время не раньше чем -45 мин от времени группы
+            $availableOrders = Order::where('visit_data', '>=', $groupTime->copy())
+//                                    where('visit_data', '>=', $groupTime->copy()->subMinutes(45)) // Время не раньше чем -45 мин от времени группы
                                   ->where('visit_data', '<=', $groupTime->copy()->addMinutes(45))  // Время не позже чем +45 мин от времени группы
                                   ->whereDate('visit_data', $groupDate) // Совпадение даты
                                   ->whereNull('order_group_id') // Не в группе

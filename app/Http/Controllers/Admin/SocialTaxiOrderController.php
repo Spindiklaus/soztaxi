@@ -191,7 +191,7 @@ class SocialTaxiOrderController extends BaseController {
         $urlParams = $this->orderService->getUrlParams(); // параметры фильтрации
         $backRoute = $this->getBackRoute($urlParams);
 
-        return redirect()->to($backRoute)->with('success', 'Заказ {{$orderNumber}} удален.');
+        return redirect()->to($backRoute)->with('success', "Заказ {$orderNumber} удален.");
     }
 
     public function restore($id) {
@@ -202,14 +202,15 @@ class SocialTaxiOrderController extends BaseController {
             return redirect()->back()->with('error', 'Заказ не найден.');
         }
 
+        $orderNumber = $order->pz_nom ?? 'Неизвестный номер';
         $urlParams = $this->orderService->getUrlParams();        
         $backRoute = $this->getBackRoute($urlParams);
 
         if ($order->trashed()) {
             $order->restore();
-            return redirect()->to($backRoute)->with('success', 'Заказ успешно восстановлен.');
+            return redirect()->to($backRoute)->with('success', "Заказ {$orderNumber} успешно восстановлен.");
         }
-        return redirect()->to($backRoute)->with('error', 'Заказ не был удален.');
+        return redirect()->to($backRoute)->with('error', "Заказ {$orderNumber} не был удален.");
     }
 
     // Показать форму создания заказа по типу с поддержкой копирования
