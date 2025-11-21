@@ -1,4 +1,4 @@
-<!-- resources/views/social-taxi-orders/taxi-components/table.blade.php -->
+<!-- resources/views/social-taxi-orders/taxi_sent-components/table.blade.php -->
 <div x-data="{
      sortField: '{{ $sort ?? 'visit_data' }}',
      sortDirection: '{{ $direction ?? 'asc' }}',
@@ -17,7 +17,7 @@
      }" x-cloak class="bg-white shadow overflow-hidden sm:rounded-lg">
     <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-blue-800 text-gray-200">
+            <thead class="bg-yellow-600 text-gray-200">
                 <tr>
                     <th @click="sortBy('pz_data')" scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-blue-700">
                         Заказ и статус
@@ -44,6 +44,9 @@
                         Фактические данные
                     </th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">
+                        Передан в такси
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">
                         Действия оператора
                     </th>
                 </tr>
@@ -53,24 +56,24 @@
                 <tr @if($order->deleted_at) class="bg-red-50" @endif>
                     <td class="px-6 py-4">
                         @if($order->deleted_at)
-                        <div class="text-sm font-medium text-red-600">
-                            {{ getOrderTypeName($order->type_order) }}
-                        </div>
-                        <div class="text-sm text-red-500">
-                            № <span class="font-bold">{{ $order->pz_nom }}</span> от {{ $order->pz_data->format('d.m.Y H:i') }}
-                        </div>
+                            <div class="text-sm font-medium text-red-600">
+                                {{ getOrderTypeName($order->type_order) }}
+                            </div>
+                            <div class="text-sm text-red-500">
+                                № <span class="font-bold">{{ $order->pz_nom }}</span> от {{ $order->pz_data->format('d.m.Y H:i') }}
+                            </div>
                         @else
-                        <div class="text-sm {{ getOrderTypeColor($order->type_order) }}">
-                            {{ getOrderTypeName($order->type_order) }}
-                        </div>
-                        <div class="text-sm text-gray-500">
-                            № {{ $order->pz_nom }} от {{ $order->pz_data->format('d.m.Y H:i') }}
-                        </div>
+                            <div class="text-sm {{ getOrderTypeColor($order->type_order) }}">
+                                {{ getOrderTypeName($order->type_order) }}
+                            </div>
+                            <div class="text-sm text-gray-500">
+                                № {{ $order->pz_nom }} от {{ $order->pz_data->format('d.m.Y H:i') }}
+                            </div>
                         @endif
                         @if($order->deleted_at)
-                        <div class="text-xs text-red-600 mt-1">
-                            Удален: {{ $order->deleted_at->format('d.m.Y H:i') }}
-                        </div>
+                            <div class="text-xs text-red-600 mt-1">
+                                Удален: {{ $order->deleted_at->format('d.m.Y H:i') }}
+                            </div>
                         @endif
                         <div class="mt-2">
                             @if($order->currentStatus && $order->currentStatus->statusOrder)
@@ -202,6 +205,11 @@
                             </div>
                         @endif
                     </td>
+                    <td class="px-6 py-4">
+                        <div class="text-sm text-gray-900">
+                            {{ $order->taxi_sent_at->format('d.m.Y H:i') }}
+                        </div>
+                    </td>        
 
                     <td class="px-6 py-4">
                         <div class="flex flex-col space-y-1">

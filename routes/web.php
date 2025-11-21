@@ -8,7 +8,8 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\TaxiController;
-use App\Http\Controllers\Admin\TaxiOrderController;
+use App\Http\Controllers\Admin\TaxiOrderController; // отправить заказы в такси
+use App\Http\Controllers\Admin\TaxiSentOrderController; // отправленные в такси
 use App\Http\Controllers\Admin\FioDtrnController;
 use App\Http\Controllers\Admin\FioDtrnMergeController;
 use App\Http\Controllers\Admin\FioRipController;
@@ -29,9 +30,6 @@ use App\Http\Controllers\Import\ImportTaxiController;
 use App\Http\Controllers\Operator\SocialTaxiController;
 use App\Http\Controllers\Operator\CarController;
 use App\Http\Controllers\Operator\GazelleController;
-
-
-
 
 
 Route::get('/', function () {
@@ -86,10 +84,11 @@ Route::middleware(['web', 'auth', IsAdmin::class])->group(function () {
     Route::resource('fio_rips', FioRipController::class)->except(['show']);
     Route::resource('skidka_dops', SkidkaDopController::class)->except(['show']);   
     Route::get('/taxi-orders', [TaxiOrderController::class, 'index'])->name('taxi-orders.index');
+    Route::get('/taxi_sent-orders', [TaxiSentOrderController::class, 'index'])->name('taxi_sent-orders.index');
     Route::get('/taxi-orders/export-to-taxi', [TaxiOrderController::class, 'exportToTaxi'])->name('taxi-orders.export.to.taxi');
     Route::post('/taxi-orders/set-sent-date', [TaxiOrderController::class, 'setSentDate'])->name('taxi-orders.set-sent-date');    
-    Route::patch('/taxi-orders/unset-sent-date', [TaxiOrderController::class, 'unsetSentDate'])->name('taxi-orders.unset-sent-date');
-    Route::patch('/taxi-orders/transfer-predictive-data', [TaxiOrderController::class, 'transferPredictiveData'])->name('taxi-orders.transfer.predictive.data');
+    Route::patch('/taxi-orders/unset-sent-date', [TaxiSentOrderController::class, 'unsetSentDate'])->name('taxi-orders.unset-sent-date');
+    Route::patch('/taxi-orders/transfer-predictive-data', [TaxiSentOrderController::class, 'transferPredictiveData'])->name('taxi-orders.transfer.predictive.data');
     
     Route::get('/reports/orders_visit', [OrderReportController::class, 'index'])->name('orders.report_visit');
     Route::get('/reports/orders_visit/export', [OrderReportController::class, 'export'])->name('orders.report_visit_export');

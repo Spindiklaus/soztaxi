@@ -4,8 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
 use App\Http\Requests\UpdateTaxiSentDateRequest;
-use App\Http\Requests\UnsetTaxiSentDateRequest;
-use App\Http\Requests\TransferPredictiveDataRequest;
 use App\Services\TaxiOrderService;
 use App\Services\TaxiOrderBuilder;
 use Maatwebsite\Excel\Facades\Excel;
@@ -75,12 +73,12 @@ class TaxiOrderController extends BaseController {
     }
 
     public function exportToTaxi(Request $request) {
-        \Log::info('Export to taxi called', [
-            'date_from' => $request->get('date_from'),
-            'date_to' => $request->get('date_to'),
-            'taxi_id' => $request->get('taxi_id'),
-            'all_params' => $request->all()
-        ]);
+//        \Log::info('Export to taxi called', [
+//            'date_from' => $request->get('date_from'),
+//            'date_to' => $request->get('date_to'),
+//            'taxi_id' => $request->get('taxi_id'),
+//            'all_params' => $request->all()
+//        ]);
 
         // Определяем такси - берем из запроса или первый активный
         $taxiId = $request->get('taxi_id');
@@ -92,7 +90,7 @@ class TaxiOrderController extends BaseController {
         // Получаем ВСЕ заказы (без пагинации)
         $orders = $query->get();
 
-        \Log::info('Orders found for export', ['count' => $orders->count()]);
+//        \Log::info('Orders found for export', ['count' => $orders->count()]);
 
         // Формируем имя файла и передаем даты в экспорт
         $DateFrom = $request->get('date_from', date('Y-m-d'));
@@ -128,40 +126,39 @@ class TaxiOrderController extends BaseController {
             // Возвращаемся с параметрами фильтрации
             $urlParams = $this->orderService->getUrlParams();
 
-            return redirect()->route('taxi-orders.index', $urlParams)
+            return redirect()->route('taxi_sent-orders.index', $urlParams)
                             ->with('success', "Дата передачи в такси установлена для {$ordersCount} заказов.");
     }
 
-    // В TaxiOrderController
-    public function unsetSentDate(UnsetTaxiSentDateRequest  $request) {
-            // Валидация данных
-            $validated = $request->validated();
+//     public function unsetSentDate(UnsetTaxiSentDateRequest  $request) {
+//            // Валидация данных
+//            $validated = $request->validated();
+//
+//             $ordersCount = $this->orderService->unsetSentDate($validated);
+//
+//            if ($ordersCount === 0) {
+//                return redirect()->back()->with('info', 'Нет заказов для обновления (у всех уже снята дата передачи в такси).');
+//            }
+//           
+//            // Возвращаемся с параметрами фильтрации
+//            $urlParams = $this->orderService->getUrlParams();
+//
+//            return redirect()->route('taxi-orders.index', $urlParams)
+//                            ->with('success', "Дата передачи в такси снята для {$ordersCount} заказов. Не забудьте отправить сведения об отмене в такси!");
+//    }
 
-             $ordersCount = $this->orderService->unsetSentDate($validated);
-
-            if ($ordersCount === 0) {
-                return redirect()->back()->with('info', 'Нет заказов для обновления (у всех уже снята дата передачи в такси).');
-            }
-           
-            // Возвращаемся с параметрами фильтрации
-            $urlParams = $this->orderService->getUrlParams();
-
-            return redirect()->route('taxi-orders.index', $urlParams)
-                            ->with('success', "Дата передачи в такси снята для {$ordersCount} заказов. Не забудьте отправить сведения об отмене в такси!");
-    }
-
-    public function transferPredictiveData(TransferPredictiveDataRequest $request) {
-        $validated = $request->validated();
-
-        $updatedCount = $this->orderService->transferPredictiveData($validated);
-        $urlParams = $this->orderService->getUrlParams();
-
-        if ($updatedCount === 0) {
-            return redirect()->route('taxi-orders.index', $urlParams)->with('info', 'Нет заказов для обновления (нет заказов соцтакси со статусом "Передан в такси" с заполненной предварительной дальностью).');
-        }
-
-        return redirect()->route('taxi-orders.index', $urlParams)
-            ->with('success', "Предварительные данные перенесены в фактические для {$updatedCount} заказов.");
-    }
+//    public function transferPredictiveData(TransferPredictiveDataRequest $request) {
+//        $validated = $request->validated();
+//
+//        $updatedCount = $this->orderService->transferPredictiveData($validated);
+//        $urlParams = $this->orderService->getUrlParams();
+//
+//        if ($updatedCount === 0) {
+//            return redirect()->route('taxi-orders.index', $urlParams)->with('info', 'Нет заказов для обновления (нет заказов соцтакси со статусом "Передан в такси" с заполненной предварительной дальностью).');
+//        }
+//
+//        return redirect()->route('taxi-orders.index', $urlParams)
+//            ->with('success', "Предварительные данные перенесены в фактические для {$updatedCount} заказов.");
+//    }
 
 }
