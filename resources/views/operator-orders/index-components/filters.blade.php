@@ -55,7 +55,7 @@
                     {{ $filter }}
                 </span>
             @endforeach
-            <a href="{{ request()->route()->getName() ? route(request()->route()->getName(), ['type_order' => request('type_order', 1)]) : route('operator.social-taxi.index', ['type_order' => request('type_order', 1)]) }}"
+            <a href="{{ request()->route()->getName() ? route(request()->route()->getName(), ['filter_type_order' => request('filter_type_order', 1)]) : route('operator.social-taxi.index', ['filter_type_order' => request('filter_type_order', 1)]) }}"
                class="ml-2 text-xs text-blue-600 hover:text-blue-800">
                 Сбросить все
             </a>
@@ -64,26 +64,21 @@
     @endif
     
     <!-- Содержимое фильтров (скрыто по умолчанию) -->
-    <div id="filters-content" class="p-1 hidden">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-0">
+    <div id="filters-content" class="p-4 hidden">
+        <div class="grid grid-cols-1 md:grid-cols-6 gap-4 mb-0">
             <!-- Скрытое поле для сохранения типа заказа -->
-            <input type="hidden" name="filter_type_order" value="{{ request('type_order', 1) }}">
+            <input type="hidden" name="filter_type_order" value="{{ request('filter_type_order', 1) }}">
             
             <!-- Скрытое поле для сохранения сортировки -->
             <input type="hidden" name="sort" value="{{ $sort ?? 'pz_data' }}">
             <input type="hidden" name="direction" value="{{ $direction ?? 'desc' }}">
 
-<!--            <div>
-                <label for="filter_pz_nom" class="block text-sm font-medium text-gray-700">Номер заказа</label>
-                <input type="text" name="filter_pz_nom" id="filter_pz_nom" value="{{ request('filter_pz_nom') }}" placeholder="%Поиск%" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-            </div>-->
-
-            <div>
-                <label for="show_deleted" class="block text-sm font-medium text-gray-700">Статус записей</label>
-                <select name="show_deleted" id="show_deleted" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                    <option value="0" {{ (request('show_deleted', '0') == '0' || is_null(request('show_deleted'))) ? 'selected' : '' }}>Только активные</option>
-                    <option value="1" {{ request('show_deleted') == '1' ? 'selected' : '' }}>Все (включая удаленные)</option>
-                </select>
+            <div class="md:col-span-2">
+                <label for="client_fio" class="block text-sm font-medium text-gray-700">ФИО клиента</label>
+                <input type="text" name="client_fio" id="client_fio" 
+                       value="{{ request('client_fio') }}" 
+                       placeholder="%Поиск по ФИО%"
+                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
             </div>
 
             <div>
@@ -96,16 +91,14 @@
                     <option value="4" {{ request('status_order_id') == '4' ? 'selected' : '' }}>Закрыт</option>
                 </select>
             </div>
-            
-            <!-- фильтр по ФИО клиента -->
+
             <div>
-                <label for="client_fio" class="block text-sm font-medium text-gray-700">ФИО клиента</label>
-                <input type="text" name="client_fio" id="client_fio" 
-                       value="{{ request('client_fio') }}" 
-                       placeholder="%Поиск по ФИО%"
-                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <label for="show_deleted" class="block text-sm font-medium text-gray-700">Статус записей</label>
+                <select name="show_deleted" id="show_deleted" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    <option value="0" {{ (request('show_deleted', '0') == '0' || is_null(request('show_deleted'))) ? 'selected' : '' }}>Только активные</option>
+                    <option value="1" {{ request('show_deleted') == '1' ? 'selected' : '' }}>Все (включая удаленные)</option>
+                </select>
             </div>
-            
 
             <div class="md:col-span-2">
                 <label class="block text-sm font-medium text-gray-700">Дата поездки:</label>
@@ -123,9 +116,10 @@
                 </div>
             </div>
 
-            <div class="md:col-span-2 flex items-end space-x-2">
+            <div class="md:col-span-6 flex items-end space-x-2">
                 <button type="submit"
-                        class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition ease-in-out duration-150">
+                        class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-white hover:bg-blue-700 
+                        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition ease-in-out duration-150">
                     Применить фильтр
                 </button>
                 @php
@@ -159,4 +153,20 @@ function toggleFilters() {
         arrow.classList.remove('rotate-180');
     }
 }
+
+// Автоматически скрывать фильтры после выбора (если не скрыты)
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function() {
+            const content = document.getElementById('filters-content');
+            const arrow = document.getElementById('filter-arrow');
+            
+            if (!content.classList.contains('hidden')) {
+                content.classList.add('hidden');
+                arrow.classList.remove('rotate-180');
+            }
+        });
+    }
+});
 </script>
