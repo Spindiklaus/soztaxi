@@ -86,6 +86,14 @@
             <!-- Скрытое поле для сохранения параметров сортировки -->
             <input type="hidden" name="sort" value="{{ $sort ?? 'pz_data' }}">
             <input type="hidden" name="direction" value="{{ $direction ?? 'desc' }}">
+                
+            <div>
+                <label for="filter_pz_nom" class="block text-sm font-medium text-gray-700">Номер заказа</label>
+                <input type="text" name="filter_pz_nom" id="filter_pz_nom" 
+                       value="{{ request('filter_pz_nom') }}" 
+                       placeholder="%Поиск%"
+                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+            </div>    
 
             <div class="md:col-span-2">
                 <label for="client_fio" class="block text-sm font-medium text-gray-700">ФИО клиента</label>
