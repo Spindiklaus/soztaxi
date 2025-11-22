@@ -2,7 +2,7 @@
 
 <form action="{{ route('social-taxi-orders.index') }}" method="GET" class="bg-white shadow rounded-lg mb-4">
     <!-- Заголовок аккордеона -->
-    <div class="px-4 py-3 bg-gray-50 border-b border-gray-200">
+    <div class="px-4 py-2 bg-gray-50 border-b border-gray-200">
         <button type="button" 
                 onclick="toggleFilters()"
                 class="flex items-center justify-between w-full text-left text-sm font-medium text-gray-700 hover:text-gray-900">
@@ -14,16 +14,85 @@
         </button>
     </div>
     
+    <!-- Отображение активных фильтров -->
+    @php
+        $activeFilters = [];
+        $filterLabels = [
+            'filter_pz_nom' => 'Номер заказа',
+            'filter_type_order' => 'Тип заказа',
+            'status_order_id' => 'Статус заказа',
+            'filter_user_id' => 'Оператор',
+            'client_fio' => 'ФИО клиента',
+            'show_deleted' => 'Статус записей',
+            'date_from' => 'Дата от',
+            'date_to' => 'Дата до'
+        ];
+        
+        $statusLabels = [
+            '1' => 'Принят',
+            '2' => 'Передан в такси',
+            '3' => 'Отменён',
+            '4' => 'Закрыт'
+        ];
+        
+        $typeLabels = [
+            '1' => 'Соцтакси',
+            '2' => 'Легковое авто',
+            '3' => 'ГАЗель'
+        ];
+        
+        $operatorNames = [];
+        foreach($operators ?? [] as $operator) {
+            $operatorNames[$operator->id] = $operator->name . ($operator->litera ? ' (' . $operator->litera . ')' : '');
+        }
+        
+        foreach (request()->all() as $key => $value) {
+            if (in_array($key, ['filter_pz_nom', 'filter_type_order', 'status_order_id', 'filter_user_id', 'client_fio', 'show_deleted', 'date_from', 'date_to']) && !empty($value)) {
+                if ($key === 'status_order_id' && isset($statusLabels[$value])) {
+                    $activeFilters[] = $filterLabels[$key] . ': ' . $statusLabels[$value];
+                } elseif ($key === 'filter_type_order' && isset($typeLabels[$value])) {
+                    $activeFilters[] = $filterLabels[$key] . ': ' . $typeLabels[$value];
+                } elseif ($key === 'filter_user_id' && isset($operatorNames[$value])) {
+                    $activeFilters[] = $filterLabels[$key] . ': ' . $operatorNames[$value];
+                } elseif ($key === 'show_deleted') {
+                    $activeFilters[] = $filterLabels[$key] . ': ' . ($value == '1' ? 'Все (включая удаленные)' : 'Только активные');
+                } elseif ($key !== 'sort' && $key !== 'direction' && $key !== 'page') {
+                    $activeFilters[] = $filterLabels[$key] . ': ' . $value;
+                }
+            }
+        }
+    @endphp
+    
+    @if(!empty($activeFilters))
+    <div class="px-4 py-2 bg-blue-50 border-b border-blue-100">
+        <div class="flex flex-wrap items-center gap-2">
+            <span class="text-sm font-medium text-blue-700">Активные фильтры:</span>
+            @foreach($activeFilters as $filter)
+                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    {{ $filter }}
+                </span>
+            @endforeach
+            <a href="{{ route('social-taxi-orders.index', ['sort' => $sort ?? 'pz_data', 'direction' => $direction ?? 'desc']) }}"
+               class="ml-2 text-xs text-blue-600 hover:text-blue-800">
+                Сбросить все
+            </a>
+        </div>
+    </div>
+    @endif
+    
     <!-- Содержимое фильтров (скрыто по умолчанию) -->
     <div id="filters-content" class="p-4 hidden">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+        <div class="grid grid-cols-1 md:grid-cols-6 gap-4 mb-0">
             <!-- Скрытое поле для сохранения параметров сортировки -->
             <input type="hidden" name="sort" value="{{ $sort ?? 'pz_data' }}">
             <input type="hidden" name="direction" value="{{ $direction ?? 'desc' }}">
 
-            <div>
-                <label for="filter_pz_nom" class="block text-sm font-medium text-gray-700">Номер заказа</label>
-                <input type="text" name="filter_pz_nom" id="filter_pz_nom" value="{{ request('filter_pz_nom') }}" placeholder="%Поиск%" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+            <div class="md:col-span-2">
+                <label for="client_fio" class="block text-sm font-medium text-gray-700">ФИО клиента</label>
+                <input type="text" name="client_fio" id="client_fio" 
+                       value="{{ request('client_fio') }}" 
+                       placeholder="%Поиск по ФИО%"
+                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
             </div>
 
             <div>
@@ -37,14 +106,6 @@
             </div>
 
             <div>
-                <label for="show_deleted" class="block text-sm font-medium text-gray-700">Статус записей</label>
-                <select name="show_deleted" id="show_deleted" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                    <option value="0" {{ (request('show_deleted', '0') == '0' || is_null(request('show_deleted'))) ? 'selected' : '' }}>Только активные</option>
-                    <option value="1" {{ request('show_deleted') == '1' ? 'selected' : '' }}>Все (включая удаленные)</option>
-                </select>
-            </div>
-
-            <div>
                 <label for="status_order_id" class="block text-sm font-medium text-gray-700">Статус заказа</label>
                 <select name="status_order_id" id="status_order_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                     <option value="">Все статусы</option>
@@ -54,8 +115,17 @@
                     <option value="4" {{ request('status_order_id') == '4' ? 'selected' : '' }}>Закрыт</option>
                 </select>
             </div>
-            <!-- фильтр по операторам -->
+
             <div>
+                <label for="show_deleted" class="block text-sm font-medium text-gray-700">Статус записей</label>
+                <select name="show_deleted" id="show_deleted" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    <option value="0" {{ (request('show_deleted', '0') == '0' || is_null(request('show_deleted'))) ? 'selected' : '' }}>Только активные</option>
+                    <option value="1" {{ request('show_deleted') == '1' ? 'selected' : '' }}>Все (включая удаленные)</option>
+                </select>
+            </div>
+
+            <!-- фильтр по операторам -->
+            <div class="md:col-span-2">
                 <label for="filter_user_id" class="block text-sm font-medium text-gray-700">Оператор</label>
                 <select name="filter_user_id" id="filter_user_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                     <option value="">Все операторы</option>
@@ -66,17 +136,6 @@
                     @endforeach
                 </select>
             </div>
-            
-            <!-- Новый фильтр по ФИО клиента -->
-            <div>
-                <label for="client_fio" class="block text-sm font-medium text-gray-700">ФИО клиента</label>
-                <input type="text" name="client_fio" id="client_fio" 
-                       value="{{ request('client_fio') }}" 
-                       placeholder="%Поиск по ФИО%"
-                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                <p class="mt-1 text-xs text-gray-500">Поиск по ФИО клиента</p>
-            </div>
-            
 
             <div class="md:col-span-2">
                 <label class="block text-sm font-medium text-gray-700">Дата поездки:</label>
@@ -94,13 +153,13 @@
                 </div>
             </div>
 
-            <div class="md:col-span-2 flex items-end space-x-2">
+            <div class="md:col-span-6 flex items-end space-x-2">
                 <button type="submit"
-                        class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition ease-in-out duration-150">
+                        class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-white hover:bg-blue-700 
+                        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition ease-in-out duration-150">
                     Применить фильтр
                 </button>
                 @php
-                    // Собираем параметры для сброса - оставляем только базовые
                     $baseParams = request()->only(['sort', 'direction']);
                     $resetParams = array_merge($baseParams, [
                         'date_from' => '2025-01-01',
@@ -131,26 +190,19 @@ function toggleFilters() {
     }
 }
 
-// Показываем фильтры, если есть активные фильтры
+// Автоматически скрывать фильтры после выбора (если не скрыты)
 document.addEventListener('DOMContentLoaded', function() {
-    // Проверяем, есть ли активные пользовательские фильтры
-    const hasUserFilters = {{ 
-        collect(request()->except(['sort', 'direction', 'page']))->filter(function($value, $key) {
-            // Исключаем параметры по умолчанию
-            if ($key === 'date_from' && $value === '2025-01-01') return false;
-            if ($key === 'date_to' && $value === date('Y-m-d')) return false;
-            if ($key === 'show_deleted' && $value === '0') return false;
-            if ($key === 'filter_user_id' && $value === '0') return false;
-            if ($key === 'client_fio' && $value === '') return false;
-            if ($key === 'filter_type_order' && ($value === '' || $value === null)) return false;
-            if ($key === 'filter_pz_nom' && $value === '') return false; // И эту строку
-            return !empty($value);
-        })->isNotEmpty() ? 'true' : 'false' 
-    }};
-    
-    if (hasUserFilters) {
-        document.getElementById('filters-content').classList.remove('hidden');
-        document.getElementById('filter-arrow').classList.add('rotate-180');
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function() {
+            const content = document.getElementById('filters-content');
+            const arrow = document.getElementById('filter-arrow');
+            
+            if (!content.classList.contains('hidden')) {
+                content.classList.add('hidden');
+                arrow.classList.remove('rotate-180');
+            }
+        });
     }
 });
 </script>

@@ -2,7 +2,7 @@
     <div id="copy-order-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
         <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
             <div class="mt-3">
-                <h3 class="text-lg font-medium text-gray-900">Копировать заказ</h3>
+                <h3 class="text-lg font-medium text-gray-900">Копировать заказ СОЦТАКСИ</h3>
                 <form id="copy-order-form" method="POST">
                     @csrf
                     <input type="hidden" id="copy-order-id" name="order_id">

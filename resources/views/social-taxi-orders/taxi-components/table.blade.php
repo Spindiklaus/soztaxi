@@ -15,9 +15,9 @@
      window.location.href = url.toString();
      }
      }" x-cloak class="bg-white shadow overflow-hidden sm:rounded-lg">
-    <div class="overflow-x-auto">
+    <div class="overflow-x-auto max-h-[70vh]">
         <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-blue-800 text-gray-200">
+            <thead class="bg-blue-800 text-gray-200 sticky top-0 z-10 shadow-lg">
                 <tr>
                     <th @click="sortBy('pz_data')" scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-blue-700">
                         Заказ и статус
@@ -50,45 +50,20 @@
             </thead>
             <tbody class="divide-y divide-gray-200">
                 @forelse ($orders as $order)
-                <tr @if($order->deleted_at) class="bg-red-50" @endif>
-                    <td class="px-6 py-4">
-                        @if($order->deleted_at)
-                        <div class="text-sm font-medium text-red-600">
-                            {{ getOrderTypeName($order->type_order) }}
-                        </div>
-                        <div class="text-sm text-red-500">
-                            № <span class="font-bold">{{ $order->pz_nom }}</span> от {{ $order->pz_data->format('d.m.Y H:i') }}
-                        </div>
-                        @else
+                <tr>
+                    <td class="px-3 py-2">
+                        @php
+                            $status = $order->currentStatus->statusOrder;
+                            $colorClass = !empty($status->color) ? $status->color : 'bg-gray-100 text-gray-800';
+                        @endphp
                         <div class="text-sm {{ getOrderTypeColor($order->type_order) }}">
                             {{ getOrderTypeName($order->type_order) }}
                         </div>
-                        <div class="text-sm text-gray-500">
-                            № {{ $order->pz_nom }} от {{ $order->pz_data->format('d.m.Y H:i') }}
-                        </div>
-                        @endif
-                        @if($order->deleted_at)
-                        <div class="text-xs text-red-600 mt-1">
-                            Удален: {{ $order->deleted_at->format('d.m.Y H:i') }}
-                        </div>
-                        @endif
-                        <div class="mt-2">
-                            @if($order->currentStatus && $order->currentStatus->statusOrder)
-                                @php
-                                    $status = $order->currentStatus->statusOrder;
-                                    $colorClass = !empty($status->color) ? $status->color : 'bg-gray-100 text-gray-800';
-                                @endphp
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $colorClass }}">
-                                {{ $status->name }}
-                            </span>
-                            @else
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                    Нет статуса
-                                </span>
-                            @endif
+                        <div class="text-sm text-gray-500 {{ $colorClass }}" title="{{ $status->name }}">
+                            {{ $order->pz_nom }} от {{ $order->pz_data->format('d.m.Y H:i') }}
                         </div>
                     </td>
-                    <td class="px-6 py-4">
+                    <td class="px-3 py-2">
                         @if($order->visit_data)
                             <div class="text-sm font-medium text-gray-900">
                                 {{ $order->visit_data->format('d.m.Y') }}
@@ -112,7 +87,7 @@
                             @endif
                         @endif
                     </td>
-                    <td class="px-6 py-4">
+                    <td class="px-3 py-2">
                         <div class="text-sm text-gray-900">
                             <span class="font-medium">Откуда:</span> {{ $order->adres_otkuda }}
                         </div>
@@ -142,7 +117,7 @@
                             </div>
                         @endif
                     </td>
-                    <td class="px-6 py-4">
+                    <td class="px-3 py-2">
                         @if($order->client)
                            <a href="{{ route('operator.social-taxi.calendar.client', ['client' => $order->client_id, 'date' => $order->visit_data->format('Y-m-d')] + $urlParams) }}" class="text-sm font-medium text-blue-600 hover:text-blue-900 hover:underline"
                                 title="{{ $order->client_tel ? 'Тел: ' . $order->client_tel . "\n" : '' }}{{ $order->client_invalid ? 'Удостоверение: ' . $order->client_invalid . "\n" : '' }}{{ $order->client_sopr ? 'Сопровождающий: ' . $order->client_sopr . "\n" : '' }}{{ $order->category ? 'NMV: ' . $order->category->nmv . "\nКатегория: " . $order->category->name . "\nСкидка: " . $order->category->skidka . "%\nЛимит: " . $order->category->kol_p . " поездок/мес\n" : '' }}{{ $order->dopus ? $order->dopus->name : '' }}"
@@ -163,7 +138,7 @@
                             <div class="text-sm text-gray-500">Клиент не найден</div>
                         @endif
                     </td>
-                    <td class="px-6 py-4">
+                    <td class="px-3 py-2">
                         @if($order->skidka_dop_all !== null)
                         <div class="text-sm text-gray-900">
                             Скидка: <span class="font-medium">{{ $order->skidka_dop_all }}%</span>
@@ -179,7 +154,7 @@
                         <div class="text-sm text-gray-500 mt-1">Лимит: -</div>
                         @endif
                     </td>
-                    <td class="px-6 py-4">
+                    <td class="px-3 py-2">
                         @if($order->taxi_way)
                             <div class="text-sm text-gray-900">
                                 <span class="font-medium">Километраж:</span> {{number_format($order->taxi_way, 3, ',', ' ') . ' км' }}
@@ -203,18 +178,16 @@
                         @endif
                     </td>
 
-                    <td class="px-6 py-4">
-                        <div class="flex flex-col space-y-1">
+                    <td class="px-3 py-2">
                             <!-- Только кнопка "Просмотр" для страницы такси -->
                             <a href="{{ route('social-taxi-orders.show', array_merge(['social_taxi_order' => $order, 'from_taxi_page' => 1], $urlParams)) }}" 
-                               class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-md hover:bg-blue-200 text-sm">
+                               class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-md hover:bg-blue-200 text-sm"
+                               title="Просмотр заказа">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                 </svg>
-                                Просмотр
                             </a>
-                        </div>
                     </td>
                 </tr>
                 @empty
