@@ -70,6 +70,7 @@ class ClientTripController extends Controller {
                     'client_id',
                     'taxi_id',
                     'taxi_sent_at',
+                    'skidka_dop_all', // Добавляем скидку
                     'closed_at'
                 ])
                 ->orderBy('visit_data');
@@ -94,13 +95,27 @@ class ClientTripController extends Controller {
             // Получаем поездки
             $trips = $query->get();
             
+            // Считаем бесплатные поездки (скидка 100%)
+            $freeTrips = $trips->filter(function ($order) {
+                return $order->skidka_dop_all == 100;
+            });
+            
+            // Считаем платные поездки (скидка = 50%)
+            $paidTrips = $trips->filter(function ($order) {
+               return ($order->skidka_dop_all !== null && $order->skidka_dop_all < 100);
+            });
+
+            
+            
             // Форматируем название периода на русском
             $period = getRussianMonthName($date) . ' ' . $date->year;
             
             return response()->json([
                 'trips' => $trips,
                 'clientName' => $client->fio,
-                'count' => $trips->count(),
+                'count' => $trips->count(), // Общее число поездок
+                'freeCount' => $freeTrips->count(), // Только бесплатные
+                'paidCount' => $paidTrips->count(), // Только платные
                 'period' => $period
             ]);
             

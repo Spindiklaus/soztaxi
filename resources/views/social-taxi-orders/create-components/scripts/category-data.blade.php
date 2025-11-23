@@ -96,17 +96,17 @@ function checkSpecialDiscountCondition(clientId, visitDate) {
             fetch(`/api/client-trips/${clientId}/${monthYear}`)
                 .then(response => response.json())
                 .then(tripsData => {
-                    const tripsCount = tripsData.count || 0;
+                    const  freeTripsCount = tripsData.freeCount || 0; // Используем число бесплатных поездок
                     
-                    // Если поездок >= 16, меняем скидку на 50%
-                    if (tripsCount >= 16) {
+                    // Если Если бесплатных поездок >= 16, меняем скидку на 50%
+                    if (freeTripsCount >= 16) {
                         if (skidkaDopAllInput) {
                             const previousValue = skidkaDopAllInput.value;
                             skidkaDopAllInput.value = '50';
                             
                             // Показываем alert оператору
                             alert('Внимание! У клиента с типом категории 2 уже совершено ' + 
-                                  tripsCount + ' поездок в этом месяце. ' +
+                                  freeTripsCount + ' бесплатных поездок в этом месяце. ' +
                                   'Окончательная скидка автоматически изменена с 100% на 50% согласно правилам.');
                             
                             // Вызываем пересчет, если это соцтакси

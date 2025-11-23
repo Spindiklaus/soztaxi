@@ -105,7 +105,7 @@ class SocialTaxiController extends BaseController
     }
 
     // Определяем месяц календаря на основе $targetDate
-    $calendarMonth = $targetDate->startOfMonth();
+    $calendarMonth = $targetDate->copy()->startOfMonth();
     // --- КОНЕЦ ОПРЕДЕЛЕНИЯ МЕСЯЦА ---
 
     // --- ФИЛЬТРАЦИЯ ЗАКАЗОВ ЗА ВЫБРАННЫЙ МЕСЯЦ ---
@@ -117,7 +117,7 @@ class SocialTaxiController extends BaseController
     $request->merge(['filter_type_order' => null]);
     $request->merge([
         'date_from' => $calendarMonth->format('Y-m-d'),
-        'date_to' => $calendarMonth->endOfMonth()->format('Y-m-d'),
+        'date_to' => $calendarMonth->copy()->endOfMonth()->format('Y-m-d'),
     ]);
 //    dd($request);
     // --- КОНЕЦ ФИЛЬТРАЦИИ ---
@@ -181,8 +181,6 @@ public function copyOrder(Request $request)
         $orderId = $request->input('order_id');
         $newVisitDateTime = Carbon::parse($request->input('visit_data'));
         $TypeKuda = (int) $request->input('type_kuda');
-        
-        
 
         // Загружаем оригинальный заказ
         $originalOrder = Order::findOrFail($orderId);
@@ -208,11 +206,11 @@ public function copyOrder(Request $request)
         }
         
         // --- Проверка, что дата поездки в текущем месяце ---
-        $currentMonthStart = now()->startOfMonth();
-        $currentMonthEnd = now()->endOfMonth();
+        $monthStart = $originalVisitDateTime->copy()->startOfMonth();
+        $monthEnd = $originalVisitDateTime->copy()->endOfMonth();
 
-        if (!$newVisitDateTime->between($currentMonthStart, $currentMonthEnd)) {
-            return response()->json(['success' => false, 'message' => 'Невозможно создать заказ: дата поездки должна быть в месяце заказа.'], 422);
+        if (!$newVisitDateTime->between($monthStart, $monthEnd)) {
+            return response()->json(['success' => false, 'message' => 'Невозможно создать заказ: дата поездки '. $newVisitDateTime.' должна быть между '.$monthStart.' и '.$monthEnd], 422);
         }
         
         
@@ -264,7 +262,7 @@ public function copyOrder(Request $request)
         $newOrderData['pz_data'] = now(); 
         
         $directionText = ($TypeKuda == 2) ? ' (обратный путь)' : '';
-        $newOrderData['komment'] = "Копия заказа №{$originalOrder->pz_nom} от {$originalOrder->pz_data->format('d.m.Y H:i')}" . $directionText
+        $newOrderData['komment'] = "Копия заказа {$originalOrder->pz_nom} от {$originalOrder->pz_data->format('d.m.Y H:i')}" . $directionText
                 ." Выполнена из календаря поездок ". now()->format('d.m.Y H:i');
         
         // Создаем новый заказ
