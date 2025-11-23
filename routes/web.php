@@ -31,6 +31,8 @@ use App\Http\Controllers\Operator\SocialTaxiController;
 use App\Http\Controllers\Operator\CarController;
 use App\Http\Controllers\Operator\GazelleController;
 
+use App\Http\Controllers\Admin\SocialTaxiOrderExportController;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -121,8 +123,9 @@ Route::middleware(['auth'])->group(function () {
     });
     Route::resource('fiodtrns', FioDtrnController::class);
     Route::get('/fiodtrns/{fiodtrn}/orders', [FiodtrnController::class, 'showOrders'])->name('fiodtrns.orders');
-    Route::resource('social-taxi-orders', SocialTaxiOrderController::class)->names('social-taxi-orders'); 
-    // маршрут для восстановления
+Route::resource('social-taxi-orders', SocialTaxiOrderController::class)
+    ->names('social-taxi-orders')
+    ->whereNumber(['social_taxi_order']);    // маршрут для восстановления
     Route::patch('/social-taxi-orders/{social_taxi_order}/restore', [SocialTaxiOrderController::class, 'restore'])->name('social-taxi-orders.restore');
     Route::get('/social-taxi-orders/create/type/{type}', [SocialTaxiOrderController::class, 'createByType'])->name('social-taxi-orders.create.by-type');
     Route::post('/social-taxi-orders/store/type/{type}', [SocialTaxiOrderController::class, 'storeByType'])->name('social-taxi-orders.store.by-type');
@@ -132,6 +135,9 @@ Route::middleware(['auth'])->group(function () {
     // Отмена заказа - выполнение
     Route::patch('/social-taxi-orders/{social_taxi_order}/cancel', [SocialTaxiOrderController::class, 'cancel'])
      ->name('social-taxi-orders.cancel'); 
+    // Экспорт в excel
+    Route::get('/social-taxi-orders/export', [SocialTaxiOrderExportController::class, 'export'])
+    ->name('social-taxi-orders.export');
 
 });
 

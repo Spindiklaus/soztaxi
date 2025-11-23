@@ -11,6 +11,8 @@ use App\Http\Requests\StoreSocialTaxiOrderByTypeRequest;
 use App\Services\SocialTaxiOrderService;
 use App\Services\SocialTaxiOrderBuilder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use App\Exports\SocialTaxiOrdersExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class SocialTaxiOrderController extends BaseController {
 
@@ -71,7 +73,7 @@ class SocialTaxiOrderController extends BaseController {
     }
 
     // Показать конкретный заказ
-    public function show($id) {
+    public function show(int $id) {
 //        \Log::info('Попытка открыть заказ', ['order_id' => $id]);
         try {
             // Вызываем метод сервиса для получения всех необходимых данных
@@ -337,7 +339,8 @@ class SocialTaxiOrderController extends BaseController {
             return redirect()->to($backRoute) ->with('error', 'Ошибка при отмене заказа: ' . $e->getMessage());
         }
     }
-
+    
+    
     /**
      * Получить маршрут для типа заказа
      */
