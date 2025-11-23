@@ -153,7 +153,7 @@ class SocialTaxiOrderController extends BaseController {
             $urlParams = $this->orderService->getUrlParams(); // параметры фильтрации
             $backRoute = $this->getBackRoute($urlParams);
 
-            return redirect()->to($backRoute)->with('success', 'Заказ №' . $social_taxi_order->pz_nom . ' успешно обновлен.');
+            return redirect()->to($backRoute)->with('success', 'Заказ ' . $social_taxi_order->pz_nom . ' успешно обновлен.');
             
         } catch (\Exception $e) {
             \Log::error('Ошибка при обновлении заказа.', ['order_id' => $social_taxi_order->id, 'exception' => $e]);

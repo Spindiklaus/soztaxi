@@ -8,24 +8,24 @@
         <div>
             <label for="zena_type" class="block text-sm font-medium text-gray-700">Тип поездки *</label>
             @if($type == 1) {{-- Для соцтакси всегда 1 и только для чтения --}}
-            <select name="zena_type" id="zena_type" 
-                    readonly disabled
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 cursor-not-allowed">
-                <option value="1" selected>Поездка в одну сторону</option>
-            </select>
-            <input type="hidden" name="zena_type" value="1"> {{-- Скрытое поле для передачи значения --}}
-            <p class="mt-1 text-xs text-gray-500">Для соцтакси тип поездки всегда "в одну сторону"</p>
+                <select name="zena_type" id="zena_type" 
+                        readonly disabled
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 cursor-not-allowed">
+                    <option value="1" selected>Поездка в одну сторону</option>
+                </select>
+                <input type="hidden" name="zena_type" value="1"> {{-- Скрытое поле для передачи значения --}}
+                <p class="mt-1 text-xs text-gray-500">Для соцтакси тип поездки всегда "в одну сторону"</p>
             @else {{-- Для легкового авто и ГАЗели --}}
-            <select name="zena_type" id="zena_type" 
-                    required
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                    <option value="1" {{ old('zena_type', $copiedOrder->zena_type ?? 1) == '1' ? 'selected' : '' }}>Поездка в одну сторону</option>
-                    <option value="2" {{ old('zena_type', $copiedOrder->zena_type ?? '') == '2' ? 'selected' : '' }}>Поездка в обе стороны</option>
-            </select>
-            @error('zena_type')
-                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-            @enderror
-            <p class="mt-1 text-xs text-gray-500">Выберите тип поездки: в одну или обе стороны</p>
+                <select name="zena_type" id="zena_type" 
+                        required
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <option value="1" {{ old('zena_type', $copiedOrder->zena_type ?? 1) == '1' ? 'selected' : '' }}>Поездка в одну сторону</option>
+                        <option value="2" {{ old('zena_type', $copiedOrder->zena_type ?? '') == '2' ? 'selected' : '' }}>Поездка в обе стороны</option>
+                </select>
+                @error('zena_type')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+                <p class="mt-1 text-xs text-gray-500">Выберите тип поездки: в одну или обе стороны</p>
             @endif
         </div>
 
@@ -67,28 +67,28 @@
             <p class="mt-1 text-xs text-gray-500">Выбор оператора такси обязателен для сохранения заказа</p>
         </div>
         <!-- Кнопка для выбора из истории адресов -->
-    <div class="flex items-end space-x-2 mt-2">
-    <div class="flex-1">
-        <label for="adres_otkuda" class="block text-sm font-medium text-gray-700">Откуда ехать *</label>
-        <textarea name="adres_otkuda" id="adres_otkuda" 
-                  rows="2" 
-                  required
-                  placeholder="Введите адрес отправки"
-                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('adres_otkuda', $copiedOrder->adres_otkuda ?? '') }}</textarea>
-        @error('adres_otkuda')
-            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-        @enderror
-    </div>
+        <div class="flex items-end space-x-2 mt-2">
+        <div class="flex-1">
+            <label for="adres_otkuda" class="block text-sm font-medium text-gray-700">Откуда ехать *</label>
+            <textarea name="adres_otkuda" id="adres_otkuda" 
+                      rows="2" 
+                      required
+                      placeholder="Введите адрес отправки"
+                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('adres_otkuda', $copiedOrder->adres_otkuda ?? '') }}</textarea>
+            @error('adres_otkuda')
+                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+            @enderror
+        </div>
     
-    <button type="button" 
-            id="open-address-history-btn"
-            title ="История поездок клиента"
-            class="mt-6 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-        <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-        </svg>
-        История
-    </button>
+        <button type="button" 
+                id="open-address-history-btn"
+                title ="История поездок клиента"
+                class="mt-6 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            История
+        </button>
     </div>
     <!-- Дополнительная информация об адресе "откуда" -->    
     <div class="mt-2">
@@ -125,9 +125,7 @@
         @enderror
         <p class="mt-1 text-xs text-gray-500">Укажите дополнительную информацию: телефон, особенности заезда и т.д.</p>
     </div>
-        
-        
-
+ 
     <!-- Обратный адрес (показываем только для типов 2 и 3 - легковое авто и ГАЗель) -->
     @if($type != 1)
          <div>
