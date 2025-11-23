@@ -20,19 +20,37 @@ class TaxiOrderService extends SocialTaxiOrderService
         return $params;
     }
     
+    
+    /**
+     * Получить базовый запрос для заказов, подходящих для передачи в такси
+     */
+    public function getBaseTaxiQuery($validatedData)
+    {
+        return Order::whereDate('visit_data', '>=', $validatedData['date_from'])
+            ->whereDate('visit_data', '<=', $validatedData['date_to'])
+            ->where('taxi_id', $validatedData['taxi_id'])
+            ->whereNull('deleted_at')
+            ->whereNull('cancelled_at')
+            ->whereNull('taxi_sent_at')
+            ->whereHas('currentStatus', function ($q) {
+                $q->where('status_order_id', 1); // только принятые
+            })
+            // Проверка: для соцтакси (type_order == 1) predv_way > 0
+            ->where(function ($query) {
+                $query->where('type_order', '!=', 1) // Не соцтакси -> без ограничений
+                      ->orWhere(function ($socTaksiQuery) {
+                          $socTaksiQuery->where('type_order', 1)
+                                        ->where('predv_way', '>', 0);
+                      });
+            });
+    }
+    
+    
+    
     //передача в такси
     public function setSentDate($validatedData, $taxiSentAt)
 {
-    $query = Order::whereDate('visit_data', '>=', $validatedData['date_from'])
-        ->whereDate('visit_data', '<=', $validatedData['date_to'])
-        ->whereDoesntHave('currentStatus', function ($q) {
-            $q->whereIn('status_order_id', [3, 4]);
-        })
-        ->where('taxi_id', $validatedData['taxi_id'])
-        ->whereNull('deleted_at')
-        ->whereNull('cancelled_at')
-        ->whereNull('taxi_sent_at');
-
+    $query = $this->getBaseTaxiQuery($validatedData);
     $orders = $query->get();
 
     foreach ($orders as $order) {

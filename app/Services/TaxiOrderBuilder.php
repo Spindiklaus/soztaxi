@@ -23,14 +23,13 @@ class TaxiOrderBuilder extends SocialTaxiOrderBuilder
             $this->query->whereDate('visit_data', '<=', $DateTo);
         }
         
-//        // Исключаем заказы со статусами 2,3,4
-//        $this->query->whereDoesntHave('currentStatus', function ($q) {
-//            $q->whereIn('status_order_id', [2, 3, 4]); // Исключаем переданные в такси, отмененные и закрытые
-//        });
         // Допускаем заказы со статусом 1
         $this->query->whereHas('currentStatus', function ($q) {
             $q->where('status_order_id', 1); // только принятые
         });
+        
+         // Исключаем уже переданные в такси
+        $this->query->whereNull('taxi_sent_at');
         
         // ПРОВЕРКА:
         // Для соцтакси (type_order == 1) предварительная дальность (predv_way) должна быть > 0

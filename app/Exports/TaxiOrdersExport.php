@@ -7,6 +7,7 @@ use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 
 class TaxiOrdersExport implements FromView, WithStyles, WithColumnFormatting
 {
@@ -39,11 +40,11 @@ class TaxiOrdersExport implements FromView, WithStyles, WithColumnFormatting
         // Устанавливаем ширину колонок
         $sheet->getColumnDimension('A')->setWidth(8);   // № п/п
         $sheet->getColumnDimension('B')->setWidth(15);  // Тип поездки
-        $sheet->getColumnDimension('C')->setWidth(20); // № заказа
+        $sheet->getColumnDimension('C')->setWidth(15); // № заказа
         $sheet->getColumnDimension('D')->setWidth(15); // Дата поездки
-        $sheet->getColumnDimension('E')->setWidth(25);  // Откуда
-        $sheet->getColumnDimension('F')->setWidth(25); // Куда
-        $sheet->getColumnDimension('G')->setWidth(15); // Обратно
+        $sheet->getColumnDimension('E')->setWidth(30);  // Откуда
+        $sheet->getColumnDimension('F')->setWidth(30); // Куда
+        $sheet->getColumnDimension('G')->setWidth(30); // Обратно
         $sheet->getColumnDimension('H')->setWidth(15); // Дата обратно
         $sheet->getColumnDimension('I')->setWidth(15); // Сотовый
         $sheet->getColumnDimension('J')->setWidth(10);  // Скидка
@@ -53,6 +54,28 @@ class TaxiOrdersExport implements FromView, WithStyles, WithColumnFormatting
         $sheet->getColumnDimension('N')->setWidth(15); // Сумма к возмещению
         $sheet->getColumnDimension('O')->setWidth(20); // Категория
         $sheet->getColumnDimension('P')->setWidth(20); // Доп. сведения
+        $sheet->getColumnDimension('Q')->setWidth(40); // Группировка заказов
+        
+    // Подсветка сгруппированных заказов (кроме первого в группе)
+        $startRow = 5; // Начинаем с 5-й строки (после заголовков)
+        $currentGroup = null;
+
+        foreach ($this->orders as $index => $order) {
+            $rowNumber = $startRow + $index;
+            
+            if ($order->order_group_id && $order->order_group_id == $currentGroup) {
+                // Это не первый заказ в группе - выделяем серым
+                $sheet->getStyle("A{$rowNumber}:Q{$rowNumber}")->applyFromArray([
+                    'fill' => [
+                        'fillType' => Fill::FILL_SOLID,
+                        'color' => ['rgb' => 'F2F2F2'] // Светло-серый фон
+                    ]
+                ]);
+            } else {
+                // Это первый заказ в группе или одиночный - оставляем белым
+                $currentGroup = $order->order_group_id;
+            }
+        }
 
         return [];
     }

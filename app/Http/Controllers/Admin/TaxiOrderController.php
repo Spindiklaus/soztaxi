@@ -60,7 +60,7 @@ class TaxiOrderController extends BaseController {
         $taxi_sent_at = now(); // дата передачи сведений в такси
         // Используем упрощенную логику для такси
         $query = $this->queryBuilder->build($request, false);
-        $orders = $query->paginate(15)->appends($request->all());
+        $orders = $query->paginate(20)->appends($request->all());
 
         return view('social-taxi-orders.taxi', compact(
                         'orders',
@@ -85,10 +85,17 @@ class TaxiOrderController extends BaseController {
         $taxi = $taxiId ? \App\Models\Taxi::find($taxiId) : \App\Models\Taxi::where('life', 1)->first();
 
         // Используем ТОТ ЖЕ запрос, что и в index
+        $request->merge(['sort' => 'visit_data', 'direction' => 'asc']);
         $query = $this->queryBuilder->build($request, false);
 
         // Получаем ВСЕ заказы (без пагинации)
         $orders = $query->get();
+        
+        $sortedOrders = $orders->sortBy([
+            ['order_group_id', 'asc'],  // Группы первыми (NULL = одиночные — в конце)
+            ['visit_data', 'asc']       // Внутри группы — по времени
+        ])->values();
+        
 
 //        \Log::info('Orders found for export', ['count' => $orders->count()]);
 
@@ -101,8 +108,40 @@ class TaxiOrderController extends BaseController {
         $fileName = 'Сведения_для_передачи_оператору_такси_' . $DateFrom . '_по_' . $DateTo . '.xlsx';
 
         // Экспортируем - передаем все три аргумента!
-        return Excel::download(new TaxiOrdersExport($orders, $formattedDateFrom, $formattedDateTo, $taxi), $fileName);
+        return Excel::download(new TaxiOrdersExport($sortedOrders, $formattedDateFrom, $formattedDateTo, $taxi), $fileName);
     }
+    
+    /**
+     * Сортировка заказов: сначала сгруппированные, затем одиночные
+     */
+//    private function sortOrdersWithGroups($orders)
+//    {
+//        // Разделяем заказы на сгруппированные и одиночные
+//        $groupedOrders = collect();
+//        $singleOrders = collect();
+//        
+//        foreach ($orders as $order) {
+//            if ($order->order_group_id) {
+//                $groupedOrders->push($order);
+//            } else {
+//                $singleOrders->push($order);
+//            }
+//        }
+//        
+//        // Сортируем сгруппированные заказы: сначала по группе, затем по времени
+//        $sortedGrouped = $groupedOrders->sortBy([
+//            ['order_group_id', 'asc'],
+//            ['visit_data', 'asc']
+//        ])->values();
+//        
+//        // Сортируем одиночные заказы по времени
+//        $sortedSingles = $singleOrders->sortBy('visit_data')->values();
+//        
+//        // Объединяем: сначала сгруппированные, затем одиночные
+//        return $sortedGrouped->concat($sortedSingles);
+//    }
+    
+    
 
     public function setSentDate(UpdateTaxiSentDateRequest $request) {
             $validated = $request->validated();
