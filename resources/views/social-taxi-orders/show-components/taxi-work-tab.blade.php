@@ -1,7 +1,7 @@
 <!-- resources/views/sozial-taxi-orders/show-components/taxi-work-tab.blade.php -->
 <div id="taxi-work" class="tab-content hidden">
-    <div class="bg-gray-50 p-4 rounded-lg mb-6">
-        <h2 class="text-lg font-semibold text-gray-800 mb-4">Работа с такси</h2>
+    <div class="bg-gray-50 p-4 rounded-lg mb-2">
+        <h2 class="text-lg font-semibold text-gray-800 mb-2">Работа с такси</h2>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <!-- Первая строчка -->
@@ -80,16 +80,30 @@
                     <div class="mt-1  text-orange-600 bg-gray-100 p-2 rounded-md">{{ number_format($order->taxi_vozm ?? 0, 11, ',', ' ') }} руб.</div>
                 @endif   
             </div>
+            
             <!-- Четвертая строчка -->
             @if($order->type_order == 1)
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Фактический километраж</label>
-                <div class="mt-1 bg-gray-100 p-2 rounded-md">
-                    {{ $order->taxi_way ? number_format($order->taxi_way, 3, ',', ' ') . ' км' : 'Не указан' }}
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Фактический километраж</label>
+                    <div class="mt-1 bg-gray-100 p-2 rounded-md">
+                        {{ $order->taxi_way ? number_format($order->taxi_way, 3, ',', ' ') . ' км' : 'Не указан' }}
+                    </div>
                 </div>
-            </div>
             @endif
             
+            <!-- Пятая строчка - Наименование группы -->
+            <div>
+                @if($order->order_group_id)
+                    <label class="block text-sm font-medium text-gray-700">Группа</label>
+                    <div class="mt-1 bg-gray-100 p-2 rounded-md">
+                            @if($order->orderGroup)
+                                {{ $order->orderGroup->name .' (id = '. $order->order_group_id.')' ?? 'Группа #' . $order->order_group_id }}
+                            @else
+                                Группа #{{ $order->order_group_id }}
+                            @endif
+                    </div>
+                @endif
+            </div>
         </div>
     </div>
   

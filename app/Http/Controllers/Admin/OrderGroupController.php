@@ -58,8 +58,17 @@ class OrderGroupController extends BaseController //
             $query->orderBy($sort, $direction);
         }
         
-        // Добавляем withCount для подсчета заказов ---
-        $orderGroups = $query->withCount('orders')->paginate(20)->appends($request->all());
+        // Добавляем withCount для подсчета всех заказов и принятых заказов ---
+        $orderGroups = $query
+            ->withCount(['orders', 'orders as accepted_orders_count' => function ($q) {
+                $q->whereHas('currentStatus', function ($subQ) {
+                    $subQ->where('status_order_id', 1); // Только принятые заказы
+                });
+            }])
+            ->paginate(20)
+            ->appends($request->all());
+//        dd($orderGroups);    
+            
         // appends($request->all()) сохраняет все параметры запроса (фильтры, сортировку) в ссылках пагинации
 
         // Собираем параметры для передачи в шаблон ---
@@ -76,9 +85,7 @@ class OrderGroupController extends BaseController //
     {
         // Для OrderGroup, возможно, не нужно отдельной формы создания,
         // так как группы создаются через логику группировки.
-        // Но если нужно, реализуйте здесь.
-        // return view('admin.order_groups.create');
-        abort(404); // Пока возвращаем 404, если создание не предусмотрено вручную
+         dd(__METHOD__);
     }
 
     /**

@@ -4,22 +4,22 @@
         <div>
 
             <!-- Клиент -->
-            <div class="border border-gray-200 rounded-lg mb-6">
-                <div class="bg-gray-50 px-4 py-3 rounded-t-lg">
+            <div class="border border-gray-200 rounded-lg mb-2">
+                <div class="bg-gray-50 px-4 py-2 rounded-t-lg">
                     <button type="button" 
                             onclick="toggleClientInfo()"
                             class="flex items-center justify-between w-full text-left">
                         <h2 class="text-lg font-semibold text-gray-800">
                             Клиент: {{ $order->client->fio ?? 'Не указан' }}
                         </h2>
-                        <svg id="client-info-arrow" class="h-5 w-5 transform transition-transform text-gray-500" 
+                        <svg id="client-info-arrow" class="h-5 w-5 transform transition-transform text-gray-500 rotate-180" 
                              xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                         </svg>
                     </button>
                 </div>
 
-                <div id="client-info-content" class="p-4 hidden">
+                <div id="client-info-content" class="p-2">
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Удостоверение инвалида</label>
@@ -73,8 +73,8 @@
             </div>
 
             <!-- Сведения о поездке -->
-            <div class="border border-gray-200 rounded-lg mb-6">
-                <div class="bg-gray-50 px-4 py-3 rounded-t-lg">
+            <div class="border border-gray-200 rounded-lg mb-2">
+                <div class="bg-gray-50 px-4 py-2 rounded-t-lg">
                     <button type="button" 
                             onclick="toggleTripInfo()"
                             class="flex items-center justify-between w-full text-left">
@@ -114,7 +114,7 @@
                                 @endif
                             </span>    
                         </h2>
-                        <svg id="trip-info-arrow" class="h-5 w-5 transform transition-transform text-gray-500" 
+                        <svg id="trip-info-arrow" class="h-5 w-5 transform transition-transform text-gray-500 rotate-180" 
                              xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                         </svg>
@@ -122,7 +122,7 @@
                 </div>
 
 
-                <div id="trip-info-content" class="p-4 hidden">
+                <div id="trip-info-content" class="p-2">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Откуда ехать</label>
@@ -144,7 +144,7 @@
             </div>
 
             <!-- Сведения о заказе -->
-            <div class="bg-gray-50 rounded-lg mb-6">
+            <div class="bg-gray-50 rounded-lg mb-2">
                 <!-- Заголовок с кнопкой раскрытия -->
                 <div class="px-4 py-3 bg-gray-100 rounded-t-lg border-b border-gray-200">
                     <button type="button" 
@@ -175,7 +175,7 @@
                             </span>
                             @endif
                         </h2>
-                        <svg id="benefits-arrow" class="h-5 w-5 transform transition-transform text-gray-500" 
+                        <svg id="benefits-arrow" class="h-5 w-5 transform transition-transform text-gray-500 rotate-180" 
                              xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                         </svg>
@@ -183,12 +183,9 @@
                 </div>
 
                 <!-- Содержимое льгот (скрыто по умолчанию) -->
-                <div id="benefits-content" class="p-4 hidden">
-                    <div class="flex flex-wrap items-center gap-2 md:gap-4">
-
-                    </div>
+                <div id="benefits-content" class="p-2">
                     <!-- Количество поездок клиента -->
-                    <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                    <div class="bg-gray-50 p-2 rounded-lg mb-2">
                         <div class="flex items-center">
                             <span class="text-lg font-semibold text-gray-800">Количество поездок клиента в этом месяце:</span>
                             <button 
@@ -227,9 +224,9 @@
     <!-- Предварительный расчет -->
     @if($order->type_order == 1) 
     <div class="col-span-1">
-        <div class="bg-gray-50 rounded-lg mb-6">
+        <div class="bg-gray-50 rounded-lg mb-2">
             <!-- Заголовок с кнопкой раскрытия -->
-            <div class="px-4 py-3 bg-gray-100 rounded-t-lg border-b border-gray-200">
+            <div class="px-4 py-2 bg-gray-100 rounded-t-lg border-b border-gray-200">
                 <button type="button" 
                         onclick="toggleCalculation()"
                         class="flex items-center justify-between w-full text-left">
@@ -238,7 +235,7 @@
                         <span class="text-sm font-medium text-gray-700">Дальность</span>
                         <span class="text-sm text-gray-900">{{  number_format($order->predv_way,3,',', ' ') ?? '0' }} км</span>
                     </h2>
-                    <svg id="calculation-arrow" class="h-5 w-5 transform transition-transform text-gray-500" 
+                    <svg id="calculation-arrow" class="h-5 w-5 transform transition-transform text-gray-500 rotate-180" 
                          xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                     </svg>
@@ -246,7 +243,7 @@
             </div>
 
             <!-- Содержимое расчета (скрыто по умолчанию) -->
-            <div id="calculation-content" class="p-4 hidden">
+            <div id="calculation-content" class="p-2">
                 <div class="space-y-3">
                     <div class="flex justify-between">
                         <span class="text-sm font-medium text-gray-700">Оператор такси</span>
@@ -285,3 +282,58 @@
     @endif
 
 </div>
+
+<script>
+// Функции для переключения раскрывающихся блоков
+function toggleClientInfo() {
+    const content = document.getElementById('client-info-content');
+    const arrow = document.getElementById('client-info-arrow');
+    
+    if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        arrow.classList.add('rotate-180');
+    } else {
+        content.classList.add('hidden');
+        arrow.classList.remove('rotate-180');
+    }
+}
+
+function toggleTripInfo() {
+    const content = document.getElementById('trip-info-content');
+    const arrow = document.getElementById('trip-info-arrow');
+    
+    if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        arrow.classList.add('rotate-180');
+    } else {
+        content.classList.add('hidden');
+        arrow.classList.remove('rotate-180');
+    }
+}
+
+function toggleBenefits() {
+    const content = document.getElementById('benefits-content');
+    const arrow = document.getElementById('benefits-arrow');
+    
+    if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        arrow.classList.add('rotate-180');
+    } else {
+        content.classList.add('hidden');
+        arrow.classList.remove('rotate-180');
+    }
+}
+
+function toggleCalculation() {
+    const content = document.getElementById('calculation-content');
+    const arrow = document.getElementById('calculation-arrow');
+    
+    if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        arrow.classList.add('rotate-180');
+    } else {
+        content.classList.add('hidden');
+        arrow.classList.remove('rotate-180');
+    }
+}
+</script>

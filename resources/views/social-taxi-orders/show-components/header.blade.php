@@ -1,14 +1,14 @@
 <!-- resources/views/sozial-taxi-orders/show-components/header.blade.php -->
 
-<div class="flex justify-between items-center mb-6">
+<div class="flex justify-between items-center mb-2">
     <div>
         <h1 class="text-3xl font-bold text-gray-800">Заказ №{{ $order->pz_nom ?? 'Неизвестный'}}</h1>
-        <div class="mt-2 flex items-center">
+        <div class="mt-1 flex items-center">
             <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium {{ getOrderTypeBadgeColor($order->type_order) }}">
                 {{ getOrderTypeName($order->type_order) ?? 0}}
             </span>
             @if($order->deleted_at)
-                <span class="ml-2 inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                <span class="ml-1 inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
                     Удален
                 </span>
             @endif
@@ -56,9 +56,7 @@
         </a>
      </div>
 </div>
-<div class="border border-gray-200 rounded-lg p-4 mb-6 bg-white shadow">
-                <h2 class="text-lg font-semibold text-gray-800 mb-4">Прием заказа:</h2>
-
+<div class="border border-gray-200 rounded-lg p-4 mb-2 bg-white shadow">
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Дата приема заказа</label>

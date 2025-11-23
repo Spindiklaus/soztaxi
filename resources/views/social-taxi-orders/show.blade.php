@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div class="bg-gray-100 py-6">
+    <div class="bg-gray-100 py-2">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             @if(isset($order))
                 <!-- Заголовок и кнопки -->
