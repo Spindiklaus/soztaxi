@@ -146,3 +146,50 @@ if (!function_exists('getClientTaxiSentTripsCountInMonthByVisitDate')) {
         return $query->count();
     }
 }
+
+if (!function_exists('getClientPaidTripsCountInMonthByVisitDate')) {
+    /**
+     * Получить количество полностью оплачиваемых поездок клиента в месяц по дате поездки из заказа
+     * Полностью оплачиваемые - это заказы с 100% скидкой (skidka_dop_all = 100)
+     *
+     * @param int $clientId ID клиента
+     * @param Carbon|null $visitDate Дата поездки для определения месяца
+     * @param int|null $excludeOrderId ID заказа для исключения из подсчета
+     * @return int Количество полностью оплачиваемых поездок в месяце
+     */
+    function getClientPaidTripsCountInMonthByVisitDate($clientId, $visitDate = null, $excludeOrderId = null)
+    {
+        // Если дата поездки не указана, возвращаем 0
+        if (!$visitDate || !$clientId) {
+            return 0;
+        }
+
+        // Преобразуем дату в Carbon, если это строка
+        if (is_string($visitDate)) {
+            try {
+                $visitDate = Carbon::parse($visitDate);
+            } catch (\Exception $e) {
+                return 0;
+            }
+        }
+
+        // Определяем начало и конец месяца по дате поездки
+        $startDate = $visitDate->copy()->startOfMonth();
+        $endDate = $visitDate->copy()->endOfMonth();
+
+        // Подсчитываем количество полностью оплачиваемых поездок клиента в этом месяце
+        $query = Order::where('client_id', $clientId)
+            ->whereBetween('visit_data', [$startDate, $endDate])
+            ->whereNotNull('visit_data') // Только с указанной датой поездки
+            ->where('skidka_dop_all', 100) // Только с 0% скидкой (полностью оплачиваемые)
+            ->whereNull('deleted_at') // Только неудаленные заказы
+            ->whereNull('cancelled_at'); // Только неотмененные заказы
+
+        // Если указан ID заказа для исключения, добавляем условие
+        if ($excludeOrderId) {
+            $query->where('id', '!=', $excludeOrderId);
+        }
+
+        return $query->count();
+    }
+}

@@ -11,8 +11,6 @@ use App\Http\Requests\StoreSocialTaxiOrderByTypeRequest;
 use App\Services\SocialTaxiOrderService;
 use App\Services\SocialTaxiOrderBuilder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use App\Exports\SocialTaxiOrdersExport;
-use Maatwebsite\Excel\Facades\Excel;
 
 class SocialTaxiOrderController extends BaseController {
 
@@ -50,7 +48,7 @@ class SocialTaxiOrderController extends BaseController {
         $urlParams = $this->orderService->getUrlParams();
 
         $query = $this->queryBuilder->build($request, $showDeleted == '1');
-        $orders = $query->paginate(15)->appends($request->all());
+        $orders = $query->paginate(30)->appends($request->all());
 
         return view('social-taxi-orders.index', compact(
                         'orders',
@@ -323,6 +321,8 @@ class SocialTaxiOrderController extends BaseController {
     // Отменить заказ
     public function cancel(CancelSocialTaxiOrderRequest $request, Order $social_taxi_order) {
         try {
+          
+            
             $validated = $request->validated();
 
             $this->orderService->cancelOrder($social_taxi_order, $validated);
@@ -331,6 +331,9 @@ class SocialTaxiOrderController extends BaseController {
            
             $urlParams = $this->orderService->getUrlParams(); // параметры фильтрации
             $backRoute = $this->getBackRoute($urlParams);
+            
+            \Log::info('Cancel redirect params', $urlParams);
+            \Log::info('Cancel redirect route', [route('social-taxi-orders.index', $urlParams)]);
             
             return redirect()->to($backRoute)->with('success', 'Заказ №' . $social_taxi_order->pz_nom . ' отменен.');
         } catch (\Exception $e) {

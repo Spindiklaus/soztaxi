@@ -61,11 +61,15 @@
                     $tripCountForDay = count($ordersForDay);
                 @endphp
 
-                <div class="h-16 p-1 border border-gray-200 
-                     @if($isToday) bg-blue-50 @endif 
+                <div class="h-20 p-1 border border-gray-200 
+                     @if($isToday) bg-blue-50 @else bg-gray-50 @endif 
                 ">
-                    <div class="text-xs font-medium text-gray-700 mb-1">{{ $currentDate->format('j') }}</div>
-                    <div class="space-y-1 max-h-20 overflow-y-auto">
+                    <div class="text-xs font-medium text-gray-700 mb-1">
+                        <span class="inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-gray-800 bg-white rounded-full shadow-sm border border-gray-300">
+                            {{ $currentDate->format('j') }}
+                         </span>    
+                    </div>
+                    <div class="space-y-1 max-h-14 overflow-y-auto">
                         @php
                             // Сортировка заказов по времени поездки ---
                             $sortedOrdersForDay = collect($ordersForDay)->sortBy('visit_data')->values(); // превращает массив $ordersForDay в Laravel-коллекцию.
