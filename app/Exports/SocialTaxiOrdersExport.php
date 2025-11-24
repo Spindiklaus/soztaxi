@@ -14,12 +14,14 @@ class SocialTaxiOrdersExport implements FromView, WithStyles, WithColumnFormatti
     protected $orders;
     protected $dateFrom;
     protected $dateTo;
+    protected $filters; 
 
-    public function __construct($orders, $dateFrom, $dateTo)
+    public function __construct($orders, $dateFrom, $dateTo, $filters = [])
     {
         $this->orders = $orders;
         $this->dateFrom = $dateFrom;
         $this->dateTo = $dateTo;
+        $this->filters = $filters;
     }
 
     public function view(): View
@@ -28,21 +30,22 @@ class SocialTaxiOrdersExport implements FromView, WithStyles, WithColumnFormatti
             'orders' => $this->orders,
             'dateFrom' => $this->dateFrom,
             'dateTo' => $this->dateTo,
-            'generatedAt' => now()
+            'generatedAt' => now(),
+            'filters' => $this->filters // <--- Передаём фильтры в шаблон
         ]);
     }
 
     public function styles(Worksheet $sheet)
     {
         // Устанавливаем ширину колонок
-        $sheet->getColumnDimension('A')->setWidth(8);   // № п/п
-        $sheet->getColumnDimension('B')->setWidth(15);  // Тип поездки
+        $sheet->getColumnDimension('A')->setWidth(6);   // № п/п
+        $sheet->getColumnDimension('B')->setWidth(10);  // Тип поездки
         $sheet->getColumnDimension('C')->setWidth(15);  // № заказа
-        $sheet->getColumnDimension('D')->setWidth(15);  // Дата поездки
+        $sheet->getColumnDimension('D')->setWidth(12);  // Дата поездки
         $sheet->getColumnDimension('E')->setWidth(30);  // Откуда
         $sheet->getColumnDimension('F')->setWidth(30);  // Куда
-        $sheet->getColumnDimension('G')->setWidth(10);  // Обратно
-        $sheet->getColumnDimension('H')->setWidth(15);  // Дата обратно
+        $sheet->getColumnDimension('G')->setWidth(30);  // Обратно
+        $sheet->getColumnDimension('H')->setWidth(12);  // Дата обратно
         $sheet->getColumnDimension('I')->setWidth(10);  // Скидка,%
         $sheet->getColumnDimension('J')->setWidth(10);  // Дальность
         $sheet->getColumnDimension('K')->setWidth(15);  // Цена за поездку
@@ -51,30 +54,21 @@ class SocialTaxiOrdersExport implements FromView, WithStyles, WithColumnFormatti
         $sheet->getColumnDimension('N')->setWidth(25);  // ФИО
         $sheet->getColumnDimension('O')->setWidth(20);  // Категория инвалидности
         $sheet->getColumnDimension('P')->setWidth(20);  // Доп. сведения
-        $sheet->getColumnDimension('Q')->setWidth(30);  // Комментарии
-
-        // Подсветка сгруппированных заказов (кроме первого в группе)
-        $startRow = 5; // Начинаем с 5-й строки (после заголовков)
-        $currentGroup = null;
-
-        foreach ($this->orders as $index => $order) {
-            $rowNumber = $startRow + $index;
-
-            if ($order->order_group_id && $order->order_group_id == $currentGroup) {
-                // Это не первый заказ в группе - выделяем серым
-                $sheet->getStyle("A{$rowNumber}:Q{$rowNumber}")->applyFromArray([
-                    'fill' => [
-                        'fillType' => Fill::FILL_SOLID,
-                        'color' => ['rgb' => 'F2F2F2'] // Светло-серый фон
-                    ]
-                ]);
-            } else {
-                // Это первый заказ в группе или одиночный - оставляем белым
-                $currentGroup = $order->order_group_id;
-            }
+        
+        // Устанавливаем перенос текста для заголовков (строка 5)
+        for ($col = 'A'; $col <= 'P'; $col++) {
+            $sheet->getStyle($col . '5')->getAlignment()->setWrapText(true);
         }
-
-        return [];
+        
+        $sheet->getRowDimension(1)->setRowHeight(30);
+        $sheet->getRowDimension(2)->setRowHeight(20);
+        $sheet->getRowDimension(3)->setRowHeight(15);
+        
+        // высота для строки заголовков
+         $sheet->getRowDimension(5)->setRowHeight(30);
+        
+         return [];
+        
     }
 
     public function columnFormats(): array
@@ -82,10 +76,10 @@ class SocialTaxiOrdersExport implements FromView, WithStyles, WithColumnFormatti
         return [
             'C' => '@', // № заказа как текст
             'I' => '0.00', // Скидка,%
-            'J' => '0.00', // Дальность
-            'K' => '0.00', // Цена за поездку
-            'L' => '0.00', // Сумма к оплате
-            'M' => '0.00', // Сумма к возмещению
+            'J' => '0.000', // Дальность
+            'K' => '0.00000000000', // Цена за поездку
+            'L' => '0.00000000000', // Сумма к оплате
+            'M' => '0.00000000000', // Сумма к возмещению
         ];
     }
 }

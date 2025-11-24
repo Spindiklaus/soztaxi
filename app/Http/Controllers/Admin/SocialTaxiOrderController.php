@@ -11,8 +11,6 @@ use App\Http\Requests\StoreSocialTaxiOrderByTypeRequest;
 use App\Services\SocialTaxiOrderService;
 use App\Services\SocialTaxiOrderBuilder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use App\Exports\SocialTaxiOrdersExport;
-use Maatwebsite\Excel\Facades\Excel;
 
 class SocialTaxiOrderController extends BaseController {
 
