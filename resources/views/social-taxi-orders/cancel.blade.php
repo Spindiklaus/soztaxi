@@ -43,7 +43,7 @@
             </div>
 
             <!-- Форма отмены заказа -->
-            <form action="{{ route('social-taxi-orders.cancel', $social_taxi_order) }}" method="POST" class="bg-white shadow rounded-lg p-6">
+            <form action="{{ route('social-taxi-orders.cancel', array_merge(['social_taxi_order' => $social_taxi_order], request()->all())) }}" method="POST" class="bg-white shadow rounded-lg p-6">
                 @csrf
                 @method('PATCH')
                 
