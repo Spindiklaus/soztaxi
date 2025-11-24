@@ -71,6 +71,7 @@ class ClientTripController extends Controller {
                     'taxi_id',
                     'taxi_sent_at',
                     'skidka_dop_all', // Добавляем скидку
+                    'zena_type', // тип поездки в 1 или 2 стороны
                     'closed_at'
                 ])
                 ->orderBy('visit_data');
@@ -94,18 +95,20 @@ class ClientTripController extends Controller {
             
             // Получаем поездки
             $trips = $query->get();
+            // Считаем общее количество поездок (сумма zena_type)
+            $totalCount = $trips->sum('zena_type');
             
             // Считаем бесплатные поездки (скидка 100%)
             $freeTrips = $trips->filter(function ($order) {
                 return $order->skidka_dop_all == 100;
             });
+            $freeCount = $freeTrips->sum('zena_type');
             
             // Считаем платные поездки (скидка = 50%)
             $paidTrips = $trips->filter(function ($order) {
                return ($order->skidka_dop_all !== null && $order->skidka_dop_all < 100);
             });
-
-            
+            $paidCount = $paidTrips->sum('zena_type');
             
             // Форматируем название периода на русском
             $period = getRussianMonthName($date) . ' ' . $date->year;
@@ -113,9 +116,9 @@ class ClientTripController extends Controller {
             return response()->json([
                 'trips' => $trips,
                 'clientName' => $client->fio,
-                'count' => $trips->count(), // Общее число поездок
-                'freeCount' => $freeTrips->count(), // Только бесплатные
-                'paidCount' => $paidTrips->count(), // Только платные
+                'count' => $totalCount, // Общее число поездок
+                'freeCount' =>  $freeCount, // Только бесплатные
+                'paidCount' =>  $paidCount, // Только платные
                 'period' => $period
             ]);
             

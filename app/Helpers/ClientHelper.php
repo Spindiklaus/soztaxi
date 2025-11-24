@@ -147,7 +147,7 @@ if (!function_exists('getClientTaxiSentTripsCountInMonthByVisitDate')) {
     }
 }
 
-if (!function_exists('getClientPaidTripsCountInMonthByVisitDate')) {
+if (!function_exists('getClientFreeTripsCountInMonthByVisitDate')) {
     /**
      * Получить количество полностью оплачиваемых поездок клиента в месяц по дате поездки из заказа
      * Полностью оплачиваемые - это заказы с 100% скидкой (skidka_dop_all = 100)
@@ -157,7 +157,7 @@ if (!function_exists('getClientPaidTripsCountInMonthByVisitDate')) {
      * @param int|null $excludeOrderId ID заказа для исключения из подсчета
      * @return int Количество полностью оплачиваемых поездок в месяце
      */
-    function getClientPaidTripsCountInMonthByVisitDate($clientId, $visitDate = null, $excludeOrderId = null)
+    function getClientFreeTripsCountInMonthByVisitDate($clientId, $visitDate = null, $excludeOrderId = null)
     {
         // Если дата поездки не указана, возвращаем 0
         if (!$visitDate || !$clientId) {

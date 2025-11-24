@@ -1,4 +1,3 @@
-<!-- Предварительная информация о заказе -->
 <!-- resources/views/social-taxi-orders/edit-components/order-info.blade.php -->
 <div class="bg-gray-50 p-4 rounded-lg mb-6">
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -56,7 +55,7 @@
                 </button>
                 , в т.ч. со 100% скидкой: 
                 <span class="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors">
-                    &nbsp;{{ getClientPaidTripsCountInMonthByVisitDate($order->client_id, $order->visit_data) }}
+                    &nbsp;{{ getClientFreeTripsCountInMonthByVisitDate($order->client_id, $order->visit_data) }}
                 </span>
             </div>
 

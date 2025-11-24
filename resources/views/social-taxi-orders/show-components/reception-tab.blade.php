@@ -206,7 +206,7 @@
                             </button>
                              , в т.ч. со 100% скидкой: 
                             <span class="ml-2 inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors">
-                                &nbsp;{{ getClientPaidTripsCountInMonthByVisitDate($order->client_id, $order->visit_data) }}
+                                &nbsp;{{ getClientFreeTripsCountInMonthByVisitDate($order->client_id, $order->visit_data) }}
                             </span>
                         </div>
                         <!-- Число поездок переданных в такси -->
