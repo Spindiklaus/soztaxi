@@ -42,8 +42,8 @@
                 <td>{{ getOrderTypeName($order->type_order) }}</td>
                 <td>{{ $order->pz_nom }}</td>
                 <td>{{ $order->visit_data ? $order->visit_data->format('d.m.Y H:i') : '-' }}</td>
-                <td>{{ $order->adres_otkuda ?? '' }}</td>
-                <td>{{ $order->adres_kuda ?? '' }}</td>
+                <td>{{ $order->adres_otkuda}} {{ $order->adres_otkuda_info}}</td>
+                <td>{{ $order->adres_kuda}} {{ $order->adres_kuda_info}}</td>
                 <td>{{ $order->adres_obratno ?? '' }}</td>
                 <td>{{ $order->visit_obratno ? $order->visit_obratno->format('d.m.Y H:i') : '' }}</td>
                 <td>{{ $order->client_tel ?? '' }} </td>
@@ -84,8 +84,8 @@
                 <td>{{ getOrderTypeName($order->type_order) }}</td>
                 <td>{{ $order->pz_nom }}</td>
                 <td>{{ $order->visit_data ? $order->visit_data->format('d.m.Y H:i') : '-' }}</td>
-                <td>{{ $order->adres_otkuda ?? '' }}</td>
-                <td>{{ $order->adres_kuda ?? '' }}</td>
+                <td>{{ $order->adres_otkuda }} {{ $order->adres_otkuda_info }}</td>
+                <td>{{ $order->adres_kuda }} {{ $order->adres_kuda_info }}</td>
                 <td>{{ $order->adres_obratno ?? '' }}</td>
                 <td>{{ $order->visit_obratno ? $order->visit_obratno->format('d.m.Y H:i') : '' }}</td>
                 <td>{{ $order->client_tel ?? '' }} </td>
