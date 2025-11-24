@@ -221,10 +221,24 @@ class FioDtrnController extends BaseController {
     }
 
     public function destroy(Request $request, FioDtrn $fiodtrn) {
-        $fiodtrn->delete();
-
+        
         // Передаем все параметры сортировки и фильтрации
         $urlParams = $this->fioDtrnService->getUrlParams();
+        
+         // Проверяем, есть ли у клиента заказы
+        $hasOrders = $fiodtrn->orders()->exists();
+    
+        if ($hasOrders) {
+            // Передаем все параметры сортировки и фильтрации
+            $urlParams = $this->fioDtrnService->getUrlParams();
+      
+            return redirect()->route('fiodtrns.index', $urlParams)
+                         ->with('error', "Невозможно удалить клиента {$fiodtrn->fio}, так как у него есть заказы");
+        }
+        
+        $fiodtrn->delete();
+
+        
         return redirect()->route('fiodtrns.index', $urlParams)->with('success', 'Клиент удалён');
     }
 
