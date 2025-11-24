@@ -1,3 +1,4 @@
+<!-- /resuces/views/operator-orders/calendar-components/scripts/modal-scripts.blade.php
 <!-- JavaScript для переключения блоков информации и модального окна -->
     <script>
         function openCopyModal(orderId, visitDateTime, adresOtkuda, adresKuda) {
@@ -49,6 +50,9 @@
             .then(data => {
                 if (data.success) {
                     // alert('Заказ успешно создан!');
+                    if (data.message) {
+                        alert(data.message); // <--- Вот тут будет "Скидка изменена с 100% на 50% для категории 2"
+                    }
                     closeCopyModal();
                     // Здесь можно обновить календарь, если нужно
                     window.location.reload(); // Простой способ, но не самый эффективный

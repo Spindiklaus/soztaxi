@@ -182,49 +182,13 @@ public function copyOrder(Request $request)
         $newVisitDateTime = Carbon::parse($request->input('visit_data'));
         $TypeKuda = (int) $request->input('type_kuda');
 
+        // --- Для проверки, что дата поездки в текущем месяце ---
+        $monthStart = $newVisitDateTime->copy()->startOfMonth();
+        $monthEnd = $newVisitDateTime->copy()->endOfMonth();
+
         // Загружаем оригинальный заказ
         $originalOrder = Order::findOrFail($orderId);
         
-        // Проверка лимита поездок клиента в месяц из оригинального заказа ---
-        $limit = $originalOrder->kol_p_limit; // Берём лимит из оригинального заказа
-        $existingTripsCountForMonth = getClientTripsCountInMonthByVisitDate($originalOrder->client_id, $newVisitDateTime);
-
-        // Сравниваем с лимитом. Если уже достигнут лимит, не позволяем создать ещё.
-        if ($existingTripsCountForMonth >= $limit) {
-            return response()->json(['success' => false, 'message' => "Невозможно создать заказ: достигнут лимит поездок для клиента ({$limit})."], 422);
-        }
-
-        // Проверка, отличается ли новая дата/время от оригинальной более чем на 30 минут ---
-        if ($originalOrder->visit_data) {
-            $originalVisitDateTime = $originalOrder->visit_data;
-            // Вычисляем абсолютную разницу в минутах
-            $diffInMinutes = abs($newVisitDateTime->diffInMinutes($originalVisitDateTime));
-
-            if ($diffInMinutes <= 60) {
-                return response()->json(['success' => false, 'message' => 'Невозможно создать заказ: новая дата/время поездки должна отличаться от оригинальной более чем на 60 минут.'], 422);
-            }
-        }
-        
-        // --- Проверка, что дата поездки в текущем месяце ---
-        $monthStart = $originalVisitDateTime->copy()->startOfMonth();
-        $monthEnd = $originalVisitDateTime->copy()->endOfMonth();
-
-        if (!$newVisitDateTime->between($monthStart, $monthEnd)) {
-            return response()->json(['success' => false, 'message' => 'Невозможно создать заказ: дата поездки '. $newVisitDateTime.' должна быть между '.$monthStart.' и '.$monthEnd], 422);
-        }
-        
-        
-        // Проверка ограничения: не больше 2 поездок в день
-        $existingTripsCount = Order::where('client_id', $originalOrder->client_id)
-            ->whereDate('visit_data', $newVisitDateTime->toDateString()) // Сравниваем только дату
-            ->whereNull('deleted_at') // Исключаем удаленные
-            ->whereNull('cancelled_at') // Исключаем отмененные
-            ->count();
-
-        if ($existingTripsCount >= 2) {
-            return response()->json(['success' => false, 'message' => 'Невозможно создать заказ: клиент уже имеет 2 поездки в этот день.'], 422);
-        }
-
         // Подготовка данных для нового заказа
         $newOrderData = $originalOrder->toArray();
         unset($newOrderData['id']); // Удаляем ID, чтобы создать новый
@@ -261,6 +225,70 @@ public function copyOrder(Request $request)
         $newOrderData['pz_nom'] = generateOrderNumber($originalOrder->type_order, auth()->id());
         $newOrderData['pz_data'] = now(); 
         
+        
+        
+        
+        // Проверка лимита поездок клиента в месяц из оригинального заказа ---
+        $limit = $originalOrder->kol_p_limit; // Берём лимит из оригинального заказа
+        $existingTripsCountForMonth = getClientTripsCountInMonthByVisitDate($originalOrder->client_id, $newVisitDateTime);
+
+        // Сравниваем с лимитом. Если уже достигнут лимит, не позволяем создать ещё.
+        if ($existingTripsCountForMonth >= $limit) {
+            return response()->json(['success' => false, 'message' => "Невозможно создать заказ: достигнут лимит поездок для клиента ({$limit})."], 422);
+        }
+        
+         // --- ПРОВЕРКА: Только для категорий с kat_dop = 2 и общей скидкой 100%---
+        $category = $originalOrder->category;
+        $message = null; 
+        if ($category && $category->kat_dop == 2 &&  $originalOrder->skidka_dop_all==100) {
+            // Получаем все заказы клиента в этом месяце
+            $freeTripsCount = Order::where('client_id', $originalOrder->client_id)
+                ->whereBetween('visit_data', [$monthStart, $monthEnd])
+                ->whereNull('deleted_at')
+                ->whereNull('cancelled_at')
+                ->where('skidka_dop_all', '=', 100)
+                ->count();
+
+            // Если бесплатных уже >= 16, запрещаем создание
+            if ($freeTripsCount >= 16) {
+                $newOrderData['skidka_dop_all'] = 50; // Изменяем скидку
+                $message = 'Скидка изменена с 100% на 50%, так как клиент с категорией 2 уже использовал 16 бесплатных поездок в этом месяце.';
+            }
+        }
+        // --- КОНЕЦ ПРОВЕРКИ ---
+
+        
+        
+
+        // Проверка, отличается ли новая дата/время от оригинальной более чем на 30 минут ---
+        if ($originalOrder->visit_data) {
+            $originalVisitDateTime = $originalOrder->visit_data;
+            // Вычисляем абсолютную разницу в минутах
+            $diffInMinutes = abs($newVisitDateTime->diffInMinutes($originalVisitDateTime));
+
+            if ($diffInMinutes <= 60) {
+                return response()->json(['success' => false, 'message' => 'Невозможно создать заказ: новая дата/время поездки должна отличаться от оригинальной более чем на 60 минут.'], 422);
+            }
+        }
+
+        if (!$newVisitDateTime->between($monthStart, $monthEnd)) {
+            return response()->json(['success' => false, 'message' => 'Невозможно создать заказ: дата поездки '. $newVisitDateTime.' должна быть между '.$monthStart.' и '.$monthEnd], 422);
+        }
+        
+        
+        // Проверка ограничения: не больше 2 поездок в день
+        $existingTripsCount = Order::where('client_id', $originalOrder->client_id)
+            ->whereDate('visit_data', $newVisitDateTime->toDateString()) // Сравниваем только дату
+            ->whereNull('deleted_at') // Исключаем удаленные
+            ->whereNull('cancelled_at') // Исключаем отмененные
+            ->count();
+
+        if ($existingTripsCount >= 2) {
+            return response()->json(['success' => false, 'message' => 'Невозможно создать заказ: клиент уже имеет 2 поездки в этот день.'], 422);
+        }
+
+        
+        
         $directionText = ($TypeKuda == 2) ? ' (обратный путь)' : '';
         $newOrderData['komment'] = "Копия заказа {$originalOrder->pz_nom} от {$originalOrder->pz_data->format('d.m.Y H:i')}" . $directionText
                 ." Выполнена из календаря поездок ". now()->format('d.m.Y H:i');
@@ -270,8 +298,14 @@ public function copyOrder(Request $request)
 
         // Здесь можно добавить начальный статус, если это делается автоматически
         // $this->orderService->addInitialStatus($newOrder); // Пример
+        
+        // Возвращаем успешный ответ (с сообщением, если оно было)
+        $response = ['success' => true, 'message' => 'Заказ успешно создан.', 'order_id' => $newOrder->id];
+        if ($message) {
+            $response['message'] = $message;
+        }
 
-        return response()->json(['success' => true, 'message' => 'Заказ успешно создан.', 'order_id' => $newOrder->id]);
+        return response()->json($response);
 
     } catch (\Exception $e) {
         \Log::error('Ошибка при копировании заказа: ' . $e->getMessage());
