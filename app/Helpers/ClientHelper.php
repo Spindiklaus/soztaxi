@@ -46,7 +46,7 @@ if (!function_exists('getClientTripsCountInMonthByVisitDate')) {
 //        dd($tripCount);
             
 
-        return $tripCount->count();
+        return $tripCount->sum('zena_type');
     }
 }
 
@@ -94,7 +94,7 @@ if (!function_exists('getClientActualTripsCountInMonthByVisitDate')) {
             $query->where('id', '!=', $excludeOrderId);
         }
 
-        return $query->count();
+        return $query->sum('zena_type');
     }
 }
 
@@ -143,7 +143,7 @@ if (!function_exists('getClientTaxiSentTripsCountInMonthByVisitDate')) {
             $query->where('id', '!=', $excludeOrderId);
         }
 
-        return $query->count();
+        return $query->sum('zena_type');
     }
 }
 
@@ -190,6 +190,6 @@ if (!function_exists('getClientPaidTripsCountInMonthByVisitDate')) {
             $query->where('id', '!=', $excludeOrderId);
         }
 
-        return $query->count();
+        return $query->sum('zena_type');
     }
 }
