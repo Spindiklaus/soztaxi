@@ -106,7 +106,6 @@ class SocialTaxiController extends BaseController
 
     // Определяем месяц календаря на основе $targetDate
     $calendarMonth = $targetDate->copy()->startOfMonth();
-    // --- КОНЕЦ ОПРЕДЕЛЕНИЯ МЕСЯЦА ---
 
     // --- ФИЛЬТРАЦИЯ ЗАКАЗОВ ЗА ВЫБРАННЫЙ МЕСЯЦ ---
     // Временно добавляем фильтр по диапазону дат для получения заказов за конкретный месяц

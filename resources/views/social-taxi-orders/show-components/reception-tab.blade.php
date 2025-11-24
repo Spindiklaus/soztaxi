@@ -80,37 +80,36 @@
                             class="flex items-center justify-between w-full text-left">
                         <h2 class="text-lg font-semibold text-gray-800">
                             @if($order->zena_type == 1)
-                            <span>Поездка в одну сторону:</span>
+                                <span>Поездка в одну сторону:</span>
                             @elseif($order->zena_type == 2)
-                            <span>Поездка в ОБЕ стороны:</span>
+                                <span>Поездка в ОБЕ стороны:</span>
                             @endif    
                             <span class="inline-flex items-center ml-2">
                                 @if($order->visit_data)
-                                <span class="inline-flex items-center px-2 py-1 rounded-l text-sm font-medium bg-blue-100 text-blue-800">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                    </svg>
-                                    {{ $order->visit_data->format('d.m.Y') }}
-                                </span>
-                                <span class="inline-flex items-center px-2 py-1 rounded-r text-sm font-medium bg-blue-50 text-blue-700 border-l border-blue-200">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    {{ $order->visit_data->format('H:i') }}
-                                </span>
-                                @if($order->zena_type == 2 && $order->visit_obratno)
-                                -
-                                <span class="inline-flex items-center px-2 py-1 rounded-r text-sm font-medium bg-green-50 text-green-700 border-l border-green-200">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    {{ $order->visit_obratno->format('H:i') }}
-                                </span>
-                                @endif
+                                    <span class="inline-flex items-center px-2 py-1 rounded-l text-sm font-medium bg-blue-100 text-blue-800">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                        {{ $order->visit_data->format('d.m.Y') }}
+                                    </span>
+                                    <span class="inline-flex items-center px-2 py-1 rounded-r text-sm font-medium bg-blue-50 text-blue-700 border-l border-blue-200">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        {{ $order->visit_data->format('H:i') }}
+                                    </span>
+                                    @if($order->zena_type == 2 && $order->visit_obratno)
+                                        <span class="inline-flex items-center px-2 py-1 rounded-r text-sm font-medium bg-green-50 text-green-700 border-l border-green-200">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            {{ $order->visit_obratno->format('H:i') }}
+                                        </span>
+                                    @endif
                                 @else
-                                <span class="inline-flex items-center px-2 py-1 rounded text-sm font-medium bg-gray-100 text-gray-800">
-                                    Не указана
-                                </span>
+                                    <span class="inline-flex items-center px-2 py-1 rounded text-sm font-medium bg-gray-100 text-gray-800">
+                                        Не указана
+                                    </span>
                                 @endif
                             </span>    
                         </h2>
@@ -126,18 +125,30 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Откуда ехать</label>
-                            <div class="mt-1 bg-gray-100 p-2 rounded-md">{{ $order->adres_otkuda ?? 'Не указано' }}</div>
+                            <div class="bg-gray-100 p-2 rounded-md">
+                                {{ $order->adres_otkuda ?? 'Не указано' }}
+                                @if($order->adres_otkuda_info)
+                                    <div class="text-xs text-gray-600 mt-1">{{ $order->adres_otkuda_info }}</div>
+                                @endif
+                            </div>
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700">Куда ехать</label>
-                            <div class="mt-1 bg-gray-100 p-2 rounded-md">{{ $order->adres_kuda ?? 'Не указано' }}</div>
+                            <label class="block text-sm font-medium text-gray-700">Откуда ехать</label>
+                            <div class="bg-gray-100 p-2 rounded-md">
+                                {{ $order->adres_kuda ?? 'Не указано' }}
+                                @if($order->adres_kuda_info)
+                                    <div class="text-xs text-gray-600 mt-1">{{ $order->adres_kuda_info }}</div>
+                                @endif
+                            </div>
                         </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Обратный адрес</label>
-                            <div class="mt-1 bg-gray-100 p-2 rounded-md">{{ $order->adres_obratno ?? ' - ' }}</div>
-                        </div>
+                        
+                        @if($order->zena_type == 2)
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Обратный адрес</label>
+                                <div class="bg-gray-100 p-2 rounded-md">{{ $order->adres_obratno ?? ' ' }}</div>
+                            </div>
+                        @endif
                      </div>
 
                 </div>
@@ -162,17 +173,17 @@
                             </span>
 
                             @if($order->category && $order->category->kat_dop)
-                            <span class="text-lg">
-                                <span class="font-medium text-gray-700">категория скидок:</span>
-                                <span class="text-blue-600 font-semibold">{{ $order->category->kat_dop }}</span>
-                            </span>
+                                <span class="text-lg">
+                                    <span class="font-medium text-gray-700">категория скидок:</span>
+                                    <span class="text-blue-600 font-semibold">{{ $order->category->kat_dop }}</span>
+                                </span>
                             @endif
 
                             @if($order->category)
-                            <span class="text-lg">
-                                <span class="font-medium text-gray-700">(NMV:</span>
-                                <span class="text-gray-600 font-semibold">{{ $order->category->nmv }})</span>
-                            </span>
+                                <span class="text-lg">
+                                    <span class="font-medium text-gray-700">(NMV:</span>
+                                    <span class="text-gray-600 font-semibold">{{ $order->category->nmv }})</span>
+                                </span>
                             @endif
                         </h2>
                         <svg id="benefits-arrow" class="h-5 w-5 transform transition-transform text-gray-500 rotate-180" 
@@ -182,7 +193,7 @@
                     </button>
                 </div>
 
-                <!-- Содержимое льгот (скрыто по умолчанию) -->
+                <!-- Содержимое льгот  -->
                 <div id="benefits-content" class="p-2">
                     <!-- Количество поездок клиента -->
                     <div class="bg-gray-50 p-2 rounded-lg mb-2">
@@ -193,6 +204,10 @@
                                 class="ml-2 inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors">
                                 {{ getClientTripsCountInMonthByVisitDate($order->client_id, $order->visit_data) }}
                             </button>
+                             , в т.ч. со 100% скидкой: 
+                            <span class="ml-2 inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors">
+                                &nbsp;{{ getClientPaidTripsCountInMonthByVisitDate($order->client_id, $order->visit_data) }}
+                            </span>
                         </div>
                         <!-- Число поездок переданных в такси -->
                         <div class="flex items-center mt-2">

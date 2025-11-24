@@ -27,6 +27,10 @@
                     class="ml-2 inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors">
                     {{ getClientTripsCountInMonthByVisitDate($client->id, $startDate) }}
                 </button>
+                 , в т.ч. со 100% скидкой: 
+                    <span class="ml-2 inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors">
+                        &nbsp;{{ getClientPaidTripsCountInMonthByVisitDate($client->id,$startDate) }}
+                    </span>
             </div>
             <!-- Число поездок переданных в такси -->
             <div class="flex items-center mt-2">

@@ -54,6 +54,10 @@
                     class="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors">
                      <span class="loading">Загрузка...</span>
                 </button>
+                , в т.ч. со 100% скидкой: 
+                <span class="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors">
+                    &nbsp;{{ getClientPaidTripsCountInMonthByVisitDate($order->client_id, $order->visit_data) }}
+                </span>
             </div>
 
             <div class="flex items-center">
@@ -68,7 +72,7 @@
             </div>
 
             <div class="flex items-center">
-                <span class="text-sm font-medium text-gray-700">Передано в такси:</span>
+                <span class="text-sm font-medium text-gray-700">Переданных в такси:</span>
                 <button 
                     id="client-taxi-sent-trips-button"
                     type="button"
