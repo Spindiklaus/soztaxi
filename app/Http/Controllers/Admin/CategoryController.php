@@ -38,7 +38,7 @@ class CategoryController extends BaseController {
             $direction = 'asc';
         }
 
-        $categories = $query->orderBy($sort, $direction)->paginate(10);
+        $categories = $query->with('user')->orderBy($sort, $direction)->paginate(20);
         
 //        dd($categories);
         

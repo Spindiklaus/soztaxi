@@ -5,14 +5,14 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
             @if(session('import_errors'))
-            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
-                <p class="font-bold">Ошибка при импорте</p>
-                <ul class="list-disc pl-5 mt-2">
-                    @foreach(session('import_errors') as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
+                <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
+                    <p class="font-bold">Ошибка при импорте</p>
+                    <ul class="list-disc pl-5 mt-2">
+                        @foreach(session('import_errors') as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
             @endif
 
             @if(session('success_count'))

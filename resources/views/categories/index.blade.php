@@ -34,63 +34,62 @@
 
             </div>            
             <!-- Форма фильтрации -->
-            <!-- Форма фильтрации -->
-<div class="bg-white shadow rounded-lg p-4 mb-2">
-    <form action="{{ route('categories.index') }}" method="GET" class="space-y-4">
-        <!-- Скрытое поле для сохранения сортировки -->
-        @if(request('sort'))
-            <input type="hidden" name="sort" value="{{ request('sort') }}">
-        @endif
-        @if(request('direction'))
-            <input type="hidden" name="direction" value="{{ request('direction') }}">
-        @endif
-        
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <!-- Поиск по названию -->
-            <div>
-                <label for="filter_name" class="block text-sm font-medium text-gray-700">Название</label>
-                <input type="text" name="name" id="filter_name"
-                       value="{{ request('name') }}"
-                       placeholder="%Поиск по названию%"
-                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+            <div class="bg-white shadow rounded-lg p-4 mb-2">
+                <form action="{{ route('categories.index') }}" method="GET" class="space-y-4">
+                    <!-- Скрытое поле для сохранения сортировки -->
+                    @if(request('sort'))
+                        <input type="hidden" name="sort" value="{{ request('sort') }}">
+                    @endif
+                    @if(request('direction'))
+                        <input type="hidden" name="direction" value="{{ request('direction') }}">
+                    @endif
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- Поиск по названию -->
+                        <div>
+                            <label for="filter_name" class="block text-sm font-medium text-gray-700">Название</label>
+                            <input type="text" name="name" id="filter_name"
+                                   value="{{ request('name') }}"
+                                   placeholder="%Поиск по названию%"
+                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        </div>
+
+                        <!-- Поиск по NMV -->
+                        <div>
+                            <label for="filter_nmv" class="block text-sm font-medium text-gray-700">NMV</label>
+                            <input type="number" name="nmv" id="filter_nmv"
+                                   value="{{ request('nmv') }}"
+                                   placeholder="Фильтр по NMV"
+                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        </div>
+
+                        <!-- Фильтр по скидке -->
+                        <div>
+                            <label for="filter_skidka" class="block text-sm font-medium text-gray-700">Скидка (%)</label>
+                            <select name="skidka" id="filter_skidka"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                <option value="">Все</option>
+                                <option value="0" {{ request('skidka') == '0' ? 'selected' : '' }}>0%</option>
+                                <option value="50" {{ request('skidka') == '50' ? 'selected' : '' }}>50%</option>
+                                <option value="100" {{ request('skidka') == '100' ? 'selected' : '' }}>100%</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Кнопки -->
+                    <div class="flex justify-end space-x-2 pt-2">
+                        <button type="submit"
+                                class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                            Применить фильтр
+                        </button>
+
+                        <a href="{{ route('categories.index', ['sort' => request('sort'), 'direction' => request('direction')]) }}"
+                            class="inline-flex items-center px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400">
+                            Очистить фильтр
+                        </a>
+                    </div>
+                </form>
             </div>
-
-            <!-- Поиск по NMV -->
-            <div>
-                <label for="filter_nmv" class="block text-sm font-medium text-gray-700">NMV</label>
-                <input type="number" name="nmv" id="filter_nmv"
-                       value="{{ request('nmv') }}"
-                       placeholder="Фильтр по NMV"
-                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-            </div>
-
-            <!-- Фильтр по скидке -->
-            <div>
-                <label for="filter_skidka" class="block text-sm font-medium text-gray-700">Скидка (%)</label>
-                <select name="skidka" id="filter_skidka"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                    <option value="">Все</option>
-                    <option value="0" {{ request('skidka') == '0' ? 'selected' : '' }}>0%</option>
-                    <option value="50" {{ request('skidka') == '50' ? 'selected' : '' }}>50%</option>
-                    <option value="100" {{ request('skidka') == '100' ? 'selected' : '' }}>100%</option>
-                </select>
-            </div>
-        </div>
-
-        <!-- Кнопки -->
-        <div class="flex justify-end space-x-2 pt-2">
-            <button type="submit"
-                    class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                Применить фильтр
-            </button>
-
-            <a href="{{ route('categories.index', ['sort' => request('sort'), 'direction' => request('direction')]) }}"
-                class="inline-flex items-center px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400">
-                Очистить фильтр
-            </a>
-        </div>
-    </form>
-</div>
 
             <!-- Таблица -->
 
@@ -181,13 +180,13 @@
                         <!-- Твои строки -->
                         @foreach ($categories as $category)
                         <tr>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $category->nmv }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $category->name }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $category->skidka }}%</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $category->kol_p }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $category->kat_dop }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $category->user?->name ?? '-' }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm space-x-2 flex">
+                            <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-900">{{ $category->nmv }}</td>
+                            <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-900">{{ $category->name }}</td>
+                            <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-900">{{ $category->skidka }}%</td>
+                            <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-900">{{ $category->kol_p }}</td>
+                            <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-900">{{ $category->kat_dop }}</td>
+                            <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-900">{{ $category->user?->name ?? '-' }}</td>
+                            <td class="px-6 py-2 whitespace-nowrap text-right text-sm space-x-2 flex">
                                 <a href="{{ route('categories.show', ['category' => $category, 'sort' => request('sort'), 'direction' => request('direction')]) }}" 
                                    class="inline-flex items-center px-2 py-1 rounded-md text-sm font-medium bg-blue-100 text-blue-800 hover:bg-blue-200"
                                    title="Просмотр">
@@ -225,7 +224,7 @@
                                     </button>
                                 </form>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $category->id }}</td>                                
+                            <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-900">{{ $category->id }}</td>                                
                         </tr>
                         @endforeach
                     </tbody>
