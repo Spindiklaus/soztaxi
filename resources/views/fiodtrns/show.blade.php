@@ -19,14 +19,16 @@
                     <div><strong>Дата рождения:</strong> {{ optional($fiodtrn->data_r)->format('d.m.Y') }}</div>
                     <div><strong>Пол:</strong> {{ $fiodtrn->sex === 'М' ? 'Мужской' : ($fiodtrn->sex === 'Ж' ? 'Женский' : '-') }}</div>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <strong>RIP дата:</strong> {{ optional($fiodtrn->rip_at)->format('d.m.Y') ?: '-' }}
+                @if ($fiodtrn->rip_at)
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <strong>RIP дата:</strong> {{ optional($fiodtrn->rip_at)->format('d.m.Y') ?: '-' }}
+                        </div>
+                        <div>
+                            <strong>Дата и время добавления информации о RIP:</strong> {{ optional($fiodtrn->created_rip)->format('d.m.Y H:i') ?: '-' }}
+                        </div>
                     </div>
-                    <div>
-                        <strong>Дата и время добавления информации о RIP:</strong> {{ optional($fiodtrn->created_rip)->format('d.m.Y H:i') ?: '-' }}
-                    </div>
-                </div>    
+                @endif
                 <div class="mb-8">
                     <strong>Комментарии:</strong> {{ $fiodtrn->komment ?: '-' }}
                 </div>
@@ -36,7 +38,7 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div>
-                        <strong>Дата создания записи:</strong> {{ optional($fiodtrn->created_at)->format('d.m.Y H:i') }}
+                        <strong>Дата создания клиента:</strong> {{ optional($fiodtrn->created_at)->format('d.m.Y H:i') }}
                     </div>
                     <div>
                         <strong>Дата последнего обновления:</strong> {{ optional($fiodtrn->updated_at)->format('d.m.Y H:i') }}

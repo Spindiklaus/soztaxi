@@ -18,10 +18,10 @@ class OrderObserver
      */
     public function created(Order $order): void
     {
-        \Log::info('OrderObserver created called', [
-        'order_id' => $order->id,
-        'trace' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10)
-        ]);
+//        \Log::info('OrderObserver created called', [
+//        'order_id' => $order->id,
+//        'trace' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10)
+//        ]);
         // Статус "принят" имеет ID = 1 (по умолчанию из сидера)
         $this->changeStatus($order, 1); // ID статуса "принят"
         
@@ -77,7 +77,13 @@ class OrderObserver
         
         // Проверяем, изменилось ли поле client_invalid
         if ($order->isDirty('client_invalid')) {
-            $this->syncClientInvalidFromOrder($order);
+            $oldValue = $order->getOriginal('client_invalid');
+            $newValue = $order->client_invalid;
+            
+            // Добавляем проверку: значение действительно изменилось
+            if ($oldValue !== $newValue) {
+                $this->syncClientInvalidFromOrder($order);
+            }
         }
         
     }
@@ -153,7 +159,7 @@ class OrderObserver
         return trim($existingComment . "\n" . $newComment);
     }
     
-    /**
+        /**
      * Синхронизировать client_invalid у клиента и других заказов
      * на основе значения в текущем заказе $order
      */
@@ -162,7 +168,7 @@ class OrderObserver
         $clientId = $order->client_id;
         $newClientInvalidValue = $order->client_invalid; // Новое значение из заказа
 
-        // Проверяем, что заказ привязан к клиенту и новое значение не null
+        // Проверяем, что заказ привязан к клиенту
         if ($clientId && $newClientInvalidValue !== null) {
             // 1. Обновляем поле client_invalid у клиента (fio_dtrns)
             $this->updateClientInvalid($clientId, $newClientInvalidValue, $order);
@@ -191,7 +197,7 @@ class OrderObserver
             $currentDateTime = Carbon::now()->format('d.m.Y H:i');
             $clientComment = ($client->komment ? $client->komment . "\n" : '') .
                              "Замена удостоверения оп. {$currentOperatorName} через заказ №{$sourceOrder->pz_nom}: "
-                             . "с '{$oldClientInvalidValue}' на '{$newClientInvalidValue}' ({$currentDateTime}).";
+                             . ($oldClientInvalidValue != '' ? "с '{$oldClientInvalidValue}'" : ''). " на '{$newClientInvalidValue}' ({$currentDateTime})";
 
             // Обновляем client_invalid и komment у клиента
             $client->update([
@@ -202,23 +208,15 @@ class OrderObserver
     }
 
     /**
-     * Обновить поле client_invalid у других незакрытых, неотмененных заказов клиента
+     * Обновить поле client_invalid у других незакрытых, неотмененных Не переданных в такси заказов клиента
      */
     private function updateOtherOrdersClientInvalid(int $clientId, string $newClientInvalidValue, Order $sourceOrder): void
     {
         $currentOperatorName = Auth::user()?->name ?? 'Неизвестный';
         $currentDateTime = Carbon::now()->format('d.m.Y H:i');
-        $oldClientInvalidValue = $sourceOrder->getOriginal('client_invalid'); // Получаем старое значение из БД для источника
 
-        // Формируем комментарий в зависимости от старого значения
-        if ($oldClientInvalidValue) {
-            // Если старое значение было, указываем его
-            $orderComment = "Удостоверение инвалида изменено оп. {$currentOperatorName} через заказ №{$sourceOrder->pz_nom}: с '{$oldClientInvalidValue}' на '{$newClientInvalidValue}' ({$currentDateTime}).";
-        } else {
-            // Если старого значения не было, не указываем "с ..."
-            $orderComment = "Удостоверение инвалида добавлено оп. {$currentOperatorName} через заказ №{$sourceOrder->pz_nom} на '{$newClientInvalidValue}' ({$currentDateTime}).";
-        }
-        // --- КОНЕЦ НОВОГО ---
+        // Если старого значения не было, не указываем "с ..."
+        $orderComment = "Удостоверение инвалида изменено оп. {$currentOperatorName} через заказ {$sourceOrder->pz_nom} на '{$newClientInvalidValue}' ({$currentDateTime}).";
         // Экранируем строку комментария 
         $escapedOrderComment = addslashes($orderComment);        
 
@@ -230,6 +228,10 @@ class OrderObserver
             ->whereNull('cancelled_at') // Не отмененные
             ->whereNull('deleted_at') // Не удаленные
             ->where('id', '!=', $sourceOrder->id) // Исключаем текущий заказ (источник)
+            ->where(function($q) use ($newClientInvalidValue) {
+                $q->where('client_invalid', '!=', $newClientInvalidValue)
+                 ->orWhereNull('client_invalid');
+            })    
             ->update([
                 'client_invalid' => $newClientInvalidValue,
                 // Безопасное обновление комментария через DB::raw
@@ -246,11 +248,5 @@ class OrderObserver
             // может быть null, если вызвано из консоли или очереди
         ]);
     }
-    
-    
-    
-    
-    
-    
-    
+ 
 }

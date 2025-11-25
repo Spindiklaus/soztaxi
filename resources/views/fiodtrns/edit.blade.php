@@ -21,12 +21,12 @@
                         <input type="text" name="kl_id" id="kl_id" value="{{ old('kl_id', $fiodtrn->kl_id) }}" required
                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500">
                         @error('kl_id')
-                        <span class="text-red-500 text-xs">{{ $message }}</span>
+                            <span class="text-red-500 text-xs">{{ $message }}</span>
                         @enderror
                     </div>
                     <div>
                         <label for="client_invalid" class="block text-sm font-medium text-gray-700">Удостоверение инвалида</label>
-                        <input type="text" name="client_invalid" id="client_invalid" value="{{ old('client_invalid', $fiodtrn->client_invalid) }}" required
+                        <input type="text" name="client_invalid" id="client_invalid" value="{{ old('client_invalid', $fiodtrn->client_invalid) }}"
                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500">
                         @error('client_invalid')
                             <span class="text-red-500 text-xs">{{ $message }}</span>
@@ -39,7 +39,7 @@
                     <input type="text" name="fio" id="fio" value="{{ old('fio', $fiodtrn->fio) }}" required
                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500">
                     @error('fio')
-                    <span class="text-red-500 text-xs">{{ $message }}</span>
+                        <span class="text-red-500 text-xs">{{ $message }}</span>
                     @enderror
                 </div>
 
@@ -51,7 +51,7 @@
                                value="{{ old('data_r', optional($fiodtrn->data_r)->format('Y-m-d')) }}"
                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500">
                         @error('data_r')
-                        <span class="text-red-500 text-xs">{{ $message }}</span>
+                            <span class="text-red-500 text-xs">{{ $message }}</span>
                         @enderror
                     </div>
                     <div>
@@ -63,7 +63,7 @@
                             <option value="Ж" {{ old('sex', $fiodtrn->sex) == 'Ж' ? 'selected' : '' }}>Женский</option>
                         </select>
                         @error('sex')
-                        <span class="text-red-500 text-xs">{{ $message }}</span>
+                            <span class="text-red-500 text-xs">{{ $message }}</span>
                         @enderror
                     </div>
                 </div>
@@ -76,7 +76,7 @@
                                value="{{ old('rip_at', optional($fiodtrn->rip_at)->format('Y-m-d')) }}"
                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500">
                         @error('rip_at')
-                        <span class="text-red-500 text-xs">{{ $message }}</span>
+                            <span class="text-red-500 text-xs">{{ $message }}</span>
                         @enderror
                     </div>
                     <!-- Время и дата события для RIP -->
@@ -86,7 +86,7 @@
                                value="{{ old('created_rip', optional($fiodtrn->created_rip)->format('Y-m-d\TH:i') ) }}"
                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500">
                         @error('created_rip')
-                        <span class="text-red-500 text-xs">{{ $message }}</span>
+                            <span class="text-red-500 text-xs">{{ $message }}</span>
                         @enderror
                     </div>
                     <!-- Оператор, занесший информацию о RIP -->
@@ -95,13 +95,13 @@
                         <select name="user_rip" id="user_rip" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500">
                             <option value="">Не указан</option>
                             @foreach ($users as $user)
-                            <option value="{{ $user->id }}" {{ old('user_rip', $fiodtrn->user_rip) == $user->id ? 'selected' : '' }}>
-                                {{ $user->name }}
-                            </option>
+                                <option value="{{ $user->id }}" {{ old('user_rip', $fiodtrn->user_rip) == $user->id ? 'selected' : '' }}>
+                                    {{ $user->name }}
+                                </option>
                             @endforeach
                         </select>
                         @error('user_rip')
-                        <span class="text-red-500 text-xs">{{ $message }}</span>
+                            <span class="text-red-500 text-xs">{{ $message }}</span>
                         @enderror
                     </div>
                 </div>

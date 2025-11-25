@@ -9,16 +9,16 @@
                 <p class="font-bold">Ошибка при импорте</p>
                 <ul class="list-disc pl-5 mt-2">
                     @foreach(session('import_errors') as $error)
-                    <li>{{ $error }}</li>
+                        <li>{{ $error }}</li>
                     @endforeach
                 </ul>
             </div>
             @endif
 
             @if(session('success_count'))
-            <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4">
-                {{ session('success_count') }} клиент(ов) успешно импортировано.
-            </div>
+                <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4">
+                    {{ session('success_count') }} клиент(ов) успешно импортировано.
+                </div>
             @endif
 
             <!-- Заголовок + кнопка создания -->
@@ -69,9 +69,9 @@
                 <div x-show="open" x-collapse class="mt-2 border border-yellow-200 rounded-b-lg bg-white">
                     <ul class="divide-y divide-gray-200">
                         @foreach($duplicateCounts as $fio => $count)
-                        <li class="p-3 text-sm text-gray-700 hover:bg-gray-50">
-                            <span class="font-medium">{{ $fio }}</span> ({{ $count }} чел.)
-                        </li>
+                            <li class="p-3 text-sm text-gray-700 hover:bg-gray-50">
+                                <span class="font-medium">{{ $fio }}</span> ({{ $count }} чел.)
+                            </li>
                         @endforeach
                     </ul>
                     <!-- Кнопка "Совместить дубликаты" -->
@@ -261,7 +261,7 @@
                             <td class="{{ $fiodtrn->rip_at ? 'px-4 py-2 whitespace-nowrap text-sm bg-gray-500' : 'px-6 py-4 whitespace-nowrap text-sm text-gray-900' }}">
                                 <div>{{ $fiodtrn->fio }}</div>
                                 @if($fiodtrn->komment)
-                                    <div class="text-xs text-gray-600 mt-1">{{ $fiodtrn->komment }}</div>
+                                    <div class="text-xs text-gray-600 mt-1">{{ \Str::limit($fiodtrn->komment, 100) }}</div>
                                 @endif
                             </td>
                             <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{{ $fiodtrn->kl_id }}</td>
