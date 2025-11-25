@@ -120,15 +120,25 @@ class SocialTaxiOrderController extends BaseController {
     public function update(UpdateSocialTaxiOrderRequest $request, Order $social_taxi_order) {
 //        dd(__METHOD__);
         
-        \Log::info('Update params', [
-        'all_request' => $request->all(),
-        'filter_pz_nom' => $request->get('filter_pz_nom'),
-        'filterParams' => $request->only([
-            'sort', 'direction', 'show_deleted', 'filter_type_order', 
-            'status_order_id', 'date_from', 'date_to', 'filter_user_id', 'client_fio', 'filter_pz_nom'
-        ])
-    ]);
-        \Log::info('Predv way from request:', ['predv_way' => $request->input('predv_way')]);
+//        \Log::info('Update params', [
+//        'all_request' => $request->all(),
+//        'filter_pz_nom' => $request->get('filter_pz_nom'),
+//        'filterParams' => $request->only([
+//            'sort', 'direction', 'show_deleted', 'filter_type_order', 
+//            'status_order_id', 'date_from', 'date_to', 'filter_user_id', 'client_fio', 'filter_pz_nom'
+//        ])
+//    ]);
+//        \Log::info('Predv way from request:', ['predv_way' => $request->input('predv_way')]);
+        
+        // Проверка разрешения на редактирование ---
+        $currentUser = auth()->user();
+        $isAdmin = $currentUser->hasRole('admin'); // Предполагаем, что у админа роль 'admin'
+        $isOwner = $social_taxi_order->user_id === $currentUser->id; // Проверяем, создатель ли текущий пользователь
+
+        if (!($isAdmin || $isOwner)) {
+            return back()->with('error', 'У вас нет прав для редактирования этого заказа.');
+        }
+
         
         try {
             $validated = $request->validated();
@@ -170,6 +180,14 @@ class SocialTaxiOrderController extends BaseController {
         if (!$order) {
             return redirect()->back()->with('error', 'Заказ не найден.');
         }
+        
+        // Проверка разрешения на удаление ---
+        $currentUser = auth()->user();
+        $isAdmin = $currentUser->hasRole('admin'); 
+        $isOwner = $order->user_id === $currentUser->id; // Проверяем, создатель ли текущий пользователь
+        if (!($isAdmin || $isOwner)) {
+            return redirect()->back()->with('error', 'У вас нет прав для удаления этого заказа.');
+        }
 
         // Проверяем текущий статус заказа
         $currentStatus = $order->currentStatus;
@@ -179,15 +197,27 @@ class SocialTaxiOrderController extends BaseController {
         if ($statusId != 1) {
             return redirect()->back()->with('error', 'Удаление возможно только для заказов со статусом "Принят". Текущий статус: ' . ($currentStatus->statusOrder->name ?? 'Неизвестный статус'));
         }
+        
+        // Формирование и добавление комментария об удалении ---
+        $currentOperatorName = $currentUser->name ?? 'Неизвестный'; // Имя текущего пользователя
+        $currentOperatorLitera = $currentUser->litera ?? 'Без литеры'; // Литера текущего пользователя
+        $deletionDateTime = now()->format('d.m.Y H:i'); // Текущая дата и время
+        $deletionComment = "Удалён оператором {$currentOperatorName} ({$currentOperatorLitera}) {$deletionDateTime}";
+        // Объединяем новый комментарий с существующим
+        $newComment = $order->komment ? $order->komment . "\n" . $deletionComment : $deletionComment;
 
-        // Принудительно устанавливаем deleted_at
-        $order->deleted_at = now();
-        $order->save();
+        // Принудительно устанавливаем deleted_at и обновляем комментарий
+        $order->update([
+            'deleted_at' => now(),
+            'komment' => $newComment, // <-- Обновляем комментарий
+        ]);
 
+
+        
+//        $fromOperatorPage = session('from_operator_page');
+//        $operatorCurrentType = session('operator_current_type');
+        
         // Определяем маршрут возврата
-        $fromOperatorPage = session('from_operator_page');
-        $operatorCurrentType = session('operator_current_type');
-
         $urlParams = $this->orderService->getUrlParams(); // параметры фильтрации
         $backRoute = $this->getBackRoute($urlParams);
 
@@ -320,11 +350,17 @@ class SocialTaxiOrderController extends BaseController {
 
     // Отменить заказ
     public function cancel(CancelSocialTaxiOrderRequest $request, Order $social_taxi_order) {
-        try {
-          
-            
-            $validated = $request->validated();
 
+        // Проверка разрешения на отмену 
+        $currentUser = auth()->user();
+        $isAdmin = $currentUser->hasRole('admin'); // 
+        $isOwner = $social_taxi_order->user_id === $currentUser->id; // Проверяем, создатель ли текущий пользователь
+        if (!($isAdmin || $isOwner)) {
+            return back()->with('error', 'У вас нет прав для отмены этого заказа.');
+        }
+
+        try {
+            $validated = $request->validated();
             $this->orderService->cancelOrder($social_taxi_order, $validated);
 
             // Определяем маршрут возврата
@@ -332,8 +368,8 @@ class SocialTaxiOrderController extends BaseController {
             $urlParams = $this->orderService->getUrlParams(); // параметры фильтрации
             $backRoute = $this->getBackRoute($urlParams);
             
-            \Log::info('Cancel redirect params', $urlParams);
-            \Log::info('Cancel redirect route', [route('social-taxi-orders.index', $urlParams)]);
+//            \Log::info('Cancel redirect params', $urlParams);
+//            \Log::info('Cancel redirect route', [route('social-taxi-orders.index', $urlParams)]);
             
             return redirect()->to($backRoute)->with('success', 'Заказ №' . $social_taxi_order->pz_nom . ' отменен.');
         } catch (\Exception $e) {

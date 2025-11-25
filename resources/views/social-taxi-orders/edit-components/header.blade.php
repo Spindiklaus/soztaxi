@@ -8,14 +8,14 @@
     </h1>
 
     @php
-    $backToOperator = request('back_to_operator');
-    $operatorType = request('operator_type');
+        $backToOperator = request('back_to_operator');
+        $operatorType = request('operator_type');
 
-    if ($backToOperator && $operatorType) {
-    $backRoute = route($backToOperator, array_merge(['type_order' => $operatorType], $backUrlParams ?? []));
-    } else {
-    $backRoute = route('social-taxi-orders.index', $backUrlParams ?? []);
-    }
+        if ($backToOperator && $operatorType) {
+            $backRoute = route($backToOperator, array_merge(['type_order' => $operatorType], $backUrlParams ?? []));
+        } else {
+            $backRoute = route('social-taxi-orders.index', $backUrlParams ?? []);
+        }
     @endphp
 
     <a href="{{ $backRoute }}" 
