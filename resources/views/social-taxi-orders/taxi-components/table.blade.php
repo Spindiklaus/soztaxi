@@ -129,29 +129,24 @@
                                     RIP: {{ $order->client->rip_at->format('d.m.Y') }}
                                 </span>
                             @endif
-                            @if($order->client->rip_at)
-                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-800 text-white mt-1">
-                                    RIP: {{ $order->client->rip_at->format('d.m.Y') }}
-                                </span>
-                            @endif
                         @else
                             <div class="text-sm text-gray-500">Клиент не найден</div>
                         @endif
                     </td>
                     <td class="px-3 py-2">
                         @if($order->skidka_dop_all !== null)
-                        <div class="text-sm text-gray-900">
-                            Скидка: <span class="font-medium">{{ $order->skidka_dop_all }}%</span>
-                        </div>
+                            <div class="text-sm text-gray-900">
+                                Скидка: <span class="font-medium">{{ $order->skidka_dop_all }}%</span>
+                            </div>
                         @else
-                        <div class="text-sm text-gray-500">Скидка: -</div>
+                            <div class="text-sm text-gray-500">Скидка: -</div>
                         @endif
                         @if($order->kol_p_limit !== null)
-                        <div class="text-sm text-gray-900 mt-1">
-                            Лимит: <span class="font-medium">{{ $order->kol_p_limit }} поездок/мес</span>
-                        </div>
+                            <div class="text-sm text-gray-900 mt-1">
+                                Лимит: <span class="font-medium">{{ $order->kol_p_limit }} поездок/мес</span>
+                            </div>
                         @else
-                        <div class="text-sm text-gray-500 mt-1">Лимит: -</div>
+                            <div class="text-sm text-gray-500 mt-1">Лимит: -</div>
                         @endif
                     </td>
                     <td class="px-3 py-2">

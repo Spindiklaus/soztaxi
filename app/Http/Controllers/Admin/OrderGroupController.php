@@ -60,15 +60,17 @@ class OrderGroupController extends BaseController //
         
         // Добавляем withCount для подсчета всех заказов и принятых заказов ---
         $orderGroups = $query
-            ->withCount(['orders', 'orders as accepted_orders_count' => function ($q) {
-                $q->whereHas('currentStatus', function ($subQ) {
-                    $subQ->where('status_order_id', 1); // Только принятые заказы
-                });
-            }])
-            ->paginate(20)
-            ->appends($request->all());
+                ->withCount(['orders' => function ($q) {
+                        $q->whereNull('cancelled_at'); // <--- Исключаем отменённые заказы
+                    }, 'orders as accepted_orders_count' => function ($q) {
+                        $q->whereNull('cancelled_at') // <--- Исключаем отменённые заказы
+                        ->whereHas('currentStatus', function ($subQ) {
+                            $subQ->where('status_order_id', 1); // Только принятые заказы
+                        });
+                    }])
+                ->paginate(20)
+                ->appends($request->all());
 //        dd($orderGroups);    
-            
         // appends($request->all()) сохраняет все параметры запроса (фильтры, сортировку) в ссылках пагинации
 
         // Собираем параметры для передачи в шаблон ---
