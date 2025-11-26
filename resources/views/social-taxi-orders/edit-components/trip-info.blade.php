@@ -263,15 +263,5 @@
             </div>
         @endif
     </div>
-    <!-- Комментарий -->
-    <div>
-        <label for="komment" class="block text-sm font-medium text-gray-700">Комментарий</label>
-        <textarea name="komment" id="komment" 
-                  rows="3" 
-                  placeholder="Введите комментарий к заказу"
-                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('komment', $order->komment ?? '') }}</textarea>
-        @error('komment')
-            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-        @enderror
-    </div>
+    
 </div>

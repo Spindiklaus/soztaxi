@@ -1,4 +1,4 @@
-<!-- Льготы по поездке -->
+<!-- Дополнительные льготы по поездке -->
 <!-- resources/views/social-taxi-orders/edit-components/benefits.blade.php -->
 <div class="bg-gray-50 p-4 rounded-lg mb-6">
     <h2 class="text-lg font-semibold text-gray-800 mb-4">Дополнительные льготы по поездке</h2>
@@ -24,7 +24,7 @@
             @enderror
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-2">
             <div>
                 <label for="skidka_dop_all" class="block text-sm font-medium text-gray-700">Окончательная скидка инвалиду, %</label>
                 <input type="number" name="skidka_dop_all" id="skidka_dop_all" 
@@ -50,6 +50,17 @@
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
             </div>
-        </div>    
+        </div>
+        <!-- Комментарий к заказу -->
+        <div class="mt-8">
+            <label for="komment" class="block text-sm font-medium text-gray-700">Комментарий к заказу</label>
+            <textarea name="komment" id="komment" readonly
+                      rows="3" 
+                      placeholder=""
+                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 focus:border-blue-500 focus:ring-blue-500">{{ old('komment', $order->komment ?? '') }}</textarea>
+            @error('komment')
+                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+            @enderror
+        </div>
     </div>
 </div>

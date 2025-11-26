@@ -282,7 +282,7 @@ class SocialTaxiOrderController extends BaseController {
                 $data = array_merge($data, $copiedOrderData);
             }
         }
-
+        
         return view('social-taxi-orders.create-by-type', array_merge($data, ['backUrlParams' => $backUrlParams]));
     }
 

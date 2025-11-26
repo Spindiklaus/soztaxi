@@ -228,6 +228,7 @@
         @endif
     </div>
     <!-- Комментарий, убрал по требрванию операторов -->
+    <input type="hidden" name="komment" value="{{ old('komment', $autoComment ?? $copiedOrder->komment ?? '') }}">
 <!--    <div class="mt-4">
         <label for="komment" class=" block text-sm font-medium text-gray-700">Комментарий</label>
         <textarea name="komment" id="komment" 
