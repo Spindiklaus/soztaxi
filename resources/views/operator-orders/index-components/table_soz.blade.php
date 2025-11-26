@@ -62,7 +62,7 @@
                 @forelse ($orders as $order)
                     <tr class="border-b border-gray-400 @if($order->deleted_at) bg-red-50 @endif hover:bg-gray-50">
 
-                    <td class="px-4 py-0 w-[180px]">
+                    <td class="px-4 py-0 w-[180px] min-w-[150px]">
                         @php
                             $status = $order->currentStatus->statusOrder;
                             $colorClass = !empty($status->color) ? $status->color : 'bg-gray-100 text-gray-800';
