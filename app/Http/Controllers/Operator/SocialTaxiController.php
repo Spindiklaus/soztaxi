@@ -229,10 +229,7 @@ public function copyOrder(Request $request)
        
         $newOrderData['pz_nom'] = generateOrderNumber($originalOrder->type_order, auth()->id());
         $newOrderData['pz_data'] = now(); 
-        
-        
-        
-        
+         
         // Проверка лимита поездок клиента в месяц из оригинального заказа ---
         $limit = $originalOrder->kol_p_limit; // Берём лимит из оригинального заказа
         $existingTripsCountForMonth = getClientTripsCountInMonthByVisitDate($originalOrder->client_id, $newVisitDateTime);
@@ -242,7 +239,7 @@ public function copyOrder(Request $request)
             return response()->json(['success' => false, 'message' => "Невозможно создать заказ: достигнут лимит поездок для клиента ({$limit})."], 422);
         }
         
-         // --- ПРОВЕРКА: Только для категорий с kat_dop = 2 и общей скидкой 100%---
+        // --- ПРОВЕРКА: Только для категорий с kat_dop = 2 и общей скидкой 100%---
         $category = $originalOrder->category;
         $message = null; 
         if ($category && $category->kat_dop == 2 &&  $originalOrder->skidka_dop_all==100) {
@@ -261,9 +258,6 @@ public function copyOrder(Request $request)
             }
         }
         // --- КОНЕЦ ПРОВЕРКИ ---
-
-        
-        
 
         // Проверка, отличается ли новая дата/время от оригинальной более чем на 30 минут ---
         if ($originalOrder->visit_data) {
@@ -301,13 +295,11 @@ public function copyOrder(Request $request)
         // Создаем новый заказ
         $newOrder = Order::create($newOrderData);
 
-        // Возвращаем успешный ответ (с сообщением, если оно было)
-        $response = ['success' => true, 'message' => 'Заказ успешно создан.', 'order_id' => $newOrder->id];
         if ($message) {
-            $response['message'] = $message;
+            return response()->json(['success' => true, 'message' => $message, 'order_id' => $newOrder->id]); // Возвращаем сообщение, если оно есть
+        } else {
+            return response()->json(['success' => true, 'order_id' => $newOrder->id]); // Возвращаем просто success и ID, если сообщения нет
         }
-
-        return response()->json($response);
 
     } catch (\Exception $e) {
         \Log::error('Ошибка при копировании заказа: ' . $e->getMessage());

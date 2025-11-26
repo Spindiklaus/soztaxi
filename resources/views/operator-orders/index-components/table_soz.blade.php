@@ -23,7 +23,7 @@
         Текущая сортировка: <strong x-text="`Поле: ${sortField}, Направление: ${sortDirection}`"></strong>
     </div>  -->
     <div class="overflow-auto max-h-[70vh]">
-        <table class="min-w-full divide-y divide-gray-200">
+        <table class="min-w-full divide-y divide-gray-200 table-fixed">
             <thead class="{{ $theadColor }} text-gray-200 sticky top-0 z-10 shadow-lg">
                 <tr>
                     <th @click="sortBy('pz_data')" scope="col" class="px-3 py-2 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:{{ $hoverColor }} ">
@@ -62,29 +62,28 @@
                 @forelse ($orders as $order)
                     <tr class="border-b border-gray-400 @if($order->deleted_at) bg-red-50 @endif hover:bg-gray-50">
 
-                    <td class="px-1 py-2">
+                    <td class="px-4 py-0 w-[180px]">
                         @php
                             $status = $order->currentStatus->statusOrder;
                             $colorClass = !empty($status->color) ? $status->color : 'bg-gray-100 text-gray-800';
                         @endphp
                         @if($order->deleted_at)
                             <div class="text-sm text-red-500" title="{{ $status->name }}">
-                                <span class="font-bold">{{ $order->pz_nom }}</span> от {{ $order->pz_data->format('d.m.y') }}
+                                <span class="font-bold">{{ $order->pz_nom }}</span> от {{ $order->pz_data->format('d.m.Y') }}
                             </div>
                             <div class="text-xs text-red-600 mt-1">
                                 Удален: {{ $order->deleted_at->format('d.m.Y H:i') }}
                             </div>
                         @else <!-- не удален -->
-                            <div class="text-sm text-gray-500 {{ $colorClass }}" title="{{ $status->name }}">
-                                {{ $order->pz_nom }} от {{ $order->pz_data->format('d.m.y') }}
+                            <div class="text-sm text-gray-500 text-center {{ $colorClass }}" title="{{ $status->name }}">
+                                {{ $order->pz_nom }} от {{ $order->pz_data->format('d.m.Y') }}
                             </div>
                         @endif
                     </td>
-                    <td class="px-1 py-2">
+                    <td class="px-1 py-0">
                         @if($order->visit_data)
                             <div class="text-lg font-medium text-gray-900">
-                                {{ $order->visit_data->format('d.m.y') }}
-                                {{ $order->visit_data->format('H:i') }}
+                                {{ $order->visit_data->format('d.m.Y') }}&nbsp;{{ $order->visit_data->format('H:i') }}
                             </div>
                             @if($order->visit_obratno)
                                 <div class="text-sm font-medium text-gray-600 mt-1">
@@ -103,31 +102,32 @@
                             <!-- Конец добавления группы -->
                         @endif
                     </td>
-                    <td class="px-1 py-2"><!-- откуда -->
+                    <td class="px-1 py-0 max-w-[200px]"><!-- откуда -->
                         <div class="text-lg text-gray-900">
                             {{ $order->adres_otkuda }}
+                            <!-- Дополнительная информация об адресе "откуда" -->
+                            @if($order->adres_otkuda_info)
+                                <span class="text-sm text-gray-500 mt-1 ml-4">
+                                    {{ $order->adres_otkuda_info }}
+                                </span>
+                            @endif
                         </div>
-                        <!-- Дополнительная информация об адресе "откуда" -->
-                        @if($order->adres_otkuda_info)
-                            <div class="text-sm text-gray-500 mt-1 ml-4">
-                                {{ $order->adres_otkuda_info }}
-                            </div>
-                        @endif
                     </td>
-                    <td class="px-1 py-2"> <!-- куда -->
+                    <td class="px-1 py-0 max-w-[200px]"> <!-- куда -->
                         <div class="text-lg text-gray-900 mt-1"
                              title ="Предварительная дальность {{ $order->predv_way }}км."
                              >
                             {{ $order->adres_kuda }}
+                            <!-- Дополнительная информация об адресе "куда" -->
+                            @if($order->adres_kuda_info)
+                                <span class="text-sm text-gray-500 mt-1 ml-4">
+                                    {{ $order->adres_kuda_info }}
+                                </span>
+                            @endif
                         </div>
-                        <!-- Дополнительная информация об адресе "куда" -->
-                        @if($order->adres_kuda_info)
-                            <div class="text-sm text-gray-500 mt-1 ml-4">
-                                {{ $order->adres_kuda_info }}
-                            </div>
-                        @endif
+
                     </td>
-                    <td class="px-1 py-2"> <!-- клиент -->
+                    <td class="px-1 py-0 max-w-[100px]"> <!-- клиент -->
                         @if($order->client)
                            <a href="{{ route('operator.social-taxi.calendar.client', ['client' => $order->client_id, 'date' => $order->visit_data->format('Y-m-d')] + $urlParams) }}" class="text-sm font-medium text-blue-600 hover:text-blue-900 hover:underline"
                                 title="{{ $order->client_tel ? 'Тел: ' . $order->client_tel . "\n" : '' }}{{ $order->client_invalid ? 'Удостоверение: ' . $order->client_invalid . "\n" : '' }}{{ $order->client_sopr ? 'Сопровождающий: ' . $order->client_sopr . "\n" : '' }}{{ $order->category ? 'NMV: ' . $order->category->nmv . "\nКатегория: " . $order->category->name . "\nСкидка: " . $order->category->skidka . "%\nЛимит: " . $order->category->kol_p . " поездок/мес\n" : '' }}{{ $order->dopus ? $order->dopus->name : '' }}"
@@ -186,7 +186,7 @@
                     </td>-->
 
 
-                    <td class="px-1 py-2"> <!-- действия оператора -->
+                    <td class="px-1 py-0"> <!-- действия оператора -->
                         <div class="flex flex-nowrap gap-1">
                             <!-- Ссылка на просмотр заказа -->
                              @php

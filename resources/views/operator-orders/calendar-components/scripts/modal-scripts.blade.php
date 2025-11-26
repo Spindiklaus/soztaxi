@@ -1,25 +1,26 @@
 <!-- /resuces/views/operator-orders/calendar-components/scripts/modal-scripts.blade.php
 <!-- JavaScript для переключения блоков информации и модального окна -->
     <script>
-        function openCopyModal(orderId, visitDateTime, adresOtkuda, adresKuda) {
-            // Заполняем форму данными из заказа
-            document.getElementById('copy-order-id').value = orderId;
-            // Форматируем дату для datetime-local (YYYY-MM-DDTHH:mm)
-            const formattedDateTime = visitDateTime.replace(' ', 'T');
-            document.getElementById('copy-visit-date-time').value = formattedDateTime;
-            
-            // Обновляем текст в опциях направления ---
-            const directionSelect = document.getElementById('copy-direction');
-            // Обновляем текст для option с value="1" (Туда)
-            directionSelect.querySelector('option[value="1"]').textContent = `Туда: (${adresOtkuda} -> ${adresKuda})`;
-            // Обновляем текст для option с value="2" (Обратно)
-            directionSelect.querySelector('option[value="2"]').textContent = `Обратно: (${adresKuda} -> ${adresOtkuda})`;
-            // Устанавливаем значение по умолчанию (например, '1')
-            directionSelect.value = '1';
+    function openCopyModal(orderId, visitDateTime, adresOtkuda, adresKuda) {
+    // Заполняем форму данными из заказа
+    document.getElementById('copy-order-id').value = orderId;
+    // Форматируем дату для datetime-local (YYYY-MM-DDTHH:mm)
+    const formattedDateTime = visitDateTime.replace(' ', 'T');
+    document.getElementById('copy-visit-date-time').value = formattedDateTime;
 
-            // Показываем модальное окно
-            document.getElementById('copy-order-modal').classList.remove('hidden');
-        }
+    // --- НОВОЕ: Обновление текста в переключателях направления ---
+    const labelDirTuda = document.getElementById('label-dir-tuda');
+    const labelDirObratno = document.getElementById('label-dir-obratno');
+
+    if (labelDirTuda && labelDirObratno) {
+        labelDirTuda.textContent = `Туда: (${adresOtkuda} -> ${adresKuda})`;
+        labelDirObratno.textContent = `Обратно: (${adresKuda} -> ${adresOtkuda})`;
+    }
+    // --- КОНЕЦ НОВОГО ---
+
+    // Показываем модальное окно
+    document.getElementById('copy-order-modal').classList.remove('hidden');
+}
 
         function closeCopyModal() {
             // Сбрасываем форму
@@ -54,8 +55,8 @@
                         alert(data.message); // <--- Вот тут будет "Скидка изменена с 100% на 50% для категории 2"
                     }
                     closeCopyModal();
-                    // Здесь можно обновить календарь, если нужно
-                    window.location.reload(); // Простой способ, но не самый эффективный
+                    // Обновляем календарь
+                    window.location.reload(); // 
                 } else {
                     alert('Ошибка: ' + (data.message || 'Неизвестная ошибка'));
                 }
