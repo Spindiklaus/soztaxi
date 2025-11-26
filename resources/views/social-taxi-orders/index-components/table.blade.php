@@ -200,7 +200,7 @@
                                 </div>
                             @endif
                         </td>
-                        <td class="px-4 py-2">
+                        <td class="px-4 py-2"> <!-- действия оператора -->
                             <div class="flex flex-wrap gap-1">
                                 <!-- Ссылка на просмотр заказа -->
                                 <a href="{{ route('social-taxi-orders.show', array_merge(['social_taxi_order' => $order], $urlParams)) }}" 
@@ -292,7 +292,17 @@
                                         </svg>
                                     </button>
                                 @endif
-
+                                
+                                <!-- Кнопка "Вернуть из такси" (только для администраторов и только если заказ передан в такси) --- -->
+                                @if(auth()->user()->hasRole('admin') && !$order->deleted_at && !$order->cancelled_at && $order->taxi_sent_at && !$order->closed_at)
+                                    <a href="{{ route('social-taxi-orders.return-from-taxi.form', array_merge(['social_taxi_order' => $order], $urlParams)) }}" title="Вернуть заказ из такси"
+                                       class="inline-flex items-center px-3 py-1 bg-yellow-100 text-yellow-800 rounded-md hover:bg-yellow-200 text-sm">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                        </svg>
+                                    </a>
+                                @endif
+            
                             </div>
                         </td>
                     </tr>

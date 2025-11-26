@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests\UpdateSocialTaxiOrderRequest;
 use App\Http\Requests\CancelSocialTaxiOrderRequest;
 use App\Http\Requests\StoreSocialTaxiOrderByTypeRequest;
+use App\Http\Requests\ReturnFromTaxiRequest;
 use App\Services\SocialTaxiOrderService;
 use App\Services\SocialTaxiOrderBuilder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -307,6 +308,77 @@ class SocialTaxiOrderController extends BaseController {
                             ->withInput();
         }
     }
+    
+     /**
+     * Показать форму возврата заказа из такси
+     */
+    public function showReturnFromTaxiForm(Order $social_taxi_order) // Model Binding
+    {
+        // Проверяем, что заказ не удален
+        if ($social_taxi_order->deleted_at) {
+            return redirect()->route('social-taxi-orders.show', $social_taxi_order)
+                            ->with('error', 'Невозможно вернуть удаленный заказ из такси.');
+        }
+
+        // Проверяем, что заказ *не* отменён (или, возможно, что статус - "передан в такси")
+        if ($social_taxi_order->cancelled_at) {
+            return redirect()->route('social-taxi-orders.show', $social_taxi_order)
+                            ->with('error', 'Невозможно вернуть заказ, который уже отменён.');
+        }
+
+        // Проверяем, что заказ *уже* передан в такси (предположим, что taxi_sent_at не null)
+        if (!$social_taxi_order->taxi_sent_at) {
+             return redirect()->route('social-taxi-orders.show', $social_taxi_order)
+                            ->with('error', 'Возврат возможен только для заказов, которые уже переданы в такси.');
+        }
+
+        // Проверяем, что заказ *не* закрыт
+        if ($social_taxi_order->closed_at) {
+             return redirect()->route('social-taxi-orders.show', $social_taxi_order)
+                            ->with('error', 'Невозможно вернуть закрытый заказ из такси.');
+        }
+
+        // Получаем параметры запроса для сохранения фильтров
+        $urlParams = $this->orderService->getUrlParams();
+        return view('social-taxi-orders.return-from-taxi', compact('social_taxi_order', 'urlParams'));
+    }
+
+    /**
+     * Вернуть заказ из такси
+     */
+    public function returnFromTaxi(ReturnFromTaxiRequest $request, Order $social_taxi_order) // Используем новый Request
+    {
+        try {
+            $validated = $request->validated();
+
+            // Убираем дату отправки в такси
+            $social_taxi_order->update([
+                'taxi_sent_at' => null,
+                // Опционально: можно сбросить ID такси
+                // 'taxi_id' => null,
+                // Добавляем комментарий о возврате
+                'komment' => ($social_taxi_order->komment ? $social_taxi_order->komment . "\n" : '') .
+                             "Возврат из такси оператором " . auth()->user()->name . " (" . auth()->user()->litera . ") " .
+                             "по причине: " . $validated['reason'] . " " .
+                             "(" . now()->format('d.m.Y H:i').")"
+            ]);
+
+            // Здесь можно добавить логику смены статуса, если нужно вернуть в статус "Принят"
+            // $this->orderService->setStatus($social_taxi_order, 1); // Пример
+
+            // Определяем маршрут возврата
+            $urlParams = $this->orderService->getUrlParams(); // параметры фильтрации
+            $backRoute = $this->getBackRoute($urlParams);
+
+            return redirect()->to($backRoute)->with('success', 'Заказ ' . $social_taxi_order->pz_nom . ' возвращен из такси.');
+
+        } catch (\Exception $e) {
+            $urlParams = $this->orderService->getUrlParams();
+            $backRoute = $this->getBackRoute($urlParams);
+            return redirect()->to($backRoute)->with('error', 'Ошибка при возврате заказа из такси: ' . $e->getMessage());
+        }
+    }
+
 
     // Получить данные клиента по AJAX
     public function getClientData($clientId) {

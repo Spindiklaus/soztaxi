@@ -138,6 +138,12 @@ Route::resource('social-taxi-orders', SocialTaxiOrderController::class)
     // Экспорт в excel
     Route::get('/social-taxi-orders/export', [SocialTaxiOrderExportController::class, 'export'])
     ->name('social-taxi-orders.export');
+    
+     // Маршруты для возврата заказа из такси ---
+    Route::get('/social-taxi-orders/{social_taxi_order}/return-from-taxi', [SocialTaxiOrderController::class, 'showReturnFromTaxiForm'])
+         ->name('social-taxi-orders.return-from-taxi.form');
+    Route::patch('/social-taxi-orders/{social_taxi_order}/return-from-taxi', [SocialTaxiOrderController::class, 'returnFromTaxi'])
+         ->name('social-taxi-orders.return-from-taxi');
 
 });
 
