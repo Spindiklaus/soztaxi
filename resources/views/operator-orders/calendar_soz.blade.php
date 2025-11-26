@@ -29,16 +29,18 @@
         <!-- Календарь -->
     
 
-    <div class="bg-white shadow overflow-hidden sm:rounded-lg p-4">
-        <h3 class="text-xl font-semibold text-gray-700 mb-4 text-center">{{ $currentMonth }}. Календарь заказов соцтакси</h3>
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg p-2">
+        <h3 class="text-xl font-semibold text-gray-700 mb-2 text-center">{{ $currentMonth }}. Календарь заказов соцтакси</h3>
 
-        <div class="grid grid-cols-7 gap-1 mb-2 w-full">
+        <div class="grid grid-cols-7 gap-2 mb-2 w-full">
             @foreach(['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'] as $day)
-                <div class="text-center text-xs font-bold text-gray-500 py-1">{{ $day }}</div>
+                <div class="text-center text-lg-center font-bold text-gray-500 py-1">
+                    {{ $day }}
+                </div>
             @endforeach
         </div>
 
-        <div class="grid grid-cols-7 gap-1 w-full">
+        <div class="grid grid-cols-7 gap-3 w-full">
             @php
                 // Определяем день недели первого дня месяца (1 = Пн, 7 = Вс)
                 $startDayOfWeek = $startDate->dayOfWeekIso;
@@ -61,15 +63,15 @@
                     $tripCountForDay = count($ordersForDay);
                 @endphp
 
-                <div class="h-20 p-1 border border-gray-200 
+                <div class="min-h-24 h-auto p-1 border border-gray-200 
                      @if($isToday) bg-blue-50 @else bg-gray-50 @endif 
                 ">
-                    <div class="text-xs font-medium text-gray-700 mb-1">
+                    <div class="text-lg font-medium text-gray-700 mb-1">
                         <span class="inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-gray-800 bg-white rounded-full shadow-sm border border-gray-300">
                             {{ $currentDate->format('j') }}
                          </span>    
                     </div>
-                    <div class="space-y-1 max-h-14 overflow-y-auto">
+                    <div class="space-y-1">
                         @php
                             // Сортировка заказов по времени поездки ---
                             $sortedOrdersForDay = collect($ordersForDay)->sortBy('visit_data')->values(); // превращает массив $ordersForDay в Laravel-коллекцию.
@@ -78,29 +80,32 @@
                             @php
                                 // Определяем цвет фона для конкретного заказа ---
                                 if ($order->type_order == 1) { // Соцтакси
-                                    $orderBgColor = ($tripCountForDay >= 2) ? 'bg-yellow-100' : 'bg-blue-100';
-                                    $orderTextColor = ($tripCountForDay >= 2) ? 'text-yellow-800' : 'text-blue-800';
+                                    $orderBgColor = ($tripCountForDay >= 2) ? 'bg-blue-100' : 'bg-yellow-100';
+                                    $orderTextColor = ($tripCountForDay >= 2) ? 'text-blue-800' : 'text-yellow-800';
                                 } else { // Газель (2) или Легковое авто (3)
                                     $orderBgColor = 'bg-gray-100';
                                     $orderTextColor = 'text-gray-800';
                                 }
                             @endphp
-                            <div class="text-xs {{ $orderBgColor }} {{ $orderTextColor }} rounded px-1 truncate flex items-center justify-between" 
+                            <div class="text-lg {{ $orderBgColor }} {{ $orderTextColor }} rounded px-1 truncate flex items-center justify-between" 
                                  title="Тип: {{ getOrderTypeName($order->type_order) }}. Откуда: {{ $order->adres_otkuda }}. Куда: {{ $order->adres_kuda }}.
                                     @if($order->zena_type == 2) Обратно: {{ $order->adres_obratno }}.@endif
                                  ">
-                                {{ $order->visit_data->format('H:i') }}
-                                <!-- Кнопка "Копировать" - отображается только для соцтакси -->
+                                
                                 @if($order->type_order == 1)
+                                    {{ $order->visit_data->format('H:i') }}
+                                    <!-- Кнопка "Копировать" - отображается только для соцтакси -->
                                     <button
                                         onclick="openCopyModal({{ $order->id }}, '{{ $order->visit_data->format('Y-m-d H:i') }}', '{{ $order->adres_otkuda }}', '{{ $order->adres_kuda }}' )"
-                                        class="ml-1 text-xs bg-gray-200 text-gray-700 rounded px-1 hover:bg-gray-300"
+                                        class="ml-1 text-lg text-gray-700 rounded px-1 hover:bg-gray-300"
                                         title="Копировать заказ"
                                     >
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                                         </svg>
                                     </button>
+                                @else
+                                    {{ $order->visit_data->format('H:i') }}
                                 @endif
                                 <!-- Кнопка "Редактировать" --- -->
                                     <a href="{{ route('social-taxi-orders.edit', [
@@ -108,10 +113,10 @@
                                         'back_to_operator' => $operatorRoute, // Передаём маршрут оператора
                                         'operator_type' => $operatorCurrentType
                                     ] + $urlParams) }}"
-                                       class="text-xs bg-yellow-200 text-yellow-800 rounded px-1 hover:bg-yellow-300"
+                                       class="text-lg text-yellow-800 rounded px-1 hover:bg-yellow-300"
                                        target ="_blank"
                                        title="Редактировать заказ">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                         </svg>
                                     </a>

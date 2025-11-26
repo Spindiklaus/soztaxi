@@ -281,16 +281,16 @@ public function copyOrder(Request $request)
         }
         
         
-        // Проверка ограничения: не больше 2 поездок в день
-        $existingTripsCount = Order::where('client_id', $originalOrder->client_id)
-            ->whereDate('visit_data', $newVisitDateTime->toDateString()) // Сравниваем только дату
-            ->whereNull('deleted_at') // Исключаем удаленные
-            ->whereNull('cancelled_at') // Исключаем отмененные
-            ->count();
-
-        if ($existingTripsCount >= 2) {
-            return response()->json(['success' => false, 'message' => 'Невозможно создать заказ: клиент уже имеет 2 поездки в этот день.'], 422);
-        }
+//        // Проверка ограничения: не больше 2 поездок в день
+//        $existingTripsCount = Order::where('client_id', $originalOrder->client_id)
+//            ->whereDate('visit_data', $newVisitDateTime->toDateString()) // Сравниваем только дату
+//            ->whereNull('deleted_at') // Исключаем удаленные
+//            ->whereNull('cancelled_at') // Исключаем отмененные
+//            ->count();
+//
+//        if ($existingTripsCount >= 2) {
+//            return response()->json(['success' => false, 'message' => 'Невозможно создать заказ: клиент уже имеет 2 поездки в этот день.'], 422);
+//        }
 
         
         
@@ -301,9 +301,6 @@ public function copyOrder(Request $request)
         // Создаем новый заказ
         $newOrder = Order::create($newOrderData);
 
-        // Здесь можно добавить начальный статус, если это делается автоматически
-        // $this->orderService->addInitialStatus($newOrder); // Пример
-        
         // Возвращаем успешный ответ (с сообщением, если оно было)
         $response = ['success' => true, 'message' => 'Заказ успешно создан.', 'order_id' => $newOrder->id];
         if ($message) {
