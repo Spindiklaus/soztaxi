@@ -57,4 +57,12 @@ class FioDtrn extends Model
     {
         return $this->belongsTo(User::class, 'user_rip');
     }
+    
+    // Вычисляемый атрибут для фамилии ---
+    public function getLastNameAttribute()
+    {
+        $fullName = $this->fio;
+        $parts = explode(' ', trim($fullName)); // Разбиваем по пробелам
+        return $parts[0] ?? $fullName; // Возвращаем первую часть (фамилию) или всё имя, если не разделилось
+    }
 }

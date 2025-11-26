@@ -26,34 +26,34 @@
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="{{ $theadColor }} text-gray-200 sticky top-0 z-10 shadow-lg">
                 <tr>
-                    <th @click="sortBy('pz_data')" scope="col" class="px-4 py-2 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:{{ $hoverColor }} ">
+                    <th @click="sortBy('pz_data')" scope="col" class="px-3 py-2 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:{{ $hoverColor }} ">
                         Заказ
                         <span class="ml-1" x-show="sortField === 'pz_data' && sortDirection === 'asc'">↑</span>
                         <span class="ml-1" x-show="sortField === 'pz_data' && sortDirection === 'desc'">↓</span>
                     </th>
-                    <th @click="sortBy('visit_data')" scope="col" class="px-4 py-2 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:{{ $hoverColor }} ">
-                        Дата и время поездки
+                    <th @click="sortBy('visit_data')" scope="col" class="px-1 py-2 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:{{ $hoverColor }} ">
+                        Дата поездки
                         <span class="ml-1" x-show="sortField === 'visit_data' && sortDirection === 'asc'">↑</span>
                         <span class="ml-1" x-show="sortField === 'visit_data' && sortDirection === 'desc'">↓</span>
                     </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">
+                    <th scope="col" class="px- py-3 text-left text-xs font-bold uppercase tracking-wider">
                         Откуда
                     </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">
+                    <th scope="col" class="px-1 py-3 text-left text-xs font-bold uppercase tracking-wider">
                         Куда
                     </th>
-                    <th @click="sortBy('client_fio')" scope="col" class="px-4 py-2 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:{{ $hoverColor }}">
+                    <th @click="sortBy('client_fio')" scope="col" class="px-1 py-2 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:{{ $hoverColor }}">
                         Клиент
                         <span class="ml-1" x-show="sortField === 'client_fio' && sortDirection === 'asc'">↑</span>
                         <span class="ml-1" x-show="sortField === 'client_fio' && sortDirection === 'desc'">↓</span>
                     </th>
-<!--                    <th scope="col" class="px-4 py-2 text-left text-xs font-bold uppercase tracking-wider">
+<!--                    <th scope="col" class="px-1 py-2 text-left text-xs font-bold uppercase tracking-wider">
                         Скидка и лимит по поездке
                     </th>-->
-<!--                    <th scope="col" class="px-4 py-2 text-left text-xs font-bold uppercase tracking-wider">
+<!--                    <th scope="col" class="px-1 py-2 text-left text-xs font-bold uppercase tracking-wider">
                         Фактические данные
                     </th>-->
-                    <th scope="col" class="px-4 py-2 w-56 min-w-56 text-left text-xs font-bold uppercase tracking-wider">
+                    <th scope="col" class="px-1 py-2 w-56 min-w-56 text-left text-xs font-bold uppercase tracking-wider">
                         Действия оператора
                     </th>
                 </tr>
@@ -62,30 +62,28 @@
                 @forelse ($orders as $order)
                     <tr class="border-b border-gray-400 @if($order->deleted_at) bg-red-50 @endif hover:bg-gray-50">
 
-                    <td class="px-4 py-2">
+                    <td class="px-1 py-2">
                         @php
                             $status = $order->currentStatus->statusOrder;
                             $colorClass = !empty($status->color) ? $status->color : 'bg-gray-100 text-gray-800';
                         @endphp
                         @if($order->deleted_at)
                             <div class="text-sm text-red-500" title="{{ $status->name }}">
-                                <span class="font-bold">{{ $order->pz_nom }}</span> от {{ $order->pz_data->format('d.m.Y H:i') }}
+                                <span class="font-bold">{{ $order->pz_nom }}</span> от {{ $order->pz_data->format('d.m.y') }}
                             </div>
                             <div class="text-xs text-red-600 mt-1">
                                 Удален: {{ $order->deleted_at->format('d.m.Y H:i') }}
                             </div>
                         @else <!-- не удален -->
                             <div class="text-sm text-gray-500 {{ $colorClass }}" title="{{ $status->name }}">
-                                {{ $order->pz_nom }} от {{ $order->pz_data->format('d.m.Y H:i') }}
+                                {{ $order->pz_nom }} от {{ $order->pz_data->format('d.m.y') }}
                             </div>
                         @endif
                     </td>
-                    <td class="px-4 py-2">
+                    <td class="px-1 py-2">
                         @if($order->visit_data)
-                            <div class="text-sm font-medium text-gray-900">
-                                {{ $order->visit_data->format('d.m.Y') }}
-                            </div>
-                            <div class="text-lg text-gray-900">
+                            <div class="text-lg font-medium text-gray-900">
+                                {{ $order->visit_data->format('d.m.y') }}
                                 {{ $order->visit_data->format('H:i') }}
                             </div>
                             @if($order->visit_obratno)
@@ -97,7 +95,7 @@
                             <!-- Добавляем отображение имени группы -->
                             @if($order->orderGroup) {{-- Проверяем, есть ли связанная группа --}}
                                 <div class="mt-1">
-                                    <span class="inline-block px-2 py-1 text-xs font-semibold bg-blue-100 text-blue-800 rounded-full">
+                                    <span class="inline-block px-1 py-1 text-xs font-semibold bg-blue-100 text-blue-800 rounded-full">
                                         {{ $order->orderGroup->name }}
                                     </span>
                                 </div>
@@ -105,39 +103,39 @@
                             <!-- Конец добавления группы -->
                         @endif
                     </td>
-                    <td class="px-4 py-2"><!-- откуда -->
-                        <div class="text-sm text-gray-900">
+                    <td class="px-1 py-2"><!-- откуда -->
+                        <div class="text-lg text-gray-900">
                             {{ $order->adres_otkuda }}
                         </div>
                         <!-- Дополнительная информация об адресе "откуда" -->
                         @if($order->adres_otkuda_info)
-                            <div class="text-xs text-gray-500 mt-1 ml-4">
+                            <div class="text-sm text-gray-500 mt-1 ml-4">
                                 {{ $order->adres_otkuda_info }}
                             </div>
                         @endif
                     </td>
-                    <td class="px-4 py-2"> <!-- куда -->
-                        <div class="text-sm text-gray-900 mt-1"
+                    <td class="px-1 py-2"> <!-- куда -->
+                        <div class="text-lg text-gray-900 mt-1"
                              title ="Предварительная дальность {{ $order->predv_way }}км."
                              >
                             {{ $order->adres_kuda }}
                         </div>
                         <!-- Дополнительная информация об адресе "куда" -->
                         @if($order->adres_kuda_info)
-                            <div class="text-xs text-gray-500 mt-1 ml-4">
+                            <div class="text-sm text-gray-500 mt-1 ml-4">
                                 {{ $order->adres_kuda_info }}
                             </div>
                         @endif
                     </td>
-                    <td class="px-4 py-2"> <!-- клиент -->
+                    <td class="px-1 py-2"> <!-- клиент -->
                         @if($order->client)
                            <a href="{{ route('operator.social-taxi.calendar.client', ['client' => $order->client_id, 'date' => $order->visit_data->format('Y-m-d')] + $urlParams) }}" class="text-sm font-medium text-blue-600 hover:text-blue-900 hover:underline"
                                 title="{{ $order->client_tel ? 'Тел: ' . $order->client_tel . "\n" : '' }}{{ $order->client_invalid ? 'Удостоверение: ' . $order->client_invalid . "\n" : '' }}{{ $order->client_sopr ? 'Сопровождающий: ' . $order->client_sopr . "\n" : '' }}{{ $order->category ? 'NMV: ' . $order->category->nmv . "\nКатегория: " . $order->category->name . "\nСкидка: " . $order->category->skidka . "%\nЛимит: " . $order->category->kol_p . " поездок/мес\n" : '' }}{{ $order->dopus ? $order->dopus->name : '' }}"
                             >
-                                {{ $order->client->fio }}
+                                {{ $order->client->last_name }}
                             </a>
                             @if($order->client->rip_at)
-                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-800 text-white mt-1">
+                                <span class="inline-flex items-center px-1 py-0.5 rounded text-xs font-medium bg-gray-800 text-white mt-1">
                                     RIP: {{ $order->client->rip_at->format('d.m.Y') }}
                                 </span>
                             @endif
@@ -188,8 +186,8 @@
                     </td>-->
 
 
-                    <td class="px-4 py-2">
-                        <div class="flex flex-wrap gap-2">
+                    <td class="px-1 py-2"> <!-- действия оператора -->
+                        <div class="flex flex-nowrap gap-1">
                             <!-- Ссылка на просмотр заказа -->
                              @php
                                 $showRoute = route('social-taxi-orders.show', ['social_taxi_order' => $order] + $urlParams);
@@ -202,7 +200,7 @@
                                 }
                             @endphp
 
-                            <a href="{{ $showRoute }}" class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-md hover:bg-blue-200 text-sm" title="Просмотр заказа">
+                            <a href="{{ $showRoute }}" class="inline-flex items-center px-1 py-1 bg-blue-100 text-blue-800 rounded-md hover:bg-blue-200 text-sm" title="Просмотр заказа">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -315,7 +313,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                        <td colspan="6" class="px-1 py-4 text-center text-gray-500">
                             Заказы не найдены
                         </td>
                     </tr>

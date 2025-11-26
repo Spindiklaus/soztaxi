@@ -40,9 +40,10 @@
                     onclick="toggleFilters()"
                     class="flex items-center justify-between w-full text-left text-sm font-medium text-gray-700 hover:text-gray-900">
                 <div class="flex items-center">
-                    <span>Мои фильтры:</span>
+                    <span>Мои заказы:&nbsp;</span> <span class="{{ $typeColor }}">{{ $typeName }}</span>
                     @if(!empty($activeFilters))
                         <div class="ml-4 flex flex-wrap items-center gap-2">
+                                <span class="text-sm font-medium">Активные фильтры:</span>
                                 @foreach($activeFilters as $filter)
                                     <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                         {{ $filter }}
@@ -136,6 +137,17 @@
                 >
                     Сбросить
                 </a>
+                
+                <a href="{{ route('social-taxi-orders.create.by-type',  array_merge(['type' => request('filter_type_order')], $urlParams)) }}" 
+                   class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                   title ="Добавить заказ "
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    Добавить
+                </a>
+                
             </div>
         </div>
     </div>

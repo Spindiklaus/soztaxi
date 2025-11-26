@@ -1,5 +1,5 @@
 <x-app-layout>
- <div class="max-w-3xl mx-auto px-4 py-6">
+ <div class="max-w-7xl mx-auto px-4 py-2">
     <!-- Кнопка "Назад" -->
     <a href="
        @if($operatorRoute)
@@ -8,7 +8,7 @@
             {{ route('social-taxi-orders.index') . '?' . http_build_query($urlParams) }} 
         @endif
         "
-       class="mb-4 inline-flex items-center px-4 py-1 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 text-sm">
+       class="mb-2 inline-flex items-center px-4 py-1 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 text-sm">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
         </svg>
@@ -150,12 +150,6 @@
             arrow.classList.toggle('rotate-180');
         }
 
-        function toggleTripCounts() {
-            const content = document.getElementById('trip-counts-content');
-            const arrow = document.getElementById('trip-counts-arrow');
-            content.classList.toggle('hidden');
-            arrow.classList.toggle('rotate-180');
-        }
     </script>
         
         

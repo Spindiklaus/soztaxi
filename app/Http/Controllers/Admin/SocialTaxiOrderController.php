@@ -49,7 +49,7 @@ class SocialTaxiOrderController extends BaseController {
         $urlParams = $this->orderService->getUrlParams();
 
         $query = $this->queryBuilder->build($request, $showDeleted == '1');
-        $orders = $query->paginate(30)->appends($request->all());
+        $orders = $query->paginate(50)->appends($request->all());
 
         return view('social-taxi-orders.index', compact(
                         'orders',

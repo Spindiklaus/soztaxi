@@ -1,7 +1,7 @@
 <!-- resources/views/operator-orders/calendar-components/client-info.blade.php -->
 
-<div class="bg-white shadow overflow-hidden sm:rounded-lg mb-6">
-    <div class="bg-gray-50 px-4 py-3 rounded-t-lg">
+<div class="bg-white shadow overflow-hidden sm:rounded-lg mb-2">
+    <div class="bg-gray-50 px-4  rounded-t-lg">
         <button type="button"
                 onclick="toggleClientInfo()"
                 class="flex items-center justify-between w-full text-left">
@@ -16,7 +16,7 @@
     </div>
 
     <div id="client-info-content" class="p-4 hidden">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
                 <label class="block text-sm font-medium text-gray-700">Серия и номер паспорта</label>
                 <div class="mt-1 bg-gray-100 p-2 rounded-md">{{ $client->kl_id ?? 'Не указан' }}</div>
@@ -30,19 +30,14 @@
                 <div class="mt-1 bg-gray-100 p-2 rounded-md">{{ $client->sex ?? 'Не указан' }}</div>
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700">Дата смерти (RIP)</label>
+                <label class="block text-sm font-medium text-gray-700">Категория инвалидности</label>
                 <div class="mt-1 bg-gray-100 p-2 rounded-md">
-                    @if($client->rip_at)
-                        {{ $client->rip_at->format('d.m.Y') }}
-                        (установлено {{ $client->created_rip ? $client->created_rip->format('d.m.Y H:i') : 'неизвестно' }})
+                    @if($lastCategory)
+                        {{ $lastCategory->name }} (NMV: {{ $lastCategory->nmv }})
                     @else
-                        Не установлено
+                        Не указана
                     @endif
                 </div>
-            </div>
-            <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700">Комментарий</label>
-                <div class="mt-1 bg-gray-100 p-2 rounded-md">{{ $client->komment ?? 'Нет' }}</div>
             </div>
         </div>
     </div>

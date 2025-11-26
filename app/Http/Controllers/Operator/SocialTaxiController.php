@@ -50,7 +50,7 @@ class SocialTaxiController extends BaseController
 
         $query = $this->queryBuilder->build($request, $showDeleted == '1');
         
-        $orders = $query->paginate(100)->appends($request->all());
+        $orders = $query->paginate(50)->appends($request->all());
         
         
         // Сохраняем текущий тип заказа в сессии только для операторов
@@ -119,11 +119,18 @@ class SocialTaxiController extends BaseController
         'date_to' => $calendarMonth->copy()->endOfMonth()->format('Y-m-d'),
     ]);
 //    dd($request);
-    // --- КОНЕЦ ФИЛЬТРАЦИИ ---
 
     // Получаем заказы, отфильтрованные по клиенту И по месяцу
     $query = $this->queryBuilder->build($request, $showDeleted == '1');
-    $orders = $query->get(); // <-- Используем get(), получаем коллекцию
+    $orders = $query->with(['client', 'category', 'currentStatus', 'currentStatus.statusOrder']) // <-- Добавлен 'category'
+            ->get(); // <-- Используем get(), получаем коллекцию
+    $lastCategory = null;
+    if ($orders->isNotEmpty()) {
+        // Находим заказ с самой поздней датой поездки (или самой поздней датой создания/обновления, если дата поездки не важна)
+        $latestOrder = $orders->sortByDesc('visit_data')->first(); 
+        $lastCategory = $latestOrder->category; // Получаем связанную категорию
+    }
+    
     
     // Фильтруем коллекцию, удаляя отменённые заказы ---
     $orders = $orders->filter(function ($order) {
@@ -138,13 +145,11 @@ class SocialTaxiController extends BaseController
             $calendarData[$dateKey][] = $order;
         }
     }
-    // --- КОНЕЦ ПОДГОТОВКИ ---
 
     // --- ОПРЕДЕЛЕНИЕ $startDate и $endDate ---
     // Устанавливаем startDate и endDate на начало и конец *вычисленного* месяца
     $startDate = $calendarMonth->copy()->startOfMonth();
     $endDate = $calendarMonth->copy()->endOfMonth();
-    // --- КОНЕЦ ОПРЕДЕЛЕНИЯ ---
 
     // Собираем параметры URL для передачи в шаблон и обратной навигации
     $urlParams = $this->orderService->getUrlParams();
@@ -160,7 +165,8 @@ class SocialTaxiController extends BaseController
         'endDate',
         'operatorRoute',
         'operatorCurrentType',
-        'urlParams'
+        'urlParams',
+        'lastCategory'     
     ));
 }
     

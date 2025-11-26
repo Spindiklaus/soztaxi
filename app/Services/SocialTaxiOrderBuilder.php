@@ -63,6 +63,16 @@ class SocialTaxiOrderBuilder {
 //            'date_to' => $request->input('date_to'),
 //            'all_request' => $request->all()
 //        ]);
+        // Фильтрация по диапазону дат ПОЕЗДКИ
+        $DateFrom = $request->input('date_from');
+        $DateTo = $request->input('date_to');
+
+        if ($DateFrom) {
+            $this->query->whereDate('visit_data', '>=', $DateFrom);
+        }
+        if ($DateTo) {
+            $this->query->whereDate('visit_data', '<=', $DateTo);
+        }
 
         // Фильтрация
         if ($request->filled('filter_pz_nom')) {
@@ -107,17 +117,7 @@ class SocialTaxiOrderBuilder {
         if ($request->filled('filter_client_id')) {
             $this->query->where('client_id', $request->input('filter_client_id'));
         }
-
-        // Фильтрация по диапазону дат ПОЕЗДКИ
-        $DateFrom = $request->input('date_from');
-        $DateTo = $request->input('date_to');
-
-        if ($DateFrom) {
-            $this->query->whereDate('visit_data', '>=', $DateFrom);
-        }
-        if ($DateTo) {
-            $this->query->whereDate('visit_data', '<=', $DateTo);
-        }
+       
 
 
         return $this;
@@ -237,9 +237,12 @@ class SocialTaxiOrderBuilder {
             $this->withTrashed();
         }
 
-        // Последовательно применяем фильтры и сортировку
-        return $this->applyFilters($request)
-               ->applySorting($request);
+        // Применяем фильтры и сортировку
+        $this->applyFilters($request);
+        $this->applySorting($request);
+
+        // ВОЗВРАЩАЕМ $this->query (Eloquent\Builder)
+        return $this->query;
     }
 
 }
