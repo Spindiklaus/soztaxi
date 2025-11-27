@@ -96,10 +96,10 @@
             </div>    
 
             <div class="md:col-span-2">
-                <label for="client_fio" class="block text-sm font-medium text-gray-700">ФИО клиента</label>
+                <label for="client_fio" class="block text-sm font-medium text-gray-700">ФИО клиента (или тел.)</label>
                 <input type="text" name="client_fio" id="client_fio" 
                        value="{{ request('client_fio') }}" 
-                       placeholder="%Поиск по ФИО%"
+                       placeholder="%Поиск по ФИО или тел.%"
                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
             </div>
 

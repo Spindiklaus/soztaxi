@@ -73,12 +73,40 @@ class SocialTaxiOrderBuilder {
         if ($DateTo) {
             $this->query->whereDate('visit_data', '<=', $DateTo);
         }
+        
+        // Фильтрация по диапазону дат поездок
+        $dateFrom = $request->input('date_from', '2025-01-01');
+        $dateTo = $request->input('date_to', date('Y-m-d', strtotime('+6 months')));
+        if ($dateFrom) {
+            $this->query->whereDate('visit_data', '>=', $dateFrom);
+        }
+        if ($dateTo) {
+            $this->query->whereDate('visit_data', '<=', $dateTo);
+        }
+        
+        // Фильтрация по ФИО клиента или телефону
+        if ($request->filled('client_fio')) {
+            $searchTerm = $request->input('client_fio');
+            $this->query->where(function ($q) use ($searchTerm) {
+                // Поиск по ФИО клиента
+                $q->whereHas('client', function ($subQ) use ($searchTerm) {
+                    $subQ->where('fio', 'like', '%' . $searchTerm . '%');
+                })
+                // Или поиск по телефону в заказе
+                ->orWhere('client_tel', 'like', '%' . $searchTerm . '%');
+            });
+        }
+        
+        // Фильтрация по ID клиента
+        if ($request->filled('filter_client_id')) {
+            $this->query->where('client_id', $request->input('filter_client_id'));
+        }        
 
-        // Фильтрация
+        // По номеру заказа
         if ($request->filled('filter_pz_nom')) {
             $this->query->where('pz_nom', 'like', '%' . $request->input('filter_pz_nom') . '%');
         }
-
+        // По типу заказа
         if ($request->filled('filter_type_order')) {
             $this->query->where('type_order', $request->input('filter_type_order'));
         }
@@ -90,33 +118,13 @@ class SocialTaxiOrderBuilder {
             });
         }
 
-        // Фильтрация по диапазону дат поездок
-        $dateFrom = $request->input('date_from', '2025-01-01');
-        $dateTo = $request->input('date_to', date('Y-m-d', strtotime('+6 months')));
-        if ($dateFrom) {
-            $this->query->whereDate('visit_data', '>=', $dateFrom);
-        }
-        if ($dateTo) {
-            $this->query->whereDate('visit_data', '<=', $dateTo);
-        }
-
         // Фильтрация по оператору (user_id)
         if ($request->filled('filter_user_id')) {
             $this->query->where('orders.user_id', $request->input('filter_user_id'));
         }
 
 
-        // Фильтрация по ФИО клиента
-        if ($request->filled('client_fio')) {
-            $this->query->whereHas('client', function ($q) use ($request) {
-                $q->where('fio', 'like', '%' . $request->input('client_fio') . '%');
-            });
-        }
-        
-        // Фильтрация по ID клиента
-        if ($request->filled('filter_client_id')) {
-            $this->query->where('client_id', $request->input('filter_client_id'));
-        }
+
        
 
 

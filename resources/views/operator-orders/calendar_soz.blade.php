@@ -31,7 +31,7 @@
 
     <div class="bg-white shadow overflow-hidden sm:rounded-lg p-2">
         <!-- Добавляем строку с навигацией по месяцам -->
-        <div class="flex items-center justify-between mb-2">
+        <div class="flex items-center justify-between mb-0">
             <a href="{{ route('operator.social-taxi.calendar.client', [
                 'client' => $client,
                 'date' => $prevMonth->format('Y-m-d')
@@ -42,7 +42,11 @@
                 </svg>
                 Предыдущий
             </a>
-             <h3 class="text-xl font-semibold text-gray-700 mb-2 text-center">{{ $currentMonth }}. Календарь заказов соцтакси</h3>
+             <div class="text-sm-center font-semibold text-gray-700 mb-0 text-center">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-lg font-bold bg-blue-100 text-blue-800">
+                        {{ $currentMonth }}
+                    </span>
+             </div>
             <a href="{{ route('operator.social-taxi.calendar.client', [
                 'client' => $client,
                 'date' => $nextMonth->format('Y-m-d')
@@ -55,7 +59,7 @@
             </a>             
         </div>            
 
-        <div class="grid grid-cols-7 gap-2 mb-2 w-full">
+        <div class="grid grid-cols-7 gap-2 mb-0 w-full">
             @foreach(['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'] as $day)
                 <div class="text-center text-lg-center font-bold text-gray-500 py-1">
                     {{ $day }}
@@ -63,7 +67,7 @@
             @endforeach
         </div>
 
-        <div class="grid grid-cols-7 gap-3 w-full">
+        <div class="grid grid-cols-7 gap-2 w-full">
             @php
                 // Определяем день недели первого дня месяца (1 = Пн, 7 = Вс)
                 $startDayOfWeek = $startDate->dayOfWeekIso;
