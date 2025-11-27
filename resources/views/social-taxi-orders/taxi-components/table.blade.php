@@ -51,7 +51,7 @@
             <tbody class="divide-y divide-gray-200">
                 @forelse ($orders as $order)
                 <tr>
-                    <td class="px-3 py-2">
+                    <td class="px-3 py-0">
                         @php
                             $status = $order->currentStatus->statusOrder;
                             $colorClass = !empty($status->color) ? $status->color : 'bg-gray-100 text-gray-800';
@@ -63,7 +63,7 @@
                             {{ $order->pz_nom }} от {{ $order->pz_data->format('d.m.Y H:i') }}
                         </div>
                     </td>
-                    <td class="px-3 py-2">
+                    <td class="px-3 py-0">
                         @if($order->visit_data)
                             <div class="text-sm font-medium text-gray-900">
                                 {{ $order->visit_data->format('d.m.Y') }}
@@ -87,7 +87,7 @@
                             @endif
                         @endif
                     </td>
-                    <td class="px-3 py-2">
+                    <td class="px-3 py-0">
                         <div class="text-sm text-gray-900">
                             <span class="font-medium">Откуда:</span> {{ $order->adres_otkuda }}
                         </div>
@@ -117,7 +117,7 @@
                             </div>
                         @endif
                     </td>
-                    <td class="px-3 py-2">
+                    <td class="px-3 py-0">
                         @if($order->client)
                            <a href="{{ route('operator.social-taxi.calendar.client', ['client' => $order->client_id, 'date' => $order->visit_data->format('Y-m-d')] + $urlParams) }}" class="text-sm font-medium text-blue-600 hover:text-blue-900 hover:underline"
                                 title="{{ $order->client_tel ? 'Тел: ' . $order->client_tel . "\n" : '' }}{{ $order->client_invalid ? 'Удостоверение: ' . $order->client_invalid . "\n" : '' }}{{ $order->client_sopr ? 'Сопровождающий: ' . $order->client_sopr . "\n" : '' }}{{ $order->category ? 'NMV: ' . $order->category->nmv . "\nКатегория: " . $order->category->name . "\nСкидка: " . $order->category->skidka . "%\nЛимит: " . $order->category->kol_p . " поездок/мес\n" : '' }}{{ $order->dopus ? $order->dopus->name : '' }}"
@@ -133,7 +133,7 @@
                             <div class="text-sm text-gray-500">Клиент не найден</div>
                         @endif
                     </td>
-                    <td class="px-3 py-2">
+                    <td class="px-3 py-0">
                         @if($order->skidka_dop_all !== null)
                             <div class="text-sm text-gray-900">
                                 Скидка: <span class="font-medium">{{ $order->skidka_dop_all }}%</span>
@@ -149,7 +149,7 @@
                             <div class="text-sm text-gray-500 mt-1">Лимит: -</div>
                         @endif
                     </td>
-                    <td class="px-3 py-2">
+                    <td class="px-3 py-0">
                         @if($order->taxi_way)
                             <div class="text-sm text-gray-900">
                                 <span class="font-medium">Километраж:</span> {{number_format($order->taxi_way, 3, ',', ' ') . ' км' }}
@@ -173,7 +173,7 @@
                         @endif
                     </td>
 
-                    <td class="px-3 py-2">
+                    <td class="px-3 py-0">
                             <!-- Только кнопка "Просмотр" для страницы такси -->
                             <a href="{{ route('social-taxi-orders.show', array_merge(['social_taxi_order' => $order, 'from_taxi_page' => 1], $urlParams)) }}" 
                                class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-md hover:bg-blue-200 text-sm"

@@ -1,7 +1,7 @@
 <!-- resources/views/social-taxi-orders/taxi_sent.blade.php -->
 <x-app-layout>
     <div class="bg-gray-100 py-6">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-[1536px] mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Заголовок -->
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-3xl font-bold text-gray-800">Переданные заказы в такси&nbsp;</h1>

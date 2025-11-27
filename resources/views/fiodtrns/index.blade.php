@@ -2,7 +2,7 @@
 
 <x-app-layout>
     <div class="bg-gray-100 py-6">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-[1536px] mx-auto px-4 sm:px-6 lg:px-8">
 
             @if(session('import_errors'))
                 <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">

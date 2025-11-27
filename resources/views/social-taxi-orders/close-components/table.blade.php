@@ -61,10 +61,10 @@
                         class="divide-y divide-gray-200"
                     @endif
                 >
-                    <td class="px-6 py-2">
+                    <td class="px-6 py-0">
                         <input type="checkbox" name="order_ids[]" value="{{ $order->id }}" class="order-checkbox rounded">
                     </td>
-                    <td class="px-6 py-2">
+                    <td class="px-6 py-0">
                         @if($order->deleted_at)
                         <div class="text-sm font-medium text-red-600">
                             {{ getOrderTypeName($order->type_order) }}
@@ -101,7 +101,7 @@
                             @endif
                         </div>
                     </td>
-                    <td class="px-6 py-2">
+                    <td class="px-6 py-0">
                         @if($order->visit_data)
                         <div class="text-sm font-medium text-gray-900">
                             {{ $order->visit_data->format('d.m.Y') }}
@@ -119,7 +119,7 @@
                         <div class="text-sm text-gray-500">-</div>
                         @endif
                     </td>
-                    <td class="px-6 py-2">
+                    <td class="px-6 py-0">
                         <div class="text-sm text-gray-900">
                             <span class="font-medium">Откуда:</span> {{ $order->adres_otkuda }}
                         </div>
@@ -132,7 +132,7 @@
                         </div>
                         @endif
                     </td>
-                    <td class="px-6 py-2">
+                    <td class="px-6 py-0">
                         @if($order->client)
                                 <a href="{{ route('operator.social-taxi.calendar.client', ['client' => $order->client_id, 'date' => $order->visit_data->format('Y-m-d')] + $urlParams) }}" class="text-sm font-medium text-blue-600 hover:text-blue-900 hover:underline"
                                     title="{{ $order->client_tel ? 'Тел: ' . $order->client_tel."\n" : '' }}{{ $order->client_invalid ? 'Удостоверение: ' . $order->client_invalid."\n"  : '' }}{{ $order->client_sopr ? 'Сопровождающий: ' . $order->client_sopr . "\n" : '' }}{{ $order->category ? 'NMV: ' . $order->category->nmv . ' Категория: ' . $order->category->name . ' Скидка: ' . $order->category->skidka . ' Лимит: ' . $order->category->kol_p . ' поездок/мес' : '' }}{{ $order->dopus ? $order->dopus->name : '' }}"
@@ -149,7 +149,7 @@
                             <div class="text-sm text-gray-500">Клиент не найден</div>
                         @endif
                     </td>
-                    <td class="px-6 py-2">
+                    <td class="px-6 py-0">
                         @if($order->skidka_dop_all !== null)
                         <div class="text-sm text-gray-900">
                             Скидка: <span class="font-medium">{{ $order->skidka_dop_all }}%</span>
@@ -165,7 +165,7 @@
                         <div class="text-sm text-gray-500 mt-1">Лимит: -</div>
                         @endif
                     </td>
-                    <td class="px-6 py-2">
+                    <td class="px-6 py-0">
                         @if($order->taxi_way)
                             <div class="text-sm text-gray-900">
                                 <span class="font-medium">Километраж:</span> {{number_format($order->taxi_way, 3, ',', ' ') . ' км' }}
@@ -189,8 +189,8 @@
                         @endif
                     </td>
 
-                    <td class="px-6 py-2">
-                        <div class="flex flex-col space-y-1">
+                    <td class="px-6 py-0">
+                        <div class="space-y-1 text-center">
                             <!-- Только кнопка "Просмотр" для страницы закрытия -->
                             <a href="{{ route('social-taxi-orders.show', array_merge(['social_taxi_order' => $order, 'from_close_page' => 1], $urlParams)) }}" 
                                class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-md hover:bg-blue-200 text-sm">
@@ -198,7 +198,6 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                 </svg>
-                                Просмотр
                             </a>
                         </div>
                     </td>
