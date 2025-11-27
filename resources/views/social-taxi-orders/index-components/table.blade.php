@@ -24,7 +24,7 @@
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-blue-800 text-gray-200 sticky top-0 z-10 shadow-lg">
                 <tr>
-                    <th @click="sortBy('pz_data')" scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-blue-700">
+                    <th @click="sortBy('pz_data')" scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-blue-700 w-[180px] ">
                         Заказ и статус
                         <span class="ml-1" x-show="sortField === 'pz_data' && sortDirection === 'asc'">↑</span>
                         <span class="ml-1" x-show="sortField === 'pz_data' && sortDirection === 'desc'">↓</span>
@@ -56,43 +56,31 @@
             <tbody class="divide-y divide-gray-200">
                 @forelse ($orders as $order)
                     <tr @if($order->deleted_at) class="bg-red-50" @endif>
-                        <td class="px-4 py-2">
+                        <td class="px-4 py-0 w-[180px]">
+                            @php
+                                $status = $order->currentStatus->statusOrder;
+                                $colorClass = !empty($status->color) ? $status->color : 'bg-gray-100 text-gray-800';
+                            @endphp
                             @if($order->deleted_at)
                                 <div class="text-sm font-medium text-red-600">
                                     {{ getOrderTypeName($order->type_order) }}
                                 </div>
-                                <div class="text-sm text-red-500">
-                                    <span class="font-bold">{{ $order->pz_nom }}</span> от {{ $order->pz_data->format('d.m.Y H:i') }}
+                                <div class="text-sm text-red-500" title="{{ $status->name }}">
+                                    <span class="font-bold">{{ $order->pz_nom }}</span>&nbsp;от&nbsp;{{ $order->pz_data->format('d.m.Y') }}
                                 </div>
                                 <div class="text-xs text-red-600 mt-1">
                                     Удален: {{ $order->deleted_at->format('d.m.Y H:i') }}
                                 </div>
-
                             @else
                                 <div class="text-sm {{ getOrderTypeColor($order->type_order) }}">
                                     {{ getOrderTypeName($order->type_order) }}
                                 </div>
-                                <div class="text-sm text-gray-500">
-                                    {{ $order->pz_nom }} от {{ $order->pz_data->format('d.m.Y H:i') }}
+                                <div class="text-sm {{ $colorClass }}" title="{{ $status->name }}">
+                                    {{$order->pz_nom}}&nbsp;от&nbsp;{{$order->pz_data->format('d.m.Y')}}
                                 </div>
                             @endif
-                            <div class="mt-2">
-                                @if($order->currentStatus && $order->currentStatus->statusOrder)
-                                    @php
-                                        $status = $order->currentStatus->statusOrder;
-                                        $colorClass = !empty($status->color) ? $status->color : 'bg-gray-100 text-gray-800';
-                                    @endphp
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $colorClass }}">
-                                        {{ $status->name }}
-                                    </span>
-                                @else
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                        Нет статуса
-                                    </span>
-                                @endif
-                            </div>
                         </td>
-                        <td class="px-4 py-2">
+                        <td class="px-4 py-0">
                             @if($order->visit_data)
                                 <div class="text-sm font-medium text-gray-900">
                                     {{ $order->visit_data->format('d.m.Y') }}
@@ -119,7 +107,7 @@
                                 <div class="text-sm text-gray-500">-</div>
                             @endif
                         </td>
-                        <td class="px-4 py-2">
+                        <td class="px-4 py-0">
                             <div class="text-sm text-gray-900">
                                 <span class="font-medium">Откуда:</span> {{ $order->adres_otkuda }}
                             </div>
@@ -144,7 +132,7 @@
                                 </div>
                             @endif
                         </td>
-                        <td class="px-4 py-2">
+                        <td class="px-4 py-0">
                             @if($order->client)
                                <a href="{{ route('operator.social-taxi.calendar.client', ['client' => $order->client_id, 'date' => $order->visit_data->format('Y-m-d')] + $urlParams) }}" class="text-sm font-medium text-blue-600 hover:text-blue-900 hover:underline"
                                     title="{{ $order->client_tel ? 'Тел: ' . $order->client_tel . "\n" : '' }}{{ $order->client_invalid ? 'Удостоверение: ' . $order->client_invalid . "\n" : '' }}{{ $order->client_sopr ? 'Сопровождающий: ' . $order->client_sopr . "\n" : '' }}{{ $order->category ? 'NMV: ' . $order->category->nmv . "\nКатегория: " . $order->category->name . "\nСкидка: " . $order->category->skidka . "%\nЛимит: " . $order->category->kol_p . " поездок/мес\n" : '' }}{{ $order->dopus ? $order->dopus->name : '' }}"
@@ -160,7 +148,7 @@
                                 <div class="text-sm text-gray-500">Клиент не найден</div>
                             @endif
                         </td>
-                        <td class="px-4 py-2">
+                        <td class="px-4 py-0">
                             @if($order->skidka_dop_all !== null)
                                 <div class="text-sm text-gray-900">
                                     Скидка: <span class="font-medium">{{ $order->skidka_dop_all }}%</span>
@@ -177,31 +165,33 @@
                             @endif
                         </td>
 
-                        <td class="px-4 py-2">
+                        <td class="px-4 py-0">
                             @if($order->taxi_way)
                                 <div class="text-sm text-gray-900">
                                     <span class="font-medium">Километраж:</span> {{number_format($order->taxi_way, 3, ',', ' ') . ' км' }}
                                 </div>
                             @endif
                             @if($order->taxi_price)
-                                <div class="text-sm text-gray-900 mt-1">
+                                <div class="text-sm text-gray-900 mt-1"
+                                  title="К оплате: {{ number_format($order->taxi_price - $order->taxi_vozm, 2, ',', ' ') . ' руб.' }}, К возмещению: {{ $order->taxi_vozm ? number_format($order->taxi_vozm, 2, ',', ' ') . ' руб.' : '0' }}"    
+                                >
                                     <span class="font-medium">Цена:</span> {{ number_format($order->taxi_price, 2, ',', ' ') . ' руб.' }}
                                 </div>
                             @endif
-                            @if($order->taxi_price - $order->taxi_vozm<>0)
+<!--                            @if($order->taxi_price - $order->taxi_vozm<>0)
                                 <div class="text-sm text-gray-900 mt-1">
                                     <span class="font-medium">К оплате:</span> 
-                                    {{ number_format($order->taxi_price - $order->taxi_vozm, 2, ',', ' ') . ' руб.' }}
+                                    {{-- number_format($order->taxi_price - $order->taxi_vozm, 2, ',', ' ') . ' руб.' --}}
                                 </div>
                             @endif
                             @if($order->taxi_vozm)
                                 <div class="text-sm text-gray-900 mt-1">
-                                    <span class="font-medium">К возмещению:</span> {{ $order->taxi_vozm ? number_format($order->taxi_vozm, 2, ',', ' ') . ' руб.' : '-' }}
+                                    <span class="font-medium">К возмещению:</span> {{-- $order->taxi_vozm ? number_format($order->taxi_vozm, 2, ',', ' ') . ' руб.' : '-' --}}
                                 </div>
-                            @endif
+                            @endif-->
                         </td>
-                        <td class="px-4 py-2"> <!-- действия оператора -->
-                            <div class="flex flex-wrap gap-1">
+                        <td class="px-4 py-0"> <!-- действия оператора -->
+                            <div class="flex flex-nowrap gap-1">
                                 <!-- Ссылка на просмотр заказа -->
                                 <a href="{{ route('social-taxi-orders.show', array_merge(['social_taxi_order' => $order], $urlParams)) }}" 
                                    class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-md hover:bg-blue-200 text-sm" title="Просмотр заказа">

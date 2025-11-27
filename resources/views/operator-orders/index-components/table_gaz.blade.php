@@ -184,7 +184,7 @@
 
 
                     <td class="px-4 py-2">
-                        <div class="flex flex-wrap gap-2">
+                        <div class="flex flex-nowrap gap-2">
                             <!-- Ссылка на просмотр заказа -->
                             @php
                                 $showRoute = route('social-taxi-orders.show', ['social_taxi_order' => $order] + $urlParams);

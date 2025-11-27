@@ -7,9 +7,9 @@
             <!-- Фильтры -->
             @include('social-taxi-orders.index-components.filters')
             <!-- Пагинация -->
-            <div class="mt-4 mb-2">
-                {{ $orders->appends(request()->all())->links() }}
-            </div>
+<!--            <div class="mt-4 mb-2">
+                {{-- $orders->appends(request()->all())->links() --}}
+            </div>-->
 
             <!-- Таблица с сортировкой -->
             @include('social-taxi-orders.index-components.table')
