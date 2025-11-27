@@ -30,7 +30,30 @@
     
 
     <div class="bg-white shadow overflow-hidden sm:rounded-lg p-2">
-        <h3 class="text-xl font-semibold text-gray-700 mb-2 text-center">{{ $currentMonth }}. Календарь заказов соцтакси</h3>
+        <!-- Добавляем строку с навигацией по месяцам -->
+        <div class="flex items-center justify-between mb-2">
+            <a href="{{ route('operator.social-taxi.calendar.client', [
+                'client' => $client,
+                'date' => $prevMonth->format('Y-m-d')
+            ] + $urlParams) }}"
+               class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-md hover:bg-blue-200 text-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+                Предыдущий
+            </a>
+             <h3 class="text-xl font-semibold text-gray-700 mb-2 text-center">{{ $currentMonth }}. Календарь заказов соцтакси</h3>
+            <a href="{{ route('operator.social-taxi.calendar.client', [
+                'client' => $client,
+                'date' => $nextMonth->format('Y-m-d')
+                ] + $urlParams) }}"
+               class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-md hover:bg-blue-200 text-sm">
+                Следующий
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </a>             
+        </div>            
 
         <div class="grid grid-cols-7 gap-2 mb-2 w-full">
             @foreach(['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'] as $day)
@@ -91,7 +114,7 @@
                                  title="Тип: {{ getOrderTypeName($order->type_order) }}. Откуда: {{ $order->adres_otkuda }}. Куда: {{ $order->adres_kuda }}.
                                     @if($order->zena_type == 2) Обратно: {{ $order->adres_obratno }}.@endif
                                  ">
-                                
+
                                 @if($order->type_order == 1)
                                     {{ $order->visit_data->format('H:i') }}
                                     <!-- Кнопка "Копировать" - отображается только для соцтакси -->

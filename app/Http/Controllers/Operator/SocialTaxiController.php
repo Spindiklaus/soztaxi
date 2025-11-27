@@ -106,6 +106,10 @@ class SocialTaxiController extends BaseController
 
     // Определяем месяц календаря на основе $targetDate
     $calendarMonth = $targetDate->copy()->startOfMonth();
+    
+    // Вычисляем предыдущий и следующий месяц
+    $prevMonth = $calendarMonth->copy()->subMonth();
+    $nextMonth = $calendarMonth->copy()->addMonth();
 
     // --- ФИЛЬТРАЦИЯ ЗАКАЗОВ ЗА ВЫБРАННЫЙ МЕСЯЦ ---
     // Временно добавляем фильтр по диапазону дат для получения заказов за конкретный месяц
@@ -166,7 +170,9 @@ class SocialTaxiController extends BaseController
         'operatorRoute',
         'operatorCurrentType',
         'urlParams',
-        'lastCategory'     
+        'lastCategory',
+        'prevMonth',
+        'nextMonth'     
     ));
 }
     
@@ -285,7 +291,7 @@ public function copyOrder(Request $request)
 //        if ($existingTripsCount >= 2) {
 //            return response()->json(['success' => false, 'message' => 'Невозможно создать заказ: клиент уже имеет 2 поездки в этот день.'], 422);
 //        }
-
+ 
         
         
         $directionText = ($TypeKuda == 2) ? ' (обратный путь)' : '';
