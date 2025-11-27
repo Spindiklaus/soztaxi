@@ -1,5 +1,5 @@
 <!-- resources/views/social-taxi-orders/edit-components/order-info.blade.php -->
-<div class="bg-gray-50 p-4 rounded-lg mb-6">
+<div class="bg-gray-50 p-4 rounded-lg mb-2">
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div>
             <label class="block text-sm font-medium text-gray-700">Номер заказа</label>
@@ -16,7 +16,7 @@
                 {{ $order->pz_data->format('d.m.Y H:i:s') }}
             </div>
             <!-- Скрытое поле для передачи даты в форму -->
-            <input type="hidden" name="pz_data" value="{{ $order->pz_data->format('Y-m-d H:i:s') }}">
+            <input type="hidden" name="pz_data" value="{{ $order->pz_data->format('Y-m-d H:i') }}">
         </div>
 
         <div>

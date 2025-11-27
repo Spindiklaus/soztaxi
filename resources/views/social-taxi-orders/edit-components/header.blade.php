@@ -1,6 +1,6 @@
 <!-- resources/views/social-taxi-orders/edit-components/header.blade.php -->
-<div class="flex justify-between items-center mb-6">
-    <h1 class="text-3xl font-bold text-gray-800">
+<div class="flex justify-between items-center mb-2">
+    <h1 class="text-2xl font-bold text-gray-800">
         Редактирование заказа: 
         <span class="{{ getOrderTypeColor($order->type_order) }} font-medium">
             {{ getOrderTypeName($order->type_order) }}
