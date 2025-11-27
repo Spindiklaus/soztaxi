@@ -121,10 +121,10 @@
                             </div>
                         @endif
                         @if($order->type_order == 1)
-                                <div class="text-sm text-gray-900 mt-1">
-                                    <span class="font-medium">Предв. дальность:</span> {{ $order->predv_way }}км.
-                                </div>
-                            @endif
+                            <div class="text-sm text-gray-900 mt-1">
+                                <span class="font-medium">Предв. дальность:</span> {{ $order->predv_way }}км.
+                            </div>
+                        @endif
                     </td>
                     <td class="px-6 py-2"> <!-- клиент -->
                         @if($order->client)
@@ -248,14 +248,24 @@
                                         </svg>
                                     </button>
                                  @endif
-                                 <!-- Кнопка копирования в actions.blade.php -->
-                                 <a href="{{ route('social-taxi-orders.create.by-type', array_merge(['type' => $order->type_order, 'copy_from' => $order->id], $urlParams)) }}" 
-                                    class="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-md hover:bg-green-200 text-sm"
-                                    title="Копировать">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                                    </svg>
-                                </a>
+                                 @if(!$order->client->rip_at)
+                                    <!-- Кнопка копирования в actions.blade.php -->
+                                    <a href="{{ route('social-taxi-orders.create.by-type', array_merge(['type' => $order->type_order, 'copy_from' => $order->id], $urlParams)) }}" 
+                                       class="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-md hover:bg-green-200 text-sm"
+                                       title="Копировать">
+                                       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                       </svg>
+                                   </a>
+                                @else
+                                    <button
+                                       class="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-md hover:bg-green-200 text-sm"
+                                       title="Копировать невозможно, клиент умер" disabled >
+                                       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                       </svg>
+                                   </button>
+                                @endif
                             @else <!-- заказ удален -->      
                                 <form action="{{ route('social-taxi-orders.restore', array_merge(['social_taxi_order' => $order], $urlParams)) }}" method="POST" class="inline">
                                     @csrf

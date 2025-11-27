@@ -165,10 +165,10 @@
                             <input type="datetime-local" name="cancelled_at" id="cancelled_at" 
                                    value="{{ old('cancelled_at', now()->format('Y-m-d\TH:i')) }}"
                                    max="{{ now()->format('Y-m-d\TH:i') }}" 
-                                   required readonly
+                                   required
                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
                                 @error('cancelled_at')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
                                 <p class="mt-1 text-xs text-gray-500">
                                     Дата отмены должна быть не позже даты и времени поездки
@@ -180,24 +180,24 @@
                 <!-- Кнопки действия -->
                 <div class="flex justify-between items-center">
                     @php
-                    $fromOperatorPage = session('from_operator_page');
-                    $operatorCurrentType = session('operator_current_type');
+                        $fromOperatorPage = session('from_operator_page');
+                        $operatorCurrentType = session('operator_current_type');
 
-                    if ($fromOperatorPage && $operatorCurrentType) {
-                    $routeMap = [
-                    1 => 'operator.social-taxi.index',
-                    2 => 'operator.car.index',
-                    3 => 'operator.gazelle.index'
-                    ];
+                        if ($fromOperatorPage && $operatorCurrentType) {
+                            $routeMap = [
+                                1 => 'operator.social-taxi.index',
+                                2 => 'operator.car.index',
+                                3 => 'operator.gazelle.index'
+                            ];
 
-                    if (isset($routeMap[$operatorCurrentType])) {
-                    $backRoute = route($routeMap[$operatorCurrentType], array_merge(['filter_type_order' => $operatorCurrentType], $urlParams ?? []));
-                    } else {
-                    $backRoute = route('social-taxi-orders.index', $urlParams ?? []);
-                    }
-                    } else {
-                    $backRoute = route('social-taxi-orders.index', $urlParams ?? []);
-                    }
+                            if (isset($routeMap[$operatorCurrentType])) {
+                                $backRoute = route($routeMap[$operatorCurrentType], array_merge(['filter_type_order' => $operatorCurrentType], $urlParams ?? []));
+                            } else {
+                                $backRoute = route('social-taxi-orders.index', $urlParams ?? []);
+                            }
+                        } else {
+                            $backRoute = route('social-taxi-orders.index', $urlParams ?? []);
+                        }
                     @endphp
 
                     <a href="{{ $backRoute }}" 

@@ -205,10 +205,10 @@ class FioDtrnController extends BaseController {
             'client_invalid' => 'nullable|string|max:191',
             'data_r' => 'nullable|date',
             'sex' => 'nullable|in:М,Ж',
-            'rip_at' => 'nullable|date',
-            'created_rip' => 'nullable|required_with:rip_at|date_format:Y-m-d\TH:i',
+            'rip_at' => 'nullable|date|after_or_equal:data_r', // Если указана дата рождения
+            'created_rip' => 'nullable|required_with:rip_at|date_format:Y-m-d\TH:i|after_or_equal:rip_at',
             'user_rip' => 'nullable|required_with:rip_at|exists:users,id',
-            'komment' => 'nullable|required_with:rip_at|string',
+            'komment' => 'nullable|string|max:1000',
         ]);
 
         $fiodtrn->update($request->all());

@@ -261,7 +261,7 @@
                             <td class="{{ $fiodtrn->rip_at ? 'px-4 py-2 whitespace-nowrap text-sm bg-gray-500' : 'px-6 py-4 whitespace-nowrap text-sm text-gray-900' }}">
                                 <div>{{ $fiodtrn->fio }}</div>
                                 @if($fiodtrn->komment)
-                                    <div class="text-xs text-gray-600 mt-1">{{ \Str::limit($fiodtrn->komment, 100) }}</div>
+                                    <div class="text-xs text-gray-600 mt-1">{{ \Str::limit($fiodtrn->komment, 60) }}</div>
                                 @endif
                             </td>
                             <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{{ $fiodtrn->kl_id }}</td>
@@ -275,7 +275,7 @@
                             <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{{ optional($fiodtrn->rip_at)->format('d.m.Y') }}</td>
                             <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
                                 @if($fiodtrn->orders_count > 0)
-                                    <a href="{{ route('fiodtrns.orders', array_merge(['fiodtrn' => $fiodtrn], $urlParams)) }}" target ="_blank"
+                                    <a href="{{ route('fiodtrns.orders', ['fiodtrn' => $fiodtrn]) }}" target ="_blank"
                                         class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 hover:bg-blue-200">
                                             {{ $fiodtrn->orders_count }}
                                     </a>

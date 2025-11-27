@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="bg-gray-100 py-6">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h1 class="text-3xl font-bold text-gray-800 mb-6">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">
                 Заказы клиента: {{ $fiodtrn->fio }}
             </h1>
             
@@ -52,23 +52,23 @@
                         <tbody class="divide-y divide-gray-200">
                             @forelse ($orders as $order)
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                <td class="px-6 py-0 whitespace-nowrap text-sm text-gray-900">
                                     {{ $orders->firstItem() + $loop->index }}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                <td class="px-6 py-0 whitespace-nowrap text-sm font-medium text-gray-900">
                                     {{ $order->pz_nom }}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                <td class="px-6 py-0 whitespace-nowrap text-sm text-gray-900">
                                     {{ $order->visit_data ? $order->visit_data->format('d.m.Y H:i') : '-' }}
                                 </td>
-                                <td class="px-6 py-4 text-sm text-gray-900">
+                                <td class="px-6 py-0 text-sm text-gray-900">
                                     <div><span class="font-medium">Откуда:</span> {{ $order->adres_otkuda }}</div>
                                     <div><span class="font-medium">Куда:</span> {{ $order->adres_kuda }}</div>
                                     @if($order->adres_obratno)
                                         <div><span class="font-medium">Обратно:</span> {{ $order->adres_obratno }}</div>
                                     @endif
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                <td class="px-6 py-0 whitespace-nowrap text-sm">
                                     @if($order->currentStatus && $order->currentStatus->statusOrder)
                                     @php
                                     $status = $order->currentStatus->statusOrder;
@@ -83,7 +83,7 @@
                                     </span>
                                     @endif
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                <td class="px-6 py-0 whitespace-nowrap text-sm text-gray-900">
                                     @if($order->taxi_price)
                                     <div>Цена: {{ number_format($order->taxi_price, 2, ',', ' ') }} руб.</div>
                                     @endif
@@ -91,7 +91,7 @@
                                     <div>Возмещение: {{ number_format($order->taxi_vozm, 2, ',', ' ') }} руб.</div>
                                     @endif
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                <td class="px-6 py-0 whitespace-nowrap text-sm text-gray-900">
                                     <a href="{{ route('social-taxi-orders.show', $order) }}"
                                        class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-md hover:bg-blue-200 text-sm">
                                         Просмотр
