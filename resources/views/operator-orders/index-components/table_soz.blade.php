@@ -60,7 +60,15 @@
             </thead>
             <tbody class="divide-y divide-gray-200">
                 @forelse ($orders as $order)
-                    <tr class="border-b border-gray-400 @if($order->deleted_at) bg-red-50 @endif hover:bg-gray-50">
+                    <tr class="border-b border-gray-400 
+                        @if($order->deleted_at) 
+                            bg-red-50 
+                        @endif 
+                        @if($order->cancelled_at) 
+                            bg-purple-100 
+                        @endif
+                        hover:bg-gray-50"
+                    >
 
                     <td class="px-4 py-0 w-[180px] min-w-[150px]">
                         @php
@@ -68,15 +76,15 @@
                             $colorClass = !empty($status->color) ? $status->color : 'bg-gray-100 text-gray-800';
                         @endphp
                         @if($order->deleted_at)
-                            <div class="text-sm text-red-500" title="{{ $status->name }}">
-                                <span class="font-bold">{{ $order->pz_nom }}</span> от {{ $order->pz_data->format('d.m.Y') }}
+                            <div class="text-sm text-red-500" title="заказ от {{ $order->pz_data->format('d.m.Y') }}, {{ $status->name }}">
+                                <span class="font-bold">{{ $order->pz_nom }}</span> 
                             </div>
                             <div class="text-xs text-red-600 mt-1">
                                 Удален: {{ $order->deleted_at->format('d.m.Y H:i') }}
                             </div>
                         @else <!-- не удален -->
-                            <div class="text-sm text-gray-500 text-center {{ $colorClass }}" title="{{ $status->name }}">
-                                {{ $order->pz_nom }} от {{ $order->pz_data->format('d.m.Y') }}
+                            <div class="text-sm text-gray-500 text-center {{ $colorClass }}" title="заказ от {{ $order->pz_data->format('d.m.Y') }}, {{ $status->name }}">
+                                {{ $order->pz_nom }}
                             </div>
                         @endif
                     </td>

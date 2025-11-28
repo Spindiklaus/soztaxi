@@ -54,7 +54,7 @@ class TaxiOrdersExport implements FromView, WithStyles, WithColumnFormatting
         $sheet->getColumnDimension('N')->setWidth(15); // Сумма к возмещению
         $sheet->getColumnDimension('O')->setWidth(20); // Категория
         $sheet->getColumnDimension('P')->setWidth(20); // Доп. сведения
-        $sheet->getColumnDimension('Q')->setWidth(40); // Группировка заказов
+//        $sheet->getColumnDimension('Q')->setWidth(40); // Группировка заказов
         
     // Подсветка сгруппированных заказов (кроме первого в группе)
         $startRow = 5; // Начинаем с 5-й строки (после заголовков)

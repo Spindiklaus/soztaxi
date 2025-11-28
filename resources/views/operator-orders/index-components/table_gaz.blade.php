@@ -30,7 +30,7 @@
                         <span class="ml-1" x-show="sortField === 'pz_data' && sortDirection === 'desc'">↓</span>
                     </th>
                     <th @click="sortBy('visit_data')" scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:{{ $hoverColor }} ">
-                        Дата и время поездки
+                        Дата поездки
                         <span class="ml-1" x-show="sortField === 'visit_data' && sortDirection === 'asc'">↑</span>
                         <span class="ml-1" x-show="sortField === 'visit_data' && sortDirection === 'desc'">↓</span>
                     </th>
@@ -55,7 +55,14 @@
             </thead>
             <tbody class="divide-y divide-gray-200">
                 @forelse ($orders as $order)
-                    <tr @if($order->deleted_at) class="bg-red-50" @endif>
+                    <tr 
+                        @if($order->deleted_at) 
+                            class="bg-red-50" 
+                        @endif
+                        @if($order->cancelled_at) 
+                            class="bg-purple-100" 
+                        @endif
+                    >
                     <td class="px-6 py-2">
                         @php
                             $status = $order->currentStatus->statusOrder;
@@ -66,7 +73,7 @@
                                 {{-- getOrderTypeName($order->type_order) --}}
                             </div>-->
                             <div class="text-sm text-red-500">
-                                № <span class="font-bold">{{ $order->pz_nom }}</span> от {{ $order->pz_data->format('d.m.Y H:i') }}
+                                <span class="font-bold">{{ $order->pz_nom }}</span> от {{ $order->pz_data->format('d.m.Y H:i') }}
                             </div>
                             <div class="text-xs text-red-600 mt-1 ">
                                 Удален: {{ $order->deleted_at->format('d.m.Y H:i') }}
@@ -75,17 +82,15 @@
 <!--                        <div class="text-sm {{-- getOrderTypeColor($order->type_order) --}}">
                                 {{-- getOrderTypeName($order->type_order) --}}
                             </div>-->
-                            <div class="text-sm text-gray-500 {{ $colorClass }}" title="{{ $status->name }}">
-                                {{ $order->pz_nom }} от {{ $order->pz_data->format('d.m.Y H:i') }}
+                            <div class="text-sm text-gray-500 {{ $colorClass }}" title="заказ от {{ $order->pz_data->format('d.m.Y H:i') }}, {{ $status->name }}">
+                                {{ $order->pz_nom }}
                             </div>
                         @endif
                     </td>
                     <td class="px-6 py-2">
                         @if($order->visit_data)
-                            <div class="text-sm font-medium text-gray-900">
+                            <div class="text-lg font-medium text-gray-900">
                                 {{ $order->visit_data->format('d.m.Y') }}
-                            </div>
-                            <div class="text-lg text-gray-900">
                                 {{ $order->visit_data->format('H:i') }}
                             </div>
                             @if($order->visit_obratno)

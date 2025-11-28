@@ -55,7 +55,14 @@
             </thead>
             <tbody class="divide-y divide-gray-200">
                 @forelse ($orders as $order)
-                    <tr @if($order->deleted_at) class="bg-red-50" @endif>
+                    <tr 
+                        @if($order->deleted_at) 
+                            class="bg-red-50" 
+                        @endif
+                        @if($order->cancelled_at) 
+                            class="bg-purple-100" 
+                        @endif
+                    >
                         <td class="px-4 py-0 w-[180px]">
                             @php
                                 $status = $order->currentStatus->statusOrder;
@@ -65,8 +72,8 @@
                                 <div class="text-sm font-medium text-red-600">
                                     {{ getOrderTypeName($order->type_order) }}
                                 </div>
-                                <div class="text-sm text-red-500" title="{{ $status->name }}">
-                                    <span class="font-bold">{{ $order->pz_nom }}</span>&nbsp;от&nbsp;{{ $order->pz_data->format('d.m.Y') }}
+                                <div class="text-sm text-red-500" title="заказ от {{ $order->pz_data->format('d.m.Y') }}, {{ $status->name }}">
+                                    <span class="font-bold">{{ $order->pz_nom }}</span>
                                 </div>
                                 <div class="text-xs text-red-600 mt-1">
                                     Удален: {{ $order->deleted_at->format('d.m.Y H:i') }}
@@ -75,8 +82,8 @@
                                 <div class="text-sm {{ getOrderTypeColor($order->type_order) }}">
                                     {{ getOrderTypeName($order->type_order) }}
                                 </div>
-                                <div class="text-sm {{ $colorClass }}" title="{{ $status->name }}">
-                                    {{$order->pz_nom}}&nbsp;от&nbsp;{{$order->pz_data->format('d.m.Y')}}
+                                <div class="text-sm {{ $colorClass }}" title="заказ от {{$order->pz_data->format('d.m.Y')}}, {{ $status->name }}" >
+                                    {{$order->pz_nom}}
                                 </div>
                             @endif
                         </td>
@@ -265,7 +272,7 @@
                                         $currentStatus = $order->currentStatus;
                                         $statusId = $currentStatus ? $currentStatus->status_order_id : 1;
                                     @endphp
-                                    @if($statusId == 1)
+                                    @if($statusId == 1 || $statusId == 2)
                                         <a href="{{ route('social-taxi-orders.cancel.form', array_merge(['social_taxi_order' => $order], $urlParams)) }}" 
                                            accesskey="" class="inline-flex items-center px-3 py-1 bg-red-100 text-red-800 rounded-md hover:bg-red-200 text-sm"
                                            title="Отменить заказ">
@@ -277,7 +284,7 @@
                                         <button type="button" 
                                             class="inline-flex items-center px-3 py-1 bg-gray-300 text-gray-500 rounded-md text-sm cursor-not-allowed" 
                                             disabled 
-                                            title="Отмена возможна только для заказов со статусом 'Принят'">
+                                            title="Отмена возможна только для заказов со статусом 'Принят' или 'Передан в такси'">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                         </svg>

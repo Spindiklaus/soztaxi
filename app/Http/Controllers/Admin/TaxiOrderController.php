@@ -61,6 +61,7 @@ class TaxiOrderController extends BaseController {
         // Используем упрощенную логику для такси
         $query = $this->queryBuilder->build($request, false);
         $orders = $query->paginate(20)->appends($request->all());
+        $totalOrders = $orders->total();
 
         return view('social-taxi-orders.taxi', compact(
                         'orders',
@@ -68,7 +69,8 @@ class TaxiOrderController extends BaseController {
                         'direction',
                         'urlParams',
                         'taxis',
-                        'taxi_sent_at'
+                        'taxi_sent_at',
+                        'totalOrders'
         ));
     }
 
@@ -86,10 +88,11 @@ class TaxiOrderController extends BaseController {
 
         // Используем ТОТ ЖЕ запрос, что и в index
         $request->merge(['sort' => 'visit_data', 'direction' => 'asc']);
+        
         $query = $this->queryBuilder->build($request, false);
-
-        // Получаем ВСЕ заказы (без пагинации)
-        $orders = $query->get();
+        
+        // Получаем ВСЕ заказы (без пагинации) и фильтруем только соцтакси
+        $orders = $query->get()->where('type_order', 1); // 
         
         $sortedOrders = $orders->sortBy([
             ['order_group_id', 'asc'],  // Группы первыми (NULL = одиночные — в конце)
