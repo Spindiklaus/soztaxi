@@ -31,6 +31,19 @@ function showClientTrips(clientId, monthYear) {
     loadClientTrips(clientId, monthYear, 'normal');
 }
 
+// Показать модальное окно с бесплатными поездками клиента (100% скидка)
+function showClientFreeTrips(clientId, monthYear) {
+    console.log('showClientFreeTrips called with:', clientId, monthYear);
+    const modal = document.getElementById('client-trips-modal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+    
+    loadClientTrips(clientId,  monthYear, 'free-trips');
+}
+
+
 // Показать модальное окно с фактическими поездками клиента
 function showClientActualTrips(clientId, monthYear) {
     const modal = document.getElementById('client-trips-modal');
@@ -80,6 +93,9 @@ function loadClientTrips(clientId, monthYear, type = 'normal') {
         case 'actual':
             apiUrl = `/api/client-actual-trips/${clientId}/${monthYear}`;
             break;
+        case 'free-trips':
+            apiUrl = `/api/client-free-trips/${clientId}/${monthYear}`;
+            break;    
         case 'taxi-sent':
             apiUrl = `/api/client-taxi-sent-trips/${clientId}/${monthYear}`;
             break;
@@ -149,6 +165,9 @@ function displayClientTrips(data, type = 'normal') {
             case 'taxi-sent':
                 modalTitle.textContent = `Поездки клиента за ${period}, переданные в такси `;
                 break;
+            case 'free-trips': 
+                modalTitle.textContent = `Бесплатные (100% скидка) поездки клиента за ${period}`;
+                break;    
             default:
                 modalTitle.textContent = `Поездки клиента за ${period}`;
         }

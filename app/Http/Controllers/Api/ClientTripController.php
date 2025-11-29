@@ -13,6 +13,10 @@ class ClientTripController extends Controller {
     {
         return $this->getTrips($clientId, $monthYear, 'all');
     }
+    public function getClientFreeTrips($clientId, $monthYear)
+    {
+        return $this->getTrips($clientId, $monthYear, 'free-trips');
+    }
 
     public function getClientActualTrips($clientId, $monthYear)
     {
@@ -87,6 +91,10 @@ class ClientTripController extends Controller {
                     // Только переданные в такси (с датой передачи в такси)
                     $query->whereNotNull('taxi_sent_at')
                         ->whereNull('closed_at');
+                    break;
+                case 'free-trips':
+                    // Только бесплатные поездки (100% скидка)
+                    $query->where('skidka_dop_all', 100);
                     break;
                 case 'all':
                 default:

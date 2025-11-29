@@ -10,6 +10,7 @@ function updateClientTripsInfo(clientId, visitDate) {
     const monthYear = visitDate.substring(0, 7); // YYYY-MM формат
     const clientTripsInfo = document.getElementById('client-trips-info');
     const clientTripsButton = document.getElementById('client-trips-button');
+    const clientFreeTripsButton = document.getElementById('client-free-trips-button'); // со 100% скидкой
     const clientActualTripsButton = document.getElementById('client-actual-trips-button');
     const clientTaxiSentTripsButton = document.getElementById('client-taxi-sent-trips-button');
     
@@ -21,6 +22,11 @@ function updateClientTripsInfo(clientId, visitDate) {
     if (clientTripsButton) {
         clientTripsButton.onclick = () => showClientTrips(clientId, monthYear);
         clientTripsButton.innerHTML = '<span class="loading">Загрузка...</span>';
+    }
+    
+    if (clientFreeTripsButton) {
+        clientFreeTripsButton.onclick = () => showClientFreeTrips(clientId, monthYear);
+        clientFreeTripsButton.innerHTML = '<span class="loading">Загрузка...</span>';
     }
     
     if (clientActualTripsButton) {
@@ -36,12 +42,16 @@ function updateClientTripsInfo(clientId, visitDate) {
     // Получаем данные о поездках
     Promise.all([
         fetchClientTripsCount(clientId, monthYear),
+        fetchClientFreeTripsCount(clientId, monthYear),
         fetchClientActualTripsCount(clientId, monthYear),
         fetchClientTaxiSentTripsCount(clientId, monthYear)
     ])
-    .then(([tripsCount, actualTripsCount, taxiSentTripsCount]) => {
+    .then(([tripsCount, freeTripsCount, actualTripsCount, taxiSentTripsCount]) => {
         if (clientTripsButton) {
             clientTripsButton.innerHTML = tripsCount;
+        }
+        if (clientFreeTripsButton) {
+            clientFreeTripsButton.innerHTML = freeTripsCount;
         }
         if (clientActualTripsButton) {
             clientActualTripsButton.innerHTML = actualTripsCount;
@@ -54,6 +64,9 @@ function updateClientTripsInfo(clientId, visitDate) {
         console.error('Ошибка при получении данных о поездках:', error);
         if (clientTripsButton) {
             clientTripsButton.innerHTML = '0';
+        }
+        if (clientFreeTripsButton) {
+            clientFreeTripsButton.innerHTML = '0';
         }
         if (clientActualTripsButton) {
             clientActualTripsButton.innerHTML = '0';
@@ -69,6 +82,13 @@ function fetchClientTripsCount(clientId, monthYear) {
     return fetch(`/api/client-trips/${clientId}/${monthYear}`)
         .then(response => response.json())
         .then(data => data.count || 0)
+        .catch(() => 0);
+}
+
+function fetchClientFreeTripsCount(clientId, monthYear) {
+    return fetch(`/api/client-free-trips/${clientId}/${monthYear}`) 
+        .then(response => response.json())
+        .then(data => data.freeCount || 0) // Используем freeCount из ответа
         .catch(() => 0);
 }
 

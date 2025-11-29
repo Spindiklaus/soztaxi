@@ -1,6 +1,6 @@
 <!-- Предварительная информация о заказе, заголовок -->
 <!-- resources/views/social-taxi-orders/create-components/order-info.blade.php -->
-<div class="bg-gray-50 p-4 rounded-lg mb-6">
+<div class="bg-gray-50 p-4 rounded-lg mb-2">
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div>
             <label class="block text-sm font-medium text-gray-700">Номер заказа</label>
@@ -14,7 +14,7 @@
         <div>
             <label class="block text-sm font-medium text-gray-700">Дата и время приема заказа</label>
             <div class="mt-1 bg-gray-100 p-2 rounded-md font-medium">
-                {{ $orderDateTime->format('d.m.Y H:i:s') }}
+                {{ $orderDateTime->format('d.m.Y H:i') }}
             </div>
             <!-- Скрытое поле для передачи даты в форму -->
             <input type="hidden" name="pz_data" value="{{ $orderDateTime->format('Y-m-d H:i:s') }}">
@@ -49,6 +49,17 @@
                     type="button"
                     onclick="showClientTrips(0, '')"
                     class="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors">
+                    0
+                </button>
+            </div>
+            
+            <div class="flex items-center">
+                <span class="text-sm font-medium text-gray-700">В т.ч. бесплатных (100% скидка):</span>
+                <button 
+                    id="client-free-trips-button"
+                    type="button"
+                    onclick="showClientFreeTrips(0, '')"
+                    class="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-800 hover:bg-purple-200 transition-colors">
                     0
                 </button>
             </div>

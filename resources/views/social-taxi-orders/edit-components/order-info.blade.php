@@ -53,10 +53,16 @@
                     class="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors">
                      <span class="loading">Загрузка...</span>
                 </button>
-                , в т.ч. со 100% скидкой: 
-                <span class="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors">
-                    &nbsp;{{ getClientFreeTripsCountInMonthByVisitDate($order->client_id, $order->visit_data) }}
-                </span>
+            </div>
+            <div class="flex items-center">
+                <span class="text-sm font-medium text-gray-700">В т.ч. бесплатных (100% скидка):</span>
+                <button 
+                    id="client-free-trips-button"
+                    type="button"
+                    onclick="showClientFreeTrips(0, '')"
+                    class="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-800 hover:bg-purple-200 transition-colors">
+                    0
+                </button>
             </div>
 
             <div class="flex items-center">

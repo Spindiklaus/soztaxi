@@ -1,19 +1,19 @@
 <!-- resources/views/social-taxi-orders/create-components/header.blade.php -->
-<div class="flex justify-between items-center mb-6">
+<div class="flex justify-between items-center mb-2">
     <h1 class="text-3xl font-bold text-gray-800">
         @if(isset($isCopying) && $isCopying)
-        Копирование заказа: 
-        <span class="{{ getOrderTypeColor($type) }} font-medium">
-            {{ getOrderTypeName($type) }}
-        </span>
-        <span class="text-lg text-gray-600 ml-2">
-            (оригинал №{{ $originalOrderNumber ?? '' }})
-        </span>
+            Копирование заказа: 
+            <span class="{{ getOrderTypeColor($type) }} font-medium">
+                {{ getOrderTypeName($type) }}
+            </span>
+            <span class="text-lg text-gray-600 ml-2">
+                (оригинал №{{ $originalOrderNumber ?? '' }})
+            </span>
         @else
-        Создание нового заказа: 
-        <span class="{{ getOrderTypeColor($type) }} font-medium">
-            {{ getOrderTypeName($type) }}
-        </span>
+            Создание нового заказа: 
+            <span class="{{ getOrderTypeColor($type) }} font-medium">
+                {{ getOrderTypeName($type) }}
+            </span>
         @endif
     </h1>
 
@@ -36,8 +36,6 @@
         }
     }
     @endphp
-
-
 
     <a href="{{ $backRoute }}" 
        class="inline-flex items-center px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400">

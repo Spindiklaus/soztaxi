@@ -1,9 +1,9 @@
 <!-- Сведения о поездке -->
 <!-- resources/views/social-taxi-orders/create-components/trip-info.blade.php -->
-<div class="bg-gray-50 p-4 rounded-lg mb-6">
-    <h2 class="text-lg font-semibold text-gray-800 mb-4">Сведения о поездке</h2>
+<div class="bg-gray-50 p-4 rounded-lg mb-2">
+    <h2 class="text-lg font-semibold text-gray-800 mb-2">Сведения о поездке</h2>
 
-    <div class="space-y-4">
+    <div class="space-y-2">
         <!-- Тип поездки -->
         <div>
             <label for="zena_type" class="block text-sm font-medium text-gray-700">Тип поездки *</label>

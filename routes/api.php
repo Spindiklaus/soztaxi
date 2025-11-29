@@ -16,8 +16,10 @@ Route::prefix('order-groups')->group(function () {
 });
 
 Route::get('/client-trips/{clientId}/{monthYear}', [ClientTripController::class, 'getClientTrips']);
+Route::get('/client-free-trips/{clientId}/{monthYear}', [ClientTripController::class, 'getClientFreeTrips']);
 Route::get('/client-actual-trips/{clientId}/{monthYear}', [ClientTripController::class, 'getClientActualTrips']);
 Route::get('/client-taxi-sent-trips/{clientId}/{monthYear}', [ClientTripController::class, 'getClientTaxiSentTrips']);
+
 
 // маршрут для получения данных клиента по AJAX
 Route::get('/social-taxi-orders/client-data/{clientId}', [SocialTaxiOrderController::class, 'getClientData'])

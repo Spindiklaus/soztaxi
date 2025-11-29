@@ -1,7 +1,7 @@
 <x-app-layout>
 
     <div class="bg-gray-100 py-6">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-[1536px] mx-auto px-4 sm:px-6 lg:px-8">
             @include('social-taxi-orders.edit-components.header')
             
             <form action="{{ route('social-taxi-orders.update', $order) }}" method="POST" class="bg-white shadow rounded-lg p-6">

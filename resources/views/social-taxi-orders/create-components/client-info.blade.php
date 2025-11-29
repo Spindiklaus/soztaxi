@@ -1,18 +1,19 @@
 <!-- Сведения о клиенте -->
 <!-- resources/views/social-taxi-orders/create-components/client-info.blade.php -->
-<div class="bg-gray-50 p-4 rounded-lg mb-6">
-    <h2 class="text-lg font-semibold text-gray-800 mb-4">Сведения о клиенте</h2>
+<div class="bg-gray-50 p-4 rounded-lg mb-2">
+    <h2 class="text-lg font-semibold text-gray-800 mb-2">Сведения о клиенте</h2>
 
-    <div class="space-y-4">
+    <div class="space-y-2">
         <div>
             <label for="client_id" class="block text-sm font-medium text-gray-700">Клиент *</label>
             <select name="client_id" id="client_id" required
                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 <option value="">Выберите клиента</option>
                 @foreach($clients as $client)
-                <option value="{{ $client->id }}" {{ old('client_id', $copiedOrder->client_id ?? '') == $client->id ? 'selected' : '' }}>
-                    {{ $client->fio }} (#{{ $client->id }})
-                </option>
+                    <option value="{{ $client->id }}" {{ old('client_id', $copiedOrder->client_id ?? '') == $client->id ? 'selected' : '' }}>
+                        {{ $client->fio }} 
+                        <!--(#{{-- $client->id --}})-->
+                    </option>
                 @endforeach
             </select>
             @error('client_id')
