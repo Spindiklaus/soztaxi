@@ -177,12 +177,12 @@ function displayClientTrips(data, type = 'normal') {
     }
 
     let tripsHtml = `
-        <h4 class="text-md font-semibold text-gray-700 mb-4">Клиент: ${clientName}</h4>
+        <h4 class="text-md font-semibold text-gray-700 mb-4 px-4">Клиент: ${clientName}</h4>
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Тип заказа<br>Номер заказа</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Тип /Номер заказа</th>
                         <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Дата поездки</th>
                         <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Откуда</th>
                         <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Куда</th>
@@ -209,6 +209,11 @@ function displayClientTrips(data, type = 'normal') {
     `;
 
     trips.forEach((trip, index) => {
+        
+        // Проверяем, удален ли заказ
+        const isDeleted = trip.deleted_at !== null;
+        const rowClass = isDeleted ? 'bg-red-50' : '';
+        
         // Форматируем дату поездки
         const { date: visitDate, time: visitTime } = parseDateTime(trip.visit_data);
 
@@ -247,7 +252,7 @@ function displayClientTrips(data, type = 'normal') {
         visitDateTimeHtml += `</div>`;
 
         tripsHtml += `
-            <tr>
+            <tr class="${rowClass}">
                 <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
                     <div class="${getOrderTypeColor(trip.type_order)} font-medium">
                         ${getOrderTypeName(trip.type_order)}
@@ -255,6 +260,11 @@ function displayClientTrips(data, type = 'normal') {
                     <div class="text-xs text-gray-500 mt-1">
                         ${trip.pz_nom || '-'}
                     </div>
+                     ${isDeleted ? `
+                        <div class="text-xs text-red-600 font-medium mt-1">
+                            УДАЛЕН: ${parseDateTime(trip.deleted_at).date} ${parseDateTime(trip.deleted_at).time}
+                        </div>
+                    ` : ''}
                 </td>
                 <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
                     ${visitDateTimeHtml}
@@ -313,7 +323,7 @@ function displayClientTrips(data, type = 'normal') {
                 </tbody>
             </table>
         </div>
-        <div class="mt-4 text-center">
+        <div class="mt-4 text-center mb-4">
             <p class="text-sm text-gray-600 mb-2">Всего поездок: ${count}</p>
             <button onclick="closeClientTripsModal()" class="px-4 py-2 bg-gray-300 rounded-md hover:bg-gray-400">Закрыть</button>
         </div>

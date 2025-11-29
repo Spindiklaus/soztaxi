@@ -7,7 +7,6 @@
             <div class="mt-1 bg-gray-100 p-2 rounded-md font-medium">
                 {{ $orderNumber }}
             </div>
-            <p class="mt-1 text-xs text-gray-500">Устанавливается автоматически</p>
             <!-- Скрытое поле для передачи номера в форму -->
             <input type="hidden" name="pz_nom" value="{{ $orderNumber }}">
         </div>
@@ -17,7 +16,6 @@
             <div class="mt-1 bg-gray-100 p-2 rounded-md font-medium">
                 {{ $orderDateTime->format('d.m.Y H:i:s') }}
             </div>
-            <p class="mt-1 text-xs text-gray-500">Устанавливается автоматически</p>
             <!-- Скрытое поле для передачи даты в форму -->
             <input type="hidden" name="pz_data" value="{{ $orderDateTime->format('Y-m-d H:i:s') }}">
         </div>

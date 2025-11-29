@@ -324,8 +324,7 @@ class SocialTaxiOrderService {
      */
     public function getOrderDataForCopy(int $orderId, int $type): array {
         try {
-            $order = Order::find($orderId);
-
+            $order = Order::withTrashed()->find($orderId);
             if (!$order) {
                 return [];
             }

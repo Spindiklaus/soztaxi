@@ -37,8 +37,9 @@ if (!function_exists('getClientTripsCountInMonthByVisitDate')) {
         $tripCount = Order::where('client_id', $clientId)
             ->whereBetween('visit_data', [$startDate, $endDate])
             ->whereNotNull('visit_data') // Только с указанной датой поездки
-            ->whereNull('deleted_at') // Только неудаленные заказы
-            ->whereNull('cancelled_at'); // Только неотмененные заказы
+//            ->whereNull('deleted_at') // Только неудаленные заказы
+            ->whereNull('cancelled_at') // Только неотмененные заказы
+            ->withTrashed(); // Включаем удаленные записи
         // Если указан ID заказа для исключения, добавляем условие
         if ($excludeOrderId) {
             $tripCount->where('id', '!=', $excludeOrderId);
@@ -182,8 +183,9 @@ if (!function_exists('getClientFreeTripsCountInMonthByVisitDate')) {
             ->whereBetween('visit_data', [$startDate, $endDate])
             ->whereNotNull('visit_data') // Только с указанной датой поездки
             ->where('skidka_dop_all', 100) // Только с 0% скидкой (полностью оплачиваемые)
-            ->whereNull('deleted_at') // Только неудаленные заказы
-            ->whereNull('cancelled_at'); // Только неотмененные заказы
+//            ->whereNull('deleted_at') // Только неудаленные заказы
+            ->whereNull('cancelled_at') // Только неотмененные заказы
+            ->withTrashed(); // Включаем удаленные записи
 
         // Если указан ID заказа для исключения, добавляем условие
         if ($excludeOrderId) {

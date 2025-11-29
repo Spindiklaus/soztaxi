@@ -55,9 +55,9 @@ class ClientTripController extends Controller {
             $query = Order::with(['currentStatus.statusOrder'])
                 ->where('client_id', $clientId)
                 ->whereBetween('visit_data', [$startDate, $endDate])
-                ->whereNotNull('visit_data')
-                ->whereNull('deleted_at')
+//                ->whereNull('deleted_at')
                 ->whereNull('cancelled_at')
+                ->withTrashed() // Включаем удаленные записи    
                 ->select([
                     'id',
                     'visit_data',
@@ -72,7 +72,8 @@ class ClientTripController extends Controller {
                     'taxi_sent_at',
                     'skidka_dop_all', // Добавляем скидку
                     'zena_type', // тип поездки в 1 или 2 стороны
-                    'closed_at'
+                    'closed_at',
+                    'deleted_at'
                 ])
                 ->orderBy('visit_data');
             
