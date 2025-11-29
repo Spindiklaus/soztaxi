@@ -63,16 +63,6 @@ class SocialTaxiOrderBuilder {
 //            'date_to' => $request->input('date_to'),
 //            'all_request' => $request->all()
 //        ]);
-        // Фильтрация по диапазону дат ПОЕЗДКИ
-        $DateFrom = $request->input('date_from');
-        $DateTo = $request->input('date_to');
-
-        if ($DateFrom) {
-            $this->query->whereDate('visit_data', '>=', $DateFrom);
-        }
-        if ($DateTo) {
-            $this->query->whereDate('visit_data', '<=', $DateTo);
-        }
         
         // Фильтрация по диапазону дат поездок
         $dateFrom = $request->input('date_from', '2025-01-01');
@@ -93,7 +83,9 @@ class SocialTaxiOrderBuilder {
                     $subQ->where('fio', 'like', '%' . $searchTerm . '%');
                 })
                 // Или поиск по телефону в заказе
-                ->orWhere('client_tel', 'like', '%' . $searchTerm . '%');
+                ->orWhere('client_tel', 'like', '%' . $searchTerm . '%')
+                // Или поиск по удостоверению в заказе
+                ->orWhere('client_invalid', 'like', '%' . $searchTerm . '%');
             });
         }
         
@@ -122,12 +114,6 @@ class SocialTaxiOrderBuilder {
         if ($request->filled('filter_user_id')) {
             $this->query->where('orders.user_id', $request->input('filter_user_id'));
         }
-
-
-
-       
-
-
         return $this;
     }
 
@@ -196,12 +182,6 @@ class SocialTaxiOrderBuilder {
 
     /**
      * Включает/исключает удаленные записи в результат
-     * 
-     * При включении удаленных записей использует withTrashed(),
-     * что позволяет показывать как активные, так и удаленные заказы.
-     * 
-     * @param bool $withTrashed Флаг включения удаленных записей
-     * @return self Возвращает себя для цепочного вызова
      */
     public function withTrashed(bool $withTrashed = true): self {
         if ($withTrashed) {
@@ -241,13 +221,17 @@ class SocialTaxiOrderBuilder {
      */
     public function build(Request $request, bool $withTrashed = false) {
         // Применяем настройку отображения удаленных записей
-        if ($withTrashed) {
-            $this->withTrashed();
-        }
-
+ 
         // Применяем фильтры и сортировку
         $this->applyFilters($request);
         $this->applySorting($request);
+        
+        // применяем настройку удаленных записей
+        if ($withTrashed) {
+            $this->withTrashed();
+        }
+        // Если $withTrashed = false, Laravel по умолчанию исключает удаленные
+
 
         // ВОЗВРАЩАЕМ $this->query (Eloquent\Builder)
         return $this->query;

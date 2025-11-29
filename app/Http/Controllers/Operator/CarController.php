@@ -35,7 +35,14 @@ class CarController extends BaseController
             $request->merge(['filter_user_id' => auth()->id()]);
         }
 
-        $showDeleted = $request->get('show_deleted', '0');
+        // По умолчанию показываем ВСЕ записи (включая удаленные)
+        $showDeletedParam = $request->get('show_deleted', '1');
+        $withTrashed = match($showDeletedParam) {
+            '0' => false,  // Только активные
+            '1' => true,   // Все (включая удаленные)
+            '2' => 'true', // Только удаленные
+            default => true
+        };
         $sort = $request->get('sort', 'pz_data');
         $direction = $request->get('direction', 'desc');
 
@@ -45,8 +52,15 @@ class CarController extends BaseController
         // Собираем параметры для передачи в шаблон
         $urlParams = $this->orderService->getUrlParams();
 
-        $query = $this->queryBuilder->build($request, $showDeleted == '1');
-        $orders = $query->paginate(15)->appends($request->all());
+        $query = $this->queryBuilder->build($request, $withTrashed);
+       // Если нужно только удаленные, добавляем фильтр
+        if ($showDeletedParam === '2') {
+            $query->onlyTrashed();
+        } elseif ($showDeletedParam === '0') {
+            // Для "только активные" не вызываем withTrashed и onlyTrashed
+            // Laravel по умолчанию исключает мягко удаленные записи
+        }
+        $orders = $query->paginate(50)->appends($request->all());
         
         // Сохраняем текущий тип заказа в сессии только для операторов
         session(['operator_current_type' => $request->get('type_order', 2)]);
@@ -54,7 +68,7 @@ class CarController extends BaseController
 
         return view('operator-orders.index', compact(
             'orders',
-            'showDeleted',
+            'showDeletedParam',
             'sort',
             'direction',
             'urlParams',

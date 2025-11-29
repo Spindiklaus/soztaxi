@@ -37,8 +37,15 @@ class SocialTaxiController extends BaseController
         if (!$request->has('filter_user_id')) {
             $request->merge(['filter_user_id' => auth()->id()]);
         }
+        // По умолчанию показываем ВСЕ записи (включая удаленные)
+        $showDeletedParam = $request->get('show_deleted', '1');
+        $withTrashed = match($showDeletedParam) {
+            '0' => false,  // Только активные
+            '1' => true,   // Все (включая удаленные)
+            '2' => 'true', // Только удаленные нужно с withTrashed(true), но с дополнительным фильтром
+            default => true
+        };
 
-        $showDeleted = $request->get('show_deleted', '0');
         $sort = $request->get('sort', 'pz_data');
         $direction = $request->get('direction', 'desc');
 
@@ -48,7 +55,14 @@ class SocialTaxiController extends BaseController
         // Собираем параметры для передачи в шаблон
         $urlParams = $this->orderService->getUrlParams();
 
-        $query = $this->queryBuilder->build($request, $showDeleted == '1');
+        $query = $this->queryBuilder->build($request, $withTrashed);
+        // Если нужно только удаленные, добавляем фильтр
+        if ($showDeletedParam === '2') {
+            $query->onlyTrashed();
+        } elseif ($showDeletedParam === '0') {
+            // Для "только активные" не вызываем withTrashed и onlyTrashed
+            // Laravel по умолчанию исключает мягко удаленные записи
+        }
         
         $orders = $query->paginate(50)->appends($request->all());
         
@@ -59,7 +73,7 @@ class SocialTaxiController extends BaseController
 
         return view('operator-orders.index', compact(
             'orders',
-            'showDeleted',
+            'showDeletedParam',
             'sort',
             'direction',
             'urlParams',

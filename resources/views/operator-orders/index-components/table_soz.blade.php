@@ -88,10 +88,10 @@
                             </div>
                         @endif
                     </td>
-                    <td class="px-1 py-0">
+                    <td class="px-1 py-0 max-w-[120px]">
                         @if($order->visit_data)
                             <div class="text-lg font-medium text-gray-900">
-                                {{ $order->visit_data->format('d.m.Y') }}&nbsp;{{ $order->visit_data->format('H:i') }}
+                                {{ $order->visit_data->format('d.m.Y') }} {{ $order->visit_data->format('H:i') }}
                             </div>
                             @if($order->visit_obratno)
                                 <div class="text-sm font-medium text-gray-600 mt-1">

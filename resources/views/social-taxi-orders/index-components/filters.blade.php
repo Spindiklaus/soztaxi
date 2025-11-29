@@ -47,37 +47,54 @@
         }
         
         foreach (request()->all() as $key => $value) {
-            if (in_array($key, ['filter_pz_nom', 'filter_type_order', 'status_order_id', 'filter_user_id', 'client_fio', 'show_deleted', 'date_from', 'date_to']) && !empty($value)) {
-                if ($key === 'status_order_id' && isset($statusLabels[$value])) {
-                    $activeFilters[] = $filterLabels[$key] . ': ' . $statusLabels[$value];
-                } elseif ($key === 'filter_type_order' && isset($typeLabels[$value])) {
-                    $activeFilters[] = $filterLabels[$key] . ': ' . $typeLabels[$value];
-                } elseif ($key === 'filter_user_id' && isset($operatorNames[$value])) {
-                    $activeFilters[] = $filterLabels[$key] . ': ' . $operatorNames[$value];
-                } elseif ($key === 'show_deleted') {
-                    $activeFilters[] = $filterLabels[$key] . ': ' . ($value == '1' ? 'Все (включая удаленные)' : 'Только активные');
-                } elseif ($key !== 'sort' && $key !== 'direction' && $key !== 'page') {
-                    $activeFilters[] = $filterLabels[$key] . ': ' . $value;
+            if (in_array($key, ['filter_pz_nom', 'filter_type_order', 'status_order_id', 'filter_user_id', 'client_fio', 'show_deleted', 'date_from', 'date_to'])) {
+                // Проверяем, что значение не пустое, но для show_deleted разрешаем '0'
+                if (($value !== null && $value !== '') || ($key === 'show_deleted' && $value !== null)) {
+                    if ($key === 'status_order_id' && isset($statusLabels[$value])) {
+                        $activeFilters[] = $filterLabels[$key] . ': ' . $statusLabels[$value];
+                    } elseif ($key === 'filter_type_order' && isset($typeLabels[$value])) {
+                        $activeFilters[] = $filterLabels[$key] . ': ' . $typeLabels[$value];
+                    } elseif ($key === 'filter_user_id' && isset($operatorNames[$value])) {
+                        $activeFilters[] = $filterLabels[$key] . ': ' . $operatorNames[$value];
+                    } elseif ($key === 'show_deleted'){
+                        $showDeletedLabel = '';
+                        if ($value == '0') {
+                            $showDeletedLabel = 'Только активные';
+                        } elseif ($value == '1') {
+                            $showDeletedLabel = 'Все (включая удаленные)';
+                        } elseif ($value == '2') {
+                            $showDeletedLabel = 'Только удаленные';
+                        }
+                        $activeFilters[] = $filterLabels[$key] . ': ' . $showDeletedLabel;
+                    } elseif ($key !== 'sort' && $key !== 'direction' && $key !== 'page') {
+                        $activeFilters[] = $filterLabels[$key] . ': ' . $value;
+                    }
                 }
             }
         }
     @endphp
     
+    <!--     Для проверки 
+    <div class="text-xs text-red-600">
+        Debug: show_deleted = "{{-- request('show_deleted') ?? 'NULL' --}}", 
+        All params = "{{-- json_encode(request()->all()) --}}"
+    </div>-->
+    
     @if(!empty($activeFilters))
-    <div class="px-4 py-2 bg-blue-50 border-b border-blue-100">
-        <div class="flex flex-wrap items-center gap-2">
-            <span class="text-sm font-medium text-blue-700">Активные фильтры:</span>
-            @foreach($activeFilters as $filter)
-                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                    {{ $filter }}
-                </span>
-            @endforeach
-            <a href="{{ route('social-taxi-orders.index', ['sort' => $sort ?? 'pz_data', 'direction' => $direction ?? 'desc']) }}"
-               class="ml-2 text-xs text-blue-600 hover:text-blue-800">
-                Сбросить все
-            </a>
+        <div class="px-4 py-2 bg-blue-50 border-b border-blue-100">
+            <div class="flex flex-wrap items-center gap-2">
+                <span class="text-sm font-medium text-blue-700">Активные фильтры:</span>
+                @foreach($activeFilters as $filter)
+                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        {{ $filter }}
+                    </span>
+                @endforeach
+                <a href="{{ route('social-taxi-orders.index', ['sort' => $sort ?? 'pz_data', 'direction' => $direction ?? 'desc']) }}"
+                   class="ml-2 text-xs text-blue-600 hover:text-blue-800">
+                    Сбросить все
+                </a>
+            </div>
         </div>
-    </div>
     @endif
     
     <!-- Содержимое фильтров (скрыто по умолчанию) -->
@@ -87,16 +104,8 @@
             <input type="hidden" name="sort" value="{{ $sort ?? 'pz_data' }}">
             <input type="hidden" name="direction" value="{{ $direction ?? 'desc' }}">
                 
-            <div>
-                <label for="filter_pz_nom" class="block text-sm font-medium text-gray-700">Номер заказа</label>
-                <input type="text" name="filter_pz_nom" id="filter_pz_nom" 
-                       value="{{ request('filter_pz_nom') }}" 
-                       placeholder="%Поиск%"
-                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-            </div>    
-
             <div class="md:col-span-2">
-                <label for="client_fio" class="block text-sm font-medium text-gray-700">ФИО клиента (или тел.)</label>
+                <label for="client_fio" class="block text-sm font-medium text-gray-700">ФИО клиента (тел., удостоверение)</label>
                 <input type="text" name="client_fio" id="client_fio" 
                        value="{{ request('client_fio') }}" 
                        placeholder="%Поиск по ФИО или тел.%"
@@ -127,8 +136,9 @@
             <div>
                 <label for="show_deleted" class="block text-sm font-medium text-gray-700">Статус записей</label>
                 <select name="show_deleted" id="show_deleted" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                    <option value="0" {{ (request('show_deleted', '0') == '0' || is_null(request('show_deleted'))) ? 'selected' : '' }}>Только активные</option>
-                    <option value="1" {{ request('show_deleted') == '1' ? 'selected' : '' }}>Все (включая удаленные)</option>
+                    <option value="0" {{ (request('show_deleted', '1') == '0') ? 'selected' : '' }}>Только активные</option>
+                    <option value="1" {{ (request('show_deleted', '1') == '1') ? 'selected' : '' }}>Все (включая удаленные)</option>
+                    <option value="2" {{ (request('show_deleted', '1') == '2') ? 'selected' : '' }}>Только удаленные</option>
                 </select>
             </div>
 
@@ -160,6 +170,13 @@
                     </div>
                 </div>
             </div>
+            <div>
+                <label for="filter_pz_nom" class="block text-sm font-medium text-gray-700">Номер заказа</label>
+                <input type="text" name="filter_pz_nom" id="filter_pz_nom" 
+                       value="{{ request('filter_pz_nom') }}" 
+                       placeholder="%Поиск%"
+                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+            </div>  
 
             <div class="md:col-span-6 flex items-end space-x-2">
                 <button type="submit"

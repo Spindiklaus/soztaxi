@@ -22,13 +22,24 @@
         ];
         
         foreach (request()->all() as $key => $value) {
-            if (in_array($key, ['filter_pz_nom', 'status_order_id', 'client_fio', 'show_deleted', 'date_from', 'date_to']) && !empty($value)) {
-                if ($key === 'status_order_id' && isset($statusLabels[$value])) {
-                    $activeFilters[] = $filterLabels[$key] . ': ' . $statusLabels[$value];
-                } elseif ($key === 'show_deleted') {
-                    $activeFilters[] = $filterLabels[$key] . ': ' . ($value == '1' ? 'Все (включая удаленные)' : 'Только активные');
-                } elseif ($key !== 'sort' && $key !== 'direction' && $key !== 'page' && $key !== 'type_order') {
-                    $activeFilters[] = $filterLabels[$key] . ': ' . $value;
+            if (in_array($key, ['filter_pz_nom', 'status_order_id', 'client_fio', 'show_deleted', 'date_from', 'date_to']) ) {
+                // Проверяем, что значение не пустое, но для show_deleted разрешаем '0'
+                if (($value !== null && $value !== '') || ($key === 'show_deleted' && $value !== null)) {
+                    if ($key === 'status_order_id' && isset($statusLabels[$value])) {
+                        $activeFilters[] = $filterLabels[$key] . ': ' . $statusLabels[$value];
+                    } elseif ($key === 'show_deleted') {
+                        $showDeletedLabel = '';
+                        if ($value == '0') {
+                            $showDeletedLabel = 'Только активные';
+                        } elseif ($value == '1') {
+                            $showDeletedLabel = 'Все (включая удаленные)';
+                        } elseif ($value == '2') {
+                            $showDeletedLabel = 'Только удаленные';
+                        }
+                        $activeFilters[] = $filterLabels[$key] . ': ' . $showDeletedLabel;
+                    } elseif ($key !== 'sort' && $key !== 'direction' && $key !== 'page' && $key !== 'type_order') {
+                        $activeFilters[] = $filterLabels[$key] . ': ' . $value;
+                    }
                 }
             }
         }
@@ -74,7 +85,7 @@
             <input type="hidden" name="direction" value="{{ $direction ?? 'desc' }}">
 
             <div class="md:col-span-2">
-                <label for="client_fio" class="block text-sm font-medium text-gray-700">ФИО клиента ( или тел.)</label>
+                <label for="client_fio" class="block text-sm font-medium text-gray-700">ФИО клиента ( тел., удостоверение)</label>
                 <input type="text" name="client_fio" id="client_fio" 
                        value="{{ request('client_fio') }}" 
                        placeholder="%поиск по ФИО или тел.%"
@@ -95,8 +106,9 @@
             <div>
                 <label for="show_deleted" class="block text-sm font-medium text-gray-700">Статус записей</label>
                 <select name="show_deleted" id="show_deleted" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                    <option value="0" {{ (request('show_deleted', '0') == '0' || is_null(request('show_deleted'))) ? 'selected' : '' }}>активные</option>
-                    <option value="1" {{ request('show_deleted') == '1' ? 'selected' : '' }}>Все (включая удаленные)</option>
+                    <option value="0" {{ (request('show_deleted', '1') == '0') ? 'selected' : '' }}>Только активные</option>
+                    <option value="1" {{ (request('show_deleted', '1') == '1') ? 'selected' : '' }}>Все (включая удаленные)</option>
+                    <option value="2" {{ (request('show_deleted', '1') == '2') ? 'selected' : '' }}>Только удаленные</option>
                 </select>
             </div>
 

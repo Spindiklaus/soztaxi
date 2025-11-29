@@ -36,8 +36,14 @@ class SocialTaxiOrderController extends BaseController {
         // Сбрасываем сессию при входе на общую страницу администратора
         session()->forget(['from_operator_page', 'operator_current_type']);
 
-        // По умолчанию показываем только неудаленные записи
-        $showDeleted = $request->get('show_deleted', '0');
+        // По умолчанию показываем ВСЕ записи (включая удаленные)
+        $showDeletedParam = $request->get('show_deleted', '1');
+        $withTrashed = match($showDeletedParam) {
+            '0' => false,  // Только активные
+            '1' => true,   // Все (включая удаленные)
+            '2' => 'true', // Только удаленные  нужно с withTrashed(true), но с дополнительным фильтром
+            default => true
+        };
 
         $sort = $request->get('sort', 'pz_data');
         $direction = $request->get('direction', 'desc');
@@ -48,12 +54,22 @@ class SocialTaxiOrderController extends BaseController {
         // Собираем параметры для передачи в шаблон
         $urlParams = $this->orderService->getUrlParams();
 
-        $query = $this->queryBuilder->build($request, $showDeleted == '1');
+        // Сначала вызываем build
+        $query = $this->queryBuilder->build($request, $withTrashed);
+
+        // Потом добавляем специфические фильтры
+        if ($showDeletedParam === '2') {
+            $query->onlyTrashed(); // Только удаленные
+        }
+//        elseif ($showDeletedParam === '0') {
+//            // Для "только активные" не нужно вызывать ничего - Laravel по умолчанию исключает удаленные
+//        }
+
         $orders = $query->paginate(50)->appends($request->all());
 
         return view('social-taxi-orders.index', compact(
                         'orders',
-                        'showDeleted',
+                        'showDeletedParam',
                         'sort',
                         'direction',
                         'urlParams', // Передаем параметры в шаблон
