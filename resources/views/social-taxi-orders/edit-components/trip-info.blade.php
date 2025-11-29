@@ -50,11 +50,6 @@
                 @error('visit_data')
                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                 @enderror
-                <p class="mt-1 text-xs text-gray-500">
-                    Время указывается с шагом 5 минут.
-                    Дата поездки должна быть не раньше завтра ({{ now()->addDay()->format('d.m.Y') }}) 
-                    и не позже чем через полгода ({{ now()->addMonths(6)->format('d.m.Y') }})
-                </p>
             @endif
         </div>
 
