@@ -19,7 +19,7 @@
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-blue-800 text-gray-200 sticky top-0 z-10 shadow-lg">
                 <tr>
-                    <th @click="sortBy('pz_data')" scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-blue-700">
+                    <th @click="sortBy('pz_data')" scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-blue-700 ">
                         Заказ и статус
                         <span class="ml-1" x-show="sortField === 'pz_data' && sortDirection === 'asc'">↑</span>
                         <span class="ml-1" x-show="sortField === 'pz_data' && sortDirection === 'desc'">↓</span>
@@ -65,10 +65,8 @@
                     </td>
                     <td class="px-3 py-0">
                         @if($order->visit_data)
-                            <div class="text-sm font-medium text-gray-900">
+                            <div class="text-lg font-medium text-gray-900">
                                 {{ $order->visit_data->format('d.m.Y') }}
-                            </div>
-                            <div class="text-lg text-gray-900">
                                 {{ $order->visit_data->format('H:i') }}
                             </div>
                             @if($order->visit_obratno)
@@ -97,7 +95,9 @@
                                 {{ $order->adres_otkuda_info }}
                             </div>
                         @endif
-                        <div class="text-sm text-gray-900 mt-1">
+                        <div class="text-sm text-gray-900 mt-1"
+                           @if($order->type_order == 1) title="Предв. дальность: {{ $order->predv_way }}км."@endif
+                        >
                             <span class="font-medium">Куда:</span> {{ $order->adres_kuda }}
                         </div>
                         <!-- Дополнительная информация об адресе "куда" -->
@@ -109,11 +109,6 @@
                         @if($order->adres_obratno)
                             <div class="text-sm text-gray-900 mt-1">
                                 <span class="font-medium">Обратно:</span> {{ $order->adres_obratno }}
-                            </div>
-                        @endif
-                        @if($order->type_order == 1)
-                            <div class="text-sm text-gray-900 mt-1">
-                                <span class="font-medium">Предв. дальность:</span> {{ $order->predv_way }}км.
                             </div>
                         @endif
                     </td>
@@ -152,7 +147,7 @@
                     <td class="px-3 py-0">
                         @if($order->taxi_way)
                             <div class="text-sm text-gray-900">
-                                <span class="font-medium">Километраж:</span> {{number_format($order->taxi_way, 3, ',', ' ') . ' км' }}
+                                <span class="font-medium">Дальность:</span> {{number_format($order->taxi_way, 3, ',', ' ') . ' км' }}
                             </div>
                         @endif
                         @if($order->taxi_price)

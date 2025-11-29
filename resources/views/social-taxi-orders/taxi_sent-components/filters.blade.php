@@ -1,7 +1,7 @@
 <!-- resources/views/social-taxi-orders/taxi_sent-components/filters.blade.php -->
 <form action="{{ route('taxi_sent-orders.index') }}" method="GET" class="bg-white shadow rounded-lg mb-4">
     <!-- Заголовок аккордеона -->
-    <div class="px-4 py-3 bg-gray-50 border-b border-gray-200">
+    <div class="px-4 py-2 bg-gray-50 border-b border-gray-200">
         <button type="button" 
                 onclick="toggleFilters()"
                 class="flex items-center justify-between w-full text-left text-sm font-medium text-gray-700 hover:text-gray-900">
@@ -14,7 +14,7 @@
     </div>
 
     <!-- Содержимое фильтров (всегда показывается) -->
-    <div id="filters-content" class="p-4">
+    <div id="filters-content" class="p-2">
         <div class="flex flex-wrap gap-4 mb-2">
             <!-- Скрытое поле для сохранения параметров сортировки -->
             <input type="hidden" name="sort" value="{{ $sort ?? 'visit_data' }}">
@@ -53,7 +53,7 @@
                     </div>
         </div>
     </div>
-    <p class="mt-1 text-xs text-gray-500">Показываются только активные заказы (не удаленные и не отмененные)</p>
+    <p class="mt-0 text-xs text-gray-500">Показываются только активные заказы (не удаленные и не отмененные)</p>
 
 </form>
 <script>

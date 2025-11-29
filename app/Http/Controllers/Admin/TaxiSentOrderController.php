@@ -62,13 +62,15 @@ class TaxiSentOrderController extends BaseController {
         // Используем упрощенную логику для такси
         $query = $this->queryBuilder->build($request, false);
         $orders = $query->paginate(15)->appends($request->all());
+        $totalOrders = $orders->total();
 
         return view('social-taxi-orders.taxi_sent', compact(
                         'orders',
                         'sort',
                         'direction',
                         'urlParams',
-                        'taxis'
+                        'taxis',
+                        'totalOrders'
         ));
     }
 

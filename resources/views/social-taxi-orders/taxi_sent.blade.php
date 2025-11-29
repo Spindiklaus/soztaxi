@@ -1,10 +1,15 @@
 <!-- resources/views/social-taxi-orders/taxi_sent.blade.php -->
 <x-app-layout>
-    <div class="bg-gray-100 py-6">
+    <div class="bg-gray-100 py-2">
         <div class="max-w-[1536px] mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Заголовок -->
-            <div class="flex justify-between items-center mb-6">
-                <h1 class="text-3xl font-bold text-gray-800">Переданные заказы в такси&nbsp;</h1>
+            <div class="flex justify-between items-center mb-2">
+                <h1 class="text-3xl font-bold text-gray-800">
+                    Переданные заказы в такси&nbsp;
+                    <span class="text-lg font-normal text-gray-600">
+                        (всего: {{ $totalOrders ?? $orders->total() }})
+                    </span>
+                </h1>
                 
                 <a href="{{ route('social-taxi-orders.index', $urlParams) }}" 
                    class="inline-flex items-center px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400">
@@ -73,14 +78,14 @@
             @include('social-taxi-orders.taxi_sent-components.filters')
             
             <!-- Пагинация -->
-            <div class="mt-4 mb-2">
+            <div class="mt-2 mb-2">
                 {{ $orders->links() }}
             </div>
 
             @include('social-taxi-orders.taxi_sent-components.table')
 
             <!-- Пагинация -->
-            <div class="mt-6">
+            <div class="mt-2">
                 {{ $orders->links() }}
             </div>
         </div>
