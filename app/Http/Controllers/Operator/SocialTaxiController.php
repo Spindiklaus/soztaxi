@@ -139,16 +139,15 @@ class SocialTaxiController extends BaseController
 //    dd($request);
 
     // Получаем заказы, отфильтрованные по клиенту И по месяцу
-    $query = $this->queryBuilder->build($request, $showDeleted == '1');
+    $query = $this->queryBuilder->build($request,  true); // с удаленными записями
     $orders = $query->with(['client', 'category', 'currentStatus', 'currentStatus.statusOrder']) // <-- Добавлен 'category'
             ->get(); // <-- Используем get(), получаем коллекцию
     $lastCategory = null;
     if ($orders->isNotEmpty()) {
-        // Находим заказ с самой поздней датой поездки (или самой поздней датой создания/обновления, если дата поездки не важна)
+        // Находим заказ с самой поздней датой поездки 
         $latestOrder = $orders->sortByDesc('visit_data')->first(); 
         $lastCategory = $latestOrder->category; // Получаем связанную категорию
     }
-    
     
     // Фильтруем коллекцию, удаляя отменённые заказы ---
     $orders = $orders->filter(function ($order) {

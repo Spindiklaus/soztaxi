@@ -106,21 +106,30 @@
                         @foreach($sortedOrdersForDay as $order) {{-- Используем отсортированную коллекцию --}}
                             @php
                                 // Определяем цвет фона для конкретного заказа ---
-                                if ($order->type_order == 1) { // Соцтакси
-                                    $orderBgColor = ($tripCountForDay >= 2) ? 'bg-blue-100' : 'bg-yellow-100';
-                                    $orderTextColor = ($tripCountForDay >= 2) ? 'text-blue-800' : 'text-yellow-800';
-                                } else { // Газель (2) или Легковое авто (3)
-                                    $orderBgColor = 'bg-gray-100';
-                                    $orderTextColor = 'text-gray-800';
+                                if(!$order->deleted_at) {
+                                    if ($order->type_order == 1) { // Соцтакси
+                                        $orderBgColor = ($tripCountForDay >= 2) ? 'bg-blue-100' : 'bg-yellow-100';
+                                        $orderTextColor = ($tripCountForDay >= 2) ? 'text-blue-800' : 'text-yellow-800';
+                                    } else { // Газель (2) или Легковое авто (3)
+                                        $orderBgColor = 'bg-gray-100';
+                                        $orderTextColor = 'text-gray-800';
+                                    }
+                                } else {
+                                    $orderBgColor = 'bg-red-50';
+                                    $orderTextColor = 'text-red-500';
                                 }
                             @endphp
-                            <div class="text-lg {{ $orderBgColor }} {{ $orderTextColor }} rounded px-1 truncate flex items-center justify-between" 
+                            <div class="text-lg {{ $orderBgColor }} {{ $orderTextColor }} rounded px-1 truncate flex items-center justify-between"
                                  title="Тип: {{ getOrderTypeName($order->type_order) }}. Откуда: {{ $order->adres_otkuda }}. Куда: {{ $order->adres_kuda }}.
                                     @if($order->zena_type == 2) Обратно: {{ $order->adres_obratno }}.@endif
+                                    @if($order->deleted_at) Удалён: {{ $order->deleted_at->format('d.m.Y H:i') }}.@endif
                                  ">
 
                                 @if($order->type_order == 1)
-                                    {{ $order->visit_data->format('H:i') }}
+ 
+                                        <span class="truncate flex-grow">
+                                            {{ $order->visit_data->format('H:i') }}
+                                        </span>
                                     <!-- Кнопка "Копировать" - отображается только для соцтакси -->
                                     <button
                                         onclick="openCopyModal({{ $order->id }}, '{{ $order->visit_data->format('Y-m-d H:i') }}', '{{ $order->adres_otkuda }}', '{{ $order->adres_kuda }}' )"
