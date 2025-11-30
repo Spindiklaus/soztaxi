@@ -358,6 +358,10 @@ class SocialTaxiOrderController extends BaseController {
         $urlParams = $this->orderService->getUrlParams();
         return view('social-taxi-orders.return-from-taxi', compact('social_taxi_order', 'urlParams'));
     }
+    
+    
+    
+    
 
     /**
      * Вернуть заказ из такси

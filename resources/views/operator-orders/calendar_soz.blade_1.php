@@ -144,12 +144,8 @@
                                     <!-- Кнопка "Множественное копирование" --- -->
                                     <button
                                         type="button"
-                                        data-order-id="{{ $order->id }}"
-                                        data-visit-datetime="{{ $order->visit_data->format('Y-m-d H:i') }}"
-                                        data-adres-otkuda="{{ $order->adres_otkuda }}"
-                                        data-adres-kuda="{{ $order->adres_kuda }}"
-                                        data-predv-way="{{ $order->predv_way ?? '' }}"
-                                        class="copy-multiple-btn ml-1 text-lg text-purple-600 rounded px-1 hover:bg-purple-100"
+                                        onclick="openCopyMultipleModal({{ $order->id }}, '{{ $order->visit_data->format('Y-m-d H:i') }}', '{{ $order->adres_otkuda }}', '{{ $order->adres_kuda }}', '{{ $order->predv_way }}' )"
+                                        class="ml-1 text-lg text-purple-600 rounded px-1 hover:bg-purple-100"
                                         title="Множественное копирование заказа"
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -222,13 +218,5 @@
     @include('social-taxi-orders.show-components.scripts.modal-scripts')    
 <!-- JavaScript для модального окна с копированиес заказов-->
     @include('operator-orders.calendar-components.scripts.modal-scripts')    
-
-   <!-- Передаём даты из PHP в глобальные переменные JavaScript -->
-    
-    <script>
-        window.calendarStartDateFromPHP = "{{ $startDate->format('Y-m-d') }}";
-        window.calendarEndDateFromPHP = "{{ $endDate->format('Y-m-d') }}";
-        window.copyMultipleApiUrl = "{{ route('api.social-taxi-orders.copy-multiple') }}";
-        @include('operator-orders.calendar-components.scripts.multiple-modal-scripts') // Теперь включаем только JS-код
-    </script>
+    @include('operator-orders.calendar-components.scripts.multiple-modal-scripts')    
 </x-app-layout>

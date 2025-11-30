@@ -1,26 +1,26 @@
 <!-- /resuces/views/operator-orders/calendar-components/scripts/modal-scripts.blade.php
 <!-- JavaScript для переключения блоков информации и модального окна -->
     <script>
-    function openCopyModal(orderId, visitDateTime, adresOtkuda, adresKuda) {
-    // Заполняем форму данными из заказа
-    document.getElementById('copy-order-id').value = orderId;
-    // Форматируем дату для datetime-local (YYYY-MM-DDTHH:mm)
-    const formattedDateTime = visitDateTime.replace(' ', 'T');
-    document.getElementById('copy-visit-date-time').value = formattedDateTime;
+        function openCopyModal(orderId, visitDateTime, adresOtkuda, adresKuda, predvWay) {
+            // Заполняем форму данными из заказа
+            document.getElementById('copy-order-id').value = orderId;
+            // Форматируем дату для datetime-local (YYYY-MM-DDTHH:mm)
+            const formattedDateTime = visitDateTime.replace(' ', 'T');
+            document.getElementById('copy-visit-date-time').value = formattedDateTime;
+            document.getElementById('copy-predv-way').value = predvWay || '';
 
-    // --- НОВОЕ: Обновление текста в переключателях направления ---
-    const labelDirTuda = document.getElementById('label-dir-tuda');
-    const labelDirObratno = document.getElementById('label-dir-obratno');
+            // --- НОВОЕ: Обновление текста в переключателях направления ---
+            const labelDirTuda = document.getElementById('label-dir-tuda');
+            const labelDirObratno = document.getElementById('label-dir-obratno');
 
-    if (labelDirTuda && labelDirObratno) {
-        labelDirTuda.textContent = `Туда: (${adresOtkuda} -> ${adresKuda})`;
-        labelDirObratno.textContent = `Обратно: (${adresKuda} -> ${adresOtkuda})`;
-    }
-    // --- КОНЕЦ НОВОГО ---
+            if (labelDirTuda && labelDirObratno) {
+                labelDirTuda.textContent = `Туда: (${adresOtkuda} -> ${adresKuda})`;
+                labelDirObratno.textContent = `Обратно: (${adresKuda} -> ${adresOtkuda})`;
+            }
 
-    // Показываем модальное окно
-    document.getElementById('copy-order-modal').classList.remove('hidden');
-}
+            // Показываем модальное окно
+            document.getElementById('copy-order-modal').classList.remove('hidden');
+        }
 
         function closeCopyModal() {
             // Сбрасываем форму

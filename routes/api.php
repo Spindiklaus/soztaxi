@@ -2,6 +2,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ClientTripController;
 use App\Http\Controllers\Admin\SocialTaxiOrderController;
+use App\Http\Controllers\Operator\SocialTaxiController;
 use App\Http\Controllers\Api\OrderReportController;
 use App\Http\Controllers\Api\HelperController;
 use App\Http\Controllers\Api\CalculationController;
@@ -43,3 +44,6 @@ Route::post('/calculate-social-taxi-values', [CalculationController::class, 'cal
 
 // Маршрут для получения заказов по фильтрам статуса из сводного отчета
 Route::get('/orders-by-status-filter', [OrderReportController::class, 'getOrdersByStatusFilter']);
+
+// Маршрут для множественного копирования заказов из календаря
+Route::post('/social-taxi-orders/copy-multiple', [SocialTaxiController::class, 'copyMultipleOrders'])->name('api.social-taxi-orders.copy-multiple');

@@ -199,19 +199,21 @@ public function copyOrder(Request $request)
         'order_id' => 'required|exists:orders,id',
         'visit_data' => 'required|date',
         'type_kuda' => 'required|in:1,2',
+        'predv_way' => 'nullable|numeric|min:0',
     ]);
 
     try {
         $orderId = $request->input('order_id');
         $newVisitDateTime = Carbon::parse($request->input('visit_data'));
         $TypeKuda = (int) $request->input('type_kuda');
+        $newPredvWay = $request->input('predv_way');
 
         // --- Для проверки, что дата поездки в текущем месяце ---
         $monthStart = $newVisitDateTime->copy()->startOfMonth();
         $monthEnd = $newVisitDateTime->copy()->endOfMonth();
 
         // Загружаем оригинальный заказ
-        $originalOrder = Order::findOrFail($orderId);
+        $originalOrder = Order::withTrashed()->find($orderId);
         
         // Подготовка данных для нового заказа
         $newOrderData = $originalOrder->toArray();
@@ -237,6 +239,7 @@ public function copyOrder(Request $request)
         $newOrderData['user_id'] = auth()->id(); // Новый оператор (текущий)
         $newOrderData['visit_data'] = $newVisitDateTime; // Новая дата поездки
         $newOrderData['zena_type'] = 1; // У соцтакси поездки - только в одну сторону. всегда 1
+        $newOrderData['predv_way'] = $newPredvWay;
 
         // Меняем адреса в зависимости от направления
         if ($TypeKuda == 2) { // переставляем местами откуда-куда али нет
@@ -322,8 +325,178 @@ public function copyOrder(Request $request)
 
     } catch (\Exception $e) {
         \Log::error('Ошибка при копировании заказа: ' . $e->getMessage());
+        \Log::error('Stack trace: ' . $e->getTraceAsString()); // <-- Опционально: логгировать трейс ошибки
         return response()->json(['success' => false, 'message' => 'Произошла ошибка при создании заказа.'], 500);
     }
 }
-    
+
+// Множественное копирование заказов ---
+    /**
+     * Копировать заказ несколько раз на разные даты
+     */
+    /**
+     * Копировать заказ несколько раз на разные даты с разным временем и дальностью
+     */
+    public function copyMultipleOrders(Request $request)
+    {
+        $request->validate([
+            'original_order_id' => 'required|exists:orders,id', // ID оригинального заказа
+            'selected_dates' => 'required|array|min:1', // Массив выбранных дат
+            'selected_dates.*.selected' => 'required|in:1', // Должно быть отмечено
+            'selected_dates.*.visit_time' => 'required_with:selected_dates.*.selected|date_format:H:i', // Время в формате HH:MM
+            'selected_dates.*.predv_way' => 'nullable|numeric|min:0', // Предв. дальность
+        ]);
+
+        $selectedDatesData = $request->input('selected_dates'); // ['2025-01-02' => ['selected' => 1, 'visit_time' => '10:30', 'predv_way' => 12.5], ...]
+        $originalOrderId = $request->input('original_order_id');
+
+        try {
+            // Загружаем оригинальный заказ (включая удалённые)
+            $originalOrder = Order::withTrashed()->findOrFail($originalOrderId);
+
+            $successfulCopies = 0;
+            $failedCopies = 0;
+            $errorMessages = [];
+
+            \DB::transaction(function () use ($selectedDatesData, $originalOrder, &$successfulCopies, &$failedCopies, &$errorMessages) {
+                foreach ($selectedDatesData as $date => $data) {
+                    // Пропускаем, если дата не отмечена (проверка по ключу 'selected')
+                    if (empty($data['selected'])) {
+                        continue;
+                    }
+
+                    try {
+                        $newVisitTime = $data['visit_time']; // HH:MM
+                        $newPredvWay = $data['predv_way']; // Может быть null
+                        // $newDirection не передаётся, можно сделать по умолчанию 1 или добавить в календарь
+                        $newDirection = 1; // По умолчанию "туда"
+
+                        // Парсим новую дату/время
+                        $newVisitDateTime = Carbon::createFromFormat('Y-m-d H:i', $date . ' ' . $newVisitTime);
+
+                        // --- Проверки идентичны copyOrder ---
+                        // 1. Проверка лимита поездок в день
+                        $existingTripsCount = Order::where('client_id', $originalOrder->client_id)
+                            ->whereDate('visit_data', $newVisitDateTime->toDateString())
+                            ->whereNull('deleted_at')
+                            ->whereNull('cancelled_at')
+                            ->count();
+
+                        if ($existingTripsCount >= 2) {
+                            throw new \Exception("Невозможно создать копию: клиент уже имеет 2 поездки в этот день ({$newVisitDateTime->format('d.m.Y')}).");
+                        }
+
+                        // 2. Проверка лимита поездок в месяц
+                        $limit = $originalOrder->kol_p_limit;
+                        $existingTripsCountForMonth = getClientTripsCountInMonthByVisitDate($originalOrder->client_id, $newVisitDateTime);
+
+                        if ($existingTripsCountForMonth >= $limit) {
+                            throw new \Exception("Невозможно создать копию: достигнут лимит поездок для клиента ({$limit}) в {$newVisitDateTime->format('m.Y')}.");
+                        }
+
+                        // 3. Проверка разницы во времени (60 минут)
+                        $originalVisitDateTime = $originalOrder->visit_data;
+                        $diffInMinutes = abs($newVisitDateTime->diffInMinutes($originalVisitDateTime));
+
+                        if ($diffInMinutes <= 60) {
+                            throw new \Exception("Невозможно создать копию: новая дата/время поездки ({$newVisitDateTime->format('d.m.Y H:i')}) должна отличаться от оригинальной ({$originalVisitDateTime->format('d.m.Y H:i')}) более чем на 60 минут.");
+                        }
+
+                        // --- ПРОВЕРКА: Только для категорий с kat_dop = 2 и общей скидкой 100%---
+                        $category = $originalOrder->category;
+                        $message = null;
+                        if ($category && $category->kat_dop == 2 && $originalOrder->skidka_dop_all == 100) {
+                            $monthStart = $newVisitDateTime->copy()->startOfMonth();
+                            $monthEnd = $newVisitDateTime->copy()->endOfMonth();
+
+                            $freeTripsCount = Order::where('client_id', $originalOrder->client_id)
+                                ->whereBetween('visit_data', [$monthStart, $monthEnd])
+                                ->whereNull('deleted_at')
+                                ->whereNull('cancelled_at')
+                                ->where('skidka_dop_all', '=', 100)
+                                ->count();
+
+                            if ($freeTripsCount >= 16) {
+                                $newSkidkaDopAll = 50; // Изменяем скидку
+                                $message = 'Скидка изменена с 100% на 50%, так как клиент с категорией 2 уже использовал 16 бесплатных поездок в этом месяце.';
+                            } else {
+                                $newSkidkaDopAll = $originalOrder->skidka_dop_all; // Сохраняем оригинальную скидку
+                            }
+                        } else {
+                            $newSkidkaDopAll = $originalOrder->skidka_dop_all; // Сохраняем оригинальную скидку
+                        }
+                        // --- КОНЕЦ ПРОВЕРКИ ---
+
+                        // Подготовка данных для нового заказа (как в copyOrder)
+                        $newOrderData = $originalOrder->toArray();
+                        unset($newOrderData['id']);
+                        unset($newOrderData['pz_nom']);
+                        unset($newOrderData['pz_data']);
+                        unset($newOrderData['taxi_sent_at']);
+                        unset($newOrderData['order_group_id']);
+                        unset($newOrderData['taxi_price']);
+                        unset($newOrderData['taxi_way']);
+                        unset($newOrderData['taxi_vozm']);
+                        unset($newOrderData['cancelled_at']);
+                        unset($newOrderData['otmena_taxi']);
+                        unset($newOrderData['closed_at']);
+                        unset($newOrderData['komment']);
+                        unset($newOrderData['created_at']);
+                        unset($newOrderData['updated_at']);
+                        unset($newOrderData['deleted_at']);
+
+                        $newOrderData['user_id'] = auth()->id();
+                        $newOrderData['visit_data'] = $newVisitDateTime;
+                        $newOrderData['zena_type'] = 1; // Всегда 1 для соцтакси
+                        $newOrderData['predv_way'] = $newPredvWay; // Устанавливаем новую предв. дальность
+                        $newOrderData['skidka_dop_all'] = $newSkidkaDopAll; // Устанавливаем новую скидку
+
+                        // Меняем адреса в зависимости от направления
+                        if ($newDirection == 2) { // Обратно
+                            $newOrderData['adres_otkuda'] = $originalOrder->adres_kuda;
+                            $newOrderData['adres_otkuda_info'] = $originalOrder->adres_kuda_info;
+                            $newOrderData['adres_kuda'] = $originalOrder->adres_otkuda;
+                            $newOrderData['adres_kuda_info'] = $originalOrder->adres_otkuda_info;
+                        }
+                        // Адреса остаются как в оригинале, если newDirection == 1
+
+                        $newOrderData['pz_nom'] = generateOrderNumber($originalOrder->type_order, auth()->id());
+                        $newOrderData['pz_data'] = now();
+
+                        $directionText = ($newDirection == 2) ? ' (обратный путь)' : '';
+                        $newOrderData['komment'] = "Копия заказа №{$originalOrder->pz_nom} от {$originalOrder->pz_data->format('d.m.Y H:i')}" . $directionText
+                                . " Выполнена из календаря поездок " . now()->format('d.m.Y H:i');
+                        if ($message) {
+                            $newOrderData['komment'] .= "\n" . $message;
+                        }
+
+                        // Создаем новый заказ
+                        Order::create($newOrderData);
+                        $successfulCopies++;
+
+                    } catch (\Exception $e) {
+                        $failedCopies++;
+                        $errorMessages[] = "Дата {$date}: " . $e->getMessage();
+                    }
+                }
+            });
+
+            if ($failedCopies > 0) {
+                $errorMessage = implode("\n", $errorMessages);
+                $overallMessage = "Часть заказов не была создана:\n{$errorMessage}";
+                if ($successfulCopies > 0) {
+                    $overallMessage .= "\n\nУспешно создано: {$successfulCopies}";
+                }
+                return response()->json(['success' => false, 'message' => $overallMessage]);
+            }
+
+            return response()->json(['success' => true, 'message' => "Успешно создано {$successfulCopies} копий."]);
+
+        } catch (\Exception $e) {
+            \Log::error('Ошибка при множественном копировании заказа: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            return response()->json(['success' => false, 'message' => 'Произошла ошибка при создании заказов.'], 500);
+        }
+    }
+
 }
