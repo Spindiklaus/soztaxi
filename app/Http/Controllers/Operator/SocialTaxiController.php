@@ -143,11 +143,14 @@ class SocialTaxiController extends BaseController
     $orders = $query->with(['client', 'category', 'currentStatus', 'currentStatus.statusOrder','dopus']) // <-- Добавлен 'category'
             ->get(); // <-- Используем get(), получаем коллекцию
     $lastCategory = null;
-    if ($orders->isNotEmpty()) {
-        // Находим заказ с самой поздней датой поездки 
-        $latestOrder = $orders->sortByDesc('visit_data')->first(); 
+
+    // Находим заказ с самой поздней датой поездки 
+        $latestOrder = Order::where('client_id', $client->id)
+            ->whereNull('cancelled_at') // исключаем отменённые
+            ->with(['category', 'dopus'])
+            ->orderBy('visit_data', 'desc')
+            ->first();
         $lastCategory = $latestOrder->category; // Получаем связанную категорию
-    }
     
     // Фильтруем коллекцию, удаляя отменённые заказы ---
     $orders = $orders->filter(function ($order) {
