@@ -135,7 +135,7 @@
                         </div>
 
                     </td>
-                    <td class="px-1 py-0 max-w-[100px]"> <!-- клиент -->
+                    <td class="px-1 py-0 max-w-[100px]">  <!-- клиент -->
                         @if($order->client)
                            <a href="{{ route('operator.social-taxi.calendar.client', ['client' => $order->client_id, 'date' => $order->visit_data->format('Y-m-d')] + $urlParams) }}" class="text-sm font-medium text-blue-600 hover:text-blue-900 hover:underline"
                                 title="{{ $order->client_tel ? 'Тел: ' . $order->client_tel . "\n" : '' }}{{ $order->client_invalid ? 'Удостоверение: ' . $order->client_invalid . "\n" : '' }}{{ $order->client_sopr ? 'Сопровождающий: ' . $order->client_sopr . "\n" : '' }}{{ $order->category ? 'NMV: ' . $order->category->nmv . "\nКатегория: " . $order->category->name . "\nСкидка: " . $order->category->skidka . "%\nЛимит: " . $order->category->kol_p . " поездок/мес\n" : '' }}{{ $order->dopus ? $order->dopus->name : '' }}"

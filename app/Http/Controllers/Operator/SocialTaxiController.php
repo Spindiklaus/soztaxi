@@ -194,7 +194,7 @@ class SocialTaxiController extends BaseController
     */
 public function copyOrder(Request $request)
 {
-    // Валидация данных
+     // Валидация данных
     $request->validate([
         'order_id' => 'required|exists:orders,id',
         'visit_data' => 'required|date',

@@ -85,7 +85,9 @@ class SocialTaxiOrderBuilder {
                 // Или поиск по телефону в заказе
                 ->orWhere('client_tel', 'like', '%' . $searchTerm . '%')
                 // Или поиск по удостоверению в заказе
-                ->orWhere('client_invalid', 'like', '%' . $searchTerm . '%');
+                ->orWhere('client_invalid', 'like', '%' . $searchTerm . '%')
+                // Или поиск по сопров.
+                ->orWhere('client_sopr', 'like', '%' . $searchTerm . '%');
             });
         }
         

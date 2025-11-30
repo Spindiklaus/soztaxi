@@ -117,7 +117,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/social-taxi', [SocialTaxiController::class, 'index'])->name('social-taxi.index');
         Route::get('/car', [CarController::class, 'index'])->name('car.index');
         Route::get('/gazelle', [GazelleController::class, 'index'])->name('gazelle.index');
-
         Route::get('/social-taxi/calendar/client/{client}/date/{date}', [SocialTaxiController::class, 'calendarByClient'])->name('social-taxi.calendar.client');
         Route::post('/social-taxi/copy-order', [SocialTaxiController::class, 'copyOrder'])->name('social-taxi.copy-order');
     });
