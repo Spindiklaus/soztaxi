@@ -13,7 +13,7 @@
                             <input type="datetime-local" id="copy-visit-date-time" name="visit_data" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
                         </div>
                         <div>
-                            <!-- --- ИЗМЕНЕНО: Направление через переключатели с ID для labels --- -->
+                            <!-- Направление через переключатели с ID для labels --- -->
                             <label class="block text-sm font-medium text-gray-700">Направление</label>
                             <div class="mt-1 inline-flex rounded-md shadow-sm" role="group">
                                 <input type="radio" name="type_kuda" id="dir-tuda" value="1" checked class="hidden peer/dir-tuda" />
@@ -27,7 +27,6 @@
                                     Обратно
                                 </label>
                             </div>
-                            <!-- --- КОНЕЦ ИЗМЕНЕНИЯ --- -->
                         </div>
                     </div>
                     <div class="items-center gap-2 mt-4">
