@@ -18,18 +18,6 @@
     <div id="client-info-content" class="p-4 hidden">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-                <label class="block text-sm font-medium text-gray-700">Серия и номер паспорта</label>
-                <div class="mt-1 bg-gray-100 p-2 rounded-md">{{ $client->kl_id ?? 'Не указан' }}</div>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Дата рождения</label>
-                <div class="mt-1 bg-gray-100 p-2 rounded-md">{{ $client->data_r ? $client->data_r->format('d.m.Y') : 'Не указана' }}</div>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Пол</label>
-                <div class="mt-1 bg-gray-100 p-2 rounded-md">{{ $client->sex ?? 'Не указан' }}</div>
-            </div>
-            <div>
                 <label class="block text-sm font-medium text-gray-700">Категория инвалидности</label>
                 <div class="mt-1 bg-gray-100 p-2 rounded-md">
                     @if($lastCategory)
@@ -37,6 +25,26 @@
                     @else
                         Не указана
                     @endif
+                </div>
+            </div>
+            <!-- Общая скидка -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Общая скидка, %</label>
+                <div class="mt-1 bg-gray-100 p-2 rounded-md">
+                    {{ $latestOrder->skidka_dop_all ?? '-' }}
+                </div>
+            </div>
+            <!-- Лимит поездок -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Лимит поездок</label>
+                <div class="mt-1 bg-gray-100 p-2 rounded-md">
+                    {{ $latestOrder->kol_p_limit ?? '-' }}
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Доп. условия</label>
+                <div class="mt-1 bg-gray-100 p-2 rounded-md">
+                    {{ $latestOrder->dopus?->name ?? '—' }}
                 </div>
             </div>
         </div>

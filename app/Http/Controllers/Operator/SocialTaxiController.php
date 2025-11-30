@@ -99,9 +99,9 @@ class SocialTaxiController extends BaseController
         $request->merge(['filter_client_id' => $client->id]);
     }
 
-    $showDeleted = $request->get('show_deleted', '0');
-    $sort = $request->get('sort', 'visit_data'); // Сортировка по дате поездки
-    $direction = $request->get('direction', 'asc');
+//    $showDeleted = $request->get('show_deleted', '0');
+//    $sort = $request->get('sort', 'visit_data'); // Сортировка по дате поездки
+//    $direction = $request->get('direction', 'asc');
 
     // --- ОПРЕДЕЛЕНИЕ МЕСЯЦА КАЛЕНДАРЯ ---
     $targetDate = null;
@@ -140,7 +140,7 @@ class SocialTaxiController extends BaseController
 
     // Получаем заказы, отфильтрованные по клиенту И по месяцу
     $query = $this->queryBuilder->build($request,  true); // с удаленными записями
-    $orders = $query->with(['client', 'category', 'currentStatus', 'currentStatus.statusOrder']) // <-- Добавлен 'category'
+    $orders = $query->with(['client', 'category', 'currentStatus', 'currentStatus.statusOrder','dopus']) // <-- Добавлен 'category'
             ->get(); // <-- Используем get(), получаем коллекцию
     $lastCategory = null;
     if ($orders->isNotEmpty()) {
@@ -184,6 +184,7 @@ class SocialTaxiController extends BaseController
         'operatorCurrentType',
         'urlParams',
         'lastCategory',
+        'latestOrder',    
         'prevMonth',
         'nextMonth'     
     ));
