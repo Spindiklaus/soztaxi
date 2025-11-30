@@ -116,7 +116,7 @@ class FioDtrnController extends BaseController {
                 ->select('fio', DB::raw('COUNT(*) as count'))
                 ->whereNull('rip_at')
                 ->groupBy('fio')
-                ->having('count', '>', 1)
+                ->havingRaw('COUNT(*) > 1')
                 ->orderBy('fio')
                 ->pluck('count', 'fio'); // ['Иванов Иван Иванович' => 3, ...]
         // Подготовим данные для Alpine.js
