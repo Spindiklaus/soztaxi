@@ -95,7 +95,10 @@
         const endDateOfMonth = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 0); // Последний день месяца
 
         while (currentDate <= endDateOfMonth) {
-            const dateStr = currentDate.toISOString().split('T')[0]; // YYYY-MM-DD
+            const year = currentDate.getFullYear();
+            const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+            const day = String(currentDate.getDate()).padStart(2, '0');
+            const dateStr = `${year}-${month}-${day}`;
             const dayNumber = currentDate.getDate();
             const isToday = currentDate.toDateString() === new Date().toDateString();
             const isSelectedOriginal = dateStr === originalDate; // Проверяем, является ли день оригинальной датой
@@ -179,10 +182,27 @@
     document.getElementById('copy-order-multiple-form').addEventListener('submit', function(e) {
         e.preventDefault();
 
+        // Отключаем поля для неотмеченных дат, чтобы они не попали в FormData
+        const checkboxes = this.querySelectorAll('input[name*="[selected]"]');
+        checkboxes.forEach(checkbox => {
+            const dateKeyMatch = checkbox.name.match(/selected_dates\[([^\]]+)\]\[selected\]/);
+            if (dateKeyMatch) {
+                const dateKey = dateKeyMatch[1];
+                const timeInput = this.querySelector(`input[name="selected_dates[${dateKey}][visit_time]"]`);
+                const wayInput = this.querySelector(`input[name="selected_dates[${dateKey}][predv_way]"]`);
+                if (!checkbox.checked) {
+                    if (timeInput) timeInput.disabled = true;
+                    if (wayInput) wayInput.disabled = true;
+                } else {
+                    // Убедимся, что отмеченные — включены
+                    if (timeInput) timeInput.disabled = false;
+                    if (wayInput) wayInput.disabled = false;
+                }
+            }
+        });
+        
+        
         const formData = new FormData(this);
-        const originalOrderId = formData.get('original_order_id');
-
-        // Проверяем, есть ли выбранные даты
         const selectedCheckboxes = this.querySelectorAll('input[name*="[selected]"]:checked');
         if (selectedCheckboxes.length === 0) {
             alert('Пожалуйста, выберите хотя бы одну дату.');
@@ -193,6 +213,7 @@
         fetch(window.copyMultipleApiUrl, {
             method: 'POST',
             body: formData,
+            credentials: 'same-origin', // ← ЭТА СТРОКА ОБЯЗАТЕЛЬНА! для куки
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                 'X-Requested-With': 'XMLHttpRequest',

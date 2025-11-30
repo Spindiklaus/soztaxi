@@ -339,6 +339,7 @@ public function copyOrder(Request $request)
      */
     public function copyMultipleOrders(Request $request)
     {
+        
         $request->validate([
             'original_order_id' => 'required|exists:orders,id', // ID оригинального заказа
             'selected_dates' => 'required|array|min:1', // Массив выбранных дат
@@ -360,6 +361,7 @@ public function copyOrder(Request $request)
 
             \DB::transaction(function () use ($selectedDatesData, $originalOrder, &$successfulCopies, &$failedCopies, &$errorMessages) {
                 foreach ($selectedDatesData as $date => $data) {
+
                     // Пропускаем, если дата не отмечена (проверка по ключу 'selected')
                     if (empty($data['selected'])) {
                         continue;
@@ -367,6 +369,9 @@ public function copyOrder(Request $request)
 
                     try {
                         $newVisitTime = $data['visit_time']; // HH:MM
+                        
+                        \Log::info('Получена дата из запроса:', ['raw_date' => $date, 'visit_time' => $newVisitTime]);
+                        
                         $newPredvWay = $data['predv_way']; // Может быть null
                         // $newDirection не передаётся, можно сделать по умолчанию 1 или добавить в календарь
                         $newDirection = 1; // По умолчанию "туда"

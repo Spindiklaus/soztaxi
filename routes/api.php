@@ -46,4 +46,7 @@ Route::post('/calculate-social-taxi-values', [CalculationController::class, 'cal
 Route::get('/orders-by-status-filter', [OrderReportController::class, 'getOrdersByStatusFilter']);
 
 // Маршрут для множественного копирования заказов из календаря
-Route::post('/social-taxi-orders/copy-multiple', [SocialTaxiController::class, 'copyMultipleOrders'])->name('api.social-taxi-orders.copy-multiple');
+Route::middleware(['auth', 'web'])->group(function () {
+    Route::post('/api/social-taxi-orders/copy-multiple', [SocialTaxiController::class, 'copyMultipleOrders'])
+        ->name('api.social-taxi-orders.copy-multiple');
+});

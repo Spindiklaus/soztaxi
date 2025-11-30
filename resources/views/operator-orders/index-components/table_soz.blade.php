@@ -111,25 +111,25 @@
                         @endif
                     </td>
                     <td class="px-1 py-0 max-w-[200px]"><!-- откуда -->
-                        <div class="text-lg text-gray-900">
-                            {{ $order->adres_otkuda }}
+                        <div class="text-lg text-gray-900" title="{{ $order->adres_otkuda }}">
+                             {{ Str::limit($order->adres_otkuda, 60) }}
                             <!-- Дополнительная информация об адресе "откуда" -->
                             @if($order->adres_otkuda_info)
-                                <span class="text-sm text-gray-500 mt-1 ml-4">
-                                    {{ $order->adres_otkuda_info }}
+                                <span class="text-sm text-gray-500 ml-4"
+                                    title="{{ $order->adres_otkuda_info }}">
+                                    {{ Str::limit($order->adres_otkuda_info, 60) }}
                                 </span>
                             @endif
                         </div>
                     </td>
                     <td class="px-1 py-0 max-w-[200px]"> <!-- куда -->
-                        <div class="text-lg text-gray-900 mt-1"
-                             title ="Предварительная дальность {{ $order->predv_way }}км."
-                             >
-                            {{ $order->adres_kuda }}
+                        <div class="text-lg text-gray-900 mt-1" title="{{ $order->adres_kuda }}">
+                            {{ Str::limit($order->adres_kuda, 60) }}
                             <!-- Дополнительная информация об адресе "куда" -->
                             @if($order->adres_kuda_info)
-                                <span class="text-sm text-gray-500 mt-1 ml-4">
-                                    {{ $order->adres_kuda_info }}
+                                <span class="text-sm text-gray-500 ml-4"
+                                 title="{{ $order->adres_kuda_info }}">
+                                {{ Str::limit($order->adres_kuda_info, 60) }}
                                 </span>
                             @endif
                         </div>
