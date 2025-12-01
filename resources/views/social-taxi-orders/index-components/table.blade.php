@@ -30,7 +30,7 @@
                         <span class="ml-1" x-show="sortField === 'pz_data' && sortDirection === 'desc'">↓</span>
                     </th>
                     <th @click="sortBy('visit_data')" scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-blue-700">
-                        Дата и время поездки
+                        Дата поездки
                         <span class="ml-1" x-show="sortField === 'visit_data' && sortDirection === 'asc'">↑</span>
                         <span class="ml-1" x-show="sortField === 'visit_data' && sortDirection === 'desc'">↓</span>
                     </th>
