@@ -4,7 +4,12 @@
         <div class="max-w-[1536px] mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Заголовок -->
             <div class="flex justify-between items-center mb-2">
-                <h1 class="text-3xl font-bold text-gray-800">Открытие заказов </h1>
+                <h1 class="text-3xl font-bold text-gray-800">
+                    Открытие заказов 
+                     <span class="text-lg font-normal text-gray-600">
+                        (всего: {{ $totalOrders ?? $orders->total() }})
+                    </span>
+                </h1>
                 
                 <a href="{{ route('social-taxi-orders.index', $urlParams) }}" 
                    class="inline-flex items-center px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400">

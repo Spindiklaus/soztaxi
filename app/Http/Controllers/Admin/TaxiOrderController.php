@@ -168,7 +168,7 @@ class TaxiOrderController extends BaseController {
             // Возвращаемся с параметрами фильтрации
             $urlParams = $this->orderService->getUrlParams();
 
-            return redirect()->route('taxi_sent-orders.index', $urlParams)
+            return redirect()->route('taxi-orders.index', $urlParams)
                             ->with('success', "Дата передачи в такси установлена для {$ordersCount} заказов.");
     }
 

@@ -25,7 +25,7 @@
                         <span class="ml-1" x-show="sortField === 'pz_data' && sortDirection === 'desc'">↓</span>
                     </th>
                     <th @click="sortBy('visit_data')" scope="col" class="px-2 py-0 text-left text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-blue-700">
-                        Дата и время поездки
+                        Дата поездки
                         <span class="ml-1" x-show="sortField === 'visit_data' && sortDirection === 'asc'">↑</span>
                         <span class="ml-1" x-show="sortField === 'visit_data' && sortDirection === 'desc'">↓</span>
                     </th>
@@ -90,7 +90,10 @@
                     </td>
                     <td class="px-2 py-0">
                         <div class="text-sm text-gray-900">
-                            <span class="font-medium">Откуда:</span> {{ $order->adres_otkuda }}
+                            <span class="font-medium" title ='{{ $order->adres_otkuda }} {{$order->adres_otkuda_info}}'>
+                                Откуда: 
+                                <span class="text-lg">{{ Str::limit( $order->adres_otkuda,20) }} <span>
+                            </span>  
                         </div>
                         <!-- Дополнительная информация об адресе "откуда" -->
 <!--                        @if($order->adres_otkuda_info)
@@ -98,10 +101,11 @@
                                 {{-- $order->adres_otkuda_info --}}
                             </div>
                         @endif-->
-                        <div class="text-sm text-gray-900 mt-1"
-                            @if($order->type_order == 1) title="Предв. дальность: {{ $order->predv_way }}км."@endif
-                        >
-                            <span class="font-medium">Куда:</span> {{ $order->adres_kuda }}
+                        <div class="text-sm text-gray-900 mt-1">
+                            <span class="font-medium" title ='{{ $order->adres_kuda }} {{$order->adres_kuda_info}}'>
+                                Куда:
+                                <span class="text-lg">{{ Str::limit($order->adres_kuda,20) }} <span>
+                            </span>    
                         </div>
                         <!-- Дополнительная информация об адресе "куда" -->
 <!--                        @if($order->adres_kuda_info)
@@ -148,10 +152,11 @@
                         @endif
                     </td>
                     <td class="px-2 py-0">
-                        @if($order->taxi_way)
+                        @if($order->taxi_price)
                             <div class="text-sm text-gray-900" 
-                                 title="Цена: {{ number_format($order->taxi_price, 2, ',', ' ') . ' руб.' }}, К оплате: {{ number_format($order->taxi_price - $order->taxi_vozm, 2, ',', ' ') . ' руб.' }}, К возмещению: {{ $order->taxi_vozm ? number_format($order->taxi_vozm, 2, ',', ' ') . ' руб.' : '-' }}">
-                                <span class="font-medium">Дальность:</span> {{number_format($order->taxi_way, 3, ',', ' ') . ' км' }}
+                                 title="@if($order->type_order==1) Дальность:{{number_format($order->taxi_way, 3, ',', ' ') . ' км' }},@endif К оплате: {{ number_format($order->taxi_price - $order->taxi_vozm, 2, ',', ' ') . ' руб.' }}, К возмещению: {{ $order->taxi_vozm ? number_format($order->taxi_vozm, 2, ',', ' ') . ' руб.' : '-' }}">
+                                <span class="font-medium">Цена:</span>
+                                {{ number_format($order->taxi_price, 2, ',', ' ') . ' руб.' }}
                             </div>
                         @endif
                     </td>

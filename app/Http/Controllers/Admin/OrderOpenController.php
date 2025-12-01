@@ -34,7 +34,8 @@ class OrderOpenController extends BaseController {
         $urlParams = $this->orderService->getUrlParams();        
         // Используем билдер
         $query = $this->queryBuilder->build($request);
-        $orders = $query->paginate(15)->appends($request->all());
+        $orders = $query->paginate(20)->appends($request->all());
+        $totalOrders = $orders->total();
 
         // Получаем список активных такси для фильтра
         $taxis = \App\Models\Taxi::where('life', 1)->orderBy('name')->get();

@@ -74,7 +74,7 @@ class TaxiSentOrderController extends BaseController {
         ));
     }
 
-    // В TaxiOrderController
+    // отменить передачу сведений в такси
     public function unsetSentDate(UnsetTaxiSentDateRequest  $request) {
             // Валидация данных
             $validated = $request->validated();
@@ -88,7 +88,7 @@ class TaxiSentOrderController extends BaseController {
             // Возвращаемся с параметрами фильтрации
             $urlParams = $this->orderService->getUrlParams();
 
-            return redirect()->route('taxi-orders.index', $urlParams)
+            return redirect()->route('taxi_sent-orders.index', $urlParams)
                             ->with('success', "Дата передачи в такси снята для {$ordersCount} заказов. Не забудьте отправить сведения об отмене в такси!");
     }
 
@@ -99,10 +99,10 @@ class TaxiSentOrderController extends BaseController {
         $urlParams = $this->orderService->getUrlParams();
 
         if ($updatedCount === 0) {
-            return redirect()->route('taxi-orders.index', $urlParams)->with('info', 'Нет заказов для обновления (нет заказов соцтакси со статусом "Передан в такси" с заполненной предварительной дальностью).');
+            return redirect()->route('taxi_sent-orders.index', $urlParams)->with('info', 'Нет заказов для обновления (нет заказов соцтакси со статусом "Передан в такси" с заполненной предварительной дальностью).');
         }
 
-        return redirect()->route('taxi-orders.index', $urlParams)
+        return redirect()->route('taxi_sent-orders.index', $urlParams)
             ->with('success', "Предварительные данные перенесены в фактические для {$updatedCount} заказов.");
     }
 

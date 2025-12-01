@@ -4,7 +4,12 @@
         <div class="max-w-[1536px] mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Заголовок -->
             <div class="flex justify-between items-center mb-2">
-                <h1 class="text-3xl font-bold text-gray-800">Закрытие заказов </h1>
+                <h1 class="text-3xl font-bold text-gray-800">
+                    Закрытие заказов 
+                     <span class="text-lg font-normal text-gray-600">
+                        (всего: {{ $totalOrders ?? $orders->total() }})
+                    </span>
+                </h1>
                 
                 <a href="{{ route('social-taxi-orders.index', $urlParams) }}" 
                    class="inline-flex items-center px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400">
@@ -19,31 +24,31 @@
 
             <!-- Форма действий -->
             <div class="flex flex-wrap gap-2 mb-2">
-            <form action="{{ route('social-taxi-orders.close.bulk-close') }}" method="POST" class="mb-4">
-                @csrf
-                <input type="hidden" name="date_from" value="{{ request('date_from', date('Y-m-d')) }}">
-                <input type="hidden" name="date_to" value="{{ request('date_to', date('Y-m-d')) }}">
-                <input type="hidden" name="taxi_id" value="{{ request('taxi_id') }}">
+                <form action="{{ route('social-taxi-orders.close.bulk-close') }}" method="POST" class="mb-4">
+                    @csrf
+                    <input type="hidden" name="date_from" value="{{ request('date_from', date('Y-m-d')) }}">
+                    <input type="hidden" name="date_to" value="{{ request('date_to', date('Y-m-d')) }}">
+                    <input type="hidden" name="taxi_id" value="{{ request('taxi_id') }}">
 
-                 <p class="mb-1 text-xs text-gray-500">
-                    Будут закрыты принятый в такси заказы ТОЛЬКО с фактическими данными о поездке
-                </p>    
-                    
-                <button type="submit"
-                        class="inline-flex items-center px-4 py-2 bg-green-600 
-                        border border-transparent rounded-md font-semibold text-white hover:bg-green-700 
-                        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 
-                        transition ease-in-out duration-150 mb-2"
-                        onclick="return confirm('Вы уверены, что хотите закрыть все отмеченные заказы?')"
-                        title="закрыть отмеченные">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    Закрыть отмеченные
-                </button>
-    
-                @include('social-taxi-orders.close-components.table')
-            </form>
+                     <p class="mb-1 text-xs text-gray-500">
+                        Будут закрыты принятый в такси заказы ТОЛЬКО с фактическими данными о поездке
+                    </p>    
+
+                    <button type="submit"
+                            class="inline-flex items-center px-4 py-2 bg-green-600 
+                            border border-transparent rounded-md font-semibold text-white hover:bg-green-700 
+                            focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 
+                            transition ease-in-out duration-150 mb-2"
+                            onclick="return confirm('Вы уверены, что хотите закрыть все отмеченные заказы?')"
+                            title="закрыть отмеченные">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        Закрыть отмеченные
+                    </button>
+
+                    @include('social-taxi-orders.close-components.table')
+                </form>
             </div>
 
             <!-- Пагинация -->

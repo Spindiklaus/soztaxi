@@ -38,9 +38,9 @@
                         <select name="taxi_id" id="taxi_id" 
                                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                             @foreach($taxis as $taxi)
-                            <option value="{{ $taxi->id }}" {{ request('taxi_id') == $taxi->id ? 'selected' : '' }}>
-                                {{ $taxi->name }} (#{{ $taxi->id }})
-                            </option>
+                                <option value="{{ $taxi->id }}" {{ request('taxi_id') == $taxi->id ? 'selected' : '' }}>
+                                    {{ $taxi->name }} (#{{ $taxi->id }})
+                                </option>
                             @endforeach
                         </select>
                     </div>
