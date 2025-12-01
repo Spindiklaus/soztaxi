@@ -92,6 +92,9 @@
                                 <x-dropdown-link :href="route('taxi_sent-orders.index')" :active="request()->routeIs('taxi_sent-orders.index')">
                                     {{ __('Подтверждение/отмена передачи') }}
                                 </x-dropdown-link>
+                                <x-dropdown-link :href="route('admin.taxi-orders.import.form')" :active="request()->routeIs('admin.taxi-orders.import.form')">
+                                    {{ __('Сверка файлов xls') }}
+                                </x-dropdown-link>
                                 <x-dropdown-link :href="route('social-taxi-orders.close.index')" :active="request()->routeIs('social-taxi-orders.close.index')">
                                     {{ __('Закрыть заказы') }}
                                 </x-dropdown-link>

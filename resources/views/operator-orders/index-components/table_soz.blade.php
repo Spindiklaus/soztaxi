@@ -111,27 +111,27 @@
                         @endif
                     </td>
                     <td class="px-1 py-0 max-w-[200px]"><!-- откуда -->
-                        <div class="text-lg text-gray-900" title="{{ $order->adres_otkuda }}">
-                             {{ Str::limit($order->adres_otkuda, 60) }}
+                        <div class="text-lg text-gray-900" title="{{ $order->adres_otkuda }} {{ $order->adres_otkuda_info }}">
+                             {{ Str::limit($order->adres_otkuda, 40) }}
                             <!-- Дополнительная информация об адресе "откуда" -->
-                            @if($order->adres_otkuda_info)
+<!--                            @if($order->adres_otkuda_info)
                                 <span class="text-sm text-gray-500 ml-4"
-                                    title="{{ $order->adres_otkuda_info }}">
-                                    {{ Str::limit($order->adres_otkuda_info, 60) }}
+                                    title="{{-- $order->adres_otkuda_info --}}">
+                                    {{-- Str::limit($order->adres_otkuda_info, 60) --}}
                                 </span>
-                            @endif
+                            @endif-->
                         </div>
                     </td>
                     <td class="px-1 py-0 max-w-[200px]"> <!-- куда -->
-                        <div class="text-lg text-gray-900 mt-1" title="{{ $order->adres_kuda }}">
-                            {{ Str::limit($order->adres_kuda, 60) }}
+                        <div class="text-lg text-gray-900 mt-1" title="{{ $order->adres_kuda }} {{ $order->adres_kuda_info }}">
+                            {{ Str::limit($order->adres_kuda, 40) }}
                             <!-- Дополнительная информация об адресе "куда" -->
-                            @if($order->adres_kuda_info)
+<!--                            @if($order->adres_kuda_info)
                                 <span class="text-sm text-gray-500 ml-4"
-                                 title="{{ $order->adres_kuda_info }}">
-                                {{ Str::limit($order->adres_kuda_info, 60) }}
+                                 title="{{-- $order->adres_kuda_info --}}">
+                                {{-- Str::limit($order->adres_kuda_info, 60) --}}
                                 </span>
-                            @endif
+                            @endif-->
                         </div>
 
                     </td>
