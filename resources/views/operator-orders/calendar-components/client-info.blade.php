@@ -16,10 +16,12 @@
     </div>
 
     <div id="client-info-content" class="p-4 hidden">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-2">
+            <div class="md:col-span-4">
                 <label class="block text-sm font-medium text-gray-700">Категория инвалидности</label>
-                <div class="mt-1 bg-gray-100 p-2 rounded-md">
+                <div class="mt-1 bg-gray-100 p-2 rounded-md"
+                     title="Cкидка %: {{$latestOrder->skidka_dop_all}}, Лимит: {{$latestOrder->kol_p_limit}}, Доп.условия: {{ $latestOrder->dopus?->name ?? '-' }} "
+                >
                     @if($lastCategory)
                         {{ $lastCategory->name }} (NMV: {{ $lastCategory->nmv }})
                     @else
@@ -27,24 +29,22 @@
                     @endif
                 </div>
             </div>
-            <!-- Общая скидка -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Общая скидка, %</label>
-                <div class="mt-1 bg-gray-100 p-2 rounded-md">
-                    {{ $latestOrder->skidka_dop_all ?? '-' }}
+            <!-- Адрес "откуда" -->
+            <div class="md:col-span-4">
+                <label class="block text-sm font-medium text-gray-700">Адрес "откуда"</label>
+                <div class="mt-1 bg-gray-100 p-2 rounded-md"
+                     title="{{ $latestOrder->adres_otkuda}} {{ $latestOrder->adres_otkuda_info}}"
+                >
+                    {{  Str::limit( $latestOrder->adres_otkuda, 40) }}
                 </div>
             </div>
-            <!-- Лимит поездок -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Лимит поездок</label>
-                <div class="mt-1 bg-gray-100 p-2 rounded-md">
-                    {{ $latestOrder->kol_p_limit ?? '-' }}
-                </div>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Доп. условия</label>
-                <div class="mt-1 bg-gray-100 p-2 rounded-md">
-                    {{ $latestOrder->dopus?->name ?? '—' }}
+            <!-- Адрес "куда" -->
+            <div class="md:col-span-4">
+                <label class="block text-sm font-medium text-gray-700">Адрес "куда"</label>
+                <div class="mt-1 bg-gray-100 p-2 rounded-md"
+                    title="{{ $latestOrder->adres_kuda}} {{ $latestOrder->adres_kuda_info}}"
+                >
+                    {{ Str::limit( $latestOrder->adres_kuda, 40) }}
                 </div>
             </div>
         </div>

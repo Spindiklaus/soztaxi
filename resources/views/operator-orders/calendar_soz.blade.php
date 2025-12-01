@@ -109,8 +109,13 @@
                                 // Определяем цвет фона для конкретного заказа ---
                                 if(!$order->deleted_at) {
                                     if ($order->type_order == 1) { // Соцтакси
-                                        $orderBgColor = ($tripCountForDay >= 2) ? 'bg-blue-100' : 'bg-yellow-100';
-                                        $orderTextColor = ($tripCountForDay >= 2) ? 'text-blue-800' : 'text-yellow-800';
+                                        if ($latestOrder && $order->adres_otkuda === $latestOrder->adres_otkuda && $order->adres_kuda === $latestOrder->adres_kuda) {
+                                            $orderBgColor = 'bg-green-100'; // Зелёный, если адреса совпадают
+                                            $orderTextColor = 'text-green-800';
+                                        } else {
+                                            $orderBgColor = 'bg-yellow-100'; // Жёлтый, если адреса не совпадают
+                                            $orderTextColor = 'text-yellow-800';
+                                        }
                                     } else { // Газель (2) или Легковое авто (3)
                                         $orderBgColor = 'bg-gray-100';
                                         $orderTextColor = 'text-gray-800';
