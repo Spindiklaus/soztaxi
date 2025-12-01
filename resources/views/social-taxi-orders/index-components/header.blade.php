@@ -1,5 +1,5 @@
 <div class="flex justify-between items-center mb-6">
-    <h1 class="text-3xl font-bold text-gray-800">Заказы</h1>
+    <h1 class="text-3xl font-bold text-gray-800">Все заказы (админ)</h1>
 
     <!-- social-taxi-orders.index-components/header.blade.php -->
     <div class="space-x-2 flex relative">
