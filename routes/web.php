@@ -111,8 +111,8 @@ Route::middleware(['web', 'auth', IsAdmin::class])->group(function () {
     Route::resource('order-groups', OrderGroupController::class)->names('order-groups'); 
     
     // импорт из такси
-    Route::get('/admin/taxi-orders/import', [TaxiOrderImportController::class, 'showUploadForm'])->name('admin.taxi-orders.import.form');
-    Route::post('/admin/taxi-orders/import', [TaxiOrderImportController::class, 'upload'])->name('admin.taxi-orders.import');
+    Route::get('/admin/taxi-orders/compare', [TaxiOrderImportController::class, 'showUploadForm'])->name('admin.taxi-orders.compare.form');
+    Route::post('/admin/taxi-orders/compare', [TaxiOrderImportController::class, 'compareAndImport'])->name('admin.taxi-orders.compare-and-import');
     
 });
 
