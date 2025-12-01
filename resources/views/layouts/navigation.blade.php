@@ -89,6 +89,9 @@
                                 <x-dropdown-link :href="route('taxi-orders.index')" :active="request()->routeIs('taxi-orders.index')">
                                     {{ __('Передача в такси') }}
                                 </x-dropdown-link>
+                                <x-dropdown-link :href="route('admin.taxi-orders.compare.form')" :active="request()->routeIs('admin.taxi-orders.compare.form')">
+                                    {{ __('Сверка файлов xls') }}
+                                </x-dropdown-link>
                                 <x-dropdown-link :href="route('taxi_sent-orders.index')" :active="request()->routeIs('taxi_sent-orders.index')">
                                     {{ __('Подтверждение/отмена передачи') }}
                                 </x-dropdown-link>

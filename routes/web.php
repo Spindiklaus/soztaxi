@@ -32,6 +32,7 @@ use App\Http\Controllers\Operator\CarController;
 use App\Http\Controllers\Operator\GazelleController;
 
 use App\Http\Controllers\Admin\SocialTaxiOrderExportController;
+use App\Http\Controllers\Admin\TaxiOrderImportController;
 
 
 Route::get('/', function () {
@@ -108,6 +109,10 @@ Route::middleware(['web', 'auth', IsAdmin::class])->group(function () {
     // --- маршрут для удаления заказа из группы --- //
     Route::delete('/order-groups/{orderGroup}/remove-order/{order}', [OrderGroupController::class, 'removeOrderFromGroup'])->name('order-groups.remove-order');
     Route::resource('order-groups', OrderGroupController::class)->names('order-groups'); 
+    
+    // импорт из такси
+    Route::get('/admin/taxi-orders/compare', [TaxiOrderImportController::class, 'showUploadForm'])->name('admin.taxi-orders.compare.form');
+    Route::post('/admin/taxi-orders/compare', [TaxiOrderImportController::class, 'compareAndImport'])->name('admin.taxi-orders.compare-and-import');
     
 });
 
