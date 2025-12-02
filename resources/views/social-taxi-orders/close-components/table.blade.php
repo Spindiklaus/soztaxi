@@ -134,12 +134,7 @@
                     </td>
                     <td class="px-6 py-0">
                         @if($order->client)
-                                <a href="{{ route('operator.social-taxi.calendar.client', ['client' => $order->client_id, 'date' => $order->visit_data->format('Y-m-d')] + $urlParams) }}" class="text-sm font-medium text-blue-600 hover:text-blue-900 hover:underline"
-                                    title="{{ $order->client_tel ? 'Тел: ' . $order->client_tel."\n" : '' }}{{ $order->client_invalid ? 'Удостоверение: ' . $order->client_invalid."\n"  : '' }}{{ $order->client_sopr ? 'Сопровождающий: ' . $order->client_sopr . "\n" : '' }}{{ $order->category ? 'NMV: ' . $order->category->nmv . ' Категория: ' . $order->category->name . ' Скидка: ' . $order->category->skidka . ' Лимит: ' . $order->category->kol_p . ' поездок/мес' : '' }}{{ $order->dopus ? $order->dopus->name : '' }}"
-                                    target="_blank"
-                                >
-                                    {{ $order->client->fio }}
-                                </a>
+                                {{ $order->client->last_name }}
                                 @if($order->client->rip_at)
                                     <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-800 text-white mt-1">
                                         RIP: {{ $order->client->rip_at->format('d.m.Y') }}

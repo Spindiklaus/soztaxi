@@ -115,8 +115,8 @@
                         <td class="px-4 py-0">
                             <div class="text-sm text-gray-900">
                                 <span title='{{$order->adres_otkuda}} {{ $order->adres_otkuda_info }}'>
-                                Откуда:
-                                <span class="font-medium text-lg">{{ Str::limit( $order->adres_otkuda, 20) }}</span>
+                                    Откуда:
+                                    <span class="font-medium text-lg">{{ Str::limit( $order->adres_otkuda, 20) }}</span>
                                 </span> 
                             </div>
                             <!-- Дополнительная информация об адресе "откуда" -->
@@ -145,12 +145,16 @@
                         </td>
                         <td class="px-4 py-0">
                             @if($order->client)
-                               <a href="{{ route('operator.social-taxi.calendar.client', ['client' => $order->client_id, 'date' => $order->visit_data->format('Y-m-d')] + $urlParams) }}" class="text-sm font-medium text-blue-600 hover:text-blue-900 hover:underline"
-                                    title="{{ $order->client_tel ? 'Тел: ' . $order->client_tel . "\n" : '' }}{{ $order->client_invalid ? 'Удостоверение: ' . $order->client_invalid . "\n" : '' }}{{ $order->client_sopr ? 'Сопровождающий: ' . $order->client_sopr . "\n" : '' }}{{ $order->category ? 'NMV: ' . $order->category->nmv . "\nКатегория: " . $order->category->name . "\nСкидка: " . $order->category->skidka . "%\nЛимит: " . $order->category->kol_p . " поездок/мес\n" : '' }}{{ $order->dopus ? $order->dopus->name : '' }}"
-                                    target="_blank"
-                                >
-                                    {{ $order->client->last_name }}
-                                </a>
+                               @if($order->type_order == 1) 
+                                    <a href="{{ route('operator.social-taxi.calendar.client', ['client' => $order->client_id, 'date' => $order->visit_data->format('Y-m-d')] + $urlParams) }}" class="text-sm font-medium text-blue-600 hover:text-blue-900 hover:underline"
+                                         title="{{ $order->client_tel ? 'Тел: ' . $order->client_tel . "\n" : '' }}{{ $order->client_invalid ? 'Удостоверение: ' . $order->client_invalid . "\n" : '' }}{{ $order->client_sopr ? 'Сопровождающий: ' . $order->client_sopr . "\n" : '' }}{{ $order->category ? 'NMV: ' . $order->category->nmv . "\nКатегория: " . $order->category->name . "\nСкидка: " . $order->category->skidka . "%\nЛимит: " . $order->category->kol_p . " поездок/мес\n" : '' }}{{ $order->dopus ? $order->dopus->name : '' }}"
+                                         target="_blank"
+                                     >
+                                @endif   
+                                {{ $order->client->last_name }}
+                                @if($order->type_order == 1) 
+                                    </a>
+                                @endif
                                 @if($order->client->rip_at)
                                     <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-800 text-white mt-1">
                                         RIP: {{ $order->client->rip_at->format('d.m.Y') }}

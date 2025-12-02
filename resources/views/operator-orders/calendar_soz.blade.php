@@ -26,7 +26,6 @@
     <!-- Включаем компонент количества поездок -->
     @include('operator-orders.calendar-components.trip-counts')
     
-
         <!-- Календарь -->
     
 
@@ -34,9 +33,12 @@
         <!-- Добавляем строку с навигацией по месяцам -->
         <div class="flex items-center justify-between mb-0">
             <a href="{{ route('operator.social-taxi.calendar.client', [
-                'client' => $client,
-                'date' => $prevMonth->format('Y-m-d')
-            ] + $urlParams) }}"
+                        'client' => $client,
+                        'date' => $prevMonth->format('Y-m-d'),
+			'latestOrder' => $latestOrder->id
+                        ] 
+                        + $urlParams)
+                      }}"
                class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-md hover:bg-blue-200 text-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
@@ -50,8 +52,10 @@
              </div>
             <a href="{{ route('operator.social-taxi.calendar.client', [
                 'client' => $client,
-                'date' => $nextMonth->format('Y-m-d')
-                ] + $urlParams) }}"
+                'date' => $nextMonth->format('Y-m-d'),
+                'latestOrder' => $latestOrder->id
+                ]
+                + $urlParams) }}"
                class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-md hover:bg-blue-200 text-sm">
                 Следующий
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -113,7 +117,7 @@
                                             $orderBgColor = 'bg-green-100'; // Зелёный, если адреса совпадают
                                             $orderTextColor = 'text-green-800';
                                         } else {
-                                            $orderBgColor = 'bg-yellow-100'; // Жёлтый, если адреса не совпадают
+                                            $orderBgColor = 'bg-light-steel-blue-100'; // записали в tailwind.config
                                             $orderTextColor = 'text-yellow-800';
                                         }
                                     } else { // Газель (2) или Легковое авто (3)

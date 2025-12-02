@@ -23,10 +23,22 @@ export default {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },
             colors: {
-             yellow: {
-                500: '#fde047',
+                yellow: {
+                   500: '#fde047',
+                },
+                'light-steel-blue': {
+                    50: '#f0f5fb',   // очень светлый
+                    100: '#e6eff5',
+                    200: '#d4e0ec',
+                    300: '#C2D2E6',
+                    400: '#B0C4DE',   // оригинальный LightSteelBlue
+                    500: '#9db5d5',
+                    600: '#8ba7cc',
+                    // и так далее при необходимости
+                  },
+                'LightCyan': '#E0FFFF',
+                'light-yellow': '#FFFFE0',
             }
-      }
             
         },
     },

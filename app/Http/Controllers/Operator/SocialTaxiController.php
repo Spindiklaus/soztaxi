@@ -89,6 +89,8 @@ class SocialTaxiController extends BaseController
     $operatorRouteData = $this->getOperatorRouteData();
     $operatorRoute = $operatorRouteData['operatorRoute'];
     $operatorCurrentType = $operatorRouteData['operatorCurrentType'];
+    
+    $latestOrderId = $request->input('latestOrder');
 
     // Устанавливаем фильтр по типу заказа "Соцтакси" (ID = 1) и по выбранному клиенту
     if (!$request->has('filter_type_order')) {
@@ -144,11 +146,9 @@ class SocialTaxiController extends BaseController
             ->get(); // <-- Используем get(), получаем коллекцию
     $lastCategory = null;
    // Находим заказ с самой поздней датой поездки 
-    $latestOrder = Order::where('client_id', $client->id)
-            ->whereNull('cancelled_at') // исключаем отменённые
-            ->with(['category', 'dopus'])
-            ->orderBy('visit_data', 'desc')
-            ->first();
+    $latestOrder = Order::withTrashed()
+    ->where('id', $latestOrderId)
+    ->first();
      $lastCategory = $latestOrder->category; // Получаем связанную категорию
       
     // Фильтруем коллекцию, удаляя отменённые заказы ---
