@@ -12,7 +12,7 @@
 
                 <div class="mt-2 space-y-2">
                     <!-- Информация об копируемом заказе -->
-                    <div class="bg-gray-50 p-2 rounded-md">
+                    <div id="original-order-info-block" class="bg-gray-50 p-2 rounded-md">
                         <p class="text-sm text-gray-700">
 <!--                            ID: <span id="original-order-info"></span>, -->
                             Дата: <span id="original-date-info"></span>, 

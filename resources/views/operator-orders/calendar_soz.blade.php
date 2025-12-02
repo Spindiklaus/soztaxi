@@ -158,6 +158,8 @@
                                         data-adres-otkuda="{{ $order->adres_otkuda }}"
                                         data-adres-kuda="{{ $order->adres_kuda }}"
                                         data-predv-way="{{ $order->predv_way ?? '' }}"
+                                        data-latest-adres-otkuda="{{ $latestOrder->adres_otkuda}}"
+                                        data-latest-adres-kuda="{{ $latestOrder->adres_kuda}}"
                                         class="copy-multiple-btn ml-1 text-lg text-purple-600 rounded px-1 hover:bg-purple-100"
                                         title="Множественное копирование заказа"
                                     >

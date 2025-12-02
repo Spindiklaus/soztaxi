@@ -3,7 +3,7 @@
     let originalPredvWay = null;
     let originalAdresOtkuda = null;
     let originalAdresKuda = null;
-    let originalDate = null; // Сохраняем оригинальную дату
+    let originalDate = null; // Сохраняем дату копируемого заказа
     
     // Глобальные переменные для дат календаря ---
     const calendarEndDate = new Date(window.calendarEndDateFromPHP); // <-- ИСПОЛЬЗУЕМ window
@@ -15,24 +15,29 @@
         const adresOtkuda = this.getAttribute('data-adres-otkuda');
         const adresKuda = this.getAttribute('data-adres-kuda');
         const predvWay = this.getAttribute('data-predv-way');
+        const latestOtkuda = this.getAttribute('data-latest-adres-otkuda');
+        const latestKuda = this.getAttribute('data-latest-adres-kuda');
 
-        openCopyMultipleModal(orderId, visitDatetime, adresOtkuda, adresKuda, predvWay);
+        openCopyMultipleModal(orderId, visitDatetime, adresOtkuda, adresKuda, predvWay, latestOtkuda, latestKuda);
     });
 });
 
 
-    function openCopyMultipleModal(orderId, originalVisitDateTime, originalAdresOtkuda, originalAdresKuda, originalPredvWayParam) {
-        console.log('originalPredvWay (raw):', originalPredvWay);
-        console.log('typeof:', typeof originalPredvWay);
+    function openCopyMultipleModal(orderId, originalVisitDateTime, originalAdresOtkuda, originalAdresKuda, originalPredvWayParam, latestAdresOtkuda, latestAdresKuda) {
+//        console.log('latestAdresOtkuda:', latestAdresOtkuda);
+//        console.log('latestAdresKuda:', latestAdresKuda);
         currentMultipleOrderId = orderId;
         document.getElementById('copy-multiple-order-id').value = orderId;
 
         const [datePart, timePart] = originalVisitDateTime.split(' ');
-        originalDate = datePart; // Сохраняем дату
+        originalDate = datePart; // Сохраняем дату поездки
         originalVisitTime = timePart.substring(0, 5); // HH:MM
-        originalPredvWay = originalPredvWayParam;
+        originalPredvWay = originalPredvWayParam; // параметеры копируемого заказа
         originalAdresOtkuda = originalAdresOtkuda;
         originalAdresKuda = originalAdresKuda;
+        
+        const latestAdresOtkudaFromModal = latestAdresOtkuda; // Дата первоначального заказа из списка
+        const latestAdresKudaFromModal = latestAdresKuda;     // 
 
         // Заполняем информацию об оригинальном заказе
         // Преобразуем YYYY-MM-DD → ДД.ММ.ГОД
@@ -45,17 +50,29 @@
         document.getElementById('original-way-info').textContent = originalPredvWay || 'N/A';
         document.getElementById('original-from-info').textContent = originalAdresOtkuda || '-';
         document.getElementById('original-to-info').textContent = originalAdresKuda || '';
+        
+        const originalOrderInfoBlock = document.getElementById('original-order-info-block');
+        if (originalAdresOtkuda === latestAdresOtkudaFromModal && originalAdresKuda === latestAdresKudaFromModal) {
+            originalOrderInfoBlock.classList.remove('bg-gray-50'); // Убираем старый цвет
+            originalOrderInfoBlock.classList.remove('bg-light-steel-blue-100'); // Убираем старый цвет
+            originalOrderInfoBlock.classList.add('bg-green-100');  // Добавляем зелёный
+        } else {
+            originalOrderInfoBlock.classList.remove('bg-gray-50'); // Убираем зелёный, если был
+            originalOrderInfoBlock.classList.remove('bg-green-100'); // Убираем зелёный, если был                  
+            originalOrderInfoBlock.classList.add('bg-light-steel-blue-100');      // Возвращаем серый
+        }
 
         // Генерируем календарь
-        generateCalendar(datePart, calendarEndDateFromPHP);
+        generateCalendar(datePart, calendarEndDateFromPHP, latestAdresOtkudaFromModal, latestAdresKudaFromModal);
 
         // Показываем модальное окно
         document.getElementById('copy-order-multiple-modal').classList.remove('hidden');
     }
 
     //  Генерация календаря ---
-    function generateCalendar(startDateStr, endDateStr) {
-        console.log('Using predv_way value:', originalPredvWay);   
+    function generateCalendar(startDateStr, endDateStr, latestAdresOtkuda, latestAdresKuda) {
+        console.log('latestAdresOtkuda:', latestAdresOtkuda);   
+        console.log('originalAdresOtkuda:', originalAdresOtkuda);   
         const calendarContainer = document.getElementById('copy-calendar-container');
         const startDate = new Date(startDateStr);
 
@@ -77,6 +94,9 @@
         const calendarMonth = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
         const year = calendarMonth.getFullYear();
 
+        let bgColorClass = 'bg-gray-50'; // Цвет по умолчанию
+       
+        
         // Генерируем HTML календаря
         let calendarHtml = `
             <div class="grid grid-cols-7 gap-1 mb-2">
