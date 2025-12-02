@@ -7,6 +7,7 @@
                 class="flex items-center justify-between w-full text-left">
             <h2 class="text-lg font-semibold text-gray-800">
                 {{ $client->fio }}
+                <span class="text-sm">(Последняя поездка: {{$latestOrder->visit_data->format('d.m.Y H:i')}}, маршрут: {{ Str::limit($latestOrder->adres_otkuda,40)}} - {{ Str::limit($latestOrder->adres_kuda,40)}})
             </h2>
             <svg id="client-info-arrow" class="h-5 w-5 transform transition-transform text-gray-500"
                  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -32,7 +33,7 @@
             <!-- Адрес "откуда" -->
             <div class="md:col-span-4">
                 <label class="block text-sm font-medium text-gray-700">Адрес "откуда"</label>
-                <div class="mt-1 bg-gray-100 p-2 rounded-md"
+                <div class="mt-1 bg-green-100 p-2 rounded-md"
                      title="{{ $latestOrder->adres_otkuda}} {{ $latestOrder->adres_otkuda_info}}"
                 >
                     {{  Str::limit( $latestOrder->adres_otkuda, 40) }}
@@ -41,7 +42,7 @@
             <!-- Адрес "куда" -->
             <div class="md:col-span-4">
                 <label class="block text-sm font-medium text-gray-700">Адрес "куда"</label>
-                <div class="mt-1 bg-gray-100 p-2 rounded-md"
+                <div class="mt-1 bg-green-100 p-2 rounded-md"
                     title="{{ $latestOrder->adres_kuda}} {{ $latestOrder->adres_kuda_info}}"
                 >
                     {{ Str::limit( $latestOrder->adres_kuda, 40) }}

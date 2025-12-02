@@ -14,8 +14,8 @@
                     <!-- Информация об оригинальном заказе -->
                     <div class="bg-gray-50 p-2 rounded-md">
                         <p class="text-sm text-gray-700">
-                            ID: <span id="original-order-info"></span>, 
-                            дата: <span id="original-date-info"></span>, 
+<!--                            ID: <span id="original-order-info"></span>, -->
+                            Дата: <span id="original-date-info"></span>, 
                             время: <span id="original-time-info"></span>,
                             откуда: <span id="original-from-info"></span>, 
                             куда: <span id="original-to-info"></span>,

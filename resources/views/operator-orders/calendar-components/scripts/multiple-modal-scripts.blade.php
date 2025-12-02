@@ -35,8 +35,12 @@
         originalAdresKuda = originalAdresKuda;
 
         // Заполняем информацию об оригинальном заказе
-        document.getElementById('original-order-info').textContent = `${orderId}`;
-        document.getElementById('original-date-info').textContent = datePart;
+        // Преобразуем YYYY-MM-DD → ДД.ММ.ГОД
+        const [year, month, day] = datePart.split('-');
+        const formattedDate = `${day}.${month}.${year}`;
+        document.getElementById('original-date-info').textContent = formattedDate;
+<!--        document.getElementById('original-order-info').textContent = `${orderId}`;-->
+        <!--document.getElementById('original-date-info').textContent = datePart;-->
         document.getElementById('original-time-info').textContent = originalVisitTime;
         document.getElementById('original-way-info').textContent = originalPredvWay || 'N/A';
         document.getElementById('original-from-info').textContent = originalAdresOtkuda || '-';
