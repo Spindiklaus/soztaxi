@@ -11,7 +11,7 @@
                 <input type="hidden" id="copy-multiple-order-id" name="original_order_id"> <!-- ID оригинального заказа -->
 
                 <div class="mt-2 space-y-2">
-                    <!-- Информация об оригинальном заказе -->
+                    <!-- Информация об копируемом заказе -->
                     <div class="bg-gray-50 p-2 rounded-md">
                         <p class="text-sm text-gray-700">
 <!--                            ID: <span id="original-order-info"></span>, -->
