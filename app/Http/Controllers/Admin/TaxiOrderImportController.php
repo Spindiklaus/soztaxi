@@ -15,85 +15,129 @@ class TaxiOrderImportController extends Controller
         return view('admin.taxi-orders.compare-upload');
     }
 
-    public function compareAndImport(Request $request)
-    {
-        $request->validate([
-            'original_file' => 'required|mimes:xlsx,xls,csv',
-            'taxi_file' => 'required|mimes:xlsx,xls,csv',
-        ]);
+  public function compareAndImport(Request $request)
+{
+    $request->validate([
+        'original_file' => 'required|mimes:xlsx,xls,csv',
+        'taxi_file' => 'required|mimes:xlsx,xls,csv',
+    ]);
 
-        $originalFile = $request->file('original_file');
-        $taxiFile = $request->file('taxi_file');
+    $originalFile = $request->file('original_file');
+    $taxiFile = $request->file('taxi_file');
 
-        try {
-            // Загружаем оба файла
-            $originalSpreadsheet = IOFactory::load($originalFile->getPathname());
-            $taxiSpreadsheet = IOFactory::load($taxiFile->getPathname());
+    try {
+        // Загружаем оба файла
+        $originalSpreadsheet = IOFactory::load($originalFile->getPathname());
+        $taxiSpreadsheet = IOFactory::load($taxiFile->getPathname());
 
-            $originalSheet = $originalSpreadsheet->getActiveSheet();
-            $taxiSheet = $taxiSpreadsheet->getActiveSheet();
+        $originalSheet = $originalSpreadsheet->getActiveSheet();
+        $taxiSheet = $taxiSpreadsheet->getActiveSheet();
 
-            $changes = [];
-            $errors = [];
-            $rowIndex = 5; // Данные начинаются с 5-й строки
+        $changes = [];
+        $errors = [];
+        $rowIndex = 5; // Данные начинаются с 5-й строки
 
+        // --- Подсчёт итогов в оригинальном файле ---
+        $originalTotalPredvWay = 0;
+        $originalTotalTaxiPrice = 0;
+        $originalTotalTaxiOpl = 0;
+        $originalTotalTaxiVozm = 0;
+
+        $origRow = 5;
+        while (true) {
+            $originalOrderId = $originalSheet->getCell("B{$origRow}")->getValue();
+            if (!$originalOrderId) break;
+
+            $originalTotalPredvWay += (float) $originalSheet->getCell("H{$origRow}")->getValue();
+            $originalTotalTaxiPrice += (float) $originalSheet->getCell("I{$origRow}")->getValue();
+            $originalTotalTaxiOpl += (float) $originalSheet->getCell("J{$origRow}")->getValue();
+            $originalTotalTaxiVozm += (float) $originalSheet->getCell("K{$origRow}")->getValue();
+
+            $origRow++;
+        }
+
+        // --- Подсчёт итогов в файле от такси ---
+        $taxiTotalPredvWay = 0;
+        $taxiTotalTaxiPrice = 0;
+        $taxiTotalTaxiOpl = 0;
+        $taxiTotalTaxiVozm = 0;
+
+        $taxiRow = 5;
+        while (true) {
+            $taxiOrderId = $taxiSheet->getCell("B{$taxiRow}")->getValue();
+            if (!$taxiOrderId) break;
+
+            $taxiTotalPredvWay += (float) $taxiSheet->getCell("H{$taxiRow}")->getValue();
+            $taxiTotalTaxiPrice += (float) $taxiSheet->getCell("I{$taxiRow}")->getValue();
+            $taxiTotalTaxiOpl += (float) $taxiSheet->getCell("J{$taxiRow}")->getValue();
+            $taxiTotalTaxiVozm += (float) $taxiSheet->getCell("K{$taxiRow}")->getValue();
+
+            $taxiRow++;
+        }
+
+        // --- Сравнение итогов ---
+        $totalChanges = [];
+        if (abs($taxiTotalPredvWay - $originalTotalPredvWay) > 0.01) {
+            $totalChanges[] = "Итог предв. дальности: {$originalTotalPredvWay} → {$taxiTotalPredvWay}";
+        }
+        if (abs($taxiTotalTaxiPrice - $originalTotalTaxiPrice) > 0.01) {
+            $totalChanges[] = "Итог цены за поездку: {$originalTotalTaxiPrice} → {$taxiTotalTaxiPrice}";
+        }
+        if (abs($taxiTotalTaxiOpl - $originalTotalTaxiOpl) > 0.01) {
+            $totalChanges[] = "Итог к оплате: {$originalTotalTaxiOpl} → {$taxiTotalTaxiOpl}";
+        }
+        if (abs($taxiTotalTaxiVozm - $originalTotalTaxiVozm) > 0.01) {
+            $totalChanges[] = "Итог суммы к возмещению: {$originalTotalTaxiVozm} → {$taxiTotalTaxiVozm}";
+        }
+
+        // --- Сравнение строк ---
+        $rowIndex = 5;
+        while (true) {
+            $taxiOrderId = $taxiSheet->getCell("B{$rowIndex}")->getValue(); // № заказа из файла такси
+
+            if (!$taxiOrderId) {
+                break; // Закончились строки в файле такси
+            }
+
+            // Проверим, есть ли этот заказ в файле "оригинал"
+            $originalRow = null;
+            $origRow = 5;
             while (true) {
-                $originalOrderId = $originalSheet->getCell("B{$rowIndex}")->getValue(); // № заказа
-                $taxiOrderId = $taxiSheet->getCell("B{$rowIndex}")->getValue(); // № заказа
-
-                // Если в одном из файлов закончились строки
-                if (!$originalOrderId && !$taxiOrderId) {
+                $originalOrderId = $originalSheet->getCell("B{$origRow}")->getValue();
+                if (!$originalOrderId) {
+                    break; // Закончились строки в оригинале
+                }
+                if ($originalOrderId === $taxiOrderId) {
+                    $originalRow = $origRow;
                     break;
                 }
+                $origRow++;
+            }
 
-                // Проверяем, совпадают ли номера заказов
-                if ($originalOrderId !== $taxiOrderId) {
-                    $errors[] = [
-                        'row' => $rowIndex,
-                        'message' => "Номера заказов не совпадают: ваш файл - {$originalOrderId}, файл от такси - {$taxiOrderId}"
-                    ];
-                    $rowIndex++;
-                    continue;
-                }
-
-                if (!$originalOrderId) {
-                    $errors[] = [
-                        'row' => $rowIndex,
-                        'message' => "В вашем файле закончились заказы, но в файле от такси есть заказ {$taxiOrderId}"
-                    ];
-                    $rowIndex++;
-                    continue;
-                }
-
-                if (!$taxiOrderId) {
-                    $errors[] = [
-                        'row' => $rowIndex,
-                        'message' => "В файле от такси закончились заказы, но в вашем файле есть заказ {$originalOrderId}"
-                    ];
-                    $rowIndex++;
-                    continue;
-                }
-
-                // Находим заказ в базе
-                $order = Order::where('pz_nom', $originalOrderId)->first();
+            if ($originalRow) {
+                // Заказ найден в оригинале — сравниваем
+                $order = Order::where('pz_nom', $taxiOrderId)->first();
 
                 if (!$order) {
                     $errors[] = [
                         'row' => $rowIndex,
-                        'message' => "Заказ {$originalOrderId} не найден в системе"
+                        'message' => "Заказ {$taxiOrderId} найден в файле такси, но не найден в системе"
                     ];
                     $rowIndex++;
                     continue;
                 }
 
                 // Сравниваем значения
-                $originalPredvWay = $originalSheet->getCell("H{$rowIndex}")->getValue(); // Предв. дальность
+                $originalPredvWay = $originalSheet->getCell("H{$originalRow}")->getValue();
                 $taxiPredvWay = $taxiSheet->getCell("H{$rowIndex}")->getValue();
 
-                $originalTaxiPrice = $originalSheet->getCell("I{$rowIndex}")->getValue(); // Цена за поездку
+                $originalTaxiPrice = $originalSheet->getCell("I{$originalRow}")->getValue();
                 $taxiTaxiPrice = $taxiSheet->getCell("I{$rowIndex}")->getValue();
 
-                $originalTaxiVozm = $originalSheet->getCell("K{$rowIndex}")->getValue(); // Сумма к возмещению
+                $originalTaxiOpl = $originalSheet->getCell("J{$originalRow}")->getValue();
+                $taxiTaxiOpl = $taxiSheet->getCell("J{$rowIndex}")->getValue();
+
+                $originalTaxiVozm = $originalSheet->getCell("K{$originalRow}")->getValue();
                 $taxiTaxiVozm = $taxiSheet->getCell("K{$rowIndex}")->getValue();
 
                 $changeDetails = [];
@@ -104,6 +148,9 @@ class TaxiOrderImportController extends Controller
                 if ($taxiTaxiPrice != $originalTaxiPrice) {
                     $changeDetails[] = "Цена за поездку: {$originalTaxiPrice} → {$taxiTaxiPrice}";
                 }
+                if ($taxiTaxiOpl != $originalTaxiOpl) {
+                    $changeDetails[] = "К оплате: {$originalTaxiOpl} → {$taxiTaxiOpl}";
+                }
                 if ($taxiTaxiVozm != $originalTaxiVozm) {
                     $changeDetails[] = "Сумма к возмещению: {$originalTaxiVozm} → {$taxiTaxiVozm}";
                 }
@@ -112,36 +159,30 @@ class TaxiOrderImportController extends Controller
                     $changes[] = [
                         'row' => $rowIndex,
                         'order_id' => $order->id,
-                        'pz_nom' => $originalOrderId,
+                        'pz_nom' => $taxiOrderId,
                         'changes' => $changeDetails,
                         'type' => 'changed'
                     ];
                 }
-
-                $rowIndex++;
+            } else {
+                // Заказа нет в оригинале — это добавление
+                $errors[] = [
+                    'row' => $rowIndex,
+                    'message' => "Заказ {$taxiOrderId} добавлен оператором такси (не был в вашем файле)"
+                ];
             }
 
-            // Применяем изменения, если разрешено
-            if ($request->has('apply_changes')) {
-                foreach ($changes as $change) {
-                    $order = Order::find($change['order_id']);
-
-                    // Обновляем только разрешённые поля
-                    $order->update([
-                        'predv_way' => $taxiSheet->getCell("H{$change['row']}")->getValue(),
-                        'taxi_price' => $taxiSheet->getCell("I{$change['row']}")->getValue(),
-                        'taxi_vozm' => $taxiSheet->getCell("K{$change['row']}")->getValue(),
-                    ]);
-                }
-            }
-
-            return redirect()->back()
-                ->with('success', 'Файлы успешно сравнены.')
-                ->with('changes', $changes)
-                ->with('errors', $errors);
-
-        } catch (\Exception $e) {
-            return redirect()->back()->withErrors(['error' => 'Ошибка при обработке файлов: ' . $e->getMessage()]);
+            $rowIndex++;
         }
+
+        return redirect()->back()
+            ->with('success', 'Файлы успешно сравнены.')
+            ->with('changes', $changes)
+            ->with('comparison_errors', $errors)
+            ->with('total_changes', $totalChanges);
+
+    } catch (\Exception $e) {
+        return redirect()->back()->withErrors(['error' => 'Ошибка при обработке файлов: ' . $e->getMessage()]);
     }
+}
 }

@@ -16,19 +16,23 @@
                 <input type="file" name="taxi_file" id="taxi_file" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
             </div>
 
-            <div class="mb-4">
-                <label class="inline-flex items-center">
-                    <input type="checkbox" name="apply_changes" value="1" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
-                    <span class="ml-2 text-sm text-gray-700">Применить изменения к заказам</span>
-                </label>
-            </div>
-
             <div class="flex items-center justify-end">
                 <button type="submit" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    Сравнить и импортировать
+                    Сравнить
                 </button>
             </div>
         </form>
+
+        @if(session('total_changes'))
+            <div class="mt-6 bg-yellow-50 p-4 rounded-md">
+                <h2 class="text-lg font-medium text-yellow-800 mb-2">Изменения в итогах:</h2>
+                <ul class="list-disc list-inside space-y-1">
+                    @foreach(session('total_changes') as $change)
+                        <li class="text-sm text-yellow-700">{{ $change }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
         @if(session('changes'))
             <div class="mt-6 bg-blue-50 p-4 rounded-md">
@@ -46,11 +50,11 @@
             </div>
         @endif
 
-        @if(session('errors'))
+        @if(session('comparison_errors'))
             <div class="mt-6 bg-red-50 p-4 rounded-md">
                 <h2 class="text-lg font-medium text-red-800 mb-2">Ошибки:</h2>
                 <ul class="list-disc list-inside space-y-1">
-                    @foreach(session('errors') as $error)
+                    @foreach(session('comparison_errors') as $error)
                         <li class="text-sm text-red-700">
                             <strong>Строка {{ $error['row'] }}:</strong> {{ $error['message'] }}
                         </li>
