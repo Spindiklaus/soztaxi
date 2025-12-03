@@ -55,15 +55,12 @@
             </thead>
             <tbody class="divide-y divide-gray-200">
                 @forelse ($orders as $order)
-                    <tr 
-                        @if($order->deleted_at) 
-                            class="bg-red-50" 
-                        @endif
-                        @if($order->cancelled_at) 
-                            class="bg-purple-100" 
-                        @endif
-                    >
-                        <td class="px-6 py-4">
+                <tr @class([
+                     'border-b border-gray-300',
+                     'bg-red-50' => $order->deleted_at,
+                    'bg-purple-100' => $order->cancelled_at,
+                    ])>
+                        <td class="px-6 py-0">
                             @php
                                 $status = $order->currentStatus->statusOrder;
                                 $colorClass = !empty($status->color) ? $status->color : 'bg-gray-100 text-gray-800';
@@ -87,7 +84,7 @@
                                 </div>
                             @endif
                         </td>
-                        <td class="px-6 py-4">
+                        <td class="px-6 py-0">
                             @if($order->visit_data)
                                 <div class="text-lg font-medium text-gray-900">
                                     {{ $order->visit_data->format('d.m.Y') }}
@@ -101,27 +98,27 @@
                                 @endif                            
                             @endif
                         </td>
-                        <td class="px-6 py-4">
-                            <div class="text-sm text-gray-900">
+                        <td class="px-6 py-0">
+                            <div class="text-sm text-gray-900" title="{{ $order->adres_otkuda }} {{ $order->adres_otkuda_info }}">
                                 <span class="font-medium">Откуда:</span> 
                                 <span class="text-lg">{{ $order->adres_otkuda }}</span>
                             </div>
                             <!-- Дополнительная информация об адресе "откуда" -->
-                            @if($order->adres_otkuda_info)
+<!--                            @if($order->adres_otkuda_info)
                                 <div class="text-xs text-gray-500 mt-1 ml-4">
                                     {{ $order->adres_otkuda_info }}
                                 </div>
-                            @endif
-                            <div class="text-sm text-gray-900 mt-1">
+                            @endif-->
+                            <div class="text-sm text-gray-900 mt-1" title="{{ $order->adres_kuda }} {{ $order->adres_kuda_info }}">
                                 <span class="font-medium">Куда:</span> 
                                 <span class="text-lg">{{ $order->adres_kuda }}</span>
                             </div>
-                            <!-- Дополнительная информация об адресе "куда" -->
+<!--                             Дополнительная информация об адресе "куда" 
                             @if($order->adres_kuda_info)
                                 <div class="text-xs text-gray-500 mt-1 ml-4">
                                     {{ $order->adres_kuda_info }}
                                 </div>
-                            @endif
+                            @endif-->
                             @if($order->adres_obratno)
                                 <div class="text-sm text-gray-900 mt-1">
                                     <span class="font-medium">Обратно:</span> 
@@ -134,7 +131,7 @@
                                     </div>
                                 @endif
                         </td>
-                        <td class="px-6 py-4">
+                        <td class="px-6 py-0">
                             @if($order->client)
 <!--                               <a href="{{-- route('operator.social-taxi.calendar.client', ['client' => $order->client_id, 'date' => $order->visit_data->format('Y-m-d')] + $urlParams+ ['latestOrder' => $order->id]) --}} 
                                     class="text-sm font-medium text-blue-600 hover:text-blue-900 hover:underline"
@@ -193,8 +190,8 @@
                         </td>-->
 
 
-                        <td class="px-6 py-4">
-                            <div class="flex  flex-nowrap gap-2">
+                        <td class="px-6 py-0">
+                            <div class="flex  flex-nowrap gap-1">
                                 <!-- Ссылка на просмотр заказа -->
                                 @php
                                     $showRoute = route('social-taxi-orders.show', ['social_taxi_order' => $order] + $urlParams);
@@ -257,35 +254,37 @@
                                             </svg>
                                         </button>
                                     @endif
-                                    <!-- Кнопка копирования -->
-                                    @if(!$order->client->rip_at)
-                                        <a href="{{ route('social-taxi-orders.create.by-type', array_merge(['type' => $order->type_order, 'copy_from' => $order->id], $urlParams)) }}" title = "Копировать"
-                                            class="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-md hover:bg-green-200 text-sm ">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                                            </svg>
-                                        </a>
-                                    @else
-                                        <button
-                                           class="inline-flex items-center px-3 py-1 bg-gray-300 text-gray-500 rounded-md hover:bg-green-200 text-sm cursor-not-allowed"
-                                           title="Копировать невозможно, клиент умер" disabled >
-                                           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                                           </svg>
-                                       </button>
-                                    @endif
+                                    
                                 @else    
                                     <form action="{{ route('social-taxi-orders.restore', array_merge(['social_taxi_order' => $order], $urlParams)) }}" method="POST" class="inline">
                                         @csrf
                                         @method('PATCH')
-                                            <button type="submit" class="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-md hover:bg-green-200 text-sm ">
+                                            <button type="submit" class="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-md hover:bg-green-200 text-sm " title="Восстановить">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                                                 </svg>
-                                                Восстановить
                                             </button>
                                     </form>
                                 @endif
+                                
+                                <!-- Кнопка копирования -->
+                                @if(!$order->client->rip_at)
+                                    <a href="{{ route('social-taxi-orders.create.by-type', array_merge(['type' => $order->type_order, 'copy_from' => $order->id], $urlParams)) }}" title = "Копировать"
+                                        class="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-md hover:bg-green-200 text-sm ">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                        </svg>
+                                    </a>
+                                @else
+                                    <button
+                                       class="inline-flex items-center px-3 py-1 bg-gray-300 text-gray-500 rounded-md hover:bg-green-200 text-sm cursor-not-allowed"
+                                       title="Копировать невозможно, клиент умер" disabled >
+                                       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                       </svg>
+                                   </button>
+                                @endif
+                                
 
                                 <!-- Кнопка отмены заказа -->
                                 @if(!$order->deleted_at && !$order->cancelled_at)
