@@ -4,42 +4,43 @@
     <h2 class="text-lg font-semibold text-gray-800 mb-2">Сведения о клиенте</h2>
 
     <div class="space-y-2">
-        <div>
-            <label for="client_id" class="block text-sm font-medium text-gray-700">Клиент *</label>
-            <select name="client_id" id="client_id" required
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                <option value="">Выберите клиента</option>
-                @foreach($clients as $client)
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-2">
+            <div class="md:col-span-6">
+                <label for="client_id" class="block text-sm font-medium text-gray-700">Клиент *</label>
+                <select name="client_id" id="client_id" required
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    <option value="">Выберите клиента</option>
+                    @foreach($clients as $client)
                     <option value="{{ $client->id }}" {{ old('client_id', $copiedOrder->client_id ?? '') == $client->id ? 'selected' : '' }}>
                         {{ $client->fio }} 
-                        <!--(#{{-- $client->id --}})-->
                     </option>
-                @endforeach
-            </select>
-            @error('client_id')
-                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-            @enderror
-        </div>
+                    @endforeach
+                </select>
+                @error('client_id')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
 
-        <div>
-            <label for="category_id" class="block text-sm font-medium text-gray-700">Категория инвалидности *</label>
-            <select name="category_id" id="category_id" required
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                <option value="">Выберите категорию</option>
-                @foreach($categories as $category)
-                <option value="{{ $category->id }}" 
-                         data-kat-dop="{{ $category->kat_dop }}"
-                        {{ old('category_id', $copiedOrder->category_id ?? '') == $category->id ? 'selected' : '' }}>
-                    {{ $category->nmv }} - {{ $category->name }} (Скидка: {{ $category->skidka }}%, Лимит: {{ $category->kol_p }} поездок/мес)
-                    @if($category->kat_dop == 2)
-                        [Категория 2]
-                    @endif
-                </option>
-                @endforeach
-            </select>
-            @error('category_id')
-            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-            @enderror
+            <div class="md:col-span-6">
+                <label for="category_id" class="block text-sm font-medium text-gray-700">Категория инвалидности *</label>
+                <select name="category_id" id="category_id" required
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    <option value="">Выберите категорию</option>
+                    @foreach($categories as $category)
+                        <option value="{{ $category->id }}" 
+                                data-kat-dop="{{ $category->kat_dop }}"
+                                {{ old('category_id', $copiedOrder->category_id ?? '') == $category->id ? 'selected' : '' }}>
+                            {{ $category->nmv }} - {{ $category->name }} (Скидка: {{ $category->skidka }}%, Лимит: {{ $category->kol_p }} поездок/мес)
+                            @if($category->kat_dop == 2)
+                                [Категория 2]
+                            @endif
+                        </option>
+                    @endforeach
+                </select>
+                @error('category_id')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
         </div>
 
         <!-- Добавлены поля category_skidka и category_limit -->
@@ -70,30 +71,30 @@
                     @enderror
             </div>
         </div>
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-2">
+            <div class="md:col-span-6">
+                <label for="client_tel" class="block text-sm font-medium text-gray-700">Телефон для связи*</label>
+                <input type="text" name="client_tel" id="client_tel" 
+                       value="{{ old('client_tel', $copiedOrder->client_tel ?? '') }}"
+                       placeholder="Введите телефон для связи"
+                       required
+                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    @error('client_tel')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+            </div>
 
-        <div>
-            <label for="client_tel" class="block text-sm font-medium text-gray-700">Телефон для связи*</label>
-            <input type="text" name="client_tel" id="client_tel" 
-                   value="{{ old('client_tel', $copiedOrder->client_tel ?? '') }}"
-                   placeholder="Введите телефон для связи"
-                   required
-                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                @error('client_tel')
-                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                @enderror
-        </div>
-
-        <div>
-            <label for="client_invalid" class="block text-sm font-medium text-gray-700">Удостоверение инвалида</label>
-            <input type="text" name="client_invalid" id="client_invalid" 
-                   value="{{ old('client_invalid', $copiedOrder->client_invalid ?? '') }}"
-                   placeholder="Введите номер удостоверения"
-                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                @error('client_invalid')
-                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                @enderror
-        </div>
-
+            <div class="md:col-span-6">
+                <label for="client_invalid" class="block text-sm font-medium text-gray-700">Удостоверение инвалида</label>
+                <input type="text" name="client_invalid" id="client_invalid" 
+                       value="{{ old('client_invalid', $copiedOrder->client_invalid ?? '') }}"
+                       placeholder="Введите номер удостоверения"
+                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    @error('client_invalid')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+            </div>
+        </div>    
         <div>
             <label for="client_sopr" class="block text-sm font-medium text-gray-700">ФИО (сопровождающий)</label>
             <input type="text" name="client_sopr" id="client_sopr" 

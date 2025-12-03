@@ -101,7 +101,7 @@
                         <td class="px-6 py-0">
                             <div class="text-sm text-gray-900" title="{{ $order->adres_otkuda }} {{ $order->adres_otkuda_info }}">
                                 <span class="font-medium">Откуда:</span> 
-                                <span class="text-lg">{{ $order->adres_otkuda }}</span>
+                                <span class="text-lg">{{ Str::limit( $order->adres_otkuda,20) }}</span>
                             </div>
                             <!-- Дополнительная информация об адресе "откуда" -->
 <!--                            @if($order->adres_otkuda_info)
@@ -111,7 +111,7 @@
                             @endif-->
                             <div class="text-sm text-gray-900 mt-1" title="{{ $order->adres_kuda }} {{ $order->adres_kuda_info }}">
                                 <span class="font-medium">Куда:</span> 
-                                <span class="text-lg">{{ $order->adres_kuda }}</span>
+                                <span class="text-lg">{{ Str::limit( $order->adres_kuda,20) }}</span>
                             </div>
 <!--                             Дополнительная информация об адресе "куда" 
                             @if($order->adres_kuda_info)
@@ -120,16 +120,11 @@
                                 </div>
                             @endif-->
                             @if($order->adres_obratno)
-                                <div class="text-sm text-gray-900 mt-1">
+                                <div class="text-sm text-gray-900 mt-1" title="{{ $order->adres_obratno }}">
                                     <span class="font-medium">Обратно:</span> 
-                                    <span class="text-lg">{{ $order->adres_obratno }}</span>
+                                    <span class="text-lg">{{ Str::limit( $order->adres_obratno,20) }}</span>
                                 </div>
                             @endif
-                            @if($order->type_order == 1)
-                                    <div class="text-sm text-gray-900 mt-1">
-                                        <span class="font-medium">Предв. дальность:</span> {{ $order->predv_way }}км.
-                                    </div>
-                                @endif
                         </td>
                         <td class="px-6 py-0">
                             @if($order->client)

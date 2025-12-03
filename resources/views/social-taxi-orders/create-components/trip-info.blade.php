@@ -25,7 +25,7 @@
 </div>
 
     <div class="space-y-2">
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-2">
             <!-- обязательный выбор оператора такси -->
             <div class="md:col-span-8">
                 <label for="taxi_id" class="block text-sm font-medium text-gray-700">Оператор такси *</label>
@@ -82,7 +82,7 @@
     </div>
     <!-- Дополнительная информация об адресе "откуда" -->    
     <div class="mt-2">
-        <label for="adres_otkuda_info" class="block text-sm font-medium text-gray-700">Дополнительная информация</label>
+<!--        <label for="adres_otkuda_info" class="block text-sm font-medium text-gray-700">Дополнительная информация</label>-->
         <textarea name="adres_otkuda_info" id="adres_otkuda_info" 
               rows="1" 
               placeholder="Телефон, особенности заезда и т.д."
@@ -90,7 +90,7 @@
         @error('adres_otkuda_info')
             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
         @enderror
-        <p class="mt-1 text-xs text-gray-500">Укажите дополнительную информацию: телефон, особенности заезда и т.д.</p>
+<!--        <p class="mt-1 text-xs text-gray-500">Укажите дополнительную информацию: телефон, особенности заезда и т.д.</p>-->
     </div>    
     <div>
         <label for="adres_kuda" class="block text-sm font-medium text-gray-700">Куда ехать *</label>
@@ -105,7 +105,7 @@
     </div>
     <!-- Дополнительная информация об адресе "куда" -->
     <div class="mt-2">
-        <label for="adres_kuda_info" class="block text-sm font-medium text-gray-700">Дополнительная информация</label>
+<!--        <label for="adres_kuda_info" class="block text-sm font-medium text-gray-700">Дополнительная информация</label>-->
         <textarea name="adres_kuda_info" id="adres_kuda_info" 
               rows="1" 
               placeholder="Телефон, особенности заезда и т.д."
@@ -113,7 +113,7 @@
         @error('adres_kuda_info')
             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
         @enderror
-        <p class="mt-1 text-xs text-gray-500">Укажите дополнительную информацию: телефон, особенности заезда и т.д.</p>
+        <!--<p class="mt-1 text-xs text-gray-500">Укажите дополнительную информацию: телефон, особенности заезда и т.д.</p>-->
     </div>
  
     <!-- Обратный адрес (показываем только для типов 2 и 3 - легковое авто и ГАЗель) -->
@@ -191,7 +191,7 @@
                 @error('predv_way')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                 @enderror
-                <p class="mt-1 text-xs text-gray-500">Предварительная дальность поездки в километрах</p>
+<!--                <p class="mt-1 text-xs text-gray-500">Предварительная дальность поездки в километрах</p>-->
             </div>    
             <!-- Расчетные значения для соцтакси -->
             <div id="calculation-results" class="bg-blue-50 p-4 rounded-lg mt-4" style="display: none;">
