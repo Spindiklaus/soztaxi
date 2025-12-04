@@ -38,7 +38,10 @@
                         <span class="ml-1" x-show="sortField === 'client_fio' && sortDirection === 'desc'">↓</span>
                     </th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">
-                        Скидка и лимит по поездке
+                        Скидка и лимит
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">
+                        Предв. дальность
                     </th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">
                         Фактические данные
@@ -59,15 +62,14 @@
                             <div class="text-sm {{ getOrderTypeColor($order->type_order) }}">
                                 {{ getOrderTypeName($order->type_order) }}
                             </div>
-                            <div class="text-sm text-gray-500 {{ $colorClass }}" title="{{ $status->name }}">
-                                {{ $order->pz_nom }} от {{ $order->pz_data->format('d.m.Y H:i') }}
+                            <div class="text-sm text-gray-500 {{ $colorClass }}" title="{{ $status->name }} {{ $order->pz_nom }} от {{ $order->pz_data->format('d.m.Y H:i') }}">
+                                {{ $order->pz_nom }}
                             </div>
                         </td>
                         <td class="px-3 py-0">
                             @if($order->visit_data)
                                 <div class="text-lg font-medium text-gray-900">
-                                    {{ $order->visit_data->format('d.m.Y') }}
-                                    {{ $order->visit_data->format('H:i') }}
+                                    {{ $order->visit_data->format('d.m.Y') }}&nbsp;{{ $order->visit_data->format('H:i') }}
                                 </div>
                                 @if($order->visit_obratno)
                                     <div class="text-sm font-medium text-gray-600 mt-1">
@@ -86,29 +88,27 @@
                             @endif
                         </td>
                         <td class="px-3 py-0">
-                            <div class="text-sm text-gray-900">
-                                <span class="font-medium">Откуда:</span> {{ $order->adres_otkuda }}
+                            <div class="text-sm text-gray-900" title="{{ $order->adres_otkuda }} {{ $order->adres_otkuda_info }}">
+                                <span class="font-medium">Откуда:</span> {{ Str::limit( $order->adres_otkuda,20) }}
                             </div>
                             <!-- Дополнительная информация об адресе "откуда" -->
-                            @if($order->adres_otkuda_info)
+<!--                            @if($order->adres_otkuda_info)
                                 <div class="text-xs text-gray-500 mt-1 ml-4">
                                     {{ $order->adres_otkuda_info }}
                                 </div>
-                            @endif
-                            <div class="text-sm text-gray-900 mt-1"
-                               @if($order->type_order == 1) title="Предв. дальность: {{ $order->predv_way }}км."@endif
-                            >
-                                <span class="font-medium">Куда:</span> {{ $order->adres_kuda }}
+                            @endif-->
+                            <div class="text-sm text-gray-900" title="{{ $order->adres_kuda }} {{ $order->adres_kuda_info }}">
+                                <span class="font-medium">Куда:</span> {{ Str::limit( $order->adres_kuda,20) }}
                             </div>
-                            <!-- Дополнительная информация об адресе "куда" -->
+<!--                             Дополнительная информация об адресе "куда" 
                             @if($order->adres_kuda_info)
                                 <div class="text-xs text-gray-500 mt-1 ml-4">
                                     {{ $order->adres_kuda_info }}
                                 </div>
-                            @endif
+                            @endif-->
                             @if($order->adres_obratno)
-                                <div class="text-sm text-gray-900 mt-1">
-                                    <span class="font-medium">Обратно:</span> {{ $order->adres_obratno }}
+                                <div class="text-sm text-gray-900 mt-1" title="{{ $order->adres_obratno }} ">
+                                    <span class="font-medium">Обратно:</span> {{ Str::limit( $order->adres_obratno,20) }}
                                 </div>
                             @endif
                         </td>
@@ -116,7 +116,7 @@
                             @if($order->client)
                                 {{ $order->client->last_name }}
                                 @if($order->client->rip_at)
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-800 text-white mt-1">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-sm bg-gray-800 text-white mt-1">
                                         RIP: {{ $order->client->rip_at->format('d.m.Y') }}
                                     </span>
                                 @endif
@@ -134,11 +134,16 @@
                             @endif
                             @if($order->kol_p_limit !== null)
                                 <div class="text-sm text-gray-900 mt-1">
-                                    Лимит: <span class="font-medium">{{ $order->kol_p_limit }} поездок/мес</span>
+                                    <span class="font-medium">{{ $order->kol_p_limit }} п/мес</span>
                                 </div>
                             @else
                                 <div class="text-sm text-gray-500 mt-1">Лимит: -</div>
                             @endif
+                        </td>
+                        <td>
+                            <div class="text-sm text-gray-900">
+                               {{ $order->predv_way }}км.
+                            </div>
                         </td>
                         <td class="px-3 py-0">
                             @if($order->taxi_way)

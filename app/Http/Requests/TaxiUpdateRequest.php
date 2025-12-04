@@ -35,7 +35,7 @@ class TaxiUpdateRequest extends FormRequest
             'zena1_gaz' => 'nullable|numeric',
             'zena2_gaz' => 'nullable|numeric',
             'komment' => 'nullable|string',
-            'update_date' => 'nullable|date_format:d.m.Y', // Валидация даты оставлена
+            'update_date' => 'nullable|date_format:d.m.Y', // Валидация даты
         ];
     }
     

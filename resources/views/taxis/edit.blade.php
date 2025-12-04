@@ -179,7 +179,11 @@
                                 class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
                             Сохранить изменения
                         </button>
-                        <button type="submit" name="action" value="update_prices"
+                        <button type="submit" name="action" value="preview_prices" title="Посмотреть заказы, которых коснутся изменения тарифов"
+                                class="inline-flex items-center px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700">
+                            Предварительный просмотр
+                        </button>
+                        <button type="submit" name="action" value="update_prices" title="Изменить заказы в соответствии с изменениями тарифов"
                                 class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
                             Обновить цены по новым тарифам
                         </button>
@@ -188,4 +192,62 @@
             </form>
         </div>
     </div>
+    
+    <!-- Модальное окно для предварительного просмотра -->
+    @if(isset($result))
+        <div id="previewModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+            <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+                <div class="mt-3">
+                    <div class="flex justify-between items-center pb-3 border-b">
+                        <h3 class="text-lg font-medium text-gray-900">Предварительный просмотр изменений</h3>
+                        <button id="closeModal" class="text-gray-400 hover:text-gray-600">
+                            <span class="text-2xl">&times;</span>
+                        </button>
+                    </div>
+                    <div class="mt-4">
+                        <p class="text-gray-700">Найдено заказов для обновления: {{ $result['count'] }}</p>
+                        <div class="mt-4 max-h-96 overflow-y-auto">
+                            @foreach($result['orders'] as $order)
+                            <div class="border p-2 rounded mb-2">
+                                <p class="font-medium">Заказ #{{ $order['pz_nom'] ?? 'N/A' }} ({{ \Carbon\Carbon::parse($order['visit_data'])->format('d.m.Y H:i') }}), тип: 
+                                    @switch($order['type_order'])
+                                        @case(1) соцтакси @break
+                                        @case(2) легковой @break
+                                        @case(3) ГАЗель @break
+                                        @default {{ $order['type_order'] }}
+                                    @endswitch
+                                </p>
+                                <p class="text-sm">До: цена={{ $order['taxi_price_before'] }}, возм={{ $order['taxi_vozm_before'] }}</p>
+                                <p class="text-sm">После: цена={{ $order['taxi_price_after'] }}, возм={{ $order['taxi_vozm_after'] }}</p>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    <div class="items-center px-4 py-3 mt-4 border-t">
+                        <button id="cancelPreview" class="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400">
+                            Отмена
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const previewModal = document.getElementById('previewModal');
+                const closeModal = document.getElementById('closeModal');
+                const cancelPreview = document.getElementById('cancelPreview');
+
+                closeModal.addEventListener('click', function() {
+                    previewModal.remove();
+                });
+
+                cancelPreview.addEventListener('click', function() {
+                    previewModal.remove();
+                });
+            });
+        </script>
+    @endif    
+        
+        
 </x-app-layout>

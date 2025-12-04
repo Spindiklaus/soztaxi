@@ -60,7 +60,7 @@ class TaxiOrderController extends BaseController {
         $taxi_sent_at = now(); // дата передачи сведений в такси
         // Используем упрощенную логику для такси
         $query = $this->queryBuilder->build($request, false);
-        $orders = $query->paginate(20)->appends($request->all());
+        $orders = $query->paginate(50)->appends($request->all());
         $totalOrders = $orders->total();
 
         return view('social-taxi-orders.taxi', compact(

@@ -165,7 +165,10 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" x-text="taxi.name"></td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" x-text="taxi.koef"></td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" x-text="taxi.posadka"></td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" x-text="taxi.komment"></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" 
+                                    x-text="taxi.komment ? (taxi.komment.length > 40 ? taxi.komment.substring(0, 40) + '...' : taxi.komment) : ''"
+                                    title="taxi.komment || ''">
+                                </td>                                
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" x-text="taxi.id"></td>   
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                     <span x-text="taxi.life == 1 ? 'Активен' : 'Не активен'"

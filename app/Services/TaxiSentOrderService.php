@@ -59,12 +59,13 @@ public function transferPredictiveData($validatedData)
         })
         ->where('taxi_id', $validatedData['taxi_id'])
         ->whereNotNull('predv_way')
-        ->where('predv_way', '>', 0)
-        ->where('taxi_way', '=', 0)
+        ->whereNull('taxi_way')
         ->whereNull('deleted_at')
         ->whereNull('cancelled_at');
 
     $orders = $query->get();
+
+    
     $updatedCount = 0;
 
     foreach ($orders as $order) {

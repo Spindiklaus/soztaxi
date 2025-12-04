@@ -38,7 +38,10 @@
                         <span class="ml-1" x-show="sortField === 'client_fio' && sortDirection === 'desc'">↓</span>
                     </th>
                     <th scope="col" class="px-2 py-0 text-left text-xs font-bold uppercase tracking-wider">
-                        Скидка и лимит по поездке
+                        Скидка и лимит
+                    </th>
+                    <th scope="col" class="px-2 py-0 text-left text-xs font-bold uppercase tracking-wider">
+                        Предв. дальность
                     </th>
                     <th scope="col" class="px-2 py-0 text-left text-xs font-bold uppercase tracking-wider">
                         Фактические данные
@@ -62,8 +65,8 @@
                         <div class="text-sm {{ getOrderTypeColor($order->type_order) }}">
                                 {{ getOrderTypeName($order->type_order) }}
                         </div>
-                        <div class="text-sm text-gray-500 {{ $colorClass }}" title="{{ $status->name }}">
-                            {{ $order->pz_nom }} от {{ $order->pz_data->format('d.m.y H:i') }}
+                        <div class="text-sm text-gray-500 {{ $colorClass }}" title="{{ $status->name }} {{ $order->pz_nom }} от {{ $order->pz_data->format('d.m.y H:i') }}">
+                            {{ $order->pz_nom }}
                         </div>
                     </td>
                     <td class="px-2 py-0">
@@ -141,16 +144,21 @@
                         @endif
                         @if($order->kol_p_limit !== null)
                             <div class="text-sm text-gray-900 mt-1">
-                                Лимит: <span class="font-medium">{{ $order->kol_p_limit }} поездок/мес</span>
+                                <span class="font-medium">{{ $order->kol_p_limit }} п/мес</span>
                             </div>
                         @else
                             <div class="text-sm text-gray-500 mt-1">Лимит: -</div>
                         @endif
                     </td>
                     <td class="px-2 py-0">
+                        <div class="text-sm text-gray-900">
+                               {{ $order->predv_way }}км.
+                        </div>
+                    </td>
+                    <td class="px-2 py-0">
                         @if($order->taxi_price)
                             <div class="text-sm text-gray-900" 
-                                 title="@if($order->type_order==1) Дальность:{{number_format($order->taxi_way, 3, ',', ' ') . ' км' }},@endif К оплате: {{ number_format($order->taxi_price - $order->taxi_vozm, 2, ',', ' ') . ' руб.' }}, К возмещению: {{ $order->taxi_vozm ? number_format($order->taxi_vozm, 2, ',', ' ') . ' руб.' : '-' }}">
+                                 title="@if($order->type_order==1) Дальность:{{number_format($order->taxi_way, 3, ',', ' ') . ' км' }},@endif Цена: {{ number_format($order->taxi_price, 2, ',', ' ') . ' руб.' }}, К оплате: {{ number_format($order->taxi_price - $order->taxi_vozm, 2, ',', ' ') . ' руб.' }}, К возмещению: {{ $order->taxi_vozm ? number_format($order->taxi_vozm, 2, ',', ' ') . ' руб.' : '-' }}">
                                 <span class="font-medium">Цена:</span>
                                 {{ number_format($order->taxi_price, 2, ',', ' ') . ' руб.' }}
                             </div>
