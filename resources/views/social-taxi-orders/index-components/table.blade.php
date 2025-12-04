@@ -76,7 +76,7 @@
                                     <span class="font-bold">{{ $order->pz_nom }}</span>
                                 </div>
                                 <div class="text-xs text-red-600 mt-1">
-                                    Удален: {{ $order->deleted_at->format('d.m.Y H:i') }}
+                                    Удален: {{ $order->deleted_at->format('d.m.Y') }}
                                 </div>
                             @else
                                 <div class="text-sm {{ getOrderTypeColor($order->type_order) }}">
@@ -94,7 +94,7 @@
                                     <div> {{ $order->visit_data->format('H:i') }} </div>
                                 </div>
                                 @if($order->visit_obratno)
-                                    <div class="text-sm font-medium text-gray-600 mt-1">
+                                    <div class="text-sm font-medium text-gray-600 mt-1" title="Обратно: {{ $order->adres_obratno }}">
                                         Обратно: 
                                         <span class="text-lg">{{ $order->visit_obratno->format('H:i') }}</span>
                                     </div>
@@ -137,11 +137,11 @@
                                     {{-- $order->adres_kuda_info --}}
                                 </div>
                             @endif-->
-                            @if($order->adres_obratno)
+<!--                            @if($order->adres_obratno)
                                 <div class="text-sm text-gray-900 mt-1">
                                     <span class="font-medium">Обратно:</span> {{ $order->adres_obratno }}
                                 </div>
-                            @endif
+                            @endif-->
                         </td>
                         <td class="px-4 py-0">
                             @if($order->client)
@@ -175,8 +175,6 @@
                                 <div class="text-sm text-gray-900 mt-1">
                                     <span class="font-medium">{{ $order->kol_p_limit }} п/мес</span>
                                 </div>
-                            @else
-                                <div class="text-sm text-gray-500 mt-1">Лимит: -</div>
                             @endif
                         </td>
 
@@ -190,7 +188,7 @@
                                 <div class="text-sm text-gray-900 mt-1"
                                   title="К оплате: {{ number_format($order->taxi_price - $order->taxi_vozm, 2, ',', ' ') . ' руб.' }}, К возмещению: {{ $order->taxi_vozm ? number_format($order->taxi_vozm, 2, ',', ' ') . ' руб.' : '0' }}"    
                                 >
-                                    <span class="font-medium">Цена:</span> {{ number_format($order->taxi_price, 2, ',', ' ') . ' руб.' }}
+                                    <span class="font-medium">Цена:</span><br/> {{ number_format($order->taxi_price, 2, ',', ' ') . ' руб.' }}
                                 </div>
                             @endif
 <!--                            @if($order->taxi_price - $order->taxi_vozm<>0)
@@ -206,7 +204,7 @@
                             @endif-->
                         </td>
                         <td class="px-4 py-0"> <!-- действия оператора -->
-                            <div class="flex flex-nowrap gap-1">
+                            <div class="flex flex-wrap gap-1">
                                 <!-- Ссылка на просмотр заказа -->
                                 <a href="{{ route('social-taxi-orders.show', array_merge(['social_taxi_order' => $order], $urlParams)) }}" 
                                    class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-md hover:bg-blue-200 text-sm" title="Просмотр заказа">
@@ -246,14 +244,13 @@
                                         </button>
                                     @endif
                                 @else
-                                    <form action="{{ route('social-taxi-orders.restore', array_merge(['social_taxi_order' => $order], $urlParams)) }}" method="POST" class="inline">
+                                    <form action="{{ route('social-taxi-orders.restore', array_merge(['social_taxi_order' => $order], $urlParams)) }}" method="POST" class="inline" title="Восстановить">
                                         @csrf
                                         @method('PATCH')
                                         <button type="submit" class="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-md hover:bg-green-200 text-sm w-full">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                                             </svg>
-                                            Восстановить
                                         </button>
                                     </form>
                                 @endif
