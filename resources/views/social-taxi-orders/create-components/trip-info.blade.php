@@ -4,25 +4,25 @@
     <div class="text-lg font-semibold text-gray-800 mb-2 flex flex-wrap items-center gap-2">
     Сведения о поездке
     <!-- Тип поездки -->
-    @if($type == 1) {{-- Для соцтакси всегда 1 и только для чтения --}}
-        <select name="zena_type" id="zena_type" 
-                readonly disabled
-                class="mt-0 block rounded-md border-gray-300 shadow-sm bg-gray-100 cursor-not-allowed text-sm">
-            <option value="1" selected>Для соцтакси всегда только в одну сторону</option>
-        </select>
-        <input type="hidden" name="zena_type" value="1"> {{-- Скрытое поле для передачи значения --}}
-    @else {{-- Для легкового авто и ГАЗели --}}
-        <select name="zena_type" id="zena_type" 
-                required
-                class="mt-0 block rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
-                <option value="1" {{ old('zena_type', $copiedOrder->zena_type ?? 1) == '1' ? 'selected' : '' }}>Поездка в одну сторону</option>
-                <option value="2" {{ old('zena_type', $copiedOrder->zena_type ?? '') == '2' ? 'selected' : '' }}>Поездка в обе стороны</option>
-        </select>
-        @error('zena_type')
-            <span class="text-sm text-red-600">{{ $message }}</span>
-        @enderror
-    @endif
-</div>
+        @if($type == 1) {{-- Для соцтакси всегда 1 и только для чтения --}}
+            <select name="zena_type" id="zena_type" 
+                    readonly disabled
+                    class="mt-0 block rounded-md border-gray-300 shadow-sm bg-gray-100 cursor-not-allowed text-sm">
+                <option value="1" selected>Для соцтакси всегда только в одну сторону</option>
+            </select>
+            <input type="hidden" name="zena_type" value="1"> {{-- Скрытое поле для передачи значения --}}
+        @else {{-- Для легкового авто и ГАЗели --}}
+            <select name="zena_type" id="zena_type" 
+                    required
+                    class="mt-0 block rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                    <option value="1" {{ old('zena_type', $copiedOrder->zena_type ?? 1) == '1' ? 'selected' : '' }}>Поездка в одну сторону</option>
+                    <option value="2" {{ old('zena_type', $copiedOrder->zena_type ?? '') == '2' ? 'selected' : '' }}>Поездка в обе стороны</option>
+            </select>
+            @error('zena_type')
+                <span class="text-sm text-red-600">{{ $message }}</span>
+            @enderror
+        @endif
+    </div>
 
     <div class="space-y-2">
         <div class="grid grid-cols-1 md:grid-cols-12 gap-2">
@@ -204,13 +204,11 @@
                     <div>
                         <span class="font-medium">Сумма к оплате:</span>
                         <span id="client-payment-amount" class="ml-2 font-bold">0,00</span> руб.
-                    </div>
-                    <div>
-                        <span class="font-medium">Сумма к возмещению:</span>
+                        <span class="font-medium">К возмещению:</span>
                         <span id="reimbursement-amount" class="ml-2 font-bold">0,00</span> руб.
                     </div>
                     <div id="taxi-info" class="text-sm text-gray-600 mt-2">
-                        <span>Оператор такси: </span>
+<!--                        <span>Оператор такси: </span>-->
                         <span id="taxi-name" class="font-semibold"></span>
                     </div>
                 </div>

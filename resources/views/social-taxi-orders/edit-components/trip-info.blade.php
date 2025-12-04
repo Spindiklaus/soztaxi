@@ -1,75 +1,77 @@
 <!-- Сведения о поездке -->
 <!-- resources/views/social-taxi-orders/edit-components/trip-info.blade.php -->
-<div class="bg-gray-50 p-4 rounded-lg mb-6">
-    <h2 class="text-lg font-semibold text-gray-800 mb-4">Сведения о поездке</h2>
-
-    <div class="space-y-4">
+<div class="bg-gray-50 p-4 rounded-lg mb-2">
+    <div class="text-lg font-semibold text-gray-800 mb-2 flex flex-wrap items-center gap-2">
+        Сведения о поездке
         <!-- Тип поездки -->
-        <div>
-            <label for="zena_type" class="block text-sm font-medium text-gray-700">Тип поездки *</label>
-            @if($order->type_order == 1) {{-- Для соцтакси (type_order == 1) zena_type = 1, только для чтения --}}
+        @if($order->type_order == 1) {{-- Для соцтакси (type_order == 1) zena_type = 1, только для чтения --}}
                 <select name="zena_type" id="zena_type" 
                         readonly disabled
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 cursor-not-allowed">
+                        class="mt-1 block rounded-md border-gray-300 shadow-sm bg-gray-100 cursor-not-allowed">
                     <option value="1" selected>Поездка в одну сторону</option>
                 </select>
                 <input type="hidden" name="zena_type" value="1"> {{-- Скрытое поле для передачи значения --}}
-                <p class="mt-1 text-xs text-gray-500">Для соцтакси тип поездки всегда "в одну сторону"</p>
+<!--                <p class="mt-1 text-xs text-gray-500">Для соцтакси тип поездки всегда "в одну сторону"</p>-->
             @else {{-- Для легкового авто и ГАЗели --}}
                 <select name="zena_type" id="zena_type" 
                         required
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        class="mt-1 block rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                     <option value="1" {{ $order->zena_type == '1' ? 'selected' : '' }}>Поездка в одну сторону</option>
                     <option value="2" {{ $order->zena_type == '2' ? 'selected' : '' }}>Поездка в обе стороны</option>
                 </select>
                 @error('zena_type')
-                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                 @enderror
                 <p class="mt-1 text-xs text-gray-500">Выберите тип поездки: в одну или обе стороны</p>
             @endif
-        </div>
+        
+    </div>
 
-
-        <div>
-            <label for="visit_data" class="block text-sm font-medium text-gray-700">Дата и время поездки *</label>
-            @if($order->order_group_id)
-                <input type="datetime-local" name="visit_data" id="visit_data" 
-                       value="{{ old('visit_data', $order->visit_data) }}"
-                       readonly disabled
-                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 cursor-not-allowed">
-                <input type="hidden" name="visit_data" value="{{ old('visit_data', $order->visit_data) }}">
-                <p class="mt-1 text-xs text-yellow-800 bg-yellow-50">
-                    Дата и время поездки заблокированы, так как заказ в группе. 
-                    Изменения возможны только при разгруппировке заказа.
-                </p>
-            @else
-                <input type="datetime-local" name="visit_data" id="visit_data" 
-                       value="{{ old('visit_data', $order->visit_data) }}"
-                       required
-                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                @error('visit_data')
-                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+    <div class="space-y-2">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-2">
+            
+             <div class="md:col-span-8">
+                <label for="taxi_id" class="block text-sm font-medium text-gray-700">Оператор такси *</label>
+                <select name="taxi_id" id="taxi_id" 
+                        required
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    <option value="">Выберите оператора такси</option>
+                    @foreach($taxis as $taxi)
+                    <option value="{{ $taxi->id }}" {{ (old('taxi_id', $order->taxi_id) == $taxi->id) ? 'selected' : '' }}>
+                        {{ $taxi->name }} (#{{ $taxi->id }})
+                    </option>
+                    @endforeach
+                </select>
+                @error('taxi_id')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                 @enderror
-            @endif
-        </div>
-
+            </div>
+            
+            <div class="md:col-span-4">
+                <label for="visit_data" class="block text-sm font-medium text-gray-700">Дата поездки *</label>
+                @if($order->order_group_id)
+                    <input type="datetime-local" name="visit_data" id="visit_data" 
+                           value="{{ old('visit_data', $order->visit_data) }}"
+                           readonly disabled
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 cursor-not-allowed">
+                    <input type="hidden" name="visit_data" value="{{ old('visit_data', $order->visit_data) }}">
+                    <p class="mt-1 text-xs text-yellow-800 bg-yellow-50">
+                        Дата и время поездки заблокированы, так как заказ в группе. 
+                        Изменения возможны только при разгруппировке заказа.
+                    </p>
+                @else
+                    <input type="datetime-local" name="visit_data" id="visit_data" 
+                           value="{{ old('visit_data', $order->visit_data) }}"
+                           required
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    @error('visit_data')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                @endif
+            </div>
+        </div>    
         <!-- обязательный выбор оператора такси -->
-        <div>
-            <label for="taxi_id" class="block text-sm font-medium text-gray-700">Оператор такси *</label>
-            <select name="taxi_id" id="taxi_id" 
-                    required
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                <option value="">Выберите оператора такси</option>
-                @foreach($taxis as $taxi)
-                <option value="{{ $taxi->id }}" {{ (old('taxi_id', $order->taxi_id) == $taxi->id) ? 'selected' : '' }}>
-                    {{ $taxi->name }} (#{{ $taxi->id }})
-                </option>
-                @endforeach
-            </select>
-            @error('taxi_id')
-                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-            @enderror
-        </div>
+       
         
         <div class="flex items-end space-x-2 mt-2">
               @if(!$order->order_group_id)
@@ -245,13 +247,11 @@
                     <div>
                         <span class="font-medium">Сумма к оплате:</span>
                         <span id="client-payment-amount" class="ml-2 font-bold">0,00</span> руб.
-                    </div>
-                    <div>
-                        <span class="font-medium">Сумма к возмещению:</span>
+                        <span class="font-medium">К возмещению:</span>
                         <span id="reimbursement-amount" class="ml-2 font-bold">0,00</span> руб.
                     </div>
                     <div id="taxi-info" class="text-sm text-gray-600 mt-2">
-                        <span>Оператор такси: </span>
+<!--                        <span>Оператор такси: </span>-->
                         <span id="taxi-name" class="font-semibold"></span>
                     </div>
                 </div>
