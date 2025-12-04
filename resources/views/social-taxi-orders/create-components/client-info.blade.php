@@ -6,7 +6,7 @@
     <div class="space-y-2">
         <div class="grid grid-cols-1 md:grid-cols-12 gap-2">
             <div class="md:col-span-6">
-                <label for="client_id" class="block text-sm font-medium text-gray-700">Клиент *</label>
+                <label for="client_id" class="block text-sm font-medium text-gray-700">ФИО *</label>
                 <select name="client_id" id="client_id" required
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                     <option value="">Выберите клиента</option>
@@ -50,7 +50,7 @@
                 <input type="number" name="category_skidka" id="category_skidka" 
                        value="{{ old('category_skidka', $copiedOrder->category_skidka ?? '') }}"
                        min="0" max="100" step="1"
-                       placeholder="Введите скидку по категории"
+                       placeholder=""
                        readonly
                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 cursor-not-allowed">
                     @error('category_skidka')
@@ -63,7 +63,7 @@
                 <input type="number" name="category_limit" id="category_limit" 
                         value="{{ old('category_limit', $copiedOrder->category_limit ?? '') }}"
                        min="10" max="26" step="1"
-                       placeholder="Введите лимит поездок по категории"
+                       placeholder=""
                        readonly
                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 cursor-not-allowed">
                     @error('category_limit')
@@ -96,7 +96,7 @@
             </div>
         </div>    
         <div>
-            <label for="client_sopr" class="block text-sm font-medium text-gray-700">ФИО (сопровождающий)</label>
+            <label for="client_sopr" class="block text-sm font-medium text-gray-700">Сопровождающий</label>
             <input type="text" name="client_sopr" id="client_sopr" 
                    value="{{ old('client_sopr', $copiedOrder->client_sopr ?? '') }}"
                    placeholder="Введите ФИО сопровождающего"

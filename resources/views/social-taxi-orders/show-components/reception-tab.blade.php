@@ -37,7 +37,7 @@
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700">ФИО (сопровождающий)</label>
+                            <label class="block text-sm font-medium text-gray-700">Сопровождающий</label>
                             <div class="mt-1 bg-gray-100 p-2 rounded-md">{{ $order->client_sopr ?? 'Не указан' }}</div>
                         </div>
 
