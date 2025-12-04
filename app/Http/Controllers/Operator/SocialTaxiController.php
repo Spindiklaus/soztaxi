@@ -283,21 +283,52 @@ public function copyOrder(Request $request)
             }
         }
         // --- КОНЕЦ ПРОВЕРКИ ---
+        
+        
+        // Проверка разницы во времени с другими заказами клиента в этот день ---
+        // Находим все *другие* заказы клиента в этот день (не копируемый заказ)
+        // Учитываются *все* заказы, включая удалённые и отменённые
+        $otherOrdersOnSameDay = Order::where('client_id', $originalOrder->client_id)
+            ->whereDate('visit_data', $newVisitDateTime->toDateString()) // Совпадение даты
+            ->whereNull('cancelled_at') // исключаем отменённые
+            ->withTrashed()
+            ->get(); // Получаем коллекцию
+       
+        $isTimeConflict = false;
+        $conflictingOrderTime = null;
+        $conflictingOrderId = null;
 
-        // Проверка, отличается ли новая дата/время от оригинальной более чем на 30 минут ---
-        if ($originalOrder->visit_data) {
-            $originalVisitDateTime = $originalOrder->visit_data;
-            // Вычисляем абсолютную разницу в минутах
-            $diffInMinutes = abs($newVisitDateTime->diffInMinutes($originalVisitDateTime));
+        foreach ($otherOrdersOnSameDay as $existingOrder) {
+            $existingVisitDateTime = $existingOrder->visit_data;
+            $diffInMinutes = abs($newVisitDateTime->diffInMinutes($existingVisitDateTime));
 
             if ($diffInMinutes <= 60) {
-                return response()->json(['success' => false, 'message' => 'Невозможно создать заказ: новая дата/время поездки должна отличаться от оригинальной более чем на 60 минут.'], 422);
+                $isTimeConflict = true;
+                $conflictingOrderTime = $existingVisitDateTime->format('d.m.Y H:i');
+                $conflictingOrderId = $existingOrder->pz_nom;
+                break; // Нашли первый конфликт, можно остановиться
             }
         }
 
-        if (!$newVisitDateTime->between($monthStart, $monthEnd)) {
-            return response()->json(['success' => false, 'message' => 'Невозможно создать заказ: дата поездки '. $newVisitDateTime.' должна быть между '.$monthStart.' и '.$monthEnd], 422);
+        if ($isTimeConflict) {
+            return response()->json(['success' => false, 'message' => "Невозможно создать копию на {$newVisitDateTime->format('d.m.Y H:i')}: слишком близко ко времени другого заказа (№{$conflictingOrderId} на {$conflictingOrderTime}). Разница должна быть более 60 минут."], 422);
         }
+        
+
+//        // Проверка, отличается ли новая дата/время от оригинальной более чем на 30 минут ---
+//        if ($originalOrder->visit_data) {
+//            $originalVisitDateTime = $originalOrder->visit_data;
+//            // Вычисляем абсолютную разницу в минутах
+//            $diffInMinutes = abs($newVisitDateTime->diffInMinutes($originalVisitDateTime));
+//
+//            if ($diffInMinutes <= 60) {
+//                return response()->json(['success' => false, 'message' => 'Невозможно создать заказ: новая дата/время поездки должна отличаться от оригинальной более чем на 60 минут.'], 422);
+//            }
+//        }
+//
+//        if (!$newVisitDateTime->between($monthStart, $monthEnd)) {
+//            return response()->json(['success' => false, 'message' => 'Невозможно создать заказ: дата поездки '. $newVisitDateTime.' должна быть между '.$monthStart.' и '.$monthEnd], 422);
+//        }
         
         
 //        // Проверка ограничения: не больше 2 поездок в день
@@ -382,18 +413,6 @@ public function copyOrder(Request $request)
                         // Парсим новую дату/время
                         $newVisitDateTime = Carbon::createFromFormat('Y-m-d H:i', $date . ' ' . $newVisitTime);
 
-                        // --- Проверки идентичны copyOrder ---
-                        // 1. Проверка лимита поездок в день
-                        $existingTripsCount = Order::where('client_id', $originalOrder->client_id)
-                            ->whereDate('visit_data', $newVisitDateTime->toDateString())
-                            ->whereNull('deleted_at')
-                            ->whereNull('cancelled_at')
-                            ->count();
-
-                        if ($existingTripsCount >= 2) {
-                            throw new \Exception("Невозможно создать копию: клиент уже имеет 2 поездки в этот день ({$newVisitDateTime->format('d.m.Y')}).");
-                        }
-
                         // 2. Проверка лимита поездок в месяц
                         $limit = $originalOrder->kol_p_limit;
                         $existingTripsCountForMonth = getClientTripsCountInMonthByVisitDate($originalOrder->client_id, $newVisitDateTime);
@@ -406,8 +425,8 @@ public function copyOrder(Request $request)
                         // Находим все *другие* заказы клиента в этот день (не копируемый заказ)
                         $otherOrdersOnSameDay = Order::where('client_id', $originalOrder->client_id)
                             ->whereDate('visit_data', $newVisitDateTime->toDateString()) // Совпадение даты
-                            ->where('id', '!=', $originalOrder->id) // Исключаем сам копируемый заказ
                             ->whereNull('cancelled_at') // отмененные игнорируем
+                            ->withTrashed()    
                             ->get(); // Получаем коллекцию
 
                         $isTimeConflict = false;
