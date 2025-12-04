@@ -1,9 +1,9 @@
 <!-- resources/views/sozial-taxi-orders/show-components/taxi-work-tab.blade.php -->
 <div id="taxi-work" class="tab-content hidden">
-    <div class="bg-gray-50 p-4 rounded-lg mb-2">
+    <div class="bg-gray-200 p-2 rounded-lg mb-2">
         <h2 class="text-lg font-semibold text-gray-800 mb-2">Работа с такси</h2>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
             <!-- Первая строчка -->
             <div>
                 <label class="block text-sm font-medium text-gray-700">Дата передачи сведений (звонка) в такси</label>

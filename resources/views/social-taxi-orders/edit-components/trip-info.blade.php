@@ -1,6 +1,6 @@
 <!-- Сведения о поездке -->
 <!-- resources/views/social-taxi-orders/edit-components/trip-info.blade.php -->
-<div class="bg-gray-50 p-4 rounded-lg mb-2">
+<div class="bg-gray-200 p-2 rounded-lg mb-2">
     <div class="text-lg font-semibold text-gray-800 mb-2 flex flex-wrap items-center gap-2">
         Сведения о поездке
         <!-- Тип поездки -->

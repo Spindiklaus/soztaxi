@@ -4,7 +4,7 @@
         <div>
 
             <!-- Клиент -->
-            <div class="border border-gray-200 rounded-lg mb-2">
+            <div class="bg-gray-200 border border-gray-200 rounded-lg mb-2">
                 <div class="bg-gray-50 px-4 py-2 rounded-t-lg">
                     <button type="button" 
                             onclick="toggleClientInfo()"
@@ -73,7 +73,7 @@
             </div>
 
             <!-- Сведения о поездке -->
-            <div class="border border-gray-200 rounded-lg mb-2">
+            <div class="bg-gray-200 border border-gray-200 rounded-lg mb-2">
                 <div class="bg-gray-50 px-4 py-2 rounded-t-lg">
                     <button type="button" 
                             onclick="toggleTripInfo()"
@@ -155,7 +155,7 @@
             </div>
 
             <!-- Сведения о заказе -->
-            <div class="bg-gray-50 rounded-lg mb-2">
+            <div class="bg-gray-200 rounded-lg mb-2">
                 <!-- Заголовок с кнопкой раскрытия -->
                 <div class="px-4 py-3 bg-gray-100 rounded-t-lg border-b border-gray-200">
                     <button type="button" 
@@ -196,7 +196,7 @@
                 <!-- Содержимое льгот  -->
                 <div id="benefits-content" class="p-2">
                     <!-- Количество поездок клиента -->
-                    <div class="bg-gray-50 p-2 rounded-lg mb-2">
+                    <div class="bg-gray-200 p-2 rounded-lg mb-2">
                         <div class="flex items-center">
                             <span class="text-lg font-semibold text-gray-800">Количество поездок клиента в этом месяце:</span>
                             <button 
@@ -211,16 +211,13 @@
                         </div>
                         <!-- Число поездок переданных в такси -->
                         <div class="flex items-center mt-2">
-                            <span class="text-lg font-semibold text-gray-800">Число поездок, переданных оператору такси:</span>
+                            <span class="text-lg font-semibold text-gray-800">Передано оператору такси:</span>
                             <button 
                                 onclick="showClientTaxiSentTrips({{ $order->client_id }}, '{{ $order->visit_data ? $order->visit_data->format('Y-m') : date('Y-m') }}')"
                                 class="ml-2 inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-yellow-100 text-yellow-800 hover:bg-yellow-200 transition-colors">
                                 {{ getClientTaxiSentTripsCountInMonthByVisitDate($order->client_id, $order->visit_data) }}
                             </button>
-                        </div>
-                        <!-- Число фактических поездок в месяц -->
-                        <div class="flex items-center mt-2">
-                            <span class="text-lg font-semibold text-gray-800">Число закрытых поездок в месяц:</span>
+                            <span class="text-lg font-semibold text-gray-800 px-4">Закрыто поездок за месяц:</span>
                             <button 
                                 onclick="showClientActualTrips({{ $order->client_id }}, '{{ $order->visit_data ? $order->visit_data->format('Y-m') : date('Y-m') }}')"
                                 class="ml-2 inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-green-100 text-green-800 hover:bg-green-200 transition-colors">
@@ -239,7 +236,7 @@
     <!-- Предварительный расчет -->
     @if($order->type_order == 1) 
     <div class="col-span-1">
-        <div class="bg-gray-50 rounded-lg mb-2">
+        <div class="bg-gray-200 rounded-lg mb-2">
             <!-- Заголовок с кнопкой раскрытия -->
             <div class="px-4 py-2 bg-gray-100 rounded-t-lg border-b border-gray-200">
                 <button type="button" 
@@ -271,23 +268,17 @@
                         </span>
                     </div>
 
-                    <div class="flex justify-between">
-                        <span class="text-sm font-medium text-gray-700">Цена поездки полная, без учета посадки, руб.</span>
+                    <div>
+                        <span class="text-sm font-medium text-gray-700">Цена поездки полная  (без учета посадки)</span>
                         <span class="text-sm text-gray-900">{{ number_format(calculateFullTripPrice($order, 11, $taxi), 11, ',', ' ') }} руб.</span>
-                    </div>
-
-                    <div class="flex justify-between">
-                        <span class="text-sm font-medium text-gray-700">Сумма к оплате, руб.</span>
+                        <span class="text-sm px-4 font-medium text-gray-700">Сумма к оплате</span>
                         @php
                             $amount = calculateClientPaymentAmount($order, 11, $taxi);
                         @endphp
                         <span class="text-sm text-blue-600 font-semibold">
                             {{ $amount == 0 ? '0' : number_format($amount, 11, ',', ' ') }} руб.
                         </span>
-                    </div>
-
-                    <div class="flex justify-between">
-                        <span class="text-sm font-medium text-gray-700">Сумма к возмещению, руб.</span>
+                        <span class="text-sm px-4 font-medium text-gray-700">Сумма к возмещению</span>
                         <span class="text-sm text-orange-600 font-semibold">{{ number_format(calculateReimbursementAmount($order, 11, $taxi), 11, ',', ' ') }} руб.</span>
                     </div>
                 </div>

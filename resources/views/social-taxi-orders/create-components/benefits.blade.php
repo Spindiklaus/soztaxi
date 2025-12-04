@@ -1,6 +1,6 @@
 <!-- Льготы по поездке -->
 <!-- resources/views/social-taxi-orders/create-components/benefits.blade.php -->
-<div class="bg-gray-50 p-2 rounded-lg mb-2">
+<div class="bg-gray-200 p-2 rounded-lg mb-2">
     <h2 class="text-lg font-semibold text-gray-800 mb-4">Дополнительные льготы по поездке</h2>
 
     <div class="space-y-2">

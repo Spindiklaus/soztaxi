@@ -1,6 +1,6 @@
 <!-- Предварительная информация о заказе, заголовок -->
 <!-- resources/views/social-taxi-orders/create-components/order-info.blade.php -->
-<div class="bg-gray-50 p-4 rounded-lg mb-2">
+<div class="bg-gray-200 p-4 rounded-lg mb-2">
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div>
             <label class="block text-sm font-medium text-gray-700">Номер заказа</label>

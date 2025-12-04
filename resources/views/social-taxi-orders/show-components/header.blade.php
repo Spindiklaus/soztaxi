@@ -56,7 +56,7 @@
         </a>
      </div>
 </div>
-<div class="border border-gray-200 rounded-lg p-4 mb-2 bg-white shadow">
+<div class="bg-gray-200 border border-gray-200 rounded-lg p-4 mb-2 shadow">
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Дата приема заказа</label>

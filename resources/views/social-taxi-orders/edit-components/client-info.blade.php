@@ -1,6 +1,6 @@
 <!-- Сведения о клиенте -->
 <!-- resources/views/social-taxi-orders/edit-components/client-info.blade.php -->
-<div class="bg-gray-50 p-4 rounded-lg mb-2">
+<div class="bg-gray-200 p-2 rounded-lg mb-2">
     <h2 class="text-lg font-semibold text-gray-800 mb-2">Сведения о клиенте</h2>
 
     <div class="space-y-2">
