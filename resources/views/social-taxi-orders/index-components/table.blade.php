@@ -188,7 +188,7 @@
                                 <div class="text-sm text-gray-900 mt-1"
                                   title="К оплате: {{ number_format($order->taxi_price - $order->taxi_vozm, 2, ',', ' ') . ' руб.' }}, К возмещению: {{ $order->taxi_vozm ? number_format($order->taxi_vozm, 2, ',', ' ') . ' руб.' : '0' }}"    
                                 >
-                                    <span class="font-medium">Цена:</span><br/> {{ number_format($order->taxi_price, 2, ',', ' ') . ' руб.' }}
+                                    <span class="font-medium">Цена:</span> {{ number_format($order->taxi_price, 2, ',', ' ') . ' руб.' }}
                                 </div>
                             @endif
 <!--                            @if($order->taxi_price - $order->taxi_vozm<>0)
