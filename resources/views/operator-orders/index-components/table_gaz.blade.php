@@ -94,7 +94,7 @@
                                 {{ $order->visit_data->format('d.m.Y') }}&nbsp;{{ $order->visit_data->format('H:i') }}
                             </div>
                             @if($order->visit_obratno)
-                                <div class="text-sm font-medium text-gray-600 mt-1">
+                                <div class="text-sm font-medium text-gray-600 mt-1" title="{{ $order->adres_obratno }}">
                                     Обратно: 
                                     <span class="text-lg">{{ $order->visit_obratno->format('H:i') }}</span>
                                 </div>
@@ -127,12 +127,12 @@
                                 {{ $order->adres_kuda_info }}
                             </div>
                         @endif-->
-                        @if($order->adres_obratno)
+<!--                        @if($order->adres_obratno)
                             <div class="text-sm text-gray-900 mt-1" title="{{ $order->adres_obratno }}">
                                 <span class="font-medium">Обратно:</span>
                                 {{ Str::limit( $order->adres_obratno ,20) }}
                             </div>
-                        @endif
+                        @endif-->
                     </td>
                     <td class="px-6 py-0"> <!-- клиент -->
                         @if($order->client)
