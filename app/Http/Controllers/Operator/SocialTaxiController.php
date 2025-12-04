@@ -284,6 +284,14 @@ public function copyOrder(Request $request)
         }
         // --- КОНЕЦ ПРОВЕРКИ ---
         
+        // Проверка года --- защита от дурака
+            $originalVisitYear = $originalOrder->visit_data->year;
+            $newVisitYear = $newVisitDateTime->year;
+
+            if ($newVisitYear < $originalVisitYear) {
+                return response()->json(['success' => false, 'message' => "Невозможно создать копию: год новой даты поездки ({$newVisitYear}) не может быть раньше года оригинальной даты поездки ({$originalVisitYear})."], 422);
+            }
+        
         
         // Проверка разницы во времени с другими заказами клиента в этот день ---
         // Находим все *другие* заказы клиента в этот день (не копируемый заказ)
