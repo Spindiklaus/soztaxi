@@ -32,26 +32,26 @@
             <main>
                 <!-- Сообщение об ошибке -->
                 @if(session('error'))
-                <x-alert type="error" title="Доступ запрещён">
-                    {{ session('error') }}
-                </x-alert>
+                    <x-alert type="error" title="Доступ запрещён">
+                        {{ session('error') }}
+                    </x-alert>
                 @endif
                 @if(session('success'))
-                <x-alert type="success" title="Успех">
-                    {{ session('success') }}
-                </x-alert>
+                    <x-alert type="success" title="Успех">
+                        {{ session('success') }}
+                    </x-alert>
                 @endif
 
                 @if(session('warning'))
-                <x-alert type="warning" title="Предупреждение">
-                    {{ session('warning') }}
-                </x-alert>
+                    <x-alert type="warning" title="Предупреждение">
+                        {{ session('warning') }}
+                    </x-alert>
                 @endif
 
                 @if(session('info'))
-                <x-alert type="info" title="Информация">
-                    {{ session('info') }}
-                </x-alert>
+                    <x-alert type="info" title="Информация">
+                        {{ session('info') }}
+                    </x-alert>
                 @endif
                 <!-- Ошибки валидации -->
                 <x-validation-errors-alert />

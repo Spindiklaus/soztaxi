@@ -58,123 +58,128 @@
         </div>    
         <!-- Кнопка для выбора из истории адресов -->
         <div class="flex items-end space-x-2 mt-2">
-        <div class="flex-1">
-            <label for="adres_otkuda" class="block text-sm font-medium text-gray-700">Откуда ехать *</label>
-            <textarea name="adres_otkuda" id="adres_otkuda" 
-                      rows="2" 
-                      required
-                      placeholder="Введите адрес отправки"
-                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('adres_otkuda', $copiedOrder->adres_otkuda ?? '') }}</textarea>
-            @error('adres_otkuda')
-                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-            @enderror
-        </div>
+            <div class="flex-1">
+                <label for="adres_otkuda" class="block text-sm font-medium text-gray-700">Откуда ехать *</label>
+                <textarea name="adres_otkuda" id="adres_otkuda" 
+                          rows="2" 
+                          required
+                          placeholder="Введите адрес отправки"
+                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('adres_otkuda', $copiedOrder->adres_otkuda ?? '') }}</textarea>
+                @error('adres_otkuda')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
     
-        <button type="button" 
-                id="open-address-history-btn"
-                title ="История поездок клиента"
-                class="mt-6 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-            <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            История
-        </button>
-    </div>
-    <!-- Дополнительная информация об адресе "откуда" -->    
-    <div class="mt-2">
-<!--        <label for="adres_otkuda_info" class="block text-sm font-medium text-gray-700">Дополнительная информация</label>-->
-        <textarea name="adres_otkuda_info" id="adres_otkuda_info" 
-              rows="1" 
-              placeholder="Телефон, особенности заезда и т.д."
-              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('adres_otkuda_info', $copiedOrder->adres_otkuda_info ?? '') }}</textarea>
-        @error('adres_otkuda_info')
-            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-        @enderror
-<!--        <p class="mt-1 text-xs text-gray-500">Укажите дополнительную информацию: телефон, особенности заезда и т.д.</p>-->
-    </div>    
-    <div>
-        <label for="adres_kuda" class="block text-sm font-medium text-gray-700">Куда ехать *</label>
-        <textarea name="adres_kuda" id="adres_kuda" 
-                      rows="2" 
-                      required
-                      placeholder="Введите адрес назначения"
-                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('adres_kuda', $copiedOrder->adres_kuda ?? '') }}</textarea>
-        @error('adres_kuda')
-            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-        @enderror
-    </div>
-    <!-- Дополнительная информация об адресе "куда" -->
-    <div class="mt-2">
-<!--        <label for="adres_kuda_info" class="block text-sm font-medium text-gray-700">Дополнительная информация</label>-->
-        <textarea name="adres_kuda_info" id="adres_kuda_info" 
-              rows="1" 
-              placeholder="Телефон, особенности заезда и т.д."
-              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('adres_kuda_info', $copiedOrder->adres_kuda_info ?? '') }}</textarea>
-        @error('adres_kuda_info')
-            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-        @enderror
-        <!--<p class="mt-1 text-xs text-gray-500">Укажите дополнительную информацию: телефон, особенности заезда и т.д.</p>-->
-    </div>
+            <button type="button" 
+                    id="open-address-history-btn"
+                    title ="История поездок клиента"
+                    class="mt-6 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                История
+            </button>
+        </div>
+        <!-- Дополнительная информация об адресе "откуда" -->    
+        <div class="mt-2">
+    <!--        <label for="adres_otkuda_info" class="block text-sm font-medium text-gray-700">Дополнительная информация</label>-->
+            <textarea name="adres_otkuda_info" id="adres_otkuda_info" 
+                  rows="1" 
+                  placeholder="Телефон, особенности заезда и т.д."
+                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('adres_otkuda_info', $copiedOrder->adres_otkuda_info ?? '') }}</textarea>
+            @error('adres_otkuda_info')
+                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+            @enderror
+    <!--        <p class="mt-1 text-xs text-gray-500">Укажите дополнительную информацию: телефон, особенности заезда и т.д.</p>-->
+        </div>    
+        <div>
+            <label for="adres_kuda" class="block text-sm font-medium text-gray-700">Куда ехать *</label>
+            <textarea name="adres_kuda" id="adres_kuda" 
+                          rows="2" 
+                          required
+                          placeholder="Введите адрес назначения"
+                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('adres_kuda', $copiedOrder->adres_kuda ?? '') }}</textarea>
+            @error('adres_kuda')
+                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+            @enderror
+        </div>
+        <!-- Дополнительная информация об адресе "куда" -->
+        <div class="mt-2">
+    <!--        <label for="adres_kuda_info" class="block text-sm font-medium text-gray-700">Дополнительная информация</label>-->
+            <textarea name="adres_kuda_info" id="adres_kuda_info" 
+                  rows="1" 
+                  placeholder="Телефон, особенности заезда и т.д."
+                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('adres_kuda_info', $copiedOrder->adres_kuda_info ?? '') }}</textarea>
+            @error('adres_kuda_info')
+                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+            @enderror
+            <!--<p class="mt-1 text-xs text-gray-500">Укажите дополнительную информацию: телефон, особенности заезда и т.д.</p>-->
+        </div>
  
-    <!-- Обратный адрес (показываем только для типов 2 и 3 - легковое авто и ГАЗель) -->
-    @if($type != 1)
-         <div>
-            <label for="visit_obratno" class="block text-sm font-medium text-gray-700">Дата и время обратной поездки</label>
-            <input type="datetime-local" name="visit_obratno" id="visit_obratno" 
-                   value="{{ old('visit_obratno') }}"
-                   min="{{ old('visit_data') ? \Carbon\Carbon::parse(old('visit_data'))->addMinutes(5)->format('Y-m-d\TH:i') : now()->addDay()->addMinutes(5)->format('Y-m-d\TH:i') }}"
-                   max="{{ old('visit_data') ? \Carbon\Carbon::parse(old('visit_data'))->addMonths(6)->format('Y-m-d\TH:i') : now()->addMonths(6)->format('Y-m-d\TH:i') }}" 
-                   {{ (old('zena_type', 1) == '1' || !$type) ? 'readonly disabled' : '' }}
-                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 {{ (old('zena_type', 1) == '1' || !$type) ? 'bg-gray-100 cursor-not-allowed' : '' }}">
-            @error('visit_obratno')
-                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-            @enderror
-            <p class="mt-1 text-xs text-gray-500">
-                Время обратной поездки должно быть позже времени основной поездки
-            </p>
-        </div>
-        <div>
-            <label for="adres_obratno" class="block text-sm font-medium text-gray-700">Обратный адрес</label>
-            <textarea name="adres_obratno" id="adres_obratno" 
-                      rows="3" 
-                      placeholder="{{ ($type == 2 || $type == 3) && (old('zena_type', $copiedOrder->zena_type ?? 1) == '2') ? 'Введите обратный адрес' : 'Поле недоступно для поездки в одну сторону' }}"
-                      {{ ($type == 2 || $type == 3) && (old('zena_type', $copiedOrder->zena_type ?? 1) == '1') ? 'readonly disabled' : '' }}
-                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 
-                      {{ ($type == 2 || $type == 3) && (old('zena_type', $copiedOrder->zena_type ?? 1) == '1') ? 'bg-gray-100 cursor-not-allowed' : '' }}">{{ old('adres_obratno', $copiedOrder->adres_obratno ?? '') }}</textarea>
-            @error('adres_obratno')
-                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-            @enderror
-            @if($type == 2 || $type == 3)
-                <p class="mt-1 text-xs text-gray-500">
-                    Обратный адрес доступен только при поездке в обе стороны
-                </p>
-            @endif
-        </div>
-        <!-- Цена поездки -->
-        <div>
-            <label for="taxi_price" class="block text-sm font-medium text-gray-700">Цена поездки</label>
-            <input type="number" name="taxi_price" id="taxi_price" 
-                   value="{{ old('taxi_price', $copiedOrder->taxi_price ?? '') }}"
-                   step="0.01"
-                   readonly
-                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 cursor-not-allowed focus:border-blue-500 focus:ring-blue-500">
-            @error('taxi_price')
-                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-            @enderror
-        </div>
+        <!-- Обратный адрес (показываем только для типов 2 и 3 - легковое авто и ГАЗель) -->
+        @if($type != 1)
+             <div class="flex items-end space-x-2 mt-2">
+                 <DIV class="flex-1">
+                    <label for="visit_obratno" class="block text-sm font-medium text-gray-700">Дата обратной поездки</label>
+                    <input type="datetime-local" name="visit_obratno" id="visit_obratno" 
+                           value="{{ old('visit_obratno') }}"
+                           min="{{ old('visit_data') ? \Carbon\Carbon::parse(old('visit_data'))->addMinutes(5)->format('Y-m-d\TH:i') : now()->addDay()->addMinutes(5)->format('Y-m-d\TH:i') }}"
+                           max="{{ old('visit_data') ? \Carbon\Carbon::parse(old('visit_data'))->addMonths(6)->format('Y-m-d\TH:i') : now()->addMonths(6)->format('Y-m-d\TH:i') }}" 
+                           {{ (old('zena_type', 1) == '1' || !$type) ? 'readonly disabled' : '' }}
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 {{ (old('zena_type', 1) == '1' || !$type) ? 'bg-gray-100 cursor-not-allowed' : '' }}">
+                    @error('visit_obratno')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                    
+                 </DIV>
+                 <DIV class="flex-1 mt-1 text-xs text-gray-500">
+                    Время обратной поездки должно быть позже времени основной поездки
+                 </DIV>
+            </div>
+            <div>
+                <label for="adres_obratno" class="block text-sm font-medium text-gray-700">Обратный адрес</label>
+                <textarea name="adres_obratno" id="adres_obratno" 
+                          rows="3" 
+                          placeholder="{{ ($type == 2 || $type == 3) && (old('zena_type', $copiedOrder->zena_type ?? 1) == '2') ? 'Введите обратный адрес' : 'Поле недоступно для поездки в одну сторону' }}"
+                          {{ ($type == 2 || $type == 3) && (old('zena_type', $copiedOrder->zena_type ?? 1) == '1') ? 'readonly disabled' : '' }}
+                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 
+                          {{ ($type == 2 || $type == 3) && (old('zena_type', $copiedOrder->zena_type ?? 1) == '1') ? 'bg-gray-100 cursor-not-allowed' : '' }}">{{ old('adres_obratno', $copiedOrder->adres_obratno ?? '') }}</textarea>
+                @error('adres_obratno')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+                @if($type == 2 || $type == 3)
+                    <p class="mt-1 text-xs text-gray-500">
+                        Доступен только при поездке в обе стороны
+                    </p>
+                @endif
+            </div>
+            <div class="flex items-end space-x-2 mt-2">
+                <!-- Цена поездки -->
+                <div class="flex-1">
+                    <label for="taxi_price" class="block text-sm font-medium text-gray-700">Цена поездки</label>
+                    <input type="number" name="taxi_price" id="taxi_price" 
+                           value="{{ old('taxi_price', $copiedOrder->taxi_price ?? '') }}"
+                           step="0.01"
+                           readonly
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 cursor-not-allowed focus:border-blue-500 focus:ring-blue-500">
+                    @error('taxi_price')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
 
-        <!-- Сумма возмещения -->
-        <div>
-            <label for="taxi_vozm" class="block text-sm font-medium text-gray-700">Сумма возмещения</label>
-            <input type="number" name="taxi_vozm" id="taxi_vozm" 
-                   value="{{ old('taxi_vozm', $copiedOrder->taxi_vozm ?? '') }}"
-                   step="0.01"
-                   readonly
-                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 cursor-not-allowed focus:border-blue-500 focus:ring-blue-500">
-            @error('taxi_vozm')
-                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-            @enderror
-        </div>
+                <!-- Сумма возмещения -->
+                <div class="flex-1">
+                    <label for="taxi_vozm" class="block text-sm font-medium text-gray-700">Сумма возмещения</label>
+                    <input type="number" name="taxi_vozm" id="taxi_vozm" 
+                           value="{{ old('taxi_vozm', $copiedOrder->taxi_vozm ?? '') }}"
+                           step="0.01"
+                           readonly
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 cursor-not-allowed focus:border-blue-500 focus:ring-blue-500">
+                    @error('taxi_vozm')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+            </DIV>    
         @else
             <!-- Скрытое поле для соцтакси -->
             <input type="hidden" name="adres_obratno" value="">

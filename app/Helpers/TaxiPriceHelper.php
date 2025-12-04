@@ -15,9 +15,9 @@ if (!function_exists('calculateSocialTaxiValues')) {
         // Проверка входных данных
         if (!$predvWay || $predvWay <= 0 || !$taxi) {
             return [
-                'full_trip_price' => 0,
-                'reimbursement_amount' => 0,
-                'client_payment_amount' => 0
+                'full_trip_price' => 0, // цена поездки полная без посадки
+                'reimbursement_amount' => 0, // сумма к возмещению
+                'client_payment_amount' => 0 // сумма оплатв клиентом
             ];
         }
 

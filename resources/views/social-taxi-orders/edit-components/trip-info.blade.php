@@ -159,24 +159,26 @@
 
         <!-- Обратный адрес (показываем только для типов 2 и 3 - легковое авто и ГАЗель) -->
         @if($order->type_order != 1)
-            <div>
-                <label for="visit_obratno" class="block text-sm font-medium text-gray-700">Дата и время обратной поездки</label>
+            <div class="flex items-end space-x-2 mt-2">
+                <DIV class="flex-1">
+                    <label for="visit_obratno" class="block text-sm font-medium text-gray-700">Дата и время обратной поездки</label>
 
-                <!-- Всегда создаем поле с id, но делаем его readonly/disabled в зависимости от zena_type -->
-                <input type="datetime-local" 
-                       name="visit_obratno" 
-                       id="visit_obratno"
-                       value="{{ old('visit_obratno', $order->visit_obratno) }}"
-                       {{ $order->zena_type == '1' ? 'readonly disabled' : '' }}
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 {{ $order->zena_type == '1' ? 'bg-gray-100 cursor-not-allowed' : '' }}">
+                    <!-- Всегда создаем поле с id, но делаем его readonly/disabled в зависимости от zena_type -->
+                    <input type="datetime-local" 
+                           name="visit_obratno" 
+                           id="visit_obratno"
+                           value="{{ old('visit_obratno', $order->visit_obratno) }}"
+                           {{ $order->zena_type == '1' ? 'readonly disabled' : '' }}
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 {{ $order->zena_type == '1' ? 'bg-gray-100 cursor-not-allowed' : '' }}">
 
-                @error('visit_obratno')
-                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                @enderror
-                <p class="mt-1 text-xs text-gray-500">
+                    @error('visit_obratno')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+                 <DIV class="flex-1 mt-1 text-xs text-gray-500">
                     Время обратной поездки должно быть позже времени основной поездки
-                </p>
-            </div>
+                 </DIV>
+            </DIV>    
             <div>
                 <label for="adres_obratno" class="block text-sm font-medium text-gray-700">Обратный адрес</label>
                 <textarea name="adres_obratno" 
@@ -190,35 +192,37 @@
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                 @enderror
                 <p class="mt-1 text-xs text-gray-500">
-                    Обратный адрес доступен только при поездке в обе стороны
+                    Доступен только при поездке в обе стороны
                 </p>
             </div>
+            
+             <div class="flex items-end space-x-2 mt-2">
+                <!-- Цена поездки -->
+                <div class="flex-1">
+                    <label for="taxi_price" class="block text-sm font-medium text-gray-700">Цена поездки</label>
+                    <input type="number" name="taxi_price" id="taxi_price" 
+                           value="{{ old('taxi_price', $order->taxi_price) }}"
+                           step="0.01"
+                           readonly
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 cursor-not-allowed focus:border-blue-500 focus:ring-blue-500">
+                    @error('taxi_price')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
 
-            <!-- Цена поездки -->
-            <div>
-                <label for="taxi_price" class="block text-sm font-medium text-gray-700">Цена поездки</label>
-                <input type="number" name="taxi_price" id="taxi_price" 
-                       value="{{ old('taxi_price', $order->taxi_price) }}"
-                       step="0.01"
-                       readonly
-                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 cursor-not-allowed focus:border-blue-500 focus:ring-blue-500">
-                @error('taxi_price')
-                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                @enderror
-            </div>
-
-            <!-- Сумма возмещения -->
-            <div>
-                <label for="taxi_vozm" class="block text-sm font-medium text-gray-700">Сумма возмещения</label>
-                <input type="number" name="taxi_vozm" id="taxi_vozm" 
-                       value="{{ old('taxi_vozm', $order->taxi_vozm) }}"
-                       step="0.01"
-                       readonly
-                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 cursor-not-allowed focus:border-blue-500 focus:ring-blue-500">
-                @error('taxi_vozm')
-                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                @enderror
-            </div>
+                <!-- Сумма возмещения -->
+                <div class="flex-1">
+                    <label for="taxi_vozm" class="block text-sm font-medium text-gray-700">Сумма возмещения</label>
+                    <input type="number" name="taxi_vozm" id="taxi_vozm" 
+                           value="{{ old('taxi_vozm', $order->taxi_vozm) }}"
+                           step="0.01"
+                           readonly
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 cursor-not-allowed focus:border-blue-500 focus:ring-blue-500">
+                    @error('taxi_vozm')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+             </div>    
         @else
             <!-- Скрытое поле для соцтакси -->
             <input type="hidden" name="adres_obratno" value="">

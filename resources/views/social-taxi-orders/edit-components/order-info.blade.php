@@ -13,7 +13,7 @@
         <div>
             <label class="block text-sm font-medium text-gray-700">Дата и время приема заказа</label>
             <div class="mt-1 bg-gray-100 p-2 rounded-md font-medium">
-                {{ $order->pz_data->format('d.m.Y H:i:s') }}
+                {{ $order->pz_data->format('d.m.Y H:i') }}
             </div>
             <!-- Скрытое поле для передачи даты в форму -->
             <input type="hidden" name="pz_data" value="{{ $order->pz_data->format('Y-m-d H:i') }}">
