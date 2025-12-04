@@ -403,12 +403,33 @@ public function copyOrder(Request $request)
                         }
 
                         // 3. Проверка разницы во времени (60 минут)
-                        $originalVisitDateTime = $originalOrder->visit_data;
-                        $diffInMinutes = abs($newVisitDateTime->diffInMinutes($originalVisitDateTime));
+                        // Находим все *другие* заказы клиента в этот день (не копируемый заказ)
+                        $otherOrdersOnSameDay = Order::where('client_id', $originalOrder->client_id)
+                            ->whereDate('visit_data', $newVisitDateTime->toDateString()) // Совпадение даты
+                            ->where('id', '!=', $originalOrder->id) // Исключаем сам копируемый заказ
+                            ->whereNull('cancelled_at') // отмененные игнорируем
+                            ->get(); // Получаем коллекцию
 
-                        if ($diffInMinutes <= 60) {
-                            throw new \Exception("Невозможно создать копию: новая дата/время поездки ({$newVisitDateTime->format('d.m.Y H:i')}) должна отличаться от оригинальной ({$originalVisitDateTime->format('d.m.Y H:i')}) более чем на 60 минут.");
+                        $isTimeConflict = false;
+                        $conflictingOrderTime = null;
+                        $conflictingOrderId = null;
+
+                        foreach ($otherOrdersOnSameDay as $existingOrder) {
+                            $existingVisitDateTime = $existingOrder->visit_data;
+                            $diffInMinutes = abs($newVisitDateTime->diffInMinutes($existingVisitDateTime));
+
+                            if ($diffInMinutes <= 60) {
+                                $isTimeConflict = true;
+                                $conflictingOrderTime = $existingVisitDateTime->format('d.m.Y H:i');
+                                $conflictingOrderId = $existingOrder->pz_nom;
+                                break; // Нашли первый конфликт, можно остановиться
+                            }
                         }
+
+                        if ($isTimeConflict) {
+                            throw new \Exception("Невозможно создать копию на {$newVisitDateTime->format('d.m.Y H:i')}: слишком близко ко времени другого заказа (№{$conflictingOrderId} на {$conflictingOrderTime}). Разница должна быть более 60 минут.");
+                        }
+                        // --- КОНЕЦ ПРОВЕРКИ ---
 
                         // --- ПРОВЕРКА: Только для категорий с kat_dop = 2 и общей скидкой 100%---
                         $category = $originalOrder->category;

@@ -63,16 +63,14 @@
         }
 
         // Генерируем календарь
-        generateCalendar(datePart, calendarEndDateFromPHP, latestAdresOtkudaFromModal, latestAdresKudaFromModal);
+        generateCalendar(datePart, calendarEndDateFromPHP);
 
         // Показываем модальное окно
         document.getElementById('copy-order-multiple-modal').classList.remove('hidden');
     }
 
     //  Генерация календаря ---
-    function generateCalendar(startDateStr, endDateStr, latestAdresOtkuda, latestAdresKuda) {
-        console.log('latestAdresOtkuda:', latestAdresOtkuda);   
-        console.log('originalAdresOtkuda:', originalAdresOtkuda);   
+    function generateCalendar(startDateStr, endDateStr) {
         const calendarContainer = document.getElementById('copy-calendar-container');
         const startDate = new Date(startDateStr);
 
