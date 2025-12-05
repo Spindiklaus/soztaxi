@@ -31,7 +31,7 @@
                         <table class="min-w-full bg-white border-collapse">
                             <thead>
                                 <tr class="bg-red-100">
-                                    <th class="px-4 py-2 border">№ заказа</th>
+                                    <th class="px-4 py-2 border">№ заказа (из файла)</th>
                                     <th class="px-4 py-2 border">Предв. дальность (из файла)</th>
                                 </tr>
                             </thead>
@@ -130,6 +130,26 @@
                                         </td>
                                     </tr>
                                 @endforeach
+                                @php
+                                    // Подсветка для итогов
+                                    $totalPredvWayClass = ($summary['file_predv_way'] != 0 || $summary['db_predv_way'] != 0) && $summary['file_predv_way'] != $summary['db_predv_way'] ? 'bg-red-200' : '';
+                                    $totalPriceClass = ($summary['file_price'] != 0 || $summary['db_price'] != 0) && $summary['file_price'] != $summary['db_price'] ? 'bg-red-200' : '';
+                                    $totalSumToPayClass = ($summary['file_sum_to_pay'] != 0 || $summary['db_sum_to_pay'] != 0) && $summary['file_sum_to_pay'] != $summary['db_sum_to_pay'] ? 'bg-red-200' : '';
+                                    $totalSumToReimburseClass = ($summary['file_sum_to_reimburse'] != 0 || $summary['db_sum_to_reimburse'] != 0) && $summary['file_sum_to_reimburse'] != $summary['db_sum_to_reimburse'] ? 'bg-red-200' : '';
+                                @endphp
+                                <!-- Строка с итогами -->
+                                <tr class="bg-gray-300 font-semibold">
+                                    <td class="px-4 py-2 border text-right">Итого:</td>
+                                    <td class="px-4 py-2 border {{ $totalPredvWayClass }}">{{ number_format($summary['file_predv_way'], 2, '.', '') }}</td>
+                                    <td class="px-4 py-2 border {{ $totalPriceClass }}">{{ number_format($summary['file_price'], 2, '.', '') }}</td>
+                                    <td class="px-4 py-2 border {{ $totalSumToPayClass }}">{{ number_format($summary['file_sum_to_pay'], 2, '.', '') }}</td>
+                                    <td class="px-4 py-2 border {{ $totalSumToReimburseClass }}">{{ number_format($summary['file_sum_to_reimburse'], 2, '.', '') }}</td>
+                                    <td class="px-4 py-2 border {{ $totalPredvWayClass }}">{{ number_format($summary['db_predv_way'], 2, '.', '') }}</td>
+                                    <td class="px-4 py-2 border {{ $totalPriceClass }}">{{ number_format($summary['db_price'], 2, '.', '') }}</td>
+                                    <td class="px-4 py-2 border {{ $totalSumToPayClass }}">{{ number_format($summary['db_sum_to_pay'], 2, '.', '') }}</td>
+                                    <td class="px-4 py-2 border {{ $totalSumToReimburseClass }}">{{ number_format($summary['db_sum_to_reimburse'], 2, '.', '') }}</td>
+                                    <td class="px-4 py-2 border"></td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>

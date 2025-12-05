@@ -192,12 +192,39 @@ class TaxiSentOrderController extends BaseController {
                 'found' => false
             ];
         }
+        
+        // Подсчитываем суммы
+        $summary = [
+            'file_predv_way' => 0,
+            'file_price' => 0,
+            'file_sum_to_pay' => 0,
+            'file_sum_to_reimburse' => 0,
+            'db_predv_way' => 0,
+            'db_price' => 0,
+            'db_sum_to_pay' => 0,
+            'db_sum_to_reimburse' => 0,
+        ];
+
+        foreach ($results as $result) {
+            $summary['file_predv_way'] += (float) $result['file_predv_way'];
+            $summary['file_price'] += (float) $result['file_price'];
+            $summary['file_sum_to_pay'] += (float) $result['file_sum_to_pay'];
+            $summary['file_sum_to_reimburse'] += (float) $result['file_sum_to_reimburse'];
+            $summary['db_predv_way'] += (float) $result['db_predv_way'];
+            $summary['db_price'] += (float) $result['db_price'];
+            $summary['db_sum_to_pay'] += (float) $result['db_sum_to_pay'];
+            $summary['db_sum_to_reimburse'] += (float) $result['db_sum_to_reimburse'];
+        }
+
+        
+        
+        
     }
     
     \Log::info('Processing complete', ['results_count' => count($results), 'not_found_count' => count($notFound)]);
 
 
     // Передаем результаты в представление
-    return view('social-taxi-orders.taxi_sent_verify', compact('results', 'notFound', 'request'));
+    return view('social-taxi-orders.taxi_sent_verify', compact('results', 'notFound', 'request', 'summary'));
  }    
 }
