@@ -124,13 +124,11 @@ class TaxiSentOrderController extends BaseController {
         return redirect()->back()->withErrors(['excel_file' => 'Ошибка при чтении файла Excel: ' . $e->getMessage()]);
     }
 
+    $taxi = \App\Models\Taxi::where('life', 1)->first();
 
-    // Берем первую (и единственную) лист
+    // Берем первый (и единственный) лист
     $data = $rows[0];
     \Log::info('First sheet data loaded', ['data_rows_count' => count($data)]);
-
-    // Берем первую (и единственную) лист
-    $data = $rows[0];
 
     // Пропускаем первые 4 строки (начиная с 5-й строки идут данные)
     for ($i = 0; $i < 4; $i++) {
@@ -147,6 +145,9 @@ class TaxiSentOrderController extends BaseController {
         //  "№ заказа" - это колонка B (индекс 1), "Предв. дальность" - колонка H (индекс 7)
         $pz_nom = trim($row[1] ?? ''); // Колонка B - № заказа
         $predvWayFromFile = trim($row[7] ?? ''); // Колонка H - Предв. дальность
+        $priceFromFile = trim($row[8] ?? ''); // Колонка I - Цена за поездку
+        $sumToPayFromFile = trim($row[9] ?? ''); // Колонка J - Сумма к оплате
+        $sumToReimburseFromFile = trim($row[10] ?? ''); // Колонка K - Сумма к возмещению
         
         \Log::debug("Processing row " . ($index + 5), ['order_number_raw' => $row[1], 'predv_way_raw' => $row[7]]); // Логируем строку, начиная с 5-й
 
@@ -162,6 +163,8 @@ class TaxiSentOrderController extends BaseController {
         $order = \App\Models\Order::where('pz_nom', $pz_nom)
             ->whereDate('visit_data', '>=', $request->date_from)
             ->whereDate('visit_data', '<=', $request->date_to)
+            ->whereNull('taxi_way')
+            ->with('currentStatus')
             ->first();
 
         if ($order) {
@@ -169,9 +172,16 @@ class TaxiSentOrderController extends BaseController {
             $results[] = [
                 'pz_nom' => $pz_nom,
                 'file_predv_way' => $predvWayFromFile,
+                'file_price' => $priceFromFile,           // Цена за поездку из файла
+                'file_sum_to_pay' => $sumToPayFromFile,    // Сумма к оплате из файла
+                'file_sum_to_reimburse' => $sumToReimburseFromFile, // Сумма к возмещению из файла
                 'db_predv_way' => $order->predv_way,
-                'db_taxi_way' => $order->taxi_way,
+                'db_price' => number_format(calculateFullTripPrice($order, 11, $taxi), 11, ',', ' '),           // Цена за поездку из БД
+                'db_sum_to_pay' => number_format(calculateClientPaymentAmount($order, 11, $taxi), 11, ',', ' '),    // Сумма к оплате из БД
+                'db_sum_to_reimburse' => number_format(calculateReimbursementAmount($order, 11, $taxi), 11, ',', ' '), // Сумма к возмещению из БД
                 'order_id' => $order->id,
+                'status_name' => $order->currentStatus->statusOrder->name,      // наименование статуса
+                'status_color' => $order->currentStatus->statusOrder->color, //цвет статуса
                 'found' => true
             ];
         } else {
