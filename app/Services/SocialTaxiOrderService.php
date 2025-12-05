@@ -362,8 +362,8 @@ class SocialTaxiOrderService {
         $currentStatus = $order->currentStatus;
         $statusId = $currentStatus ? $currentStatus->status_order_id : 1;
 
-        if ($statusId != 1) {
-            throw new \Exception('Отмена возможна только для заказов со статусом "Принят".');
+        if ($statusId > 2) {
+            throw new \Exception('Отмена возможна только для заказов со статусом "Принят" или "Передан в такси".');
         }
 
         \DB::beginTransaction();

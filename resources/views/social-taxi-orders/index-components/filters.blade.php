@@ -1,18 +1,6 @@
 <!-- resources/views/social-taxi-orders/index-components/filters.blade.php -->
 
 <form action="{{ route('social-taxi-orders.index') }}" method="GET" class="bg-white shadow rounded-lg mb-4">
-    <!-- Заголовок аккордеона -->
-    <div class="px-4 py-2 bg-gray-50 border-b border-gray-200">
-        <button type="button" 
-                onclick="toggleFilters()"
-                class="flex items-center justify-between w-full text-left text-sm font-medium text-gray-700 hover:text-gray-900">
-            <span>Фильтры</span>
-            <svg id="filter-arrow" class="h-5 w-5 transform transition-transform" 
-                 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-            </svg>
-        </button>
-    </div>
     
     <!-- Отображение активных фильтров -->
     @php
@@ -74,28 +62,44 @@
         }
     @endphp
     
+    <!-- Заголовок аккордеона -->
+    <div class="px-4 py-2 bg-gray-50 border-b border-gray-200">
+        <button type="button" 
+                onclick="toggleFilters()"
+                class="flex items-center justify-between w-full text-left text-sm font-medium text-gray-700 hover:text-gray-900">
+            <span>
+                Фильтры
+                @if(!empty($activeFilters))
+                    <span class="text-sm font-medium text-blue-700 px-2">активные:</span>
+                    @foreach($activeFilters as $filter)
+                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            {{ $filter }}
+                        </span>
+                    @endforeach
+                    <a href="{{ route('social-taxi-orders.index', ['sort' => $sort ?? 'pz_data', 'direction' => $direction ?? 'desc']) }}"
+                       class="ml-2 text-xs text-blue-600 hover:text-blue-800">
+                        Сбросить все
+                    </a>
+                @endif
+                
+                
+            </span>
+            <svg id="filter-arrow" class="h-5 w-5 transform transition-transform" 
+                 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+        </button>
+    </div>
+    
+    
+    
     <!--     Для проверки 
     <div class="text-xs text-red-600">
         Debug: show_deleted = "{{-- request('show_deleted') ?? 'NULL' --}}", 
         All params = "{{-- json_encode(request()->all()) --}}"
     </div>-->
     
-    @if(!empty($activeFilters))
-        <div class="px-4 py-2 bg-blue-50 border-b border-blue-100">
-            <div class="flex flex-wrap items-center gap-2">
-                <span class="text-sm font-medium text-blue-700">Активные фильтры:</span>
-                @foreach($activeFilters as $filter)
-                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        {{ $filter }}
-                    </span>
-                @endforeach
-                <a href="{{ route('social-taxi-orders.index', ['sort' => $sort ?? 'pz_data', 'direction' => $direction ?? 'desc']) }}"
-                   class="ml-2 text-xs text-blue-600 hover:text-blue-800">
-                    Сбросить все
-                </a>
-            </div>
-        </div>
-    @endif
+    
     
     <!-- Содержимое фильтров (скрыто по умолчанию) -->
     <div id="filters-content" class="p-4 hidden">

@@ -8,9 +8,9 @@ use App\Http\Requests\TransferPredictiveDataRequest;
 use App\Services\TaxiSentOrderService;
 use App\Services\TaxiSentOrderBuilder;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Exports\TaxiOrdersExport;
 use Carbon\Carbon;
 
+use App\Imports\TaxiExcelImport;
 
 class TaxiSentOrderController extends BaseController {
 
@@ -106,4 +106,88 @@ class TaxiSentOrderController extends BaseController {
             ->with('success', "Предварительные данные перенесены в фактические для {$updatedCount} заказов.");
     }
 
+   public function verifyExcel(Request $request)
+{
+    // Валидация загрузки файла
+    $request->validate([
+        'excel_file' => 'required|mimes:xlsx,xls',
+        'date_from' => 'required|date',
+        'date_to' => 'required|date',
+    ]);
+    
+    try {
+        // Читаем файл Excel
+        $rows = Excel::toArray(new TaxiExcelImport(), $request->file('excel_file'));
+        \Log::info('Excel file read successfully', ['rows_count' => count($rows)]);
+    } catch (\Exception $e) {
+        \Log::error('Error reading Excel file', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+        return redirect()->back()->withErrors(['excel_file' => 'Ошибка при чтении файла Excel: ' . $e->getMessage()]);
+    }
+
+
+    // Берем первую (и единственную) лист
+    $data = $rows[0];
+    \Log::info('First sheet data loaded', ['data_rows_count' => count($data)]);
+
+    // Берем первую (и единственную) лист
+    $data = $rows[0];
+
+    // Пропускаем первые 4 строки (начиная с 5-й строки идут данные)
+    for ($i = 0; $i < 4; $i++) {
+        $shiftedRow = array_shift($data);
+        \Log::debug("Skipped header row $i", ['content' => $shiftedRow]);
+    }
+    \Log::info('Header rows skipped, processing data rows', ['remaining_rows_count' => count($data)]);
+
+    $results = [];
+    $notFound = [];
+
+
+    foreach ($data as $index => $row) {
+        //  "№ заказа" - это колонка B (индекс 1), "Предв. дальность" - колонка H (индекс 7)
+        $pz_nom = trim($row[1] ?? ''); // Колонка B - № заказа
+        $predvWayFromFile = trim($row[7] ?? ''); // Колонка H - Предв. дальность
+        
+        \Log::debug("Processing row " . ($index + 5), ['order_number_raw' => $row[1], 'predv_way_raw' => $row[7]]); // Логируем строку, начиная с 5-й
+
+
+        if (empty($pz_nom)) {
+            \Log::debug("Skipping empty order number at row " . ($index + 5));
+            continue; // Пропускаем пустые строки
+        }
+
+        \Log::debug("Searching for order number: " . $pz_nom);
+
+        // Ищем заказ по номеру, удаленные и отмененные игнорируем
+        $order = \App\Models\Order::where('pz_nom', $pz_nom)
+            ->whereDate('visit_data', '>=', $request->date_from)
+            ->whereDate('visit_data', '<=', $request->date_to)
+            ->first();
+
+        if ($order) {
+            \Log::debug("Order found: " . $order->id . ", predv_way_db: " . $order->predv_way);
+            $results[] = [
+                'pz_nom' => $pz_nom,
+                'file_predv_way' => $predvWayFromFile,
+                'db_predv_way' => $order->predv_way,
+                'db_taxi_way' => $order->taxi_way,
+                'order_id' => $order->id,
+                'found' => true
+            ];
+        } else {
+            \Log::debug("Order NOT found for number: " . $pz_nom);
+            $notFound[] = [
+                'pz_nom' => $pz_nom,
+                'file_predv_way' => $predvWayFromFile,
+                'found' => false
+            ];
+        }
+    }
+    
+    \Log::info('Processing complete', ['results_count' => count($results), 'not_found_count' => count($notFound)]);
+
+
+    // Передаем результаты в представление
+    return view('social-taxi-orders.taxi_sent_verify', compact('results', 'notFound', 'request'));
+ }    
 }

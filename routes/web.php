@@ -87,11 +87,12 @@ Route::middleware(['web', 'auth', IsAdmin::class])->group(function () {
     Route::resource('fio_rips', FioRipController::class)->except(['show']);
     Route::resource('skidka_dops', SkidkaDopController::class)->except(['show']);   
     Route::get('/taxi-orders', [TaxiOrderController::class, 'index'])->name('taxi-orders.index');
-    Route::get('/taxi_sent-orders', [TaxiSentOrderController::class, 'index'])->name('taxi_sent-orders.index');
     Route::get('/taxi-orders/export-to-taxi', [TaxiOrderController::class, 'exportToTaxi'])->name('taxi-orders.export.to.taxi');
     Route::post('/taxi-orders/set-sent-date', [TaxiOrderController::class, 'setSentDate'])->name('taxi-orders.set-sent-date');    
+    Route::get('/taxi_sent-orders', [TaxiSentOrderController::class, 'index'])->name('taxi_sent-orders.index');
     Route::patch('/taxi-orders/unset-sent-date', [TaxiSentOrderController::class, 'unsetSentDate'])->name('taxi-orders.unset-sent-date');
     Route::patch('/taxi-orders/transfer-predictive-data', [TaxiSentOrderController::class, 'transferPredictiveData'])->name('taxi-orders.transfer.predictive.data');
+    Route::post('/taxi-orders/verify-excel', [TaxiSentOrderController::class, 'verifyExcel'])->name('taxi-orders.verify-excel'); // верификация файла excel от оператора соцтакси
     
     Route::get('/reports/orders_visit', [OrderReportController::class, 'index'])->name('orders.report_visit');
     Route::get('/reports/orders_visit/export', [OrderReportController::class, 'export'])->name('orders.report_visit_export');

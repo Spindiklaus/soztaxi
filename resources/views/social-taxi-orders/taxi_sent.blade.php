@@ -4,7 +4,7 @@
         <div class="max-w-[1536px] mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Заголовок -->
             <div class="flex justify-between items-center mb-2">
-                <h1 class="text-3xl font-bold text-gray-800">
+                <h1 class="text-2xl font-bold text-gray-800">
                     Переданные заказы в такси&nbsp;
                     <span class="text-lg font-normal text-gray-600">
                         (всего: {{ $totalOrders ?? $orders->total() }})
@@ -50,9 +50,25 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
-                        Удалить дату передачи 
+                        Откат поездок 
                     </button>
                 </form>
+                
+                <!-- Кнопка для загрузки файла Excel для сверки -->
+                <form id="verify-excel-form" action="{{ route('taxi-orders.verify-excel') }}" method="POST" enctype="multipart/form-data" class="inline">
+                    @csrf
+                    <input type="file" name="excel_file" accept=".xlsx,.xls" required class="hidden" id="excel_file_input" onchange="this.form.submit();">
+                    <input type="hidden" name="date_from" value="{{ request('date_from', date('Y-m-d')) }}">
+                    <input type="hidden" name="date_to" value="{{ request('date_to', date('Y-m-d')) }}">
+                    <label for="excel_file_input" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition ease-in-out duration-150 cursor-pointer">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7m0 0l5-5m-5 5l5-5" />
+                        </svg>
+                        Сверить с такси
+                    </label>
+                </form>
+                
+                
                 <!-- Кнопка "Перенести предварительные данные в фактические" -->
                  <form action="{{ route('taxi-orders.transfer.predictive.data') }}" method="POST" class="inline">
                     @csrf
@@ -71,8 +87,7 @@
                         Фактические данные
                     </button>
                 </form>
-                
-                
+ 
             </div>
             
             @include('social-taxi-orders.taxi_sent-components.filters')

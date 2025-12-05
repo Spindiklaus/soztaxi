@@ -430,7 +430,7 @@ class SocialTaxiOrderController extends BaseController {
         $currentStatus = $social_taxi_order->currentStatus;
         $statusId = $currentStatus ? $currentStatus->status_order_id : 1;
 
-        if ($statusId != 1) {
+        if ($statusId >2) {
             return redirect()->route('social-taxi-orders.show', $social_taxi_order)
                             ->with('error', 'Отмена возможна только для заказов со статусом "Принят".');
         }
