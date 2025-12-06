@@ -162,10 +162,8 @@ class TaxiSentOrderController extends BaseController {
 
         \Log::debug("Searching for order number: " . $pz_nom);
 
-        // Ищем заказ по номеру, удаленные и отмененные игнорируем
+        // Ищем заказ по номеру, удаленный заказ не должен быть найден. Отмененный - найдется
         $order = Order::where('pz_nom', $pz_nom)
-            ->whereDate('visit_data', '>=', $request->date_from)
-            ->whereDate('visit_data', '<=', $request->date_to)
             ->whereNull('taxi_way')
             ->with('currentStatus')
             ->first();
