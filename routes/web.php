@@ -94,8 +94,10 @@ Route::middleware(['web', 'auth', IsAdmin::class])->group(function () {
     Route::patch('/taxi-orders/transfer-predictive-data', [TaxiSentOrderController::class, 'transferPredictiveData'])->name('taxi-orders.transfer.predictive.data');
     // верификация файла excel от оператора соцтакси
     Route::post('/taxi-orders/verify-excel', [TaxiSentOrderController::class, 'verifyExcel'])->name('taxi-orders.verify-excel'); 
+    // обновление поля predv_way по сведениям из такси (AJAX)
+    Route::post('/taxi-orders/update-predv-way-ajax', [TaxiSentOrderController::class, 'updatePredvWayAjax'])->name('taxi-orders.update-predv-way-ajax');
     // обновление поля predb_way по сведениям из такси
-    Route::post('/taxi-orders/update-predv-way', [TaxiSentOrderController::class, 'updatePredvWay'])->name('taxi-orders.update-predv-way');
+    // Route::post('/taxi-orders/update-predv-way', [TaxiSentOrderController::class, 'updatePredvWay'])->name('taxi-orders.update-predv-way');
     
     Route::get('/reports/orders_visit', [OrderReportController::class, 'index'])->name('orders.report_visit');
     Route::get('/reports/orders_visit/export', [OrderReportController::class, 'export'])->name('orders.report_visit_export');

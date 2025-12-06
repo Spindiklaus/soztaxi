@@ -11,6 +11,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
 use App\Models\Order;
 use App\Models\Taxi;
+use Illuminate\Http\JsonResponse;
 
 use App\Imports\TaxiExcelImport;
 
@@ -230,55 +231,104 @@ class TaxiSentOrderController extends BaseController {
     return view('social-taxi-orders.taxi_sent_verify', compact('results', 'notFound', 'request', 'summary'));
  }  
  
- public function updatePredvWay(Request $request)
-{
-    // Валидация входящих данных
-    $request->validate([
-        'order_id' => 'required|exists:orders,id',
-        'new_predv_way' => 'required|numeric|min:0', // Предполагаем, что это число
-        'date_from' => 'required|date',
-        'date_to' => 'required|date',
-    ]);
+// public function updatePredvWay(Request $request)
+//    {
+//        // Валидация входящих данных
+//        $request->validate([
+//            'order_id' => 'required|exists:orders,id',
+//            'new_predv_way' => 'required|numeric|min:0', // Предполагаем, что это число
+//            'date_from' => 'required|date',
+//            'date_to' => 'required|date',
+//        ]);
+//
+//        $orderId = $request->input('order_id');
+//        $newPredvWay = $request->input('new_predv_way');
+//        // Получаем параметры для редиректа
+//        $dateFrom = $request->input('date_from');
+//        $dateTo = $request->input('date_to');
+//
+//        try {
+//            // Найти заказ
+//            $order = Order::findOrFail($orderId);
+//
+//            // Сохранить старое значение для комментария (опционально)
+//            $oldPredvWay = $order->predv_way;
+//
+//            // Обновить поле predv_way
+//            $order->predv_way = $newPredvWay;
+//            $order->save();
+//
+//            // Добавить комментарий об изменении (опционально)
+//            $comment = 'Предварительная дальность обновлена по файлу Excel: ' . $oldPredvWay . ' -> ' . $newPredvWay . 'км. Оператор: ' . auth()->user()->name . ' (' . auth()->user()->litera . ') ' . now()->format('d.m.Y H:i');
+//            $order->komment = $order->komment ? $order->komment . "\n" . $comment : $comment;
+//            $order->save(); // Сохранить комментарий
+//
+//            \Log::info("Updated predv_way for order ID {$orderId} from {$oldPredvWay} to {$newPredvWay} via Excel verification.");
+//
+//        } catch (\Exception $e) {
+//            \Log::error("Error updating predv_way for order ID {$orderId}: " . $e->getMessage());
+//            // Редиректим с ошибкой на index с параметрами
+//            return redirect()->route('taxi_sent-orders.index', [
+//                'date_from' => $dateFrom,
+//                'date_to' => $dateTo,
+//            ])->withErrors(['global' => 'Ошибка при обновлении данных заказа.']);
+//        }
+//
+//        // Редирект на страницу списка переданных в такси с исходными параметрами
+//        return redirect()->route('taxi_sent-orders.index', [
+//            'date_from' => $dateFrom,
+//            'date_to' => $dateTo,
+//        ])->with('success', "Предварительная дальность для заказа №{$order->pz_nom} обновлена на {$newPredvWay}.");
+//    }
+    
+    public function updatePredvWayAjax(Request $request): JsonResponse
+        {
+            // Валидация входящих данных
+            $request->validate([
+                'order_id' => 'required|exists:orders,id',
+                'new_predv_way' => 'required|numeric|min:0', // Предполагаем, что это число
+            ]);
 
-    $orderId = $request->input('order_id');
-    $newPredvWay = $request->input('new_predv_way');
-    // Получаем параметры для редиректа
-    $dateFrom = $request->input('date_from');
-    $dateTo = $request->input('date_to');
+            $orderId = $request->input('order_id');
+            $newPredvWay = $request->input('new_predv_way');
 
-    try {
-        // Найти заказ
-        $order = Order::findOrFail($orderId);
+            try {
+                // Найти заказ
+                $order = Order::findOrFail($orderId);
 
-        // Сохранить старое значение для комментария (опционально)
-        $oldPredvWay = $order->predv_way;
+                // Сохранить старое значение для комментария (опционально)
+                $oldPredvWay = $order->predv_way;
 
-        // Обновить поле predv_way
-        $order->predv_way = $newPredvWay;
-        $order->save();
+                // Обновить поле predv_way
+                $order->predv_way = $newPredvWay;
+                $order->save();
 
-        // Добавить комментарий об изменении (опционально)
-        $comment = 'Предварительная дальность обновлена по файлу Excel: ' . $oldPredvWay . ' -> ' . $newPredvWay . 'км. Оператор: ' . auth()->user()->name . ' (' . auth()->user()->litera . ') ' . now()->format('d.m.Y H:i');
-        $order->komment = $order->komment ? $order->komment . "\n" . $comment : $comment;
-        $order->save(); // Сохранить комментарий
+                // Добавить комментарий об изменении (опционально)
+                $comment = 'Предварительная дальность обновлена по файлу Excel: ' . $oldPredvWay . ' -> ' . $newPredvWay . 'км. Оператор: ' . auth()->user()->name . ' (' . auth()->user()->litera . ') ' . now()->format('d.m.Y H:i');
+                $order->komment = $order->komment ? $order->komment . "\n" . $comment : $comment;
+                $order->save(); // Сохранить комментарий
 
-        \Log::info("Updated predv_way for order ID {$orderId} from {$oldPredvWay} to {$newPredvWay} via Excel verification.");
+                \Log::info("Updated predv_way for order ID {$orderId} from {$oldPredvWay} to {$newPredvWay} via Excel verification (AJAX).");
 
-    } catch (\Exception $e) {
-        \Log::error("Error updating predv_way for order ID {$orderId}: " . $e->getMessage());
-        // Редиректим с ошибкой на index с параметрами
-        return redirect()->route('taxi_sent-orders.index', [
-            'date_from' => $dateFrom,
-            'date_to' => $dateTo,
-        ])->withErrors(['global' => 'Ошибка при обновлении данных заказа.']);
-    }
+                // Возвращаем успешный JSON-ответ
+                return response()->json([
+                    'success' => true,
+                    'message' => "Предварительная дальность для заказа №{$order->pz_nom} обновлена на {$newPredvWay}.",
+                    'order_id' => $order->id,
+                    'new_predv_way' => $newPredvWay, // Возвращаем новое значение, если нужно обновить UI
+                    'old_predv_way' => $oldPredvWay, // Возвращаем старое значение, если нужно обновить UI
+                ]);
 
-    // Редирект на страницу списка переданных в такси с исходными параметрами
-    return redirect()->route('taxi_sent-orders.index', [
-        'date_from' => $dateFrom,
-        'date_to' => $dateTo,
-    ])->with('success', "Предварительная дальность для заказа №{$order->pz_nom} обновлена на {$newPredvWay}.");
-}
- 
+            } catch (\Exception $e) {
+                \Log::error("Error updating predv_way for order ID {$orderId} (AJAX): " . $e->getMessage());
+
+                // Возвращаем JSON-ответ с ошибкой
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Ошибка при обновлении данных заказа: ' . $e->getMessage(),
+                ], 500); // 500 Internal Server Error
+            }
+        }
+    
  
 }

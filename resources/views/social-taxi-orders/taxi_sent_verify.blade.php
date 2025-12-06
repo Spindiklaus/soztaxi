@@ -1,4 +1,5 @@
 <x-app-layout>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <div class="bg-gray-100 py-2">
         <div class="max-w-[1536px] mx-auto px-4 sm:px-6 lg:px-8">
 
@@ -93,17 +94,23 @@
                                             </span>
                                             @if ($predvWayClass)
                                                 <!-- Форма для обновления predv_way -->
-                                                <form method="POST" action="{{ route('taxi-orders.update-predv-way') }}" style="display:inline;" onsubmit="return confirm('Вы уверены, что хотите обновить предварительную дальность для этого заказа?')">
+<!--                                                <form method="POST" action="{{-- route('taxi-orders.update-predv-way') --}}" style="display:inline;" onsubmit="return confirm('Вы уверены, что хотите обновить предварительную дальность для этого заказа?')">
                                                     @csrf
                                                     <input type="hidden" name="order_id" value="{{ $result['order_id'] }}">
                                                     <input type="hidden" name="new_predv_way" value="{{ $result['file_predv_way'] }}">
-                                                    <!-- Передаём параметры фильтрации, чтобы вернуться туда же -->
+                                                     Передаём параметры фильтрации, чтобы вернуться туда же 
                                                     <input type="hidden" name="date_from" value="{{ $request->date_from }}">
                                                     <input type="hidden" name="date_to" value="{{ $request->date_to }}">
                                                     <button type="submit" class="ml-2 text-xs bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded">
                                                         Обновить
                                                     </button>
-                                                </form>
+                                                </form>-->
+                                                <button type="button"
+                                                        onclick="updatePredvWayAjax({{ $result['order_id'] }}, '{{ $result['file_predv_way'] }}', this)"
+                                                        class="ml-2 text-xs bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded"
+                                                        title="Обновить предварительную дальность">
+                                                    Обновить
+                                                </button>
                                             @endif
                                         </td>
                                         <td class="px-4 py-2 border {{ $priceClass }}">{{ (float) $result['file_price'] != 0 ? $result['file_price'] : '' }}</td>
@@ -159,17 +166,98 @@
         </div>
     </div>
 
-<!--     Скрипт для копирования 
     <script>
-        function copyToClipboard(id) {
-            const element = document.getElementById('copy-' + id);
-            const text = element.textContent;
-            navigator.clipboard.writeText(text).then(() => {
-                alert('Скопировано: ' + text);
-            }).catch(err => {
-                console.error('Ошибка при копировании: ', err);
-                alert('Не удалось скопировать. Попробуйте вручную.');
+        // Убедитесь, что CSRF-токен доступен
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        function updatePredvWayAjax(orderId, newPredvWayValue, buttonElement) {
+            // Проверяем подтверждение
+            if (!confirm('Вы уверены, что хотите обновить предварительную дальность для этого заказа?')) {
+                return;
+            }
+
+            // Блокируем кнопку на время запроса
+            const originalButtonText = buttonElement.textContent;
+            buttonElement.disabled = true;
+            buttonElement.textContent = '...';
+
+            fetch('{{ route('taxi-orders.update-predv-way-ajax') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                },
+                body: JSON.stringify({
+                    order_id: orderId,
+                    new_predv_way: newPredvWayValue,
+                    // Не нужно передавать date_from, date_to, taxi_id, так как это AJAX и мы не делаем редирект
+                })
+            })
+            .then(response => {
+                // Проверяем, успешен ли HTTP-ответ
+                if (!response.ok) {
+                    // Если сервер вернул ошибку (например, 500), бросаем исключение
+                    return response.json().then(errData => {
+                        // Пытаемся получить сообщение об ошибке из JSON
+                        throw new Error(errData.message || 'Ошибка сервера');
+                    });
+                }
+                // Если HTTP-ответ успешен, парсим JSON
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Показываем сообщение об успехе
+                    alert(data.message);
+
+                    // --- Обновление UI ---
+                    // Найти span с копируемым значением и обновить его
+                    const copySpan = document.getElementById(`copy-${orderId}-file`);
+                    if (copySpan) {
+                        copySpan.textContent = data.new_predv_way;
+                    }
+
+                    // Найти ячейку с DB значением и обновить её
+                    // Предположим, что ячейка с DB значением находится в той же строке, и у неё есть класс, указывающий на order_id
+                    // Найдём строку (tr), в которой находится кнопка
+                    const row = buttonElement.closest('tr');
+                    if (row) {
+                        // Найдём ячейку, которая содержит DB predv_way (это 6-я ячейка в строке, индекс 5, если считать с 0)
+                        const dbPredvWayCell = row.cells[5]; // Индекс 5 соответствует 'Предв. дальность (в БД)'
+                        if (dbPredvWayCell) {
+                            // Обновим текст ячейки
+                            dbPredvWayCell.textContent = data.new_predv_way;
+                            // Уберём подсветку, так как значения теперь равны
+                            dbPredvWayCell.classList.remove('bg-red-200');
+                            // Найдём соответствующую ячейку с файловым значением в той же строке (индекс 1)
+                            const filePredvWayCell = row.cells[1];
+                            if (filePredvWayCell) {
+                                 // Уберём подсветку и кнопку из ячейки файла
+                                 filePredvWayCell.classList.remove('bg-red-200');
+                                 // Удалим кнопку из DOM
+                                 const buttonInCell = filePredvWayCell.querySelector('button');
+                                 if (buttonInCell) {
+                                     buttonInCell.remove();
+                                 }
+                            }
+                        }
+                    }
+
+                } else {
+                    // Если success = false, показываем сообщение из ответа
+                    alert('Ошибка: ' + (data.message || 'Неизвестная ошибка'));
+                }
+            })
+            .catch(error => {
+                // Обработка ошибок сети или других исключений
+                console.error('Error:', error);
+                alert('Произошла ошибка при обновлении: ' + error.message);
+            })
+            .finally(() => {
+                // Восстанавливаем кнопку
+                buttonElement.disabled = false;
+                buttonElement.textContent = originalButtonText;
             });
         }
-    </script>-->
+    </script>
 </x-app-layout>
