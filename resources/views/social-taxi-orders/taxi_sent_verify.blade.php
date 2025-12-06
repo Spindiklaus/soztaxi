@@ -55,20 +55,20 @@
             @if(count($results) > 0)
                 <div class="mb-6">
                     <h2 class="text-xl font-semibold mb-2">Найденные в файле заказы (всего {{ count($results) }})</h2>
-                    <div class="overflow-x-auto">
+                    <div class="overflow-x-auto overflow-y-auto max-h-[60vh]"> 
                         <table class="min-w-full bg-white border-collapse">
-                            <thead>
+                            <thead class="sticky top-0 z-10 bg-gray-200">
                                 <tr class="bg-gray-200">
-                                    <th class="px-4 py-2 border">№ заказа</th>
-                                    <th class="px-4 py-2 border">Предв. дальность (из Excel)</th>
-                                    <th class="px-4 py-2 border">Цена за поездку (из Excel)</th>
-                                    <th class="px-4 py-2 border">Сумма к оплате (из Excel)</th>
-                                    <th class="px-4 py-2 border">Сумма к возмещению (из Excel)</th>
-                                    <th class="px-4 py-2 border">Предв. дальность (в БД)</th>
-                                    <th class="px-4 py-2 border">Цена за поездку (из БД)</th>
-                                    <th class="px-4 py-2 border">Сумма к оплате (из БД)</th>
-                                    <th class="px-4 py-2 border">Сумма к возмещению (из БД)</th>
-                                    <th class="px-4 py-2 border">Действия</th>
+                                    <th class="px-4 py-1 border">№ заказа</th>
+                                    <th class="px-4 py-1 border">Предв. дальность (из Excel)</th>
+                                    <th class="px-4 py-1 border">Цена за поездку (из Excel)</th>
+                                    <th class="px-4 py-1 border">Сумма к оплате (из Excel)</th>
+                                    <th class="px-4 py-1 border">Сумма к возмещению (из Excel)</th>
+                                    <th class="px-4 py-1 border">Предв. дальность (в БД)</th>
+                                    <th class="px-4 py-1 border">Цена за поездку (из БД)</th>
+                                    <th class="px-4 py-1 border">Сумма к оплате (из БД)</th>
+                                    <th class="px-4 py-1 border">Сумма к возмещению (из БД)</th>
+                                    <th class="px-4 py-1 border">Действия</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -84,11 +84,11 @@
                                         $sumToReimburseClass = ((float) $result['file_sum_to_reimburse'] != 0 || (float) $result['db_sum_to_reimburse'] != 0) && (float) $result['file_sum_to_reimburse'] != (float) $result['db_sum_to_reimburse'] ? 'bg-red-200' : '';
                                     @endphp                                        
                                     <tr>
-                                        <td class="px-4 py-2 border {{ $result['status_color'] }}" title="{{ $result['status_name'] }}">
+                                        <td class="px-4 py-1 border {{ $result['status_color'] }}" title="{{ $result['status_name'] }}">
                                             {{ $result['pz_nom'] }}
                                         </td>
                                         
-                                        <td class="px-4 py-2 border {{ $predvWayClass }}">
+                                        <td class="px-4 py-1 border {{ $predvWayClass }}">
                                             <span id="copy-{{ $result['order_id'] }}-file">
                                                 {{ (float) $result['file_predv_way'] != 0 ? $result['file_predv_way'] : '' }}
                                             </span>
@@ -116,18 +116,18 @@
                                                 </button>
                                             @endif
                                         </td>
-                                        <td class="px-4 py-2 border {{ $priceClass }}">{{ (float) $result['file_price'] != 0 ? $result['file_price'] : '' }}</td>
-                                        <td class="px-4 py-2 border {{ $sumToPayClass }}">{{ (float) $result['file_sum_to_pay'] != 0 ? $result['file_sum_to_pay'] : '' }}</td>
-                                        <td class="px-4 py-2 border {{ $sumToReimburseClass }}">{{ (float) $result['file_sum_to_reimburse'] != 0 ? $result['file_sum_to_reimburse'] : '' }}</td>
+                                        <td class="px-4 py-1 border {{ $priceClass }}">{{ (float) $result['file_price'] != 0 ? $result['file_price'] : '' }}</td>
+                                        <td class="px-4 py-1 border {{ $sumToPayClass }}">{{ (float) $result['file_sum_to_pay'] != 0 ? $result['file_sum_to_pay'] : '' }}</td>
+                                        <td class="px-4 py-1 border {{ $sumToReimburseClass }}">{{ (float) $result['file_sum_to_reimburse'] != 0 ? $result['file_sum_to_reimburse'] : '' }}</td>
                                         <!-- Подсветка для Предв. дальности в БД (вторая ячейка из пары) -->
-                                        <td class="px-4 py-2 border {{ $predvWayClass }}">{{ (float) $result['db_predv_way'] != 0 ? $result['db_predv_way'] : '' }}</td>
+                                        <td class="px-4 py-1 border {{ $predvWayClass }}">{{ (float) $result['db_predv_way'] != 0 ? $result['db_predv_way'] : '' }}</td>
                                         <!-- Подсветка для Цена за поездку в БД (вторая ячейка из пары) -->
-                                        <td class="px-4 py-2 border {{ $priceClass }}">{{ (float) $result['db_price'] != 0 ? $result['db_price'] : '' }}</td>
+                                        <td class="px-4 py-1 border {{ $priceClass }}">{{ (float) $result['db_price'] != 0 ? $result['db_price'] : '' }}</td>
                                         <!-- Подсветка для Сумма к оплате в БД (вторая ячейка из пары) -->
-                                        <td class="px-4 py-2 border {{ $sumToPayClass }}">{{ (float) $result['db_sum_to_pay'] != 0 ? $result['db_sum_to_pay'] : '' }}</td>
+                                        <td class="px-4 py-1 border {{ $sumToPayClass }}">{{ (float) $result['db_sum_to_pay'] != 0 ? $result['db_sum_to_pay'] : '' }}</td>
                                         <!-- Подсветка для Сумма к возмещению в БД (вторая ячейка из пары) -->
-                                        <td class="px-4 py-2 border {{ $sumToReimburseClass }}">{{ (float) $result['db_sum_to_reimburse'] != 0 ? $result['db_sum_to_reimburse'] : '' }}</td>
-                                        <td class="px-4 py-2 border">
+                                        <td class="px-4 py-1 border {{ $sumToReimburseClass }}">{{ (float) $result['db_sum_to_reimburse'] != 0 ? $result['db_sum_to_reimburse'] : '' }}</td>
+                                        <td class="px-4 py-1 border">
                                             <a href="{{ route('social-taxi-orders.show', $result['order_id']) }}" title="Просмотреть заказ" target="_blank"
                                                class="text-blue-600 hover:text-blue-800 text-sm">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -169,145 +169,6 @@
         </div>
     </div>
 
-    <script>
-        // Убедитесь, что CSRF-токен доступен
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-        function updatePredvWayAjax(orderId, newPredvWayValue, buttonElement) {
-        // Проверяем подтверждение
-        if (!confirm('Вы уверены, что хотите обновить предварительную дальность для этого заказа?')) {
-            return;
-        }
-
-        // Блокируем кнопку на время запроса
-        const originalButtonText = buttonElement.textContent;
-        buttonElement.disabled = true;
-        buttonElement.textContent = '...';
-
-        fetch('{{ route('taxi-orders.update-predv-way-ajax') }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken,
-            },
-            body: JSON.stringify({
-                order_id: orderId,
-                new_predv_way: newPredvWayValue,
-            })
-        })
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(errData => {
-                    throw new Error(errData.message || 'Ошибка сервера');
-                });
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                // Показываем сообщение об успехе
-                alert(data.message);
-
-                // --- Обновление UI ---
-                // Найти span с копируемым значением и обновить его
-                const copySpan = document.getElementById(`copy-${orderId}-file`);
-                if (copySpan) {
-                    copySpan.textContent = data.new_predv_way;
-                }
-
-                // Найти строку (tr), в которой находится кнопка
-                const row = buttonElement.closest('tr');
-                if (row) {
-                    // Найдём ячейку, которая содержит СТАРОЕ DB predv_way (это 6-я ячейка в строке, индекс 5, если считать с 0)
-                    const dbPredvWayCell = row.cells[5]; // Индекс 5 соответствует 'Предв. дальность (в БД)'
-                    if (dbPredvWayCell) {
-                        // Запомним СТАРОЕ значение DB predv_way до его изменения в UI
-                        const oldDbPredvWayValue = parseFloat(dbPredvWayCell.textContent) || 0;
-
-                        // Обновим текст ячейки DB predv_way на новое значение
-                        dbPredvWayCell.textContent = data.new_predv_way;
-
-                        // Уберём подсветку, так как значения (file и db) теперь равны (или db равно новому file)
-                        // Подсветка зависит от несовпадения file и db. После обновления db = file, подсветка убирается.
-                        dbPredvWayCell.classList.remove('bg-red-200');
-
-                        // Найдём соответствующую ячейку с файловым значением в той же строке (индекс 1)
-                        const filePredvWayCell = row.cells[1];
-                        if (filePredvWayCell) {
-                             // Уберём подсветку из ячейки файла
-                             filePredvWayCell.classList.remove('bg-red-200');
-                             // Удалим кнопку из DOM
-                             const buttonInCell = filePredvWayCell.querySelector('button');
-                             if (buttonInCell) {
-                                 buttonInCell.remove();
-                             }
-                        }
-
-                        // --- Пересчитываем и обновляем итоги ---
-                        updateTotals(oldDbPredvWayValue, parseFloat(data.new_predv_way));
-                    }
-                }
-            } else {
-                alert('Ошибка: ' + (data.message || 'Неизвестная ошибка'));
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Произошла ошибка при обновлении: ' + error.message);
-        })
-        .finally(() => {
-            buttonElement.disabled = false;
-            buttonElement.textContent = originalButtonText;
-        });
-    }
-
-    // --- Новая функция для обновления итогов ---
-    function updateTotals(oldValue, newValue) {
-        // Найдём строку с итогами (предполагаем, что она одна и имеет font-semibold)
-        const totalRow = document.querySelector('tbody tr.bg-gray-300.font-semibold');
-        if (!totalRow) {
-            console.error('Total row not found');
-            return;
-        }
-
-        // Ячейки итогов (предполагаем фиксированный порядок, как в шаблоне)
-        // Индексы: 0-номер, 1-file_predv, 2-file_price, 3-file_sum_pay, 4-file_sum_reim, 5-db_predv, 6-db_price, 7-db_sum_pay, 8-db_sum_reim, 9-действия
-        const totalDbPredvWayCell = totalRow.cells[5]; // 'Предв. дальность (в БД)'
-        const totalFilePredvWayCell = totalRow.cells[1]; // 'Предв. дальность (из Excel)'
-
-        if (totalDbPredvWayCell && totalFilePredvWayCell) {
-            // Получаем текущие отображаемые итоговые значения
-            let currentTotalDb = parseFloat(totalDbPredvWayCell.textContent) || 0;
-            let currentTotalFile = parseFloat(totalFilePredvWayCell.textContent) || 0;
-
-            // Пересчитываем итог для DB predv_way
-            let newTotalDb = currentTotalDb - oldValue + newValue;
-
-            // Пересчитываем итог для FILE predv_way (это не меняется при обновлении DB, но если бы мы обновляли и файловое значение, то тут был бы пересчёт)
-            // В данном случае, файловое значение итога не изменяется при обновлении DB predv_way, так что newTotalFile = currentTotalFile
-            let newTotalFile = currentTotalFile;
-
-            // Форматируем и обновляем текст ячеек
-            totalDbPredvWayCell.textContent = newTotalDb.toFixed(2);
-            // totalFilePredvWayCell.textContent = newTotalFile.toFixed(2); // Не нужно, если файл не меняется
-
-            // --- Пересчитываем подсветку итоговой строки для predv_way ---
-            const totalMismatch = (newTotalFile !== 0 || newTotalDb !== 0) && newTotalFile !== newTotalDb;
-            const totalPredvWayClass = 'bg-red-200';
-
-            if (totalMismatch) {
-                totalDbPredvWayCell.classList.add(totalPredvWayClass);
-                totalFilePredvWayCell.classList.add(totalPredvWayClass);
-            } else {
-                totalDbPredvWayCell.classList.remove(totalPredvWayClass);
-                totalFilePredvWayCell.classList.remove(totalPredvWayClass);
-            }
-        } else {
-            console.error('Total predv_way cells not found');
-        }
-
-        // Здесь можно добавить пересчёт и для других итогов (цена, оплата, возмещение),
-        // если бы они тоже обновлялись через AJAX. В текущем сценарии обновляется только predv_way.
-    }
-    </script>
+    <!-- Подключаем JS файл через include -->
+    @include('social-taxi-orders.taxi_sent-components.scripts.verify-excel')
 </x-app-layout>
