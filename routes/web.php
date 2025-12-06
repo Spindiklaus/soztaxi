@@ -92,7 +92,10 @@ Route::middleware(['web', 'auth', IsAdmin::class])->group(function () {
     Route::get('/taxi_sent-orders', [TaxiSentOrderController::class, 'index'])->name('taxi_sent-orders.index');
     Route::patch('/taxi-orders/unset-sent-date', [TaxiSentOrderController::class, 'unsetSentDate'])->name('taxi-orders.unset-sent-date');
     Route::patch('/taxi-orders/transfer-predictive-data', [TaxiSentOrderController::class, 'transferPredictiveData'])->name('taxi-orders.transfer.predictive.data');
-    Route::post('/taxi-orders/verify-excel', [TaxiSentOrderController::class, 'verifyExcel'])->name('taxi-orders.verify-excel'); // верификация файла excel от оператора соцтакси
+    // верификация файла excel от оператора соцтакси
+    Route::post('/taxi-orders/verify-excel', [TaxiSentOrderController::class, 'verifyExcel'])->name('taxi-orders.verify-excel'); 
+    // обновление поля predb_way по сведениям из такси
+    Route::post('/taxi-orders/update-predv-way', [TaxiSentOrderController::class, 'updatePredvWay'])->name('taxi-orders.update-predv-way');
     
     Route::get('/reports/orders_visit', [OrderReportController::class, 'index'])->name('orders.report_visit');
     Route::get('/reports/orders_visit/export', [OrderReportController::class, 'export'])->name('orders.report_visit_export');

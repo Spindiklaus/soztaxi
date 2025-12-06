@@ -9,6 +9,8 @@ use App\Http\Controllers\Api\CalculationController;
 // Маршруты для добавления заказа в группу 
 use App\Http\Controllers\Admin\OrderGroupController; 
 
+use App\Http\Controllers\Admin\TaxiSentOrderController;
+
 
 // Маршруты для добавления заказа в группу 
 Route::prefix('order-groups')->group(function () {

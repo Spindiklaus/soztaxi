@@ -53,7 +53,7 @@
             <!-- Результаты сверки -->
             @if(count($results) > 0)
                 <div class="mb-6">
-                    <h2 class="text-xl font-semibold mb-2">Найденные в файле заказы ({{ count($results) }})</h2>
+                    <h2 class="text-xl font-semibold mb-2">Найденные в файле заказы (всего {{ count($results) }})</h2>
                     <div class="overflow-x-auto">
                         <table class="min-w-full bg-white border-collapse">
                             <thead>
@@ -88,37 +88,35 @@
                                         </td>
                                         
                                         <td class="px-4 py-2 border {{ $predvWayClass }}">
-                                            <span id="copy-{{ $result['order_id'] }}-file">{{ (float) $result['file_predv_way'] != 0 ? $result['file_predv_way'] : '' }}</span>
+                                            <span id="copy-{{ $result['order_id'] }}-file">
+                                                {{ (float) $result['file_predv_way'] != 0 ? $result['file_predv_way'] : '' }}
+                                            </span>
                                             @if ($predvWayClass)
-                                                <button type="button"
-                                                        onclick="copyToClipboard('{{ $result['order_id'] }}-file')"
-                                                        class="ml-2 text-xs bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded">
-                                                    Копировать
-                                                </button>
+                                                <!-- Форма для обновления predv_way -->
+                                                <form method="POST" action="{{ route('taxi-orders.update-predv-way') }}" style="display:inline;" onsubmit="return confirm('Вы уверены, что хотите обновить предварительную дальность для этого заказа?')">
+                                                    @csrf
+                                                    <input type="hidden" name="order_id" value="{{ $result['order_id'] }}">
+                                                    <input type="hidden" name="new_predv_way" value="{{ $result['file_predv_way'] }}">
+                                                    <!-- Передаём параметры фильтрации, чтобы вернуться туда же -->
+                                                    <input type="hidden" name="date_from" value="{{ $request->date_from }}">
+                                                    <input type="hidden" name="date_to" value="{{ $request->date_to }}">
+                                                    <button type="submit" class="ml-2 text-xs bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded">
+                                                        Обновить
+                                                    </button>
+                                                </form>
                                             @endif
                                         </td>
-
-
                                         <td class="px-4 py-2 border {{ $priceClass }}">{{ (float) $result['file_price'] != 0 ? $result['file_price'] : '' }}</td>
-
-
                                         <td class="px-4 py-2 border {{ $sumToPayClass }}">{{ (float) $result['file_sum_to_pay'] != 0 ? $result['file_sum_to_pay'] : '' }}</td>
-
-
                                         <td class="px-4 py-2 border {{ $sumToReimburseClass }}">{{ (float) $result['file_sum_to_reimburse'] != 0 ? $result['file_sum_to_reimburse'] : '' }}</td>
-
                                         <!-- Подсветка для Предв. дальности в БД (вторая ячейка из пары) -->
                                         <td class="px-4 py-2 border {{ $predvWayClass }}">{{ (float) $result['db_predv_way'] != 0 ? $result['db_predv_way'] : '' }}</td>
-
                                         <!-- Подсветка для Цена за поездку в БД (вторая ячейка из пары) -->
                                         <td class="px-4 py-2 border {{ $priceClass }}">{{ (float) $result['db_price'] != 0 ? $result['db_price'] : '' }}</td>
-
                                         <!-- Подсветка для Сумма к оплате в БД (вторая ячейка из пары) -->
                                         <td class="px-4 py-2 border {{ $sumToPayClass }}">{{ (float) $result['db_sum_to_pay'] != 0 ? $result['db_sum_to_pay'] : '' }}</td>
-
                                         <!-- Подсветка для Сумма к возмещению в БД (вторая ячейка из пары) -->
                                         <td class="px-4 py-2 border {{ $sumToReimburseClass }}">{{ (float) $result['db_sum_to_reimburse'] != 0 ? $result['db_sum_to_reimburse'] : '' }}</td>
-
                                         <td class="px-4 py-2 border">
                                             <a href="{{ route('social-taxi-orders.show', $result['order_id']) }}" title="Просмотреть заказ" target="_blank"
                                                class="text-blue-600 hover:text-blue-800 text-sm">
@@ -161,7 +159,7 @@
         </div>
     </div>
 
-    <!-- Скрипт для копирования -->
+<!--     Скрипт для копирования 
     <script>
         function copyToClipboard(id) {
             const element = document.getElementById('copy-' + id);
@@ -173,5 +171,5 @@
                 alert('Не удалось скопировать. Попробуйте вручную.');
             });
         }
-    </script>
+    </script>-->
 </x-app-layout>

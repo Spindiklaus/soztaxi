@@ -9,6 +9,8 @@ use App\Services\TaxiSentOrderService;
 use App\Services\TaxiSentOrderBuilder;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
+use App\Models\Order;
+use App\Models\Taxi;
 
 use App\Imports\TaxiExcelImport;
 
@@ -124,7 +126,7 @@ class TaxiSentOrderController extends BaseController {
         return redirect()->back()->withErrors(['excel_file' => 'Ошибка при чтении файла Excel: ' . $e->getMessage()]);
     }
 
-    $taxi = \App\Models\Taxi::where('life', 1)->first();
+    $taxi = Taxi::where('life', 1)->first();
 
     // Берем первый (и единственный) лист
     $data = $rows[0];
@@ -160,7 +162,7 @@ class TaxiSentOrderController extends BaseController {
         \Log::debug("Searching for order number: " . $pz_nom);
 
         // Ищем заказ по номеру, удаленные и отмененные игнорируем
-        $order = \App\Models\Order::where('pz_nom', $pz_nom)
+        $order = Order::where('pz_nom', $pz_nom)
             ->whereDate('visit_data', '>=', $request->date_from)
             ->whereDate('visit_data', '<=', $request->date_to)
             ->whereNull('taxi_way')
@@ -226,5 +228,57 @@ class TaxiSentOrderController extends BaseController {
 
     // Передаем результаты в представление
     return view('social-taxi-orders.taxi_sent_verify', compact('results', 'notFound', 'request', 'summary'));
- }    
+ }  
+ 
+ public function updatePredvWay(Request $request)
+{
+    // Валидация входящих данных
+    $request->validate([
+        'order_id' => 'required|exists:orders,id',
+        'new_predv_way' => 'required|numeric|min:0', // Предполагаем, что это число
+        'date_from' => 'required|date',
+        'date_to' => 'required|date',
+    ]);
+
+    $orderId = $request->input('order_id');
+    $newPredvWay = $request->input('new_predv_way');
+    // Получаем параметры для редиректа
+    $dateFrom = $request->input('date_from');
+    $dateTo = $request->input('date_to');
+
+    try {
+        // Найти заказ
+        $order = Order::findOrFail($orderId);
+
+        // Сохранить старое значение для комментария (опционально)
+        $oldPredvWay = $order->predv_way;
+
+        // Обновить поле predv_way
+        $order->predv_way = $newPredvWay;
+        $order->save();
+
+        // Добавить комментарий об изменении (опционально)
+        $comment = 'Предварительная дальность обновлена по файлу Excel: ' . $oldPredvWay . ' -> ' . $newPredvWay . 'км. Оператор: ' . auth()->user()->name . ' (' . auth()->user()->litera . ') ' . now()->format('d.m.Y H:i');
+        $order->komment = $order->komment ? $order->komment . "\n" . $comment : $comment;
+        $order->save(); // Сохранить комментарий
+
+        \Log::info("Updated predv_way for order ID {$orderId} from {$oldPredvWay} to {$newPredvWay} via Excel verification.");
+
+    } catch (\Exception $e) {
+        \Log::error("Error updating predv_way for order ID {$orderId}: " . $e->getMessage());
+        // Редиректим с ошибкой на index с параметрами
+        return redirect()->route('taxi_sent-orders.index', [
+            'date_from' => $dateFrom,
+            'date_to' => $dateTo,
+        ])->withErrors(['global' => 'Ошибка при обновлении данных заказа.']);
+    }
+
+    // Редирект на страницу списка переданных в такси с исходными параметрами
+    return redirect()->route('taxi_sent-orders.index', [
+        'date_from' => $dateFrom,
+        'date_to' => $dateTo,
+    ])->with('success', "Предварительная дальность для заказа №{$order->pz_nom} обновлена на {$newPredvWay}.");
+}
+ 
+ 
 }
