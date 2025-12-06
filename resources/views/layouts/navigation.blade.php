@@ -127,6 +127,9 @@
                                 <x-dropdown-link :href="route('fiodtrns.merge.form')" :active="request()->routeIs('fiodtrns.merge.form')">
                                     {{ __('Совместить дубликаты') }}
                                 </x-dropdown-link>
+                                <x-dropdown-link :href="route('import.fio_rips.form')" :active="request()->routeIs('import.fio_rips.form')">
+                                    {{ __('Импорт RIP из ЗАГС') }}
+                                </x-dropdown-link>
                             </x-slot>
                         </x-dropdown>
                     </div>

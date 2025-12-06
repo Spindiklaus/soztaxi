@@ -33,6 +33,8 @@ use App\Http\Controllers\Operator\GazelleController;
 
 use App\Http\Controllers\Admin\SocialTaxiOrderExportController;
 use App\Http\Controllers\Admin\TaxiOrderImportController;
+// импорт сведений из ЗАГС
+use App\Http\Controllers\Admin\FioRipImportController; 
 
 
 Route::get('/', function () {
@@ -111,14 +113,15 @@ Route::middleware(['web', 'auth', IsAdmin::class])->group(function () {
     Route::get('/orders/grouping', [OrderGroupingController::class, 'showGroupingForm'])->name('orders.grouping.form');
     Route::post('/orders/grouping/show', [OrderGroupingController::class, 'showOrdersForGrouping'])->name('orders.grouping.show');
     Route::post('/orders/grouping/process', [OrderGroupingController::class, 'processGrouping'])->name('orders.grouping.process');
-
     // --- маршрут для удаления заказа из группы --- //
     Route::delete('/order-groups/{orderGroup}/remove-order/{order}', [OrderGroupController::class, 'removeOrderFromGroup'])->name('order-groups.remove-order');
     Route::resource('order-groups', OrderGroupController::class)->names('order-groups'); 
-    
     // импорт из такси
     Route::get('/admin/taxi-orders/compare', [TaxiOrderImportController::class, 'showUploadForm'])->name('admin.taxi-orders.compare.form');
     Route::post('/admin/taxi-orders/compare', [TaxiOrderImportController::class, 'compareAndImport'])->name('admin.taxi-orders.compare-and-import');
+    // импорт RIP из ЗАГС
+    Route::get('/import/fio_rips', [FioRipImportController::class, 'showForm'])->name('import.fio_rips.form');
+    Route::post('/import/fio_rips', [FioRipImportController::class, 'import'])->name('import.fio_rips');
     
 });
 

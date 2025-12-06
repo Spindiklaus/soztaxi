@@ -12,9 +12,9 @@
 
     <!-- Сообщение об успехе -->
     @if(session('success_count'))
-    <x-alert type="success" title="Импорт завершён">
-        {{ session('success_count') }} записей успешно импортировано.
-    </x-alert>
+        <x-alert type="success" title="Импорт завершён">
+            {{ session('success_count') }} записей успешно импортировано.
+        </x-alert>
     @endif
 
     <div class="bg-gray-100 py-6">

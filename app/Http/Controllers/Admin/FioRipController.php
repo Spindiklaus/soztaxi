@@ -33,7 +33,7 @@ class FioRipController extends BaseController
         $sort = $request->input('sort', 'id');
         $direction = $request->input('direction', 'asc');
 
-        $fioRips = $query->orderBy($sort, $direction)->paginate(50);
+        $fioRips = $query->orderBy($sort, $direction)->paginate(100);
 
         return view('fio_rips.index', compact('fioRips', 'sort', 'direction'));
     }
